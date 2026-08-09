@@ -22,8 +22,9 @@ venv/
 Thumbs.db
 
 # Datasets and point clouds
-data/
-datasets/
+/data/
+/datasets/
+audit-reports/
 *.las
 *.laz
 *.pcd
