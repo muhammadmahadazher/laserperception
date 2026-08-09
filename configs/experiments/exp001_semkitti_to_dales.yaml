@@ -1,7 +1,7 @@
 experiment:
   id: exp001
   name: semantickitti_to_dales_zero_shot
-  status: scaffold
+  status: data_audit_ready
   research_question: >-
     How well does semantic knowledge learned from sparse vehicle-mounted automotive LiDAR
     transfer zero-shot to dense airborne LiDAR under a shared geometry-only semantic label space?
@@ -23,8 +23,29 @@ input_features:
 
 preprocessing:
   coordinate_normalization: min_xyz
+  normalization_scope:
+    source: per_scan
+    target: per_patch
   voxel_size_m: 0.30
   normalization_is_explicit: true
+  operation_order:
+    - load
+    - crop_or_patch
+    - normalize
+    - map_ontology
+    - future_voxelize
+
+patching:
+  enabled: true
+  applies_to: target_dataset
+  size_m:
+    x: 50.0
+    y: 50.0
+  policy: deterministic_grid
+  grid_origin: tile_header_min_xy
+  boundary: half_open_xy
+  overlap: false
+  empty_patch_policy: skip_and_count
 
 ontology:
   name: cvgc_group2_v1
@@ -51,5 +72,6 @@ provenance:
   cvgc_reference:
     paper: https://arxiv.org/abs/2602.14525
     note: >-
-      CVGC settings are reference material only. LaserPerception training patch dimensions,
-      backbone, optimizer, and schedule have not been selected.
+      The 50 m x 50 m target patch size is adopted as a configurable Phase 2 audit/reference
+      setting informed by CVGC Group 2. It does not claim preprocessing or training equivalence;
+      a backbone, optimizer, schedule, and reduced-compute subset have not been selected.
