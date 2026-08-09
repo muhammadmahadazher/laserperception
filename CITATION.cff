@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: >-
+  If you use LaserPerception, cite this repository and the exact commit used. No DOI or software
+  release exists yet.
+type: software
+title: LaserPerception
+authors:
+  - given-names: Mahad
+    family-names: Azher
+    alias: muhammadmahadazher
+repository-code: https://github.com/muhammadmahadazher/laserperception
+url: https://github.com/muhammadmahadazher/laserperception
+license: Apache-2.0
+abstract: >-
+  An open-source research framework for studying cross-view and cross-domain semantic understanding
+  across heterogeneous automotive and airborne 3D LiDAR point clouds.
+keywords:
+  - LiDAR
+  - point cloud
+  - semantic segmentation
+  - domain generalization
+  - SemanticKITTI
+  - DALES

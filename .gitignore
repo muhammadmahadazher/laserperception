@@ -1,0 +1,47 @@
+# Local Git metadata fallback for Google Drive workspaces
+.git-data/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Datasets and point clouds
+data/
+datasets/
+*.las
+*.laz
+*.pcd
+
+# Training outputs and model artifacts
+checkpoints/
+weights/
+runs/
+wandb/
+tensorboard/
+outputs/
+artifacts/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+
+# Temporary and cache data
+tmp/
+cache/

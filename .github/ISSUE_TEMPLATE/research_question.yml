@@ -1,0 +1,42 @@
+name: Research question or experiment proposal
+description: Propose a falsifiable question, experiment, or ablation.
+title: "[Research]: "
+labels: [research]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: State a precise, falsifiable question.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation and related work
+      description: Explain relevance and link verifiable sources without novelty hype.
+    validations:
+      required: true
+  - type: textarea
+    id: protocol
+    attributes:
+      label: Proposed protocol
+      description: Datasets, splits, inputs, preprocessing, ontology, baseline, metrics, and seeds.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What evidence would support or reject the hypothesis?
+    validations:
+      required: true
+  - type: checkboxes
+    id: integrity
+    attributes:
+      label: Research integrity
+      options:
+        - label: No result or benchmark value in this proposal is fabricated.
+          required: true
+        - label: Dataset access, terms, and citations will be documented.
+          required: true

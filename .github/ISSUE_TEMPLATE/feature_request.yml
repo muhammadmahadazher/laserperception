@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a focused addition within the current research scope.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Research or user problem
+      description: What concrete limitation would this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful API or workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and sources
+      description: Link authoritative specifications or papers where applicable.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: This request is within the current 3D LiDAR semantic-segmentation scope.
+          required: true
+        - label: The proposal does not require committing dataset or model artifacts.
+          required: true
