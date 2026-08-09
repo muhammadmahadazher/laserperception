@@ -14,4 +14,5 @@ releases begin.
 - LAS/optional LAZ loading with metadata and attribute preservation.
 - Explicit `min_xyz` coordinate normalization.
 - Verified six-class SemanticKITTI and DALES ontology mappings.
-- Experiment 001 configuration, synthetic tests, and research documentation.
+- Experiment 001 configuration, synthetic tests, and research documentation, including a pinned
+  CVGC reference investigation.
