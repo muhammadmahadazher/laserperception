@@ -40,5 +40,5 @@ No datasets are included, and the current package/tests are CPU-only.
 
 ## What follows Experiment 001?
 
-Subject to evidence: dataset adapters, a maintained sparse baseline, source training, zero-shot
-evaluation, and one evidence-driven ablation.
+Subject to evidence from bounded real-dataset audits: deliberate sparse-backend selection, a minimal
+baseline, source training, zero-shot evaluation, and one evidence-driven ablation.

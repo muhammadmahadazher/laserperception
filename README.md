@@ -12,7 +12,7 @@ generalization, and representation differences across heterogeneous 3D LiDAR acq
 It begins with geometry-only semantic segmentation transfer from sparse vehicle-mounted automotive
 LiDAR in **SemanticKITTI** to dense **DALES** airborne LiDAR.
 
-The repository currently provides a small, CPU-testable data layer. It does **not** yet contain a
+The repository currently provides a CPU-testable data and dataset-audit layer. It does **not** yet contain a
 trained point-cloud deep-learning model, sparse-convolution baseline, or measured benchmark.
 
 ## Contents
@@ -63,11 +63,14 @@ deep learning. It is not a claim of production readiness or universal sensor gen
 - Explicit, non-mutating `min_xyz` coordinate normalization
 - Verified SemanticKITTI and DALES mappings into a six-class shared ontology
 - Synthetic CPU unit tests that require no dataset download
-- A configuration scaffold for Experiment 001
+- Official-split SemanticKITTI directory discovery and scan/label pairing
+- Chunked DALES tile reading with deterministic, non-overlapping grid patches
+- CPU-only SemanticKITTI and DALES audits with redacted JSON output
+- A data-audit-ready configuration for Experiment 001
 
 ### Not implemented yet
 
-- SemanticKITTI or DALES dataset-directory adapters and split management
+- Real-dataset audit results or a selected reduced-compute training subset
 - Voxelization, sparse-convolution models, training, inference, or evaluation runners
 - Source-domain training or zero-shot DALES evaluation
 - Measured accuracy, mIoU, per-class IoU, VRAM, or wall-clock results
@@ -82,12 +85,13 @@ loader produces the same in-memory object, and normalization happens only throug
 
 ```mermaid
 flowchart LR
-    A["KITTI .bin + optional .label"] --> C["PointCloud"]
-    B["LAS / LAZ"] --> C
-    C --> D["Explicit coordinate transforms"]
-    D --> E["Verified shared ontology mapping"]
-    E --> F["Future sparse model"]
-    F --> G["Evaluation + reproducibility record"]
+    A["SemanticKITTI hierarchy"] --> B["Raw scan PointCloud"]
+    C["DALES split + streamed tile"] --> D["Raw grid patch PointCloud"]
+    B --> E["Explicit normalization"]
+    D --> E
+    E --> F["Explicit ontology mapping"]
+    F --> G["Dataset audit"]
+    F --> H["Future sparse model"]
 ```
 
 ```mermaid
@@ -168,6 +172,36 @@ available_dimensions = cloud.metadata["available_dimensions"]
 
 Scaled file coordinates are loaded as-is. LAZ requires `laserperception[laz]`.
 
+### Inspect dataset directories
+
+```python
+from laserperception.datasets import DalesDataset, SemanticKITTIDataset
+
+semkitti = SemanticKITTIDataset("/data/semantic-kitti", split="train", sequences=["00"])
+sample = semkitti.sample_info(0)
+raw_scan = semkitti.load(0)
+
+dales = DalesDataset("/data/dales", split="test")
+partition = dales.partition_tile(0, patch_size_m=(50.0, 50.0))
+raw_patch = partition.patches[0].cloud
+```
+
+DALES partitioning uses one chunked pass per tile, retains only XYZ and classification, assigns
+half-open non-overlapping grid cells, and skips empty cells while reporting their count. Neither
+adapter normalizes coordinates or maps labels automatically.
+
+### Audit a safe subset
+
+```bash
+python -m laserperception.audit semantickitti --split train --sequences 00 --max-samples 5
+python -m laserperception.audit dales --split test --max-tiles 1 \
+  --patch-size-x 50 --patch-size-y 50 --normalization min_xyz \
+  --json audit-reports/dales-test.json
+```
+
+Roots come from `--root` or the dataset environment variables. JSON reports contain sequence/frame
+or tile IDs rather than absolute source paths.
+
 ### Normalize coordinates explicitly
 
 ```python
@@ -190,11 +224,12 @@ The original cloud is unchanged. Dataset locations should be configured outside 
 | Target | DALES airborne LiDAR |
 | Task | Zero-shot semantic segmentation transfer |
 | Input features | `x`, `y`, `z` only |
-| Normalization | Explicit `min_xyz` |
+| Normalization | Explicit `min_xyz`: per scan for source, per patch for target |
+| DALES patching | Configurable 50 m × 50 m deterministic grid reference; no overlap |
 | Reference voxel size | 0.30 m |
 | Shared classes | Ground, Building, Natural, Vehicle, Pole, Fence |
 | Model | Not implemented |
-| Status | Scaffold |
+| Status | Data audit ready; model not implemented |
 
 The ontology uses contiguous IDs `0..5` in the order shown and `-1` for ignored or unmapped labels.
 Source IDs are cited from authoritative material; grouping them is an explicit LaserPerception
@@ -215,7 +250,7 @@ See [docs/BENCHMARKS.md](docs/BENCHMARKS.md) for the durable result schema.
 ```text
 configs/experiments/   Research configurations
 docs/                  Architecture, data, roadmap, and research documentation
-src/laserperception/   Core package, I/O, transforms, and ontology
+src/laserperception/   Core, I/O, dataset adapters, audit, transforms, and ontology
 tests/                 Synthetic CPU tests
 .github/               CI, security analysis, and contribution templates
 ```
@@ -225,11 +260,11 @@ tests/                 Synthetic CPU tests
 ```mermaid
 flowchart LR
     subgraph NOW["NOW — V0.1"]
-      A["PointCloud"] --> B["SemanticKITTI I/O"] --> C["LAS/LAZ I/O"]
-      C --> D["Explicit normalization"] --> E["Shared ontology"] --> F["Exp001 scaffold"]
+      A["PointCloud"] --> B["Raw I/O"] --> C["Dataset adapters"]
+      C --> D["Grid patching"] --> E["Dataset audit"] --> F["Exp001 data pipeline"]
     end
-    subgraph NEXT["NEXT — after validation"]
-      G["DALES adapter"] --> H["Sparse-voxel baseline"] --> I["Source training"]
+    subgraph NEXT["NEXT — after real-data audit"]
+      G["Select sparse backend"] --> H["Sparse-voxel baseline"] --> I["Source training"]
       I --> J["Zero-shot evaluation"] --> K["Evidence-driven ablation"]
     end
     subgraph FUTURE["FUTURE — conditional"]

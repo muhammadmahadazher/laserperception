@@ -6,12 +6,11 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
 
 - [x] `PointCloud`, KITTI/SemanticKITTI I/O, LAS/LAZ loading
 - [x] Explicit `min_xyz` normalization and verified six-class ontology
-- [x] Experiment 001 scaffold and synthetic tests
-- [ ] Validate real dataset-directory conventions without committing data
+- [x] Experiment 001 config, directory adapters, deterministic patches, and dataset-audit CLI
+- [ ] Run bounded real-dataset audits without committing data or generated reports
 
-## Next — after data-layer validation
+## Next — after real-dataset audit
 
-- Dataset-directory adapters
 - Deliberate sparse backend selection and minimal sparse-voxel baseline
 - SemanticKITTI source training and zero-shot DALES evaluation
 - One ablation selected from observed failure evidence
