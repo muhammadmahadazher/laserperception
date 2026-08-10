@@ -6,6 +6,14 @@ releases begin.
 
 ## [Unreleased]
 
+### Changed
+
+- Transitioned the active roadmap to reproducible real-time 3D LiDAR object detection: M1 uses an
+  official pretrained PointPillars model on nuScenes v1.0-mini with honest RTX 4060 FP32
+  measurements and headless BEV visualization; TensorRT FP16 and ROS 2 remain later milestones.
+- Parked, rather than removed, the tested SemanticKITTI/DALES semantic-segmentation and audit
+  infrastructure while keeping the core package and standard CI lightweight and CPU-testable.
+
 ### Added
 
 - Professional open-source repository foundation and CPU CI.

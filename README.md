@@ -1,120 +1,76 @@
 # LaserPerception
 
-> Cross-view 3D LiDAR perception research across automotive and airborne point clouds.
+> Reproducible real-time 3D LiDAR object detection and deployment engineering.
 
 [![CI](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
 [![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
 
-LaserPerception is an open-source research framework for studying semantic transfer, domain
-generalization, and representation differences across heterogeneous 3D LiDAR acquisition domains.
-It begins with geometry-only semantic segmentation transfer from sparse vehicle-mounted automotive
-LiDAR in **SemanticKITTI** to dense **DALES** airborne LiDAR.
+LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
+object detection and deployment. The active goal is a narrow, evidence-gated path from an official
+pretrained PointPillars model on nuScenes to measured RTX 4060 inference, then TensorRT FP16 and
+ROS 2 in later milestones.
 
-The repository currently provides a CPU-testable data and dataset-audit layer. It does **not** yet contain a
-trained point-cloud deep-learning model, sparse-convolution baseline, or measured benchmark.
-
-## Contents
-
-- [Research question](#research-question)
-- [Why this problem matters](#why-this-problem-matters)
-- [Project status](#project-status)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Quickstart](#quickstart)
-- [Experiment 001](#experiment-001)
-- [Benchmarks](#benchmarks)
-- [Repository map](#repository-map)
-- [Roadmap](#roadmap)
-- [Reproducibility](#reproducibility)
-- [Contributing and support](#contributing-and-support)
-- [Citation, license, and acknowledgements](#citation-license-and-acknowledgements)
-
-## Research question
-
-> How well does semantic knowledge learned from sparse vehicle-mounted automotive LiDAR transfer
-> zero-shot to dense airborne LiDAR under a shared geometry-only semantic label space?
-
-Experiment 001 studies **SemanticKITTI → DALES** using only `x`, `y`, and `z` as network input
-features. File loaders retain available attributes such as remission and LAS dimensions, but the
-initial benchmark excludes them from model input for comparability.
-
-## Why this problem matters
-
-Automotive LiDAR and airborne LiDAR observe the same physical world from very different views.
-Their point clouds differ in density, occlusion, sampling geometry, coordinate scale, and visible
-surfaces. A model trained around a road vehicle may therefore learn representations that do not
-transfer to geospatial point clouds captured from above. LaserPerception makes those preprocessing
-and ontology decisions explicit so cross-domain LiDAR experiments can be audited and reproduced.
-
-This research is relevant to 3D semantic segmentation, cross-view domain generalization,
-autonomous-driving perception, aerial perception, geospatial analysis, and future sparse point-cloud
-deep learning. It is not a claim of production readiness or universal sensor generalization.
+Detection is not yet claimed as working in this repository. M1 is in progress; all unmeasured
+detector results remain `Pending measurement`.
 
 ## Project status
 
-### Works today
+### Active: M1 — PointPillars first sight
 
-- A validated, canonical `PointCloud` representation with float32 geometry
-- KITTI/SemanticKITTI float32 `[x, y, z, remission]` scan loading and writing
-- Official SemanticKITTI packed semantic/instance label decoding
-- LAS loading and optional LAZ loading through `laspy`
-- Explicit, non-mutating `min_xyz` coordinate normalization
-- Verified SemanticKITTI and DALES mappings into a six-class shared ontology
-- Synthetic CPU unit tests that require no dataset download
-- Official-split SemanticKITTI directory discovery and scan/label pairing
-- Chunked DALES tile reading with deterministic, non-overlapping grid patches
-- CPU-only SemanticKITTI and DALES audits with redacted JSON output
-- A data-audit-ready configuration for Experiment 001
+M1 will:
 
-### Not implemented yet
+- reproduce one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
+- export a small, framework-independent 3D detection result contract;
+- render original headless bird's-eye-view prediction visualizations; and
+- measure real FP32 latency and peak GPU memory on an NVIDIA GeForce RTX 4060 Laptop GPU.
 
-- Real-dataset audit results or a selected reduced-compute training subset
-- Voxelization, sparse-convolution models, training, inference, or evaluation runners
-- Source-domain training or zero-shot DALES evaluation
-- Measured accuracy, mIoU, per-class IoU, VRAM, or wall-clock results
-- 2D LiDAR, object detection, tracking, ROS2, TensorRT, or edge deployment
+M1 is inference-only. It does not include training, a second detector, ONNX, TensorRT, mixed
+precision, INT8, ROS 2, camera fusion, custom CUDA, or Jetson work.
 
-See [VISION.md](docs/VISION.md) for explicitly aspirational ideas.
+### Existing experimental infrastructure
+
+The earlier SemanticKITTI-to-DALES semantic-segmentation work remains in the repository as tested,
+supported infrastructure, but it is parked rather than the active development line before
+detection v0.1. It currently provides:
+
+- a validated float32 `PointCloud` representation;
+- KITTI/SemanticKITTI and LAS/optional LAZ I/O;
+- official-split SemanticKITTI and chunked DALES directory adapters;
+- explicit, non-mutating `min_xyz` normalization;
+- verified mappings into a six-class experimental ontology;
+- deterministic DALES grid patching and CPU-only dataset audit tooling; and
+- synthetic tests that download no datasets.
+
+No semantic-segmentation model, training run, or accuracy benchmark has been implemented. The
+historical Experiment 001 config remains at
+[`configs/experiments/exp001_semkitti_to_dales.yaml`](configs/experiments/exp001_semkitti_to_dales.yaml).
 
 ## Architecture
 
-LAS is an interchange and storage format here, not a required neural runtime representation. Every
-loader produces the same in-memory object, and normalization happens only through an explicit call.
+The lightweight core and standard CI remain CPU-only. M1 GPU dependencies live in an isolated WSL
+environment and are imported only by the optional detector backend.
 
 ```mermaid
 flowchart LR
-    A["SemanticKITTI hierarchy"] --> B["Raw scan PointCloud"]
-    C["DALES split + streamed tile"] --> D["Raw grid patch PointCloud"]
-    B --> E["Explicit normalization"]
-    D --> E
-    E --> F["Explicit ontology mapping"]
-    F --> G["Dataset audit"]
-    F --> H["Future sparse model"]
+    A["nuScenes v1.0-mini"] --> B["Official MMDetection3D multi-sweep pipeline"]
+    B --> C["Official pretrained PointPillars"]
+    C --> D["LaserPerception result adapter"]
+    D --> E["DetectionFrame"]
+    E --> F["JSON / concise table"]
+    E --> G["Headless BEV visualization"]
+    C --> H["FP32 latency and memory benchmark"]
 ```
 
-```mermaid
-flowchart TD
-    S["SemanticKITTI automotive source"] --> P1["Raw loading; preserve remission"]
-    P1 --> N1["Explicit min_xyz normalization"]
-    N1 --> O1["Six-class shared ontology"]
-    O1 --> M["Sparse baseline: not implemented"]
-    M --> Z["Zero-shot evaluation"]
-    T["DALES airborne target"] --> P2["Raw LAS/LAZ loading"]
-    P2 --> N2["Explicit min_xyz normalization"]
-    N2 --> O2["Six-class shared ontology"]
-    O2 --> Z
-    Z --> R["mIoU + per-class IoU + system measurements"]
-```
+nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
+the official calibrated, multi-sweep upstream pipeline. See
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-More detail: [Architecture](docs/ARCHITECTURE.md) · [Datasets](docs/DATASETS.md) ·
-[Reproducibility](docs/REPRODUCIBILITY.md)
+## Core installation
 
-## Installation
-
-LaserPerception supports Python 3.10–3.13 in CI. The core package has no CUDA or GPU framework
-dependency.
+LaserPerception supports Python 3.10–3.13 in CPU CI. The base package has no CUDA, PyTorch, or
+MMDetection3D dependency.
 
 ```bash
 git clone https://github.com/muhammadmahadazher/laserperception.git
@@ -124,12 +80,11 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-Install `laserperception[laz]` for compressed LAZ support, or
-`laserperception[dev,laz]` for all development tools. No dataset is downloaded by installation.
+Install `laserperception[laz]` for compressed LAZ support or `laserperception[dev,laz]` for local
+development. No dataset or model is downloaded by core installation. The reproducible M1 GPU setup
+will be documented separately and will not make heavy libraries core requirements.
 
-## Quickstart
-
-### Create a point cloud
+## Existing CPU quickstart
 
 ```python
 import numpy as np
@@ -144,164 +99,72 @@ cloud = PointCloud(
 print(len(cloud), cloud.xyz.dtype)  # 2 float32
 ```
 
-Inputs are defensively copied. Point-level attributes stay separate from canonical geometry.
-
-### Load KITTI/SemanticKITTI data
+Load existing point-cloud formats and normalize explicitly:
 
 ```python
-from laserperception.io import load_kitti_bin
-
-cloud = load_kitti_bin(
-    "sequences/00/velodyne/000000.bin",
-    label_path="sequences/00/labels/000000.label",
-)
-remission = cloud.attributes["remission"]
-semantic_ids = cloud.labels
-instance_ids = cloud.attributes["instance_id"]
-```
-
-### Load LAS or LAZ
-
-```python
-from laserperception.io import load_las
-
-cloud = load_las("tile.las")
-classification = cloud.labels
-available_dimensions = cloud.metadata["available_dimensions"]
-```
-
-Scaled file coordinates are loaded as-is. LAZ requires `laserperception[laz]`.
-
-### Inspect dataset directories
-
-```python
-from laserperception.datasets import DalesDataset, SemanticKITTIDataset
-
-semkitti = SemanticKITTIDataset("/data/semantic-kitti", split="train", sequences=["00"])
-sample = semkitti.sample_info(0)
-raw_scan = semkitti.load(0)
-
-dales = DalesDataset("/data/dales", split="test")
-partition = dales.partition_tile(0, patch_size_m=(50.0, 50.0))
-raw_patch = partition.patches[0].cloud
-```
-
-DALES partitioning uses one chunked pass per tile, retains only XYZ and classification, assigns
-half-open non-overlapping grid cells, and skips empty cells while reporting their count. Neither
-adapter normalizes coordinates or maps labels automatically.
-
-### Audit a safe subset
-
-```bash
-python -m laserperception.audit semantickitti --split train --sequences 00 --max-samples 5
-python -m laserperception.audit dales --split test --max-tiles 1 \
-  --patch-size-x 50 --patch-size-y 50 --normalization min_xyz \
-  --json audit-reports/dales-test.json
-```
-
-Roots come from `--root` or the dataset environment variables. JSON reports contain sequence/frame
-or tile IDs rather than absolute source paths.
-
-### Normalize coordinates explicitly
-
-```python
+from laserperception.io import load_kitti_bin, load_las
 from laserperception.transforms import normalize_coordinates
 
-normalized = normalize_coordinates(cloud, mode="min_xyz")
-print(normalized.xyz.min(axis=0))
-print(normalized.metadata["coordinate_normalization"])
+kitti = load_kitti_bin("sequences/00/velodyne/000000.bin")
+las = load_las("tile.las")
+normalized = normalize_coordinates(kitti, mode="min_xyz")
 ```
 
-The original cloud is unchanged. Dataset locations should be configured outside Git through
-`LASERPERCEPTION_SEMANTICKITTI_ROOT` and `LASERPERCEPTION_DALES_ROOT`, as documented in the
-[Experiment 001 config](configs/experiments/exp001_semkitti_to_dales.yaml).
-
-## Experiment 001
-
-| Field | Policy |
-|---|---|
-| Source | SemanticKITTI automotive LiDAR |
-| Target | DALES airborne LiDAR |
-| Task | Zero-shot semantic segmentation transfer |
-| Input features | `x`, `y`, `z` only |
-| Normalization | Explicit `min_xyz`: per scan for source, per patch for target |
-| DALES patching | Configurable 50 m × 50 m deterministic grid reference; no overlap |
-| Reference voxel size | 0.30 m |
-| Shared classes | Ground, Building, Natural, Vehicle, Pole, Fence |
-| Model | Not implemented |
-| Status | Data audit ready; model not implemented |
-
-The ontology uses contiguous IDs `0..5` in the order shown and `-1` for ignored or unmapped labels.
-Source IDs are cited from authoritative material; grouping them is an explicit LaserPerception
-experiment policy.
+Dataset paths come from configuration or environment variables; datasets, checkpoints, and
+generated artifacts must remain outside Git.
 
 ## Benchmarks
 
-No benchmark has been run. Every result remains explicit until measured.
+No detection benchmark has been run.
 
-| Experiment | Source → Target | Input | Normalization | Voxel size | mIoU | Per-class IoU | Peak VRAM | Wall-clock |
-|---|---|---|---|---:|---|---|---|---|
-| exp001 | SemanticKITTI → DALES | xyz | min_xyz | 0.30 m | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
+|---|---|---|---|---|---|---|---|
+| M1 | Official PointPillars asset to be pinned | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | Pending measurement | Pending measurement | Pending measurement |
 
-See [docs/BENCHMARKS.md](docs/BENCHMARKS.md) for the durable result schema.
+The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
+`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for acceptance criteria.
+
+## Roadmap
+
+- **M0:** project direction and governance transition.
+- **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
+- **M2:** ONNX and TensorRT FP16, only after M1 review.
+- **M3:** ROS 2, only after M2 review.
+- **M4:** evidence-backed v0.1 release.
+- **M5:** Jetson measurements only if physical hardware is available.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md). Capabilities are not promised before their evidence gate.
 
 ## Repository map
 
 ```text
-configs/experiments/   Research configurations
-docs/                  Architecture, data, roadmap, and research documentation
-src/laserperception/   Core, I/O, dataset adapters, audit, transforms, and ontology
+configs/experiments/   Parked semantic-transfer research configurations
+docs/                  Architecture, environment, benchmarks, roadmap, and research documentation
+src/laserperception/   Lightweight core, I/O, datasets, audits, and optional detection surface
 tests/                 Synthetic CPU tests
-.github/               CI, security analysis, and contribution templates
+.github/               CPU CI, security analysis, and contribution templates
 ```
 
-## Roadmap
+## Safety and scientific integrity
 
-```mermaid
-flowchart LR
-    subgraph NOW["NOW — V0.1"]
-      A["PointCloud"] --> B["Raw I/O"] --> C["Dataset adapters"]
-      C --> D["Grid patching"] --> E["Dataset audit"] --> F["Exp001 data pipeline"]
-    end
-    subgraph NEXT["NEXT — after real-data audit"]
-      G["Select sparse backend"] --> H["Sparse-voxel baseline"] --> I["Source training"]
-      I --> J["Zero-shot evaluation"] --> K["Evidence-driven ablation"]
-    end
-    subgraph FUTURE["FUTURE — conditional"]
-      L["See docs/VISION.md"]
-    end
-    F --> G
-    K --> L
-```
+LaserPerception is for research, benchmarking, and demonstrations. It is not safety-certified,
+production-qualified, or a certified perception system for operation around people. Predictions
+can be missed, misclassified, or poorly localized.
 
-Milestones are evidence-gated; see [ROADMAP.md](docs/ROADMAP.md).
+No accuracy, latency, throughput, memory, hardware, or dataset statistic is published unless it was
+actually measured with documented provenance. Unknown fields use `Pending measurement`.
 
-## Reproducibility
+## Contributing, citation, and licensing
 
-Benchmark reports must include the exact commit SHA, config snapshot, dataset version and terms,
-preprocessing and ontology versions, random seeds, environment, hardware, metric implementation,
-wall-clock method, and peak GPU-memory method. Unknown values remain `Pending measurement`.
-
-## Contributing and support
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and the agent rules in [AGENTS.md](AGENTS.md). Do not commit
-datasets, checkpoints, secrets, or generated experiment outputs.
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md). Do not commit datasets,
+point-cloud archives, checkpoints, generated visualizations, raw benchmark outputs, or secrets.
 
 - Questions: [GitHub Discussions](https://github.com/muhammadmahadazher/laserperception/discussions)
 - Bugs and features: [GitHub Issues](https://github.com/muhammadmahadazher/laserperception/issues)
-- Security: [SECURITY.md](SECURITY.md)
-- Common questions: [FAQ](docs/FAQ.md)
+- Security: [`SECURITY.md`](SECURITY.md)
 
-## Citation, license, and acknowledgements
-
-Citation metadata is in [CITATION.cff](CITATION.cff). Until a release or paper exists, cite the
-repository URL and exact commit; do not infer a DOI.
-
-Original source code is [Apache-2.0](LICENSE). That license does not relicense datasets, papers,
-external weights, or third-party software. See [DATASETS.md](docs/DATASETS.md) and
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-LaserPerception is informed by official [SemanticKITTI](https://semantic-kitti.org/) and
-[DALES](https://openaccess.thecvf.com/content_CVPRW_2020/html/w11/Varney_DALES_A_Large-Scale_Aerial_LiDAR_Data_Set_for_Semantic_Segmentation_CVPRW_2020_paper.html)
-resources and research including [CVGC](https://arxiv.org/abs/2602.14525). These works are not
-bundled with or relicensed by LaserPerception.
+Original LaserPerception code is [Apache-2.0](LICENSE). That license does not relicense nuScenes,
+SemanticKITTI, KITTI, DALES, MMDetection3D, external weights, papers, or other third-party assets.
+See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). Citation metadata is in
+[`CITATION.cff`](CITATION.cff); until a release or paper exists, cite the repository URL and exact
+commit rather than inferring a DOI.
