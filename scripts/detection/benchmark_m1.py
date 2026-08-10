@@ -43,11 +43,49 @@ def _git_sha() -> str:
     process = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=_repository_root(),
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
-    return process.stdout.strip()
+    sha = process.stdout.strip().lower()
+    if (
+        process.returncode == 0
+        and len(sha) == 40
+        and all(character in "0123456789abcdef" for character in sha)
+    ):
+        return sha
+
+    pointer = _repository_root() / ".git"
+    if pointer.is_file():
+        value = pointer.read_text(encoding="utf-8").strip()
+        if value.startswith("gitdir: "):
+            raw_path = value.removeprefix("gitdir: ")
+            if len(raw_path) >= 3 and raw_path[1:3] == ":/":
+                git_dir = Path("/mnt") / raw_path[0].lower() / raw_path[3:]
+            else:
+                git_dir = Path(raw_path)
+                if not git_dir.is_absolute():
+                    git_dir = _repository_root() / git_dir
+            process = subprocess.run(
+                [
+                    "git",
+                    f"--git-dir={git_dir}",
+                    f"--work-tree={_repository_root()}",
+                    "rev-parse",
+                    "HEAD",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            sha = process.stdout.strip().lower()
+            if (
+                process.returncode == 0
+                and len(sha) == 40
+                and all(character in "0123456789abcdef" for character in sha)
+            ):
+                return sha
+    raise RuntimeError("cannot resolve the benchmark commit SHA from this checkout")
 
 
 def _driver_version() -> str:
@@ -141,6 +179,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ).expanduser() / str(checkpoint_info["filename"])
 
     try:
+        commit_sha = _git_sha()
         torch = importlib.import_module("torch")
         backend = Mmdet3dBackend(
             config,
@@ -191,7 +230,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "schema_version": "1.0",
             "status": "measured",
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-            "commit_sha": _git_sha(),
+            "commit_sha": commit_sha,
             "milestone": "M1",
             "task": "pretrained 3D LiDAR object detection inference",
             "precision": "fp32",
