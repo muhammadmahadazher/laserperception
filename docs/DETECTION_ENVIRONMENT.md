@@ -62,10 +62,24 @@ bash scripts/setup_detection_m1.sh
 source ~/.venvs/laserperception-m1/bin/activate
 ```
 
-The script pins every version above, clones only the official MMDetection3D v1.4.0 checkout into
-`~/.cache/laserperception`, downloads the official checkpoint into the external cache, verifies its
-SHA256, installs LaserPerception editable, runs `pip check`, verifies CUDA, and imports compiled MMCV
-operators. It is idempotent and rejects a different upstream commit or checkpoint checksum.
+The script pins every version above, installs LaserPerception editable, runs `pip check`, verifies
+CUDA with a small operation, prints the detected GPU, and imports compiled MMCV operators. It
+accepts any NVIDIA GPU that CUDA and the pinned stack can use; the RTX 4060 Laptop GPU remains the
+canonical hardware for the committed M1 measurement, not an installation requirement.
+
+The cache root is `LASERPERCEPTION_M1_CACHE` when that variable is set and
+`~/.cache/laserperception` otherwise. The setup and runtime scripts derive the checkout as
+`<cache_root>/mmdetection3d-v1.4.0` and the checkpoint as
+`<cache_root>/checkpoints/<checkpoint filename>`. For example:
+
+```bash
+export LASERPERCEPTION_M1_CACHE=/path/to/external/m1-cache
+bash scripts/setup_detection_m1.sh
+```
+
+The setup script clones only the pinned official checkout and downloads the official checkpoint
+into that external cache, verifies the checkpoint SHA256, and rejects a different upstream commit
+or checkpoint checksum. It is idempotent.
 
 The setup script requires network access to the official PyTorch, OpenMMLab, GitHub, and Python
 package sources. It never creates a virtual environment, framework clone, checkpoint, or cache in

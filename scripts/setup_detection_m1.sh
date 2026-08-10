@@ -102,14 +102,17 @@ if versions != expected:
     raise SystemExit(f"version mismatch: expected {expected}, found {versions}")
 if not torch.cuda.is_available():
     raise SystemExit("PyTorch cannot access CUDA")
-if torch.cuda.get_device_name(0) != "NVIDIA GeForce RTX 4060 Laptop GPU":
-    raise SystemExit(f"unexpected M1 GPU: {torch.cuda.get_device_name(0)}")
-probe = torch.ones((32, 32), device="cuda")
-_ = probe @ probe
-torch.cuda.synchronize()
+if torch.cuda.device_count() < 1:
+    raise SystemExit("PyTorch reports no CUDA devices")
+gpu_name = torch.cuda.get_device_name(0)
+probe = torch.ones((32, 32), device="cuda:0")
+result = probe @ probe
+if not torch.isfinite(result).all().item():
+    raise SystemExit("CUDA verification operation returned a non-finite result")
+torch.cuda.synchronize(0)
 print("M1 environment verified")
 print(versions)
-print({"cuda_runtime": torch.version.cuda, "gpu": torch.cuda.get_device_name(0)})
+print({"cuda_runtime": torch.version.cuda, "gpu": gpu_name})
 PY
 
 echo "activate with: source $VENV_PATH/bin/activate"

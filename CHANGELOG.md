@@ -8,6 +8,9 @@ releases begin.
 
 ### Changed
 
+- Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
+  and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
+  measured reference hardware.
 - Transitioned the active roadmap to reproducible real-time 3D LiDAR object detection: M1 uses an
   official pretrained PointPillars model on nuScenes v1.0-mini with honest RTX 4060 FP32
   measurements and headless BEV visualization; TensorRT FP16 and ROS 2 remain later milestones.

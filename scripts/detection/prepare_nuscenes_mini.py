@@ -8,8 +8,20 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
-MMDET3D_COMMIT = "fe25f7a51d36e3702f961e198894580d83c4387b"
+import yaml
+
+from laserperception.detection.m1_assets import resolve_m1_asset_paths
+
+
+def _repository_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _manifest() -> dict[str, Any]:
+    path = _repository_root() / "configs" / "detection" / "m1_pointpillars_nuscenes.yaml"
+    return dict(yaml.safe_load(path.read_text(encoding="utf-8")))
 
 
 def _configured_root(value: str | None) -> Path:
@@ -56,8 +68,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out-dir", help="prepared output directory; defaults to data root")
     parser.add_argument(
         "--mmdet3d-root",
-        default="~/.cache/laserperception/mmdetection3d-v1.4.0",
-        help="pinned official MMDetection3D checkout",
+        help="override pinned checkout; defaults to the resolved M1 cache",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="validate and print no private paths"
@@ -67,11 +78,17 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    repository_root = Path(__file__).resolve().parents[2]
+    repository_root = _repository_root()
+    manifest = _manifest()
+    assets = resolve_m1_asset_paths(manifest)
     try:
         data_root = _configured_root(args.data_root)
         out_dir = Path(args.out_dir).expanduser().resolve() if args.out_dir else data_root
-        mmdet3d_root = Path(args.mmdet3d_root).expanduser().resolve()
+        mmdet3d_root = (
+            Path(args.mmdet3d_root).expanduser().resolve()
+            if args.mmdet3d_root
+            else assets.mmdet3d_root
+        )
         _require_outside_repository(data_root, repository_root, "data root")
         _require_outside_repository(out_dir, repository_root, "output directory")
         _validate_raw_mini(data_root)
@@ -81,8 +98,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         commit = subprocess.check_output(
             ["git", "-C", str(mmdet3d_root), "rev-parse", "HEAD"], text=True
         ).strip()
-        if commit != MMDET3D_COMMIT:
-            raise RuntimeError(f"MMDetection3D commit mismatch: expected {MMDET3D_COMMIT}")
+        expected_commit = str(manifest["backend"]["commit"])
+        if commit != expected_commit:
+            raise RuntimeError(f"MMDetection3D commit mismatch: expected {expected_commit}")
         _ensure_upstream_dataset_link(mmdet3d_root, data_root)
     except (FileNotFoundError, RuntimeError, ValueError) as error:
         raise SystemExit(f"error: {error}") from error

@@ -11,6 +11,7 @@ from typing import Any
 
 import yaml
 
+from laserperception.detection.m1_assets import resolve_m1_asset_paths
 from laserperception.detection.mmdet3d_backend import (
     DetectionEnvironmentError,
     Mmdet3dBackend,
@@ -67,12 +68,10 @@ def _print_frame(raw_count: int, threshold: float, frame: object) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     manifest = _manifest()
-    checkout = Path(str(manifest["model"]["upstream_checkout"])).expanduser()
-    config = args.config or checkout / str(manifest["model"]["upstream_config"])
+    assets = resolve_m1_asset_paths(manifest)
+    config = args.config or assets.mmdet3d_root / str(manifest["model"]["upstream_config"])
     checkpoint_info = manifest["model"]["checkpoint"]
-    checkpoint = args.checkpoint or Path(
-        str(checkpoint_info["cache_directory"])
-    ).expanduser() / str(checkpoint_info["filename"])
+    checkpoint = args.checkpoint or assets.checkpoint_path
     threshold = (
         float(args.min_score)
         if args.min_score is not None

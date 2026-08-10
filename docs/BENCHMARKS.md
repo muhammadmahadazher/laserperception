@@ -20,7 +20,9 @@ The measured PointPillars asset is
 `f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0`. The model was not trained
 by LaserPerception. The run used `mini_val` index 0, sample token
 `3e8750f331d7499e9b5123e9eb70f2e2`, explicit FP32, batch size one, 10 warm-up iterations, and 50
-measurements per boundary.
+measurements per boundary. Warm-ups run before measurements, and every iteration repeats
+`mini_val` index 0. The end-to-end result is therefore a warm-cache, repeated-single-sample latency
+microbenchmark—not cold-storage I/O latency or whole-dataset sequential throughput.
 
 | Boundary | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|

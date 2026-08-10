@@ -118,7 +118,7 @@ generated artifacts must remain outside Git.
 
 ## Benchmarks
 
-The reviewed measured record is
+The measured record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |

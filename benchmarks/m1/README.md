@@ -2,7 +2,7 @@
 
 Status: **Measured**
 
-The reviewed, sanitized result is
+The sanitized measured result is
 [`results/rtx4060_laptop_fp32.json`](results/rtx4060_laptop_fp32.json). It was measured on the
 NVIDIA GeForce RTX 4060 Laptop GPU at commit
 `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, using official nuScenes v1.0-mini validation index 0,
@@ -24,10 +24,12 @@ The benchmark reports two deliberately separate FP32, batch-size-one boundaries 
    model execution and conversion to `DetectionFrame`.
 
 Each boundary receives its own warm-up phase. The committed defaults are 10 warm-up iterations and
-50 measured iterations, all repeating the documented `mini_val` sample index 0. Reported statistics
-are count, mean, median, p90, p95, minimum, maximum, population standard deviation, and FPS derived
-from median latency. Peak allocated and reserved CUDA memory come from PyTorch counters reset before
-each measured boundary.
+50 measured iterations, all repeatedly measuring the documented `mini_val` sample index 0. Because
+warm-ups run first and the same sample is repeated, the end-to-end boundary is a warm-cache,
+repeated-single-sample latency microbenchmark. It is not cold-storage I/O latency and is not
+whole-dataset sequential throughput. Reported statistics are count, mean, median, p90, p95,
+minimum, maximum, population standard deviation, and FPS derived from median latency. Peak allocated
+and reserved CUDA memory come from PyTorch counters reset before each measured boundary.
 
 ## Running the benchmark
 

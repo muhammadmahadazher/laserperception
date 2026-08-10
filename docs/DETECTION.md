@@ -64,13 +64,14 @@ Activate the environment from `docs/DETECTION_ENVIRONMENT.md`, then run:
 
 ```bash
 python scripts/detection/prepare_nuscenes_mini.py \
-  --data-root "$LASERPERCEPTION_NUSCENES_ROOT" \
-  --mmdet3d-root ~/.cache/laserperception/mmdetection3d-v1.4.0
+  --data-root "$LASERPERCEPTION_NUSCENES_ROOT"
 ```
 
-The wrapper validates that both data and generated metadata remain outside the repository, verifies
-the exact upstream commit, creates the upstream-documented `data/nuscenes` symlink in that external
-checkout for the v1.4 info updater, and invokes the installed official `tools/create_data.py` with
+The wrapper resolves the MMDetection3D checkout through `LASERPERCEPTION_M1_CACHE`, falling back to
+`~/.cache/laserperception`, unless `--mmdet3d-root` explicitly overrides it. It validates that both
+data and generated metadata remain outside the repository, verifies the exact upstream commit,
+creates the upstream-documented `data/nuscenes` symlink in that external checkout for the v1.4 info
+updater, and invokes the installed official `tools/create_data.py` with
 `--version v1.0-mini --max-sweeps 10`. It does not copy or rewrite the upstream converter. A dry run
 is available with `--dry-run`.
 
