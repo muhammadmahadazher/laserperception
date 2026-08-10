@@ -22,13 +22,21 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
   fixed 0.25 threshold.
 - [x] Measure and promote a sanitized, two-boundary RTX 4060 FP32 latency and CUDA-memory result.
 
-M1 is complete and awaiting review. It remains inference-only and does not include training, a
-second detector, model conversion, ROS 2, or edge deployment.
+M1 is complete and merged. It remains inference-only and does not include training, a second
+detector, model conversion, ROS 2, or edge deployment.
 
 ## M2 — TensorRT FP16
 
-Convert and benchmark the verified M1 model with ONNX and TensorRT FP16. This work begins only after
-M1 review.
+- [x] Freeze the exact M1 asset, official MMDeploy v1.3.1 commit, deployment boundary, 20-sample
+  parity set, and acceptance tolerances before engine evidence.
+- [ ] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
+- [ ] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
+- [ ] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
+- [ ] Pass final-box parity on all frozen samples with identical preprocessing and postprocessing.
+- [ ] Remeasure the deployable PyTorch FP32 and TensorRT FP16 paths in the same session.
+
+M2 is active. No ONNX, engine, parity, or M2 benchmark result is accepted until measured evidence
+exists; unmeasured fields remain `Pending measurement`.
 
 ## M3 — ROS 2
 

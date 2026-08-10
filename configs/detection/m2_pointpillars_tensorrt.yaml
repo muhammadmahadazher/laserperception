@@ -1,0 +1,107 @@
+schema_version: "1.0"
+milestone: M2
+status: protocol_frozen
+
+cache:
+  root_environment_variable: LASERPERCEPTION_M2_CACHE
+  default_root: ~/.cache/laserperception
+  mmdeploy_checkout_relative: mmdeploy-v1.3.1
+  artifact_directory_relative: m2
+  engine_directory_relative: engines
+
+source_model:
+  reference: M1 official pretrained PointPillars
+  manifest: configs/detection/m1_pointpillars_nuscenes.yaml
+  framework: MMDetection3D
+  framework_version: 1.4.0
+  framework_commit: fe25f7a51d36e3702f961e198894580d83c4387b
+  config: configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py
+  checkpoint_filename: hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  training: false
+
+deployment:
+  exporter: MMDeploy
+  exporter_version: 1.3.1
+  exporter_tag: v1.3.1
+  exporter_commit: bc75c9d6c8940aa03d0e1e5b5962bd930478ba77
+  official_deployment_config: configs/mmdet3d/voxel-detection/voxel-detection_tensorrt_dynamic-nus-64x4.py
+  onnx_opset: 11
+  tensorrt_target_version: 8.6.1
+  tensorrt_actual_version: Pending measurement
+  precision: fp16
+  int8: false
+  custom_ops_policy: official_mmdeploy_only
+  support_status: officially_listed_less_thoroughly_demonstrated
+
+architecture_boundary:
+  preprocessing: official_nuscenes_multi_sweep_outside_engine
+  voxelization: official_mmdet3d_data_preprocessor_outside_engine
+  network: mmdeploy_rewritten_pointpillars_tensorrt
+  postprocessing: official_mmdeploy_voxel_detection_model_postprocess_outside_engine
+  output_contract: laserperception_detection_frame
+
+voxel_contract:
+  point_features: 4
+  max_points_per_voxel: 64
+  voxel_size_m: [0.25, 0.25, 8.0]
+  point_cloud_range_m: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+  upstream_max_voxels:
+    training: 30000
+    validation: 40000
+
+exported_graph:
+  verification_status: Pending measurement
+  inputs: Pending measurement
+  outputs: Pending measurement
+  onnx_checker: Pending measurement
+
+profile:
+  scan_split: mini_val
+  preferred_samples_scanned: 81
+  minimum_required_samples: frozen_parity_set_plus_benchmark_sample
+  observed_shapes: Pending measurement
+  selected_min_shapes: Pending measurement
+  selected_opt_shapes: Pending measurement
+  selected_max_shapes: Pending measurement
+  rationale: Pending measurement
+
+artifacts:
+  onnx:
+    logical_name: m2/pointpillars.onnx
+    committed: false
+    sha256: Pending measurement
+    size_bytes: Pending measurement
+  engine:
+    logical_name: engines/pointpillars_fp16.engine
+    committed: false
+    sha256: Pending measurement
+    size_bytes: Pending measurement
+    build_time_seconds: Pending measurement
+
+benchmark:
+  sample_split: mini_val
+  sample_index: 0
+  batch_size: 1
+  warmup_iterations_per_runtime_and_boundary: 10
+  measured_iterations_per_runtime_and_boundary: 100
+  pytorch_precision: fp32
+  tensorrt_precision: fp16
+  baseline: same_session_mmdeploy_rewritten_pytorch
+  network_boundary: common_voxelized_inputs_to_raw_network_outputs
+  end_to_end_boundary: dataset_loading_through_detection_frame
+  headline_metric: end_to_end_speedup
+  cache_state: warm_cache_repeated_single_sample
+
+memory:
+  pytorch: torch_cuda_peak_allocated_and_reserved
+  tensorrt: engine_size_and_reported_device_or_context_memory
+  comparable_process_level_gpu_memory: Pending measurement
+
+evidence:
+  tensorrt_gate_0: Pending measurement
+  profile_result: Pending measurement
+  onnx_result: Pending measurement
+  engine_result: Pending measurement
+  parity_result: Pending measurement
+  same_session_benchmark_result: Pending measurement

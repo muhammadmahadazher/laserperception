@@ -19,6 +19,8 @@ releases begin.
 
 ### Added
 
+- Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
+  set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
 - Real official nuScenes v1.0-mini evidence: 323/81 prepared train/validation samples, successful
   FP32 detection with genuine pedestrian predictions, original BEV output, and a sanitized 50-run
   two-boundary RTX 4060 Laptop GPU benchmark.

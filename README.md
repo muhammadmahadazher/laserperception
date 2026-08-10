@@ -8,27 +8,29 @@
 [![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
 
 LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment. The active goal is a narrow, evidence-gated path from an official
-pretrained PointPillars model on nuScenes to measured RTX 4060 inference, then TensorRT FP16 and
-ROS 2 in later milestones.
+object detection and deployment. The active goal is to deploy the exact verified M1 PointPillars
+model through the pinned official MMDeploy ONNX/TensorRT FP16 path without changing model semantics.
 
-M1 now has verified real FP32 inference, framework-independent detections, an original pedestrian
-BEV visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is
-complete and awaiting review; M2 TensorRT work has not started.
+M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
+visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
+and merged. M2 is active with its deployment boundary and parity criteria frozen before engine
+evidence; ONNX, TensorRT, parity, and M2 performance remain `Pending measurement`.
 
 ## Project status
 
-### Active: M1 — PointPillars first sight
+### Active: M2 — TensorRT FP16 deployment
 
-M1 currently provides:
+M2 is constrained to:
 
-- reproduces one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
-- exports a small, framework-independent 3D detection result contract;
-- renders original headless bird's-eye-view prediction visualizations; and
-- measures real FP32 latency and peak GPU memory on an NVIDIA GeForce RTX 4060 Laptop GPU.
+- the exact M1 MMDetection3D 1.4.0 PointPillars config and checkpoint;
+- official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
+- official shared voxelization and postprocessing outside the TensorRT network;
+- a frozen 20-sample parity set and immutable engineering tolerances; and
+- same-session PyTorch FP32 versus TensorRT FP16 measurements after parity succeeds.
 
-M1 is inference-only. It does not include training, a second detector, ONNX, TensorRT, mixed
-precision, INT8, ROS 2, camera fusion, custom CUDA, or Jetson work.
+M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
+custom LaserPerception CUDA plugins, C++, or Jetson work. See
+[`docs/TENSORRT.md`](docs/TENSORRT.md) for the frozen boundary and acceptance protocol.
 
 ### Existing experimental infrastructure
 
@@ -50,18 +52,20 @@ historical Experiment 001 config remains at
 
 ## Architecture
 
-The lightweight core and standard CI remain CPU-only. M1 GPU dependencies live in an isolated WSL
-environment and are imported only by the optional detector backend.
+The lightweight core and standard CI remain CPU-only. M1 and M2 GPU dependencies live in isolated
+WSL environments and are imported only by optional detector/deployment backends.
 
 ```mermaid
 flowchart LR
     A["nuScenes v1.0-mini"] --> B["Official MMDetection3D multi-sweep pipeline"]
-    B --> C["Official pretrained PointPillars"]
-    C --> D["LaserPerception result adapter"]
-    D --> E["DetectionFrame"]
-    E --> F["JSON / concise table"]
-    E --> G["Headless BEV visualization"]
-    C --> H["FP32 latency and memory benchmark"]
+    B --> C["Official MMDetection3D voxelization"]
+    C --> D["Shared voxel tensors"]
+    D --> E["MMDeploy-rewritten PyTorch FP32"]
+    D --> F["TensorRT FP16 network"]
+    E --> G["Official shared postprocessing"]
+    F --> G
+    G --> H["DetectionFrame parity"]
+    H --> I["Same-session benchmark"]
 ```
 
 nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
@@ -132,7 +136,7 @@ The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fiel
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** ONNX and TensorRT FP16, only after M1 review.
+- **M2:** active—frozen ONNX/TensorRT FP16 parity and same-session benchmark protocol.
 - **M3:** ROS 2, only after M2 review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.
