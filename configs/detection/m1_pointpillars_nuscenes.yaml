@@ -1,0 +1,80 @@
+schema_version: "1.0"
+milestone: M1
+status: Pending measurement
+
+backend:
+  framework: MMDetection3D
+  version: 1.4.0
+  commit: fe25f7a51d36e3702f961e198894580d83c4387b
+  source: https://github.com/open-mmlab/mmdetection3d/tree/v1.4.0
+  environment:
+    os: Ubuntu 22.04.5 LTS on WSL2
+    python: 3.10.12
+    pytorch: 2.1.0+cu118
+    cuda_runtime: "11.8"
+    mmcv: 2.1.0
+    mmengine: 0.10.7
+    mmdetection: 3.2.0
+    numpy: 1.26.4
+
+model:
+  architecture: PointPillars
+  task: 3D LiDAR object detection
+  training: false
+  upstream_config: configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py
+  upstream_checkout: ~/.cache/laserperception/mmdetection3d-v1.4.0
+  checkpoint:
+    filename: hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth
+    source: https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth
+    sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+    cache_directory: ~/.cache/laserperception/checkpoints
+
+dataset:
+  name: nuScenes
+  version: v1.0-mini
+  root_environment_variable: LASERPERCEPTION_NUSCENES_ROOT
+  default_split: mini_val
+  prepared_train_info: nuscenes_infos_train.pkl
+  prepared_val_info: nuscenes_infos_val.pkl
+  max_sweeps: 10
+  classes:
+    - car
+    - truck
+    - trailer
+    - bus
+    - construction_vehicle
+    - bicycle
+    - motorcycle
+    - pedestrian
+    - traffic_cone
+    - barrier
+
+inference:
+  device: cuda:0
+  precision: fp32
+  autocast: false
+  batch_size: 1
+  coordinate_frame: nuscenes_lidar_top
+  axes: x_forward_y_left_z_up
+  box_center: geometric_center
+  box_dimension_order: length_width_height
+  yaw: counter_clockwise_from_positive_x_radians
+
+visualization:
+  score_threshold: 0.25
+  x_limits_m: [-50.0, 50.0]
+  y_limits_m: [-50.0, 50.0]
+  max_points: 120000
+  pedestrian_search:
+    class_name: pedestrian
+    min_score: 0.25
+    max_samples: 100
+
+benchmark:
+  warmup_iterations: 10
+  measured_iterations: 50
+  precision: fp32
+  sample_split: mini_val
+  sample_index: 0
+  model_gpu_boundary: model test step including device preprocessing and postprocessing
+  end_to_end_boundary: dataset sample loading and official preprocessing through conversion

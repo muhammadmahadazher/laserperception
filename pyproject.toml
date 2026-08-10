@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "laserperception"
 version = "0.1.0.dev0"
-description = "Research framework for cross-view 3D LiDAR semantic understanding."
+description = "Research toolkit for reproducible real-time 3D LiDAR object detection."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -15,10 +15,9 @@ authors = [
 keywords = [
   "lidar",
   "point-cloud",
-  "semantic-segmentation",
-  "domain-generalization",
-  "automotive-lidar",
-  "airborne-lidar",
+  "3d-object-detection",
+  "pointpillars",
+  "autonomous-driving-perception",
 ]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
@@ -93,6 +92,9 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 addopts = "-ra --strict-config --strict-markers"
 testpaths = ["tests"]
+markers = [
+  "gpu: manual integration tests requiring the pinned CUDA detection environment",
+]
 
 [tool.coverage.run]
 branch = true
