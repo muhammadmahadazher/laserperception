@@ -38,6 +38,18 @@ def _validate_raw_mini(root: Path) -> None:
         raise FileNotFoundError("nuScenes v1.0-mini is incomplete; missing: " + ", ".join(missing))
 
 
+def _ensure_upstream_dataset_link(mmdet3d_root: Path, data_root: Path) -> None:
+    """Satisfy the v1.4 update converter's documented ``data/nuscenes`` lookup."""
+
+    link = mmdet3d_root / "data" / "nuscenes"
+    link.parent.mkdir(parents=True, exist_ok=True)
+    if link.exists() or link.is_symlink():
+        if link.resolve() != data_root:
+            raise RuntimeError("upstream data/nuscenes already points to a different dataset root")
+        return
+    link.symlink_to(data_root, target_is_directory=True)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", help="nuScenes root; defaults to environment variable")
@@ -71,6 +83,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         ).strip()
         if commit != MMDET3D_COMMIT:
             raise RuntimeError(f"MMDetection3D commit mismatch: expected {MMDET3D_COMMIT}")
+        _ensure_upstream_dataset_link(mmdet3d_root, data_root)
     except (FileNotFoundError, RuntimeError, ValueError) as error:
         raise SystemExit(f"error: {error}") from error
 
@@ -95,7 +108,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    subprocess.run(command, cwd=mmdet3d_root, check=True)
+    try:
+        subprocess.run(command, cwd=mmdet3d_root, check=True)
+    except subprocess.CalledProcessError as error:
+        raise SystemExit(
+            "error: the pinned official MMDetection3D nuScenes converter failed; "
+            "review the upstream output above"
+        ) from error
 
     from mmengine import load
 
