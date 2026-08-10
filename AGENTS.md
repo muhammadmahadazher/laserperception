@@ -3,24 +3,64 @@
 This file is the source of truth for AI coding agents working on LaserPerception. Read it before
 modifying the repository. User instructions take precedence when they explicitly change scope.
 
-## Mission and current experiment
+## Active project and current milestone
 
-LaserPerception studies cross-view and cross-domain semantic understanding of heterogeneous 3D
-LiDAR point clouds. Experiment 001 asks how SemanticKITTI automotive-source knowledge transfers
-zero-shot to DALES airborne LiDAR under a geometry-only six-class ontology: Ground, Building,
-Natural, Vehicle, Pole, Fence.
+LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
+object detection and deployment engineering.
 
-The current input policy is `x`, `y`, `z`; `min_xyz` normalization; 0.30 m reference voxel size; and
-mIoU plus per-class IoU. The model is not implemented and every result is `Pending measurement`.
+The current milestone is **M1 — PointPillars first sight**: run an official pretrained
+MMDetection3D PointPillars model on nuScenes v1.0-mini, export a small LaserPerception-owned
+detection result contract, produce headless BEV visualizations, and measure honest FP32 latency and
+GPU memory on the available NVIDIA GeForce RTX 4060 Laptop GPU. M1 is inference-only.
 
-## Scope and non-goals
+Existing SemanticKITTI-to-DALES semantic-segmentation adapters, ontology, configuration, and audit
+pipeline remain built, tested, documented, and supported as parked experimental infrastructure.
+They are not the active development line before detection v0.1 and must not be deleted.
 
-Current work is 3D LiDAR semantic segmentation research. Do not implement 2D LiDAR, detection,
-tracking, ROS2, a C++ SDK, TensorRT, Jetson optimization, language models, multimodal fusion,
-embeddings, streaming, or foundation models unless the project scope is explicitly revised. Keep
-aspirational material in `docs/VISION.md`, not as README functionality.
+## Roadmap scope
 
-## Architecture rules
+- M0: transition project governance and documentation to the detection direction.
+- M1: official pretrained PointPillars, nuScenes v1.0-mini, FP32 CUDA inference, original BEV
+  visualization, and real RTX 4060 measurements.
+- M2 only: ONNX and TensorRT FP16 conversion and benchmarking.
+- M3 only: ROS 2 integration.
+- M4: evidence-backed v0.1 release.
+- M5 only if physical hardware is available: Jetson measurements and tuning.
+
+Before v0.1, do not add training, a second detector architecture, INT8 optimization, camera fusion,
+foundation models, custom CUDA kernels, Jetson-specific tuning, or unrelated features unless the
+owner explicitly changes scope. Do not begin M2 or M3 work during M1.
+
+## Detection architecture rules
+
+- Use the official pretrained MMDetection3D PointPillars implementation and nuScenes pipeline. Do
+  not reimplement PointPillars, voxelization, NMS, CUDA operations, or training infrastructure.
+- Keep the LaserPerception-owned detection output contract small and independent of MMDetection3D
+  types. Document coordinate frame, axes, dimension order, and yaw convention; never silently swap
+  length and width.
+- Preserve official nuScenes class names in raw converted results. Any future taxonomy mapping must
+  be explicit and versioned.
+- Keep model output separate from export and visualization filtering. A display threshold must not
+  alter the model execution used for latency measurement.
+- nuScenes inference must preserve the official multi-sweep MMDetection3D preprocessing pipeline.
+  Do not force it through the existing single-scan `PointCloud` abstraction.
+- Generated visualizations and raw benchmark outputs belong in ignored artifact directories. Only
+  a reviewed, sanitized, real benchmark result may be committed.
+
+## Dependency and environment policy
+
+- The core package must remain lightweight, CPU-testable, and importable without GPU libraries.
+- PyTorch, CUDA, and the verified MMDetection3D/OpenMMLab stack are permitted for M1 only as
+  optional, isolated detection dependencies.
+- Heavy GPU dependencies must not become core requirements or be imported by core modules.
+- Standard GitHub CI must continue to run without a GPU or detection dependencies. GPU integration
+  tests are manual/local and must skip cleanly when their environment is absent.
+- Put CUDA-specific installation in dedicated setup and environment documentation. Keep the heavy
+  environment, datasets, checkpoints, caches, logs, and generated outputs outside the Google Drive
+  repository, preferably on the WSL ext4 filesystem.
+- ONNX and TensorRT are permitted starting in M2 only. ROS 2 is permitted starting in M3 only.
+
+## Parked segmentation architecture
 
 - Use the Python `src` layout and keep the public package import as `laserperception`.
 - Keep `PointCloud` simple: float32 `(N, 3)` geometry, optional point labels, separate attributes,
@@ -29,46 +69,55 @@ aspirational material in `docs/VISION.md`, not as README functionality.
 - Coordinate normalization is an explicit, non-mutating transform. `min_xyz` means
   `xyz - xyz.min(axis=0)` and must record its parameters.
 - Keep LAS as storage/interchange, not a required neural representation.
-- Keep model/training dependencies out of the core until corresponding functionality exists.
+- Experiment 001 retains its geometry-only six-class ontology: Ground, Building, Natural, Vehicle,
+  Pole, Fence. Its input policy is `x`, `y`, `z`; `min_xyz`; 0.30 m reference voxel size; and mIoU
+  plus per-class IoU. Its model and every unmeasured result remain `Pending measurement`.
 
-## Dataset and ontology rules
+## Dataset and asset rules
 
 - Never commit datasets, point-cloud tiles, downloaded archives, checkpoints, weights, caches,
-  training outputs, or logs.
+  training outputs, generated visualizations, raw benchmark outputs, or logs.
 - Use environment/configuration variables for dataset roots; do not hard-code machine paths.
-- Do not copy third-party dataset tooling without verifying license and attribution obligations.
+- M1 uses nuScenes v1.0-mini only. Respect its official access terms and never redistribute it.
+- Download checkpoints only from an official upstream source, keep them outside the repository,
+  and record the source, version/commit, license note, and SHA256 after download.
+- Do not copy third-party dataset or model tooling without verifying license and attribution.
 - Verify source class IDs from authoritative dataset material before changing mappings. Cite the
   source and test ignored/unmapped behavior.
-- Treat ontology changes as scientifically material preprocessing changes.
-- The Apache-2.0 project license does not relicense SemanticKITTI, KITTI, DALES, external weights,
-  papers, or third-party assets.
+- Treat ontology or detector-class mapping changes as scientifically material preprocessing changes.
+- Apache-2.0 does not relicense nuScenes, SemanticKITTI, KITTI, DALES, external weights, papers, or
+  third-party assets.
 
 ## Scientific integrity and reproducibility
 
-- Never fabricate accuracy, mIoU, IoU, dataset statistics, hardware data, timing, VRAM, citations,
-  authors, DOIs, or novelty claims.
+- Never fabricate detections, accuracy, latency, throughput, memory, dataset statistics, hardware
+  data, citations, authors, DOIs, or novelty claims.
 - Use the exact text `Pending measurement` for unmeasured benchmark fields.
-- Make every preprocessing decision explicit in configuration.
-- Record commit SHA, config, dataset version/split, preprocessing/ontology versions, seeds,
-  environment, hardware, metrics, wall-clock boundaries, and memory method for measured runs.
-- Do not claim SOTA, universality, production readiness, or deployment suitability without evidence.
+- Record commit SHA, manifest/config, exact upstream versions/commits, checkpoint checksum, dataset
+  version/split, sample selection, precision, thresholds, warmup/measured counts, timing boundaries,
+  environment, hardware, timestamp, metrics, and memory method for measured runs.
+- FP32 M1 benchmarking must explicitly disable autocast and use correct CUDA synchronization/events.
+- Do not claim SOTA, universality, production readiness, deployment suitability, or safety around
+  people without evidence and certification.
 
 ## Code, tests, and dependencies
 
 - Use type hints, focused docstrings, deterministic behavior, defensive validation, and clear
   exceptions.
-- Add synthetic tests for new I/O; tests must never download public datasets.
+- Add synthetic CPU tests for the detection contract, conversion, geometry, visualization helpers,
+  lazy optional-dependency failures, and benchmark statistics. Tests must never download datasets or
+  checkpoints.
 - Run `ruff check .`, `ruff format --check .`, `mypy src`, `python -m pytest`, and
   `python -m build` before a major push.
-- Keep base dependencies minimal and CPU-testable. Do not add Torch, spconv, TorchSparse, Open3D,
-  CUDA tooling, or another heavy framework for scaffolding.
-- Document optional dependency behavior and skip optional-backend tests cleanly.
+- Keep base dependencies minimal and CPU-testable. Document optional detection dependency behavior
+  and skip optional-backend tests cleanly.
 
 ## Licensing, citations, and contributions
 
 - Original LaserPerception code is Apache-2.0. Preserve `LICENSE` and `NOTICE`.
 - Record incorporated third-party material and required attribution in `THIRD_PARTY_NOTICES.md`.
-- Cite authoritative file specifications and scientific sources; do not invent bibliographic data.
-- Prefer Conventional Commit messages such as `feat(io): ...`, `test: ...`, and `docs: ...`.
+- Cite authoritative file specifications, framework documentation, model sources, and scientific
+  sources; do not invent bibliographic data.
+- Prefer Conventional Commit messages such as `feat(detection): ...`, `test: ...`, and `docs: ...`.
 - Keep commits logical, inspect staged content for secrets and large files, and update
   `CHANGELOG.md` for user-visible changes.

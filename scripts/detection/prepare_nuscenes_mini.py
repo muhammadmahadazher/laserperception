@@ -1,0 +1,152 @@
+"""Validate and prepare official nuScenes v1.0-mini metadata with MMDetection3D."""
+
+from __future__ import annotations
+
+import argparse
+import os
+import subprocess
+import sys
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from laserperception.detection.m1_assets import resolve_m1_asset_paths
+
+
+def _repository_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _manifest() -> dict[str, Any]:
+    path = _repository_root() / "configs" / "detection" / "m1_pointpillars_nuscenes.yaml"
+    return dict(yaml.safe_load(path.read_text(encoding="utf-8")))
+
+
+def _configured_root(value: str | None) -> Path:
+    raw = value or os.environ.get("LASERPERCEPTION_NUSCENES_ROOT")
+    if not raw:
+        raise ValueError(
+            "set LASERPERCEPTION_NUSCENES_ROOT or pass --data-root after obtaining "
+            "nuScenes v1.0-mini from the official nuScenes download page"
+        )
+    return Path(raw).expanduser().resolve()
+
+
+def _require_outside_repository(path: Path, repository_root: Path, name: str) -> None:
+    if path == repository_root or path.is_relative_to(repository_root):
+        raise ValueError(f"{name} must be outside the LaserPerception repository")
+
+
+def _validate_raw_mini(root: Path) -> None:
+    required = (
+        root / "v1.0-mini",
+        root / "samples" / "LIDAR_TOP",
+        root / "sweeps" / "LIDAR_TOP",
+    )
+    missing = [path.relative_to(root).as_posix() for path in required if not path.is_dir()]
+    if missing:
+        raise FileNotFoundError("nuScenes v1.0-mini is incomplete; missing: " + ", ".join(missing))
+
+
+def _ensure_upstream_dataset_link(mmdet3d_root: Path, data_root: Path) -> None:
+    """Satisfy the v1.4 update converter's documented ``data/nuscenes`` lookup."""
+
+    link = mmdet3d_root / "data" / "nuscenes"
+    link.parent.mkdir(parents=True, exist_ok=True)
+    if link.exists() or link.is_symlink():
+        if link.resolve() != data_root:
+            raise RuntimeError("upstream data/nuscenes already points to a different dataset root")
+        return
+    link.symlink_to(data_root, target_is_directory=True)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data-root", help="nuScenes root; defaults to environment variable")
+    parser.add_argument("--out-dir", help="prepared output directory; defaults to data root")
+    parser.add_argument(
+        "--mmdet3d-root",
+        help="override pinned checkout; defaults to the resolved M1 cache",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="validate and print no private paths"
+    )
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    repository_root = _repository_root()
+    manifest = _manifest()
+    assets = resolve_m1_asset_paths(manifest)
+    try:
+        data_root = _configured_root(args.data_root)
+        out_dir = Path(args.out_dir).expanduser().resolve() if args.out_dir else data_root
+        mmdet3d_root = (
+            Path(args.mmdet3d_root).expanduser().resolve()
+            if args.mmdet3d_root
+            else assets.mmdet3d_root
+        )
+        _require_outside_repository(data_root, repository_root, "data root")
+        _require_outside_repository(out_dir, repository_root, "output directory")
+        _validate_raw_mini(data_root)
+        tool = mmdet3d_root / "tools" / "create_data.py"
+        if not tool.is_file():
+            raise FileNotFoundError("pinned MMDetection3D data preparation tool was not found")
+        commit = subprocess.check_output(
+            ["git", "-C", str(mmdet3d_root), "rev-parse", "HEAD"], text=True
+        ).strip()
+        expected_commit = str(manifest["backend"]["commit"])
+        if commit != expected_commit:
+            raise RuntimeError(f"MMDetection3D commit mismatch: expected {expected_commit}")
+        _ensure_upstream_dataset_link(mmdet3d_root, data_root)
+    except (FileNotFoundError, RuntimeError, ValueError) as error:
+        raise SystemExit(f"error: {error}") from error
+
+    command = [
+        sys.executable,
+        str(tool),
+        "nuscenes",
+        "--root-path",
+        str(data_root),
+        "--out-dir",
+        str(out_dir),
+        "--extra-tag",
+        "nuscenes",
+        "--version",
+        "v1.0-mini",
+        "--max-sweeps",
+        "10",
+    ]
+    if args.dry_run:
+        print("Validated official nuScenes v1.0-mini structure and pinned MMDetection3D checkout.")
+        print("Preparation command is ready; paths are intentionally redacted.")
+        return 0
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        subprocess.run(command, cwd=mmdet3d_root, check=True)
+    except subprocess.CalledProcessError as error:
+        raise SystemExit(
+            "error: the pinned official MMDetection3D nuScenes converter failed; "
+            "review the upstream output above"
+        ) from error
+
+    from mmengine import load
+
+    counts: dict[str, int] = {}
+    for split in ("train", "val"):
+        info_path = out_dir / f"nuscenes_infos_{split}.pkl"
+        if not info_path.is_file():
+            raise SystemExit(f"error: preparation did not create the {split} info file")
+        document = load(info_path)
+        counts[split] = len(document["data_list"])
+    print("Prepared nuScenes v1.0-mini with the official MMDetection3D converter.")
+    print(f"Observed prepared sample counts: train={counts['train']}, val={counts['val']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

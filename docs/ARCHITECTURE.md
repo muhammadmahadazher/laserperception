@@ -1,71 +1,59 @@
 # Architecture
 
-LaserPerception V0.1 keeps file decoding, geometry transforms, ontology mapping, future modeling,
-and evaluation as distinct stages.
+LaserPerception keeps its lightweight CPU core separate from optional detector backends and their
+heavy CUDA environments.
 
 ```mermaid
 flowchart LR
-    A["Dataset hierarchy"] --> B["Directory adapter"]
-    B --> C["Raw scan or patch PointCloud"]
-    C --> D["Explicit normalization"]
-    D --> E["Explicit ontology mapping"]
-    E --> F["Dataset audit"]
-    E --> G["Future sparse model"]
+    A["Official nuScenes multi-sweep input"] --> B["Official MMDetection3D preprocessing"]
+    B --> C["Official pretrained PointPillars"]
+    C --> D["Upstream prediction objects"]
+    D --> E["LaserPerception conversion adapter"]
+    E --> F["Framework-independent DetectionFrame"]
+    F --> G["JSON/table export"]
+    F --> H["Original headless BEV visualization"]
+    C --> I["FP32 benchmark boundaries"]
 ```
 
-## File format to `PointCloud`
+M1 uses the upstream MMDetection3D nuScenes pipeline, model implementation, voxelization, and NMS.
+LaserPerception does not reproduce those algorithms. Its owned surface is intentionally small: an
+asset manifest, lazy backend wrapper, documented result contract, visualization geometry, and
+benchmark/reporting helpers.
+
+## Dependency boundary
+
+`laserperception.core`, I/O, datasets, transforms, ontology, and audit remain importable and tested
+with the base CPU dependencies. Detection data types and geometry helpers must also remain CPU-only.
+The MMDetection3D adapter imports PyTorch and OpenMMLab lazily and raises an actionable error when
+the isolated detection environment is unavailable. Standard CI does not install GPU dependencies.
+
+## Detection result boundary
+
+MMDetection3D predictions are converted into a LaserPerception-owned `DetectionFrame`; public
+results do not contain upstream classes or tensors. The contract documents coordinate frame, XYZ
+axes, one fixed dimension order, yaw convention, class identity, scores, and optional velocity.
+Raw upstream class names are preserved. Export/visualization score filtering occurs after model
+execution and therefore does not redefine the benchmarked model path.
+
+## nuScenes is not a `PointCloud` adapter
+
+Official nuScenes PointPillars inference uses calibrated sensor metadata and a multi-sweep pipeline.
+M1 preserves that upstream representation and does not route it through the existing single-scan
+`PointCloud` or its normalization transforms. Dataset roots, prepared metadata, checkpoints, caches,
+and artifacts stay outside the repository.
+
+## Parked segmentation architecture
+
+```mermaid
+flowchart LR
+    J["SemanticKITTI / DALES hierarchy"] --> K["Directory adapter"]
+    K --> L["Raw scan or patch PointCloud"]
+    L --> M["Explicit normalization"]
+    M --> N["Explicit ontology mapping"]
+    N --> O["Dataset audit"]
+```
 
 Readers preserve point-level information and never silently translate, center, scale, crop,
-voxelize, or augment coordinates. KITTI remission and SemanticKITTI instance IDs remain attributes.
-LAS/LAZ classification becomes labels while other stored dimensions remain attributes.
-
-LAS is an interchange/storage format, not a required runtime neural representation.
-
-## Directory adapters and patching
-
-`SemanticKITTIDataset` resolves the official sequence hierarchy and keeps the official split
-manifest separate from optional experiment subsets. `sample_info()` exposes stable sequence/frame
-provenance; `load()` delegates scan decoding to the existing KITTI I/O layer.
-
-`DalesDataset` deliberately does not call the full `load_las()` interchange reader. It streams a
-tile with `laspy.open(...).chunk_iterator(...)`, uses float64 scaled coordinates for grid assignment,
-and retains only XYZ plus classification. A single pass partitions one tile into raw non-empty
-patches. Optional LAS dimensions are neither materialized as attributes nor propagated into patches.
-
-Grid cells are non-overlapping half-open XY intervals anchored at the tile header minimum. Empty
-cells are skipped and counted. A partition conserves all finite points; non-finite points are
-reported separately.
-
-## Explicit preprocessing order
-
-```text
-LOAD -> CROP/PATCH -> NORMALIZE -> ONTOLOGY MAP -> future voxelization
-```
-
-Adapters stop after load or crop. The audit may request normalization and mapping, but records those
-as distinct report stages. This makes raw, patch-only, normalized, and ontology-mapped evidence
-separately inspectable.
-
-## Canonical representation
-
-`PointCloud` owns validated copies of float32 `xyz` with shape `(N, 3)`, optional one-dimensional
-labels, named point attributes, and descriptive metadata. It intentionally has no model hierarchy
-or hidden preprocessing policy.
-
-## Explicit transforms
-
-Transforms return new clouds and record their parameters. V0.1 implements only `min_xyz`, defined
-as `xyz - xyz.min(axis=0)`. Additional modes require a documented experiment and tests.
-
-## Ontology and future model
-
-Named, cited mappings convert source IDs into six shared classes; unmapped labels receive ignore ID
-`-1`. A mapping change is a preprocessing-version change. Future models must consume explicit
-features, voxelization, ontology, and config policies. Evaluation must retain per-class counts and
-the complete reproducibility record.
-
-## Dependency direction
-
-`core` depends on NumPy. `io` adds `laspy`. `datasets` composes core I/O and streamed laspy access;
-`audit` composes datasets, transforms, and ontology. No layer depends on an ML framework. Model
-code must not leak into readers, adapters, or audit utilities.
+voxelize, or augment coordinates. LAS remains interchange/storage rather than a neural runtime
+representation. `min_xyz` remains explicit and non-mutating. This pipeline is tested and supported,
+but its future semantic-segmentation model is inactive before detection v0.1.

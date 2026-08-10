@@ -37,6 +37,7 @@ wandb/
 tensorboard/
 outputs/
 artifacts/
+/benchmarks/m1/raw/
 *.pt
 *.pth
 *.ckpt
