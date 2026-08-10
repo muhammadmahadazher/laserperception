@@ -48,7 +48,7 @@ for the current WSL session. For a Windows `J:` drive, for example:
 ```bash
 sudo mkdir -p /mnt/j
 sudo mount -t drvfs J: /mnt/j
-cd "/mnt/j/My Drive/laserperception"
+cd /mnt/j/path/to/laserperception
 ```
 
 The drive letter and repository path are local choices, not assumptions in source code.
