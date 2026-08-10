@@ -363,8 +363,8 @@ class Mmdet3dBackend:
             split=split,
         )
 
-    def run_prepared(self, sample: PreparedMmdet3dSample) -> DetectionFrame:
-        """Run one prepared sample in explicit FP32 and convert every raw result."""
+    def run_model(self, sample: PreparedMmdet3dSample) -> object:
+        """Run the official model test step in explicit FP32 without score filtering."""
 
         self.initialize()
         assert self._runtime is not None
@@ -375,9 +375,18 @@ class Mmdet3dBackend:
             predictions = self._model.test_step(sample.batch)
         if len(predictions) != 1:
             raise RuntimeError("M1 backend expected exactly one prediction")
+        return predictions[0]
+
+    def convert_prediction(
+        self, prediction: object, sample: PreparedMmdet3dSample
+    ) -> DetectionFrame:
+        """Convert one raw backend prediction into the LaserPerception contract."""
+
+        self.initialize()
+        assert self._runtime is not None
         classes = tuple(str(name) for name in self._model.dataset_meta["classes"])
         return convert_mmdet3d_prediction(
-            predictions[0],
+            prediction,
             class_names=classes,
             sample_id=sample.sample_id,
             metadata={
@@ -389,3 +398,8 @@ class Mmdet3dBackend:
                 "checkpoint_sha256": self.expected_checkpoint_sha256,
             },
         )
+
+    def run_prepared(self, sample: PreparedMmdet3dSample) -> DetectionFrame:
+        """Run and convert one prepared sample without applying a score threshold."""
+
+        return self.convert_prediction(self.run_model(sample), sample)
