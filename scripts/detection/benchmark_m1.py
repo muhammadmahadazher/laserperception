@@ -260,6 +260,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 **_linux_metadata(),
                 "python": platform.python_version(),
                 **dict(backend.versions),
+                "mmdet3d_commit": str(manifest["backend"]["commit"]),
                 "torch_cuda_runtime": str(torch.version.cuda),
                 "nvidia_driver": _driver_version(),
                 "gpu_name": str(properties.name),
