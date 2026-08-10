@@ -12,14 +12,15 @@ object detection and deployment. The active goal is a narrow, evidence-gated pat
 pretrained PointPillars model on nuScenes to measured RTX 4060 inference, then TensorRT FP16 and
 ROS 2 in later milestones.
 
-Detection is not yet claimed as working in this repository. M1 is in progress; all unmeasured
-detector results remain `Pending measurement`.
+M1 is implemented through real CUDA model initialization but remains data-dependent until a
+nuScenes v1.0-mini run completes. The environment, official checkpoint, backend, result contract,
+visualizer, and benchmark protocol are verified; all unmeasured results remain `Pending measurement`.
 
 ## Project status
 
 ### Active: M1 — PointPillars first sight
 
-M1 will:
+M1 currently provides:
 
 - reproduce one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
 - export a small, framework-independent 3D detection result contract;
@@ -80,9 +81,10 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-Install `laserperception[laz]` for compressed LAZ support or `laserperception[dev,laz]` for local
-development. No dataset or model is downloaded by core installation. The reproducible M1 GPU setup
-will be documented separately and will not make heavy libraries core requirements.
+Install `laserperception[laz]` for compressed LAZ support, `laserperception[viz]` for the optional
+headless renderer, or `laserperception[dev,laz]` for local development. No dataset or model is downloaded by core installation. The reproducible M1 GPU setup is documented in
+[`docs/DETECTION_ENVIRONMENT.md`](docs/DETECTION_ENVIRONMENT.md) and does not make heavy libraries
+core requirements. See [`docs/DETECTION.md`](docs/DETECTION.md) for data preparation and commands.
 
 ## Existing CPU quickstart
 
@@ -119,7 +121,7 @@ No detection benchmark has been run.
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
-| M1 | Official PointPillars asset to be pinned | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | Pending measurement | Pending measurement | Pending measurement |
+| M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | Pending measurement | Pending measurement | Pending measurement |
 
 The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for acceptance criteria.
@@ -147,9 +149,9 @@ tests/                 Synthetic CPU tests
 
 ## Safety and scientific integrity
 
-LaserPerception is for research, benchmarking, and demonstrations. It is not safety-certified,
-production-qualified, or a certified perception system for operation around people. Predictions
-can be missed, misclassified, or poorly localized.
+LaserPerception v0.1 is for research, benchmarking and demo use. It is NOT safety-certified and
+must not be treated as a certified perception system for operation around humans. Predictions can
+be missed, misclassified, or poorly localized.
 
 No accuracy, latency, throughput, memory, hardware, or dataset statistic is published unless it was
 actually measured with documented provenance. Unknown fields use `Pending measurement`.

@@ -60,6 +60,30 @@ def _driver_version() -> str:
     return process.stdout.splitlines()[0].strip()
 
 
+def _linux_metadata() -> dict[str, str | int]:
+    release: dict[str, str] = {}
+    for line in Path("/etc/os-release").read_text(encoding="utf-8").splitlines():
+        if "=" in line:
+            key, value = line.split("=", 1)
+            release[key] = value.strip().strip('"')
+    cpu_name = next(
+        (
+            line.split(":", 1)[1].strip()
+            for line in Path("/proc/cpuinfo").read_text(encoding="utf-8").splitlines()
+            if line.startswith("model name")
+        ),
+        "unknown",
+    )
+    page_size = int(os.sysconf("SC_PAGE_SIZE"))
+    page_count = int(os.sysconf("SC_PHYS_PAGES"))
+    return {
+        "ubuntu": release.get("PRETTY_NAME", "unknown"),
+        "wsl_kernel": platform.release(),
+        "cpu": cpu_name,
+        "system_ram_bytes_visible_to_wsl": page_size * page_count,
+    }
+
+
 def _memory_record(torch: Any) -> dict[str, float | int]:
     allocated = int(torch.cuda.max_memory_allocated(0))
     reserved = int(torch.cuda.max_memory_reserved(0))
@@ -194,6 +218,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "environment": {
                 "platform": platform.platform(),
                 "wsl_distribution": os.environ.get("WSL_DISTRO_NAME", "unknown"),
+                **_linux_metadata(),
                 "python": platform.python_version(),
                 **dict(backend.versions),
                 "torch_cuda_runtime": str(torch.version.cuda),

@@ -3,17 +3,29 @@
 No LaserPerception detection benchmark has been measured yet. Values remain **Pending measurement**
 until a reproducible run succeeds on the stated hardware and produces a sanitized record.
 
+The real M1 CUDA environment and official PointPillars checkpoint have been initialized successfully
+on the target RTX 4060 Laptop GPU. That is an integration check, not a latency measurement or model
+quality result.
+
 ## M1 — PointPillars FP32
 
-| Model | Dataset | Device | Precision | Model/GPU latency | End-to-end latency | FPS | Peak VRAM | Commit | Manifest |
-|---|---|---|---|---|---|---|---|---|---|
-| PointPillars (official pretrained asset to be pinned) | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | `configs/detection/m1_pointpillars_nuscenes.yaml` (planned) |
+| Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | P95 | FPS | Peak VRAM |
+|---|---|---|---|---|---:|---:|---:|---:|---:|
+| PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| TensorRT (future M2) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 
-Model/GPU timing will use CUDA events and synchronization. End-to-end sample timing will include
-the documented preprocessing, inference, and postprocessing path, while excluding model/checkpoint
-initialization, downloads, visualization, and image writes. Warmup and measured counts, complete
-software/hardware metadata, checkpoint checksum, sample selection, threshold, and timing boundaries
-must accompany any accepted result.
+The pinned M1 asset is
+`configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py` with checkpoint SHA256
+`f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0`. The tracked manifest is
+`configs/detection/m1_pointpillars_nuscenes.yaml`.
+
+Model/GPU timing uses CUDA events around the official MMDetection3D model test step, including
+device preprocessing and upstream postprocessing. End-to-end timing uses a synchronized monotonic
+wall clock from official dataset sample loading/multi-sweep preprocessing through LaserPerception
+result conversion. Both exclude environment setup, downloads, model/checkpoint initialization,
+visualization, and image writes. Defaults are 10 warm-up and 50 measured iterations per boundary.
+The complete protocol is in `benchmarks/m1/README.md`.
 
 ## Parked Experiment 001 — semantic transfer
 
@@ -28,7 +40,7 @@ The implemented data pipeline uses official SemanticKITTI splits and determinist
 
 A measured row must come from an actual run and include the immutable commit SHA, config/manifest,
 dataset release and split, exact framework versions, official checkpoint source and SHA256, sample
-selection, precision, threshold, environment, hardware, warmup/run counts, complete latency
+selection, precision, threshold, environment, hardware, warm-up/run counts, complete latency
 statistics, timing boundaries, and memory-measurement method. Private absolute paths and secrets
-must be removed. Missing values use `Pending measurement`; illustrative or estimated values are not
-accepted.
+must be removed. Missing values use `Pending measurement`; illustrative, upstream-published, or
+estimated values are not accepted as LaserPerception measurements.

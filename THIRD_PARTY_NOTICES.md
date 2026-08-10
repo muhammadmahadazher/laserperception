@@ -1,12 +1,55 @@
 # Third-party notices
 
-LaserPerception's Python distribution declares dependencies on NumPy and laspy, with lazrs as an
-optional LAZ backend. These packages are not vendored; each remains governed by its upstream license
-and notice files.
+LaserPerception's own source code is licensed under Apache-2.0. The following software, model
+artifact, datasets, and specifications remain third-party material under their own licenses and
+terms. They are not vendored or redistributed by this repository unless explicitly stated.
 
-Dataset formats and source IDs were implemented from public specifications rather than copied
-source code. SemanticKITTI, KITTI, DALES, CVGC, their papers, datasets, development kits, and model
-weights are not included and are not relicensed by LaserPerception.
+## Core Python dependencies
+
+The Python distribution declares NumPy and laspy, with lazrs as an optional LAZ backend and
+Matplotlib as an optional headless-visualization backend. These packages are installed from their
+upstream distributions and remain governed by their upstream license and notice files.
+
+## M1 OpenMMLab and PyTorch environment
+
+M1 wraps installed copies of:
+
+- [MMDetection3D 1.4.0](https://github.com/open-mmlab/mmdetection3d/tree/v1.4.0), commit
+  `fe25f7a51d36e3702f961e198894580d83c4387b`, Apache-2.0;
+- [MMDetection 3.2.0](https://github.com/open-mmlab/mmdetection/tree/v3.2.0), Apache-2.0;
+- [MMCV 2.1.0](https://github.com/open-mmlab/mmcv/tree/v2.1.0), Apache-2.0;
+- [MMEngine 0.10.7](https://github.com/open-mmlab/mmengine/tree/v0.10.7), Apache-2.0; and
+- [PyTorch 2.1.0 and torchvision 0.16.0](https://github.com/pytorch/pytorch/tree/v2.1.0),
+  under their upstream BSD-style licenses and notices.
+
+No OpenMMLab or PyTorch source is copied into LaserPerception. The setup script clones/installs the
+official packages into an external user cache and environment.
+
+## Upstream pretrained PointPillars checkpoint
+
+M1 uses the official MMDetection3D nuScenes PointPillars checkpoint
+`hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth`, obtained from the
+[OpenMMLab model distribution](https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth).
+Its verified SHA256 is
+`f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0`.
+
+The checkpoint is downloaded to an ignored external cache and is not distributed in this
+repository. LaserPerception did not train it, does not claim ownership of it, and does not relicense
+it. Users are responsible for reviewing the upstream software/model terms and the nuScenes dataset
+terms that apply to the pretrained artifact and its use.
+
+## Datasets and specifications
+
+nuScenes, SemanticKITTI, KITTI, DALES, CVGC, their papers, datasets, development kits, and model
+weights are not included and are not relicensed by LaserPerception. nuScenes v1.0-mini is obtained
+only from the [official nuScenes distribution](https://www.nuscenes.org/nuscenes), remains subject to
+the [nuScenes terms of use](https://www.nuscenes.org/terms-of-use), and is not redistributed. No
+endorsement by Motional, nuScenes, or any dataset maintainer is implied.
+
+Dataset formats and source IDs in the parked segmentation layer were implemented from public
+specifications rather than copied third-party source code.
+
+## Community documents
 
 The project Code of Conduct uses the Contributor Covenant, version 2.1, available at
 <https://www.contributor-covenant.org/version/2/1/code_of_conduct/> under Creative Commons

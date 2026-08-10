@@ -16,6 +16,17 @@ releases begin.
 
 ### Added
 
+- Framework-independent, validated `Detection3D` and `DetectionFrame` contracts with documented
+  nuScenes LiDAR axes, length-width-height dimensions, yaw, class names, filtering, and JSON export.
+- Lazy MMDetection3D 1.4.0 PointPillars backend that validates the official checkpoint SHA256,
+  preserves the upstream ten-sweep nuScenes pipeline, and runs explicit FP32 evaluation on `cuda:0`.
+- Reproducible pinned WSL2 setup and nuScenes v1.0-mini preparation, inference, and sample-discovery
+  commands without making PyTorch or OpenMMLab core dependencies.
+- Original deterministic headless BEV renderer for LiDAR points and oriented model-predicted boxes.
+- Two-boundary FP32 benchmark protocol with CUDA events, synchronized end-to-end timing, complete
+  latency statistics, CUDA memory counters, sanitized metadata, and fail-closed output behavior.
+- Synthetic CPU tests for detection types, geometry, conversion, lazy dependency diagnostics,
+  visualization, and benchmark statistics.
 - Professional open-source repository foundation and CPU CI.
 - Canonical validated `PointCloud` representation.
 - KITTI/SemanticKITTI scan I/O and packed label decoding.

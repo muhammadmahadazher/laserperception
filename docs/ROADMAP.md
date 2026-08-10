@@ -11,13 +11,19 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
 
 ## M1 — PointPillars first sight
 
-- [ ] Reproduce an official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini.
-- [ ] Export framework-independent 3D detections with documented box conventions.
-- [ ] Produce original, headless BEV visualizations of real predictions.
-- [ ] Measure honest FP32 latency and peak GPU memory on an RTX 4060 Laptop GPU.
+- [x] Reproduce the isolated official MMDetection3D stack and initialize the pinned pretrained
+  PointPillars checkpoint on the RTX 4060 Laptop GPU.
+- [x] Export framework-independent 3D detections with documented box conventions and upstream class
+  names.
+- [x] Implement original headless BEV rendering and bounded qualifying-sample discovery.
+- [x] Implement synchronized, two-boundary FP32 latency and CUDA-memory measurement.
+- [ ] Run real inference against prepared nuScenes v1.0-mini and inspect its converted output.
+- [ ] Produce and review real-prediction BEV output, including an honest pedestrian prediction if a
+  bounded 0.25-threshold scan finds one.
+- [ ] Record a sanitized real RTX 4060 FP32 benchmark and promote measured values.
 
-M1 is inference-only. It does not include training, a second detector, model conversion, ROS 2, or
-edge deployment.
+M1 is **PARTIAL** until all data-dependent unchecked items complete. It is inference-only and does
+not include training, a second detector, model conversion, ROS 2, or edge deployment.
 
 ## M2 — TensorRT FP16
 
