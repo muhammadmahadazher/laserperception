@@ -12,9 +12,9 @@ object detection and deployment. The active goal is a narrow, evidence-gated pat
 pretrained PointPillars model on nuScenes to measured RTX 4060 inference, then TensorRT FP16 and
 ROS 2 in later milestones.
 
-M1 is implemented through real CUDA model initialization but remains data-dependent until a
-nuScenes v1.0-mini run completes. The environment, official checkpoint, backend, result contract,
-visualizer, and benchmark protocol are verified; all unmeasured results remain `Pending measurement`.
+M1 now has verified real FP32 inference, framework-independent detections, an original pedestrian
+BEV visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is
+complete and awaiting review; M2 TensorRT work has not started.
 
 ## Project status
 
@@ -22,10 +22,10 @@ visualizer, and benchmark protocol are verified; all unmeasured results remain `
 
 M1 currently provides:
 
-- reproduce one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
-- export a small, framework-independent 3D detection result contract;
-- render original headless bird's-eye-view prediction visualizations; and
-- measure real FP32 latency and peak GPU memory on an NVIDIA GeForce RTX 4060 Laptop GPU.
+- reproduces one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
+- exports a small, framework-independent 3D detection result contract;
+- renders original headless bird's-eye-view prediction visualizations; and
+- measures real FP32 latency and peak GPU memory on an NVIDIA GeForce RTX 4060 Laptop GPU.
 
 M1 is inference-only. It does not include training, a second detector, ONNX, TensorRT, mixed
 precision, INT8, ROS 2, camera fusion, custom CUDA, or Jetson work.
@@ -82,7 +82,8 @@ python -m pip install -e .
 ```
 
 Install `laserperception[laz]` for compressed LAZ support, `laserperception[viz]` for the optional
-headless renderer, or `laserperception[dev,laz]` for local development. No dataset or model is downloaded by core installation. The reproducible M1 GPU setup is documented in
+headless renderer, or `laserperception[dev,laz]` for local development. No dataset or model is
+downloaded by core installation. The reproducible M1 GPU setup is documented in
 [`docs/DETECTION_ENVIRONMENT.md`](docs/DETECTION_ENVIRONMENT.md) and does not make heavy libraries
 core requirements. See [`docs/DETECTION.md`](docs/DETECTION.md) for data preparation and commands.
 
@@ -117,11 +118,12 @@ generated artifacts must remain outside Git.
 
 ## Benchmarks
 
-No detection benchmark has been run.
+The reviewed measured record is
+[`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
-| M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | Pending measurement | Pending measurement | Pending measurement |
+| M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
 
 The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for acceptance criteria.

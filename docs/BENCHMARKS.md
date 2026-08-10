@@ -1,31 +1,42 @@
 # Benchmarks
 
-No LaserPerception detection benchmark has been measured yet. Values remain **Pending measurement**
-until a reproducible run succeeds on the stated hardware and produces a sanitized record.
-
-The real M1 CUDA environment and official PointPillars checkpoint have been initialized successfully
-on the target RTX 4060 Laptop GPU. That is an integration check, not a latency measurement or model
-quality result.
+LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
+measurement record is
+[`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).
+It records benchmark commit `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, UTC timestamp
+`2026-08-10T09:36:11.151600+00:00`, and the complete software, hardware, sample, asset, timing, and
+memory provenance.
 
 ## M1 — PointPillars FP32
 
-| Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | P95 | FPS | Peak VRAM |
-|---|---|---|---|---|---:|---:|---:|---:|---:|
-| PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
-| TensorRT (future M2) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
-| Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | Model P95 | End-to-end P95 | Model FPS | Peak CUDA memory |
+|---|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | NVIDIA GeForce RTX 4060 Laptop GPU | 52.896 ms | 55.097 ms | 60.729 ms | 62.568 ms | 18.905 | 0.381 GiB allocated / 0.400 GiB reserved |
+| TensorRT (future M2) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 
-The pinned M1 asset is
+The measured PointPillars asset is
 `configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py` with checkpoint SHA256
-`f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0`. The tracked manifest is
-`configs/detection/m1_pointpillars_nuscenes.yaml`.
+`f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0`. The model was not trained
+by LaserPerception. The run used `mini_val` index 0, sample token
+`3e8750f331d7499e9b5123e9eb70f2e2`, explicit FP32, batch size one, 10 warm-up iterations, and 50
+measurements per boundary.
 
-Model/GPU timing uses CUDA events around the official MMDetection3D model test step, including
-device preprocessing and upstream postprocessing. End-to-end timing uses a synchronized monotonic
-wall clock from official dataset sample loading/multi-sweep preprocessing through LaserPerception
-result conversion. Both exclude environment setup, downloads, model/checkpoint initialization,
-visualization, and image writes. Defaults are 10 warm-up and 50 measured iterations per boundary.
-The complete protocol is in `benchmarks/m1/README.md`.
+| Boundary | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Model/GPU | 53.472 ms | 52.896 ms | 59.067 ms | 60.729 ms | 45.788 ms | 64.323 ms | 3.904 ms | 18.905 |
+| End to end | 56.272 ms | 55.097 ms | 61.477 ms | 62.568 ms | 51.889 ms | 64.036 ms | 3.044 ms | 18.150 |
+
+Model/GPU timing uses `torch.cuda.Event` around the official MMDetection3D model test step,
+including device preprocessing and upstream postprocessing. End-to-end timing uses
+`time.perf_counter` with explicit CUDA synchronization from official dataset sample loading and
+multi-sweep preprocessing through LaserPerception result conversion. Both exclude environment
+setup, downloads, model/checkpoint initialization, visualization, and image writes.
+
+PyTorch peak counters, reset before each measured boundary, reported 409,533,440 bytes (0.381 GiB)
+allocated and 429,916,160 bytes (0.400 GiB) reserved. The GPU reported 8,585,216,000 bytes
+(7.996 GiB) total memory. These figures are framework memory counters, not board power or total
+system consumption.
 
 ## Parked Experiment 001 — semantic transfer
 
@@ -40,7 +51,7 @@ The implemented data pipeline uses official SemanticKITTI splits and determinist
 
 A measured row must come from an actual run and include the immutable commit SHA, config/manifest,
 dataset release and split, exact framework versions, official checkpoint source and SHA256, sample
-selection, precision, threshold, environment, hardware, warm-up/run counts, complete latency
-statistics, timing boundaries, and memory-measurement method. Private absolute paths and secrets
-must be removed. Missing values use `Pending measurement`; illustrative, upstream-published, or
-estimated values are not accepted as LaserPerception measurements.
+selection, precision, threshold where applicable, environment, hardware, warm-up/run counts,
+complete latency statistics, timing boundaries, and memory-measurement method. Private absolute
+paths and secrets must be removed. Missing values use `Pending measurement`; illustrative,
+upstream-published, or estimated values are not accepted as LaserPerception measurements.

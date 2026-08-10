@@ -16,6 +16,9 @@ releases begin.
 
 ### Added
 
+- Real official nuScenes v1.0-mini evidence: 323/81 prepared train/validation samples, successful
+  FP32 detection with genuine pedestrian predictions, original BEV output, and a sanitized 50-run
+  two-boundary RTX 4060 Laptop GPU benchmark.
 - Framework-independent, validated `Detection3D` and `DetectionFrame` contracts with documented
   nuScenes LiDAR axes, length-width-height dimensions, yaw, class names, filtering, and JSON export.
 - Lazy MMDetection3D 1.4.0 PointPillars backend that validates the official checkpoint SHA256,

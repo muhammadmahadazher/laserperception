@@ -6,10 +6,15 @@ official nuScenes ten-class taxonomy and multi-sweep preprocessing pipeline.
 
 ## Status
 
-The pinned CUDA/OpenMMLab stack, compiled operators, checkpoint checksum, and real `cuda:0` model
-initialization have been verified on the target RTX 4060 Laptop GPU. Data-dependent status and any
-measured results are recorded in `docs/BENCHMARKS.md`; `Pending measurement` is retained until a
-complete real run succeeds.
+M1 is complete and awaiting review. The official converter observed 323 training and 81 validation
+samples. FP32 inference on `mini_val` index 0 (token `3e8750f331d7499e9b5123e9eb70f2e2`)
+produced 182 raw detections and nine at the fixed 0.25 display threshold: four cars and five genuine
+model-predicted pedestrians, with best pedestrian score 0.403. The original 1800×1800 headless BEV
+was generated at `artifacts/m1/pedestrian_sample0_bev.png` and remains intentionally ignored.
+
+The sanitized measured benchmark is
+`benchmarks/m1/results/rtx4060_laptop_fp32.json`; see `docs/BENCHMARKS.md` for its concise table and
+exact timing boundaries.
 
 ## Official assets
 
@@ -64,7 +69,8 @@ python scripts/detection/prepare_nuscenes_mini.py \
 ```
 
 The wrapper validates that both data and generated metadata remain outside the repository, verifies
-the exact upstream commit, and invokes the installed official `tools/create_data.py` with
+the exact upstream commit, creates the upstream-documented `data/nuscenes` symlink in that external
+checkout for the v1.4 info updater, and invokes the installed official `tools/create_data.py` with
 `--version v1.0-mini --max-sweeps 10`. It does not copy or rewrite the upstream converter. A dry run
 is available with `--dry-run`.
 

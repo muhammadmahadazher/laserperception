@@ -1,6 +1,6 @@
 schema_version: "1.0"
 milestone: M1
-status: Pending measurement
+status: measured
 
 backend:
   framework: MMDetection3D
@@ -78,3 +78,17 @@ benchmark:
   sample_index: 0
   model_gpu_boundary: model test step including device preprocessing and postprocessing
   end_to_end_boundary: dataset sample loading and official preprocessing through conversion
+
+evidence:
+  measurement_commit: f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86
+  benchmark_result: benchmarks/m1/results/rtx4060_laptop_fp32.json
+  prepared_sample_counts:
+    mini_train: 323
+    mini_val: 81
+  inference_sample:
+    split: mini_val
+    index: 0
+    token: 3e8750f331d7499e9b5123e9eb70f2e2
+    raw_detection_count: 182
+    displayed_detection_count: 9
+    displayed_pedestrian_count: 5

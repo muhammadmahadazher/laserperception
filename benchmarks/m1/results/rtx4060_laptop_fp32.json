@@ -1,0 +1,95 @@
+{
+  "batch_size": 1,
+  "commit_sha": "f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86",
+  "dataset": {
+    "name": "nuScenes",
+    "observed_split_size": 81,
+    "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+    "sample_index": 0,
+    "split": "mini_val",
+    "version": "v1.0-mini"
+  },
+  "device": "cuda:0",
+  "environment": {
+    "cpu": "Intel(R) Core(TM) i7-14650HX",
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_memory_bytes": 8585216000,
+    "gpu_total_memory_gib": 7.99560546875,
+    "mmcv": "2.1.0",
+    "mmdet": "3.2.0",
+    "mmdet3d": "1.4.0",
+    "mmdet3d_commit": "fe25f7a51d36e3702f961e198894580d83c4387b",
+    "mmengine": "0.10.7",
+    "nvidia_driver": "610.88",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "system_ram_bytes_visible_to_wsl": 8203722752,
+    "torch": "2.1.0+cu118",
+    "torch_cuda_runtime": "11.8",
+    "ubuntu": "Ubuntu 22.04.5 LTS",
+    "wsl_distribution": "Ubuntu-22.04",
+    "wsl_kernel": "6.18.33.2-microsoft-standard-WSL2"
+  },
+  "generated_at_utc": "2026-08-10T09:36:11.151600+00:00",
+  "measured_iterations_per_boundary": 50,
+  "measurements": {
+    "end_to_end": {
+      "boundary": "dataset sample loading and official preprocessing through conversion",
+      "clock": "time.perf_counter with torch.cuda.synchronize",
+      "memory": {
+        "method": "torch.cuda peak memory counters after reset on cuda:0",
+        "peak_allocated_bytes": 409533440,
+        "peak_allocated_gib": 0.3814077377319336,
+        "peak_reserved_bytes": 429916160,
+        "peak_reserved_gib": 0.400390625
+      },
+      "statistics": {
+        "count": 50,
+        "fps_from_median_latency": 18.149760424983935,
+        "max_ms": 64.03574100022524,
+        "mean_ms": 56.271948700032226,
+        "median_ms": 55.09714599998006,
+        "min_ms": 51.888868999867555,
+        "p90_ms": 61.476947300343454,
+        "p95_ms": 62.56789425015086,
+        "population_std_ms": 3.0436193773700557
+      }
+    },
+    "model_gpu": {
+      "boundary": "model test step including device preprocessing and postprocessing",
+      "clock": "torch.cuda.Event",
+      "memory": {
+        "method": "torch.cuda peak memory counters after reset on cuda:0",
+        "peak_allocated_bytes": 409533440,
+        "peak_allocated_gib": 0.3814077377319336,
+        "peak_reserved_bytes": 429916160,
+        "peak_reserved_gib": 0.400390625
+      },
+      "statistics": {
+        "count": 50,
+        "fps_from_median_latency": 18.905090056888568,
+        "max_ms": 64.32256317138672,
+        "mean_ms": 53.472195892333986,
+        "median_ms": 52.89580726623535,
+        "min_ms": 45.78803253173828,
+        "p90_ms": 59.06728935241699,
+        "p95_ms": 60.72859363555908,
+        "population_std_ms": 3.9039188029348333
+      }
+    }
+  },
+  "milestone": "M1",
+  "model": {
+    "architecture": "PointPillars",
+    "checkpoint_filename": "hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth",
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "raw_detection_count": 182,
+    "trained_by_laserperception": false,
+    "upstream_config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py"
+  },
+  "precision": "fp32",
+  "schema_version": "1.0",
+  "status": "measured",
+  "task": "pretrained 3D LiDAR object detection inference",
+  "warmup_iterations_per_boundary": 10
+}

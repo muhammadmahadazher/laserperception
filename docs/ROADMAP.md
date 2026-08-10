@@ -15,15 +15,15 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
   PointPillars checkpoint on the RTX 4060 Laptop GPU.
 - [x] Export framework-independent 3D detections with documented box conventions and upstream class
   names.
-- [x] Implement original headless BEV rendering and bounded qualifying-sample discovery.
-- [x] Implement synchronized, two-boundary FP32 latency and CUDA-memory measurement.
-- [ ] Run real inference against prepared nuScenes v1.0-mini and inspect its converted output.
-- [ ] Produce and review real-prediction BEV output, including an honest pedestrian prediction if a
-  bounded 0.25-threshold scan finds one.
-- [ ] Record a sanitized real RTX 4060 FP32 benchmark and promote measured values.
+- [x] Prepare official nuScenes v1.0-mini metadata with the ten-sweep upstream converter (323 train,
+  81 validation samples observed).
+- [x] Run real FP32 inference and inspect the converted output.
+- [x] Produce original headless BEV output with genuine model-predicted pedestrian detections at the
+  fixed 0.25 threshold.
+- [x] Measure and promote a sanitized, two-boundary RTX 4060 FP32 latency and CUDA-memory result.
 
-M1 is **PARTIAL** until all data-dependent unchecked items complete. It is inference-only and does
-not include training, a second detector, model conversion, ROS 2, or edge deployment.
+M1 is complete and awaiting review. It remains inference-only and does not include training, a
+second detector, model conversion, ROS 2, or edge deployment.
 
 ## M2 — TensorRT FP16
 
