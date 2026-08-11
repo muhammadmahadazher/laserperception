@@ -401,14 +401,14 @@ def _performance_profile(
             measurements=measurements,
             synchronize_cuda=True,
         )
-        preprocessing_reference, _ = _time_block(
+        preprocessing_reference, reference_voxelized = _time_block(
             torch,
             partial(backend.voxelize, prepared),
             warmups=warmups,
             measurements=measurements,
             synchronize_cuda=True,
         )
-        preprocessing_fast, _ = _time_block(
+        preprocessing_fast, fast_voxelized = _time_block(
             torch,
             partial(experiment.voxelize, prepared, fast=True),
             warmups=warmups,
@@ -479,11 +479,33 @@ def _performance_profile(
                 and [item.to_dict() for item in fast_frame.detections]
                 == [item.to_dict() for item in no_hash_frame.detections]
             )
+        if not isinstance(reference_voxelized, VoxelizedM2Sample) or not isinstance(
+            fast_voxelized, VoxelizedM2Sample
+        ):
+            raise RuntimeError("timed preprocessing did not return voxelized samples")
+        voxel_config = experiment.protocol["voxelization"]
+        workload_saturation = {
+            "official_deterministic": saturation_statistics(
+                source.points_xyzt,
+                _numpy(reference_voxelized.num_points),
+                point_cloud_range=voxel_config["point_cloud_range"],
+                max_num_points=int(voxel_config["max_num_points"]),
+                max_voxels=int(voxel_config["max_voxels_test"]),
+            ),
+            "experimental_fast": saturation_statistics(
+                source.points_xyzt,
+                _numpy(fast_voxelized.num_points),
+                point_cloud_range=voxel_config["point_cloud_range"],
+                max_num_points=int(voxel_config["max_num_points"]),
+                max_voxels=int(voxel_config["max_voxels_test"]),
+            ),
+        }
         result[name] = {
             "sample_index": index,
             "sample_id": dataset_prepared.sample_id,
             "history": str(workload["history"]),
             "point_count": int(source.points_xyzt.shape[0]),
+            "saturation": workload_saturation,
             "decomposition": decomposition,
             "official_complete_preprocessing_synchronized_wall_ms": preprocessing_reference,
             "official_hard_voxel_layer_synchronized_wall_ms": layer_reference,
