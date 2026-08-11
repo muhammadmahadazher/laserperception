@@ -1,0 +1,27 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: Model-ready points
+      Topic:
+        Value: /laserperception/points_model_ready
+      Size (Pixels): 2
+      Style: Points
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Predicted boxes and labels
+      Topic:
+        Value: /laserperception/markers
+  Enabled: true
+  Global Options:
+    Background Color: 24; 24; 24
+    Fixed Frame: nuscenes_lidar_top
+    Frame Rate: 30
+  Name: root
+Window Geometry:
+  Height: 900
+  Width: 1440

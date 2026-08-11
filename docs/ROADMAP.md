@@ -39,12 +39,24 @@ Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 r
 benchmark at e2f9b6b remains rejected because rewritten eager PyTorch was used as the performance
 baseline. At repaired measurement commit 3f240d6, exact-commit parity and native-vs-rewritten
 fidelity passed, then the direct benchmark measured a 1.2991× end-to-end median speedup and a
-secondary 3.1326× network-only speedup with no review flags. PR #3 remains draft for final M2
-review, and M3 has not started.
+secondary 3.1326× network-only speedup with no review flags. PR #3 merged at b1d42a0, satisfying
+the prerequisite for M3.
 
 ## M3 — ROS 2
 
-Add ROS 2 integration around a verified detector runtime. This work begins only after M2 review.
+- [x] Prove ROS 2 Humble and the frozen M2 detector coexist in Python 3.10 on Ubuntu 22.04.
+- [x] Implement the strict model-ready `x/y/z/time_lag` PointCloud2 contract and official in-memory
+  MMDetection3D preprocessing adapter.
+- [x] Preserve headers and exact geometric-center/LWH/yaw/class/score semantics in
+  Detection3DArray, with empty tracking IDs.
+- [x] Pass exact 20-sample PointCloud2 transport fidelity through voxels, TensorRT raw outputs, and
+  final detections.
+- [x] Add bounded QoS, nuScenes replay, RViz/Foxglove markers, setup, launch, CPU tests, and ROS-native
+  tests.
+- [ ] Pass the preregistered M3A callback-median and sustained 20 Hz rate gate.
+
+The first M3A rate diagnostic failed, so no M3 benchmark is canonical. M3B is indicated for owner
+and reviewer consideration but is not authorized. No optimization or M4 work has started.
 
 ## M4 — v0.1
 

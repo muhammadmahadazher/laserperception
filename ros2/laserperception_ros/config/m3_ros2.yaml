@@ -1,0 +1,23 @@
+laserperception_detector:
+  ros__parameters:
+    input_topic: /laserperception/points_model_ready
+    output_topic: /laserperception/detections
+    marker_topic: /laserperception/markers
+    publish_markers: true
+    input_qos_depth: 1
+    input_reliability: best_effort
+    output_qos_depth: 5
+    output_reliability: reliable
+    engine_path: ""
+
+laserperception_replay:
+  ros__parameters:
+    output_topic: /laserperception/points_model_ready
+    split: mini_val
+    start_index: 0
+    sample_count: 1
+    one_shot: false
+    loop: true
+    publish_rate_hz: 20.0
+    frame_id: nuscenes_lidar_top
+    qos_depth: 1

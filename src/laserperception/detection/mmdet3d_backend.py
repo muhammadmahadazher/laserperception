@@ -16,6 +16,7 @@ from typing import Any
 
 import numpy as np
 
+from laserperception.detection.ros2_contract import ModelReadyPointCloud
 from laserperception.detection.types import Detection3D, DetectionFrame
 
 EXPECTED_M1_VERSIONS = {
@@ -64,6 +65,8 @@ class PreparedMmdet3dSample:
     sample_id: str
     sample_index: int
     split: str
+    points_xyzt: np.ndarray | None = None
+    coordinate_frame: str = "nuscenes_lidar_top"
 
     def __post_init__(self) -> None:
         points = np.asarray(self.points_xyz, dtype=np.float32)
@@ -71,7 +74,23 @@ class PreparedMmdet3dSample:
             raise ValueError("points_xyz must have shape (N, 3)")
         if not np.isfinite(points).all():
             raise ValueError("points_xyz must contain only finite values")
+        model_ready = self.points_xyzt
+        if model_ready is not None:
+            validated = ModelReadyPointCloud(np.asarray(model_ready, dtype=np.float32))
+            if validated.points_xyzt.shape[0] != points.shape[0]:
+                raise ValueError("points_xyzt and points_xyz counts must match")
+            object.__setattr__(self, "points_xyzt", validated.points_xyzt)
+        if not isinstance(self.coordinate_frame, str) or not self.coordinate_frame.strip():
+            raise ValueError("coordinate_frame must be a non-empty string")
         object.__setattr__(self, "points_xyz", points.copy())
+        object.__setattr__(self, "coordinate_frame", self.coordinate_frame.strip())
+
+    def model_ready_points(self) -> ModelReadyPointCloud:
+        """Return the exact ``x, y, z, time_lag`` network-point representation."""
+
+        if self.points_xyzt is None:
+            raise RuntimeError("prepared sample does not retain four model-ready point features")
+        return ModelReadyPointCloud(self.points_xyzt)
 
 
 def _load_mmdet3d_runtime() -> _Mmdet3dRuntime:
@@ -140,6 +159,7 @@ def convert_mmdet3d_prediction(
     *,
     class_names: Sequence[str],
     sample_id: str,
+    coordinate_frame: str = "nuscenes_lidar_top",
     metadata: Mapping[str, object] | None = None,
 ) -> DetectionFrame:
     """Convert one MMDetection3D prediction without retaining upstream objects.
@@ -219,7 +239,7 @@ def convert_mmdet3d_prediction(
     return DetectionFrame(
         detections=tuple(detections),
         sample_id=sample_id,
-        coordinate_frame="nuscenes_lidar_top",
+        coordinate_frame=coordinate_frame,
         metadata=frame_metadata,
     )
 
@@ -351,7 +371,7 @@ class Mmdet3dBackend:
         info = dataset.get_data_info(index)
         sample_id = str(info.get("token") or info.get("sample_idx") or index)
         points = _to_numpy(item["inputs"]["points"], name="prepared points")
-        if points.ndim != 2 or points.shape[1] < 3:
+        if points.ndim != 2 or points.shape[1] < 4:
             raise RuntimeError("official nuScenes pipeline returned malformed point inputs")
         assert self._runtime is not None
         batch = self._runtime.pseudo_collate([item])
@@ -361,6 +381,52 @@ class Mmdet3dBackend:
             sample_id=sample_id,
             sample_index=index,
             split=split,
+            points_xyzt=np.asarray(points[:, :4], dtype=np.float32),
+        )
+
+    def prepare_model_ready_points(
+        self,
+        points: ModelReadyPointCloud | np.ndarray,
+        *,
+        sample_id: str,
+        coordinate_frame: str,
+    ) -> PreparedMmdet3dSample:
+        """Create the official minimal batch for an in-memory M3 ``Nx4`` point array."""
+
+        self.initialize()
+        assert self._runtime is not None
+        cloud = points if isinstance(points, ModelReadyPointCloud) else ModelReadyPointCloud(points)
+        try:
+            det3d_data_sample = importlib.import_module("mmdet3d.structures").Det3DDataSample
+            get_box_type = importlib.import_module("mmdet3d.structures.bbox_3d").get_box_type
+        except (AttributeError, ImportError, OSError) as error:
+            raise DetectionEnvironmentError(
+                "The pinned MMDetection3D structures required by M3 are unavailable"
+            ) from error
+        box_type, box_mode = get_box_type("LiDAR")
+        data_sample = det3d_data_sample(
+            metainfo={
+                "box_type_3d": box_type,
+                "box_mode_3d": box_mode,
+                "num_pts_feats": 4,
+                "sample_idx": sample_id,
+            }
+        )
+        item = {
+            "inputs": {
+                "points": self._runtime.torch.from_numpy(cloud.points_xyzt.copy()),
+            },
+            "data_samples": data_sample,
+        }
+        batch = self._runtime.pseudo_collate([item])
+        return PreparedMmdet3dSample(
+            batch=batch,
+            points_xyz=cloud.points_xyzt[:, :3],
+            sample_id=sample_id,
+            sample_index=-1,
+            split="model_ready_ros",
+            points_xyzt=cloud.points_xyzt,
+            coordinate_frame=coordinate_frame,
         )
 
     def run_model(self, sample: PreparedMmdet3dSample) -> object:
@@ -389,6 +455,7 @@ class Mmdet3dBackend:
             prediction,
             class_names=classes,
             sample_id=sample.sample_id,
+            coordinate_frame=sample.coordinate_frame,
             metadata={
                 "sample_index": sample.sample_index,
                 "split": sample.split,

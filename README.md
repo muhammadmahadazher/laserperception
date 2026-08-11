@@ -8,8 +8,8 @@
 [![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
 
 LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment. The active goal is to deploy the exact verified M1 PointPillars
-model through the pinned official MMDeploy ONNX/TensorRT FP16 path without changing model semantics.
+object detection and deployment. The active work is an evidence-gated ROS 2 Humble interface around
+the exact verified M2 PointPillars TensorRT FP16 runtime without changing model semantics.
 
 M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
 visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
@@ -18,24 +18,21 @@ engine. Parity v1 remains an authoritative failure. The separately preregistered
 passed all gates on the same 20 samples and unchanged engine and remains valid. The first M2
 benchmark was rejected because it used MMDeploy-rewritten eager PyTorch as the performance
 baseline. The repaired exact-commit benchmark uses native MMDetection3D PyTorch FP32 and measures a
-direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 remains draft for final review.
+direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 merged as
+`b1d42a0d62646b5d38a9839e69a50fe0d2917a70`.
 
 ## Project status
 
-### Canonical measurement complete—awaiting final review: M2 — TensorRT FP16 deployment
+### Review required: M3A — ROS 2 interface rate gate failed
 
-M2 is constrained to:
+M3A adds a ROS 2 Humble Python package for model-ready multi-sweep PointCloud2 input, the unchanged
+M2 TensorRT FP16 runtime, canonical Detection3DArray output, nuScenes replay, and RViz/Foxglove
+markers. The exact 20-sample PointCloud2 round-trip fidelity gate passes.
 
-- the exact M1 MMDetection3D 1.4.0 PointPillars config and checkpoint;
-- official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
-- official shared voxelization and postprocessing outside the TensorRT network;
-- a frozen 20-sample parity set and immutable engineering tolerances; and
-- MMDeploy-rewritten PyTorch FP32 as the parity reference, but native MMDetection3D PyTorch FP32
-  as the measured performance baseline.
-
-M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
-custom LaserPerception CUDA plugins, C++, or Jetson work. See
-[`docs/TENSORRT.md`](docs/TENSORRT.md) for the frozen boundary and acceptance protocol.
+The first 20 Hz diagnostic failed the preregistered callback-median and sustained-rate gates, so no
+M3 result is canonical and M3B is not authorized. No postprocessing optimization, raw single-sweep
+adapter, tracking, model change, or M4 work has started. See [`docs/ROS2.md`](docs/ROS2.md) and
+[`benchmarks/m3/README.md`](benchmarks/m3/README.md).
 
 ### Existing experimental infrastructure
 
@@ -159,9 +156,10 @@ complete statistics, memory definitions, parity disclosures, and acceptance crit
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** parity v2 and native/rewrite fidelity passed; repaired canonical benchmark measured on
-  draft PR #3, which remains open for final review.
-- **M3:** ROS 2, only after M2 review.
+- **M2:** parity v2, native/rewrite fidelity, and the repaired canonical benchmark passed; PR #3
+  is merged.
+- **M3:** model-ready ROS 2 Humble interface and 20-sample fidelity pass; M3A rate gate failed and
+  M3B requires explicit review authorization.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.
 
@@ -171,9 +169,11 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md). Capabilities are not promised before t
 
 ```text
 configs/experiments/   Parked semantic-transfer research configurations
+ros2/                  Isolated ROS 2 Humble Python package, launch, config, and native tests
+scripts/ros2/          M3 round-trip and latency evidence tooling
 docs/                  Architecture, environment, benchmarks, roadmap, and research documentation
 src/laserperception/   Lightweight core, I/O, datasets, audits, and optional detection surface
-tests/                 Synthetic CPU tests
+tests/                 Synthetic CPU tests, including ROS-independent M3 contracts
 .github/               CPU CI, security analysis, and contribution templates
 ```
 

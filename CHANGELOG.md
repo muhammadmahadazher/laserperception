@@ -8,6 +8,12 @@ releases begin.
 
 ### Changed
 
+- Advanced to M3 only after PR #3 merged, preserved every frozen M2 artifact, and recorded that the
+  first M3A 20 Hz diagnostic failed its callback-median and sustained-rate gates. M3B remains
+  unauthorized and no runtime optimization was attempted.
+- Added a strict model-ready multi-sweep PointCloud2 interface that rejects missing `time_lag`,
+  performs no TF/history reconstruction, and preserves source headers and detector box semantics.
+
 - Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate parity
   v2 protocol with unchanged samples, artifacts, thresholds, and numerical tolerances plus
   per-detection 99% acceptance and explicit direction diagnostics. Stage 1 passed every gate on the
@@ -40,6 +46,12 @@ releases begin.
   infrastructure while keeping the core package and standard CI lightweight and CPU-testable.
 
 ### Added
+
+- Isolated ROS 2 Humble Python package with one-time TensorRT initialization, bounded QoS,
+  Detection3DArray conversion, nuScenes replay, per-frame visualization markers, launch/config,
+  official setup, and ROS-native tests without adding ROS to the core wheel.
+- ROS-independent PointCloud2 layout and detection-message contracts with CPU regression tests, plus
+  all-20-sample exact transport-fidelity and two-boundary ROS latency tooling.
 
 - Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
