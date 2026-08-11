@@ -1,0 +1,108 @@
+schema_version: "1.0"
+protocol_version: 1
+milestone: M3B-V1
+status: protocol_frozen_before_measurement
+purpose: diagnostic_only_experimental_hard_voxelization_evaluation
+production_adoption_authorized: false
+
+frozen_artifacts:
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  onnx_sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+  tensorrt_fp16_engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+
+voxelization:
+  type: hard
+  voxel_size: [0.25, 0.25, 8.0]
+  point_cloud_range: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+  max_num_points: 64
+  max_voxels_training: 30000
+  max_voxels_test: 40000
+  reference_deterministic: true
+  candidate_deterministic: false
+  candidate_construction: equivalent_upstream_mmcv_voxelization_layer_in_memory
+  official_config_may_be_edited: false
+
+dataset:
+  name: nuScenes
+  version: v1.0-mini
+  split: mini_val
+  observed_split_size: 81
+  sample_indices: [0, 4, 8, 12, 16, 21, 25, 29, 33, 37, 42, 46, 50, 54, 58, 63, 67, 71, 75, 80]
+  timing_workloads:
+    W0: {sample_index: 0, history: scene_start_zero_history}
+    W1: {sample_index: 42, history: ten_historical_sweeps_plus_current}
+    W2: {sample_index: 49, history: ten_historical_sweeps_plus_current}
+
+timing:
+  warmups: 20
+  measurements: 100
+  synchronization: cuda_synchronize_at_stage_boundaries
+  statistic_fields: [mean, median, p95, minimum, maximum, population_standard_deviation]
+  boundaries:
+    - cpu_model_ready_batch_construction
+    - cast_data_cpu_to_cuda
+    - hard_voxel_layer
+    - voxel_center_construction
+    - coordinate_batch_padding
+    - cat_contiguous_and_bookkeeping
+    - complete_preprocessing
+    - complete_direct_detector_e2e_with_current_hashing
+    - complete_direct_detector_e2e_without_hashing_experimental_only
+
+voxel_fidelity:
+  canonical_key: padded_voxel_coordinate
+  raw_output_order_may_differ: true
+  compare_coordinate_sets: true
+  compare_per_coordinate_num_points: true
+  compare_point_multisets_ignoring_order: true
+  report_saturated_and_non_saturated_separately: true
+  saturation_samples: all_frozen_20
+
+detector_fidelity:
+  reference: official_deterministic_true_voxelization
+  candidate: experimental_deterministic_false_voxelization
+  runtime: unchanged_tensorrt_fp16_engine
+  postprocess: unchanged_shared_mmdeploy
+  conversion: unchanged_laserperception_detection_frame
+  exported_detection_threshold: 0.25
+  high_confidence_threshold: 0.30
+  matching:
+    class_wise: true
+    reference_order: descending_score_then_detection_sort_key
+    candidate_selection: maximum_bev_iou_among_unmatched_candidate_detections
+    minimum_bev_iou: 0.50
+    one_to_one: true
+  diagnostic_yardstick_reused_from_parity_v2:
+    minimum_bidirectional_high_confidence_coverage: 0.99
+    minimum_per_metric_pass_fraction: 0.99
+    maximum_xy_center_displacement_m: 0.25
+    maximum_absolute_z_center_difference_m: 0.25
+    maximum_relative_error_per_lwh_dimension: 0.05
+    maximum_absolute_score_difference: 0.05
+    maximum_axis_yaw_difference_degrees_modulo_pi: 5.0
+    minimum_heading_direction_agreement: 0.99
+    maximum_class_name_mismatches: 0
+    aggregate_maximum_exported_count_relative_difference: 0.05
+  policy: new_m3b_diagnostic_does_not_reinterpret_or_modify_m2_parity
+
+repeatability:
+  sample_indices: [42, 49]
+  runs_per_sample: 30
+  identical_input_points_each_run: true
+  compare_each_run_to_first_fast_run: true
+  compare_each_run_to_deterministic_reference: true
+  fields:
+    - voxel_count_and_coordinate_set
+    - raw_tensorrt_output_absolute_differences
+    - final_detection_counts_and_classes
+    - final_score_and_box_differences
+
+policy:
+  model_change_allowed: false
+  engine_rebuild_allowed: false
+  onnx_export_allowed: false
+  postprocess_optimization_allowed: false
+  ros_or_dds_optimization_allowed: false
+  provenance_hash_removal_from_production_allowed: false
+  default_voxelizer_change_allowed: false
+  m4_allowed: false
