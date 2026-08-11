@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
+import platform
 import time
 from collections.abc import Sequence
 from copy import deepcopy
@@ -18,6 +20,7 @@ from mmengine import Config
 
 from laserperception.detection.artifacts import ExternalArtifactMetadata
 from laserperception.detection.m2_assets import resolve_m2_asset_paths
+from laserperception.detection.runtime_metadata import nvidia_smi_value
 from laserperception.detection.tensorrt_backend import inspect_engine, load_tensorrt
 
 
@@ -60,6 +63,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     onnx_model = onnx.load(str(onnx_path), load_external_data=True)
     onnx.checker.check_model(onnx_model, full_check=True)
     trt = load_tensorrt()
+    torch = importlib.import_module("torch")
     if not bool(trt.Builder(trt.Logger(trt.Logger.WARNING)).platform_has_fast_fp16):
         raise SystemExit("error: TensorRT builder reports no fast FP16 support")
 
@@ -100,6 +104,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     artifact = ExternalArtifactMetadata.from_file(
         engine_path, logical_name=str(manifest["artifacts"]["engine"]["logical_name"])
     )
+    onnx_artifact = ExternalArtifactMetadata.from_file(
+        onnx_path, logical_name=str(manifest["artifacts"]["onnx"]["logical_name"])
+    )
 
     logger = trt.Logger(trt.Logger.WARNING)
     runtime = trt.Runtime(logger)
@@ -115,14 +122,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         "schema_version": "1.0",
         "status": "pass",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "environment": {
+            "platform": platform.platform(),
+            "python": platform.python_version(),
+            "gpu_name": str(torch.cuda.get_device_name(0)),
+            "nvidia_driver": nvidia_smi_value("driver_version"),
+            "torch_cuda_runtime": str(torch.version.cuda),
+            "onnx_version": str(onnx.__version__),
+        },
+        "source_onnx": onnx_artifact.to_dict(),
         "builder": {
             "name": "MMDeploy official onnx2tensorrt",
             "mmdeploy_version": str(manifest["deployment"]["exporter_version"]),
             "mmdeploy_commit": str(manifest["deployment"]["exporter_commit"]),
             "official_config": deploy_relative,
             "tensorrt_version": str(trt.__version__),
+            "requested_builder_flags": ["FP16"],
             "fp16_mode": True,
             "int8_mode": False,
+            "tf32_policy": "TensorRT 8.6.1 builder default; not overridden",
             "workspace_size_bytes": int(
                 deploy_config["backend_config"]["common_config"]["max_workspace_size"]
             ),
