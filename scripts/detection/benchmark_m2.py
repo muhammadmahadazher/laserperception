@@ -20,6 +20,7 @@ from laserperception.detection.benchmark import bytes_to_gib, latency_statistics
 from laserperception.detection.m1_assets import resolve_m1_asset_paths
 from laserperception.detection.m2_assets import resolve_m2_asset_paths
 from laserperception.detection.m2_backend import M2Backend, VoxelizedM2Sample
+from laserperception.detection.m2_benchmark import build_parity_v2_benchmark_record
 from laserperception.detection.runtime_metadata import (
     nvidia_smi_value,
     repository_git_sha,
@@ -226,21 +227,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     engine_path = args.engine or m2_assets.engine_directory / "pointpillars_fp16.engine"
     onnx_path = m2_assets.artifact_directory / "pointpillars.onnx"
     parity_path = args.parity or m2_assets.artifact_directory / "parity_v2.json"
-    parity = json.loads(parity_path.read_text(encoding="utf-8"))
+    parity_bytes = parity_path.read_bytes()
+    parity = json.loads(parity_bytes)
     frozen_indices = [int(value) for value in parity_manifest["dataset"]["sample_indices"]]
-    if (
-        parity.get("status") != "pass"
-        or parity.get("protocol_version") != 2
-        or parity.get("diagnostic_only") is not False
-        or parity.get("dataset", {}).get("sample_indices") != frozen_indices
-        or parity.get("stage_1", {}).get("overall_pass") is not True
-    ):
-        raise SystemExit(
-            "error: benchmark promotion requires a passing full 20-sample parity-v2 run"
-        )
     current_commit = repository_git_sha(repository_root)
-    if parity.get("commit_sha") != current_commit:
-        raise SystemExit("error: parity evidence must come from the current implementation commit")
 
     model_info = m1_manifest["model"]
     checkpoint_info = model_info["checkpoint"]
@@ -276,12 +266,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     engine_artifact = ExternalArtifactMetadata.from_file(
         engine_path, logical_name=str(m2_manifest["artifacts"]["engine"]["logical_name"])
     )
-    parity_artifacts = parity.get("artifacts", {})
-    if (
-        parity_artifacts.get("onnx", {}).get("sha256") != onnx_artifact.sha256
-        or parity_artifacts.get("engine", {}).get("sha256") != engine_artifact.sha256
-    ):
-        raise SystemExit("error: parity evidence does not identify the current ONNX and engine")
+    try:
+        parity_record = build_parity_v2_benchmark_record(
+            parity,
+            parity_bytes,
+            current_commit=current_commit,
+            frozen_indices=frozen_indices,
+            onnx_sha256=onnx_artifact.sha256,
+            engine_sha256=engine_artifact.sha256,
+        )
+    except ValueError as error:
+        raise SystemExit(f"error: {error}") from error
 
     engine_inspection = inspect_engine(
         engine_path,
@@ -381,13 +376,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "onnx": onnx_artifact.to_dict(),
             "engine": engine_artifact.to_dict(),
         },
-        "parity": {
-            "status": "pass",
-            "commit_sha": str(parity["commit_sha"]),
-            "sample_count": len(parity["dataset"]["sample_indices"]),
-            "result_sha256": __import__("hashlib").sha256(parity_path.read_bytes()).hexdigest(),
-            "summary": parity["acceptance_summary"],
-        },
+        "parity": parity_record,
         "measurements": {
             "network": {
                 "boundary": str(benchmark_config["network_boundary"]),
