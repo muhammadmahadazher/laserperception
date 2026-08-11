@@ -60,11 +60,31 @@ profile:
   scan_split: mini_val
   preferred_samples_scanned: 81
   minimum_required_samples: frozen_parity_set_plus_benchmark_sample
-  observed_shapes: Pending measurement
-  selected_min_shapes: Pending measurement
-  selected_opt_shapes: Pending measurement
-  selected_max_shapes: Pending measurement
-  rationale: Pending measurement
+  observed_voxel_counts:
+    samples_scanned: 81
+    minimum: 4352
+    p50_nearest_rank: 18207
+    p90_nearest_rank: 20085
+    p95_nearest_rank: 20544
+    maximum: 22546
+    upstream_validation_limit: 40000
+  selected_min_shapes:
+    voxels: [4352, 64, 4]
+    num_points: [4352]
+    coors: [4352, 4]
+  selected_opt_shapes:
+    voxels: [18207, 64, 4]
+    num_points: [18207]
+    coors: [18207, 4]
+  selected_max_shapes:
+    voxels: [30000, 64, 4]
+    num_points: [30000]
+    coors: [30000, 4]
+  rationale: >-
+    The profile uses the exact observed minimum and nearest-rank p50 from all 81 mini_val
+    samples. The official MMDeploy 64x4 maximum of 30000 is retained because it exceeds a
+    25 percent measured-headroom target and remains below the upstream validation limit of
+    40000 voxels.
 
 artifacts:
   onnx:
@@ -99,8 +119,8 @@ memory:
   comparable_process_level_gpu_memory: Pending measurement
 
 evidence:
-  tensorrt_gate_0: Pending measurement
-  profile_result: Pending measurement
+  tensorrt_gate_0: pass
+  profile_result: pass
   onnx_result: Pending measurement
   engine_result: Pending measurement
   parity_result: Pending measurement
