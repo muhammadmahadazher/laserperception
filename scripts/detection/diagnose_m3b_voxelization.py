@@ -438,7 +438,7 @@ def _performance_profile(
             measurements=measurements,
             synchronize_cuda=True,
         )
-        direct_fast, fast_frame = _time_block(
+        direct_fast, _ = _time_block(
             torch,
             partial(
                 _run_direct,
@@ -457,7 +457,7 @@ def _performance_profile(
         no_hash: dict[str, float | int] | None = None
         no_hash_semantic_exact: bool | None = None
         if name in {"W1", "W2"}:
-            no_hash, no_hash_frame = _time_block(
+            no_hash, _ = _time_block(
                 torch,
                 partial(
                     _run_direct,
@@ -473,16 +473,24 @@ def _performance_profile(
                 measurements=measurements,
                 synchronize_cuda=True,
             )
-            no_hash_semantic_exact = (
-                isinstance(fast_frame, DetectionFrame)
-                and isinstance(no_hash_frame, DetectionFrame)
-                and [item.to_dict() for item in fast_frame.detections]
-                == [item.to_dict() for item in no_hash_frame.detections]
-            )
+
         if not isinstance(reference_voxelized, VoxelizedM2Sample) or not isinstance(
             fast_voxelized, VoxelizedM2Sample
         ):
             raise RuntimeError("timed preprocessing did not return voxelized samples")
+        if name in {"W1", "W2"}:
+            semantic_raw = backend.run_tensorrt_raw(fast_voxelized, engine)
+            semantic_prediction = backend.run_official_postprocess_raw(semantic_raw, fast_voxelized)
+            hashed_frame = backend.convert_postprocessed_prediction(
+                semantic_prediction,
+                fast_voxelized,
+                backend_name="tensorrt",
+                precision="fp16",
+            )
+            no_hash_frame = _no_hash_conversion(backend, semantic_prediction, fast_voxelized)
+            no_hash_semantic_exact = [item.to_dict() for item in hashed_frame.detections] == [
+                item.to_dict() for item in no_hash_frame.detections
+            ]
         voxel_config = experiment.protocol["voxelization"]
         workload_saturation = {
             "official_deterministic": saturation_statistics(
@@ -517,7 +525,7 @@ def _performance_profile(
             "current_deterministic_direct_e2e_with_hashing_ms": direct_reference,
             "experimental_fast_direct_e2e_with_hashing_ms": direct_fast,
             "projected_experimental_fast_direct_e2e_without_hashing_ms": no_hash,
-            "hash_disabled_detection_values_exact": no_hash_semantic_exact,
+            "same_prediction_hash_disabled_detection_values_exact": no_hash_semantic_exact,
             "timing_protocol": {
                 "warmups": warmups,
                 "measurements": measurements,
