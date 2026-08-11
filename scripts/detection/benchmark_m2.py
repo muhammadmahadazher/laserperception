@@ -206,7 +206,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     repository_root = _repository_root()
     m1_manifest = _manifest("m1_pointpillars_nuscenes.yaml")
     m2_manifest = _manifest("m2_pointpillars_tensorrt.yaml")
-    parity_manifest = _manifest("m2_parity.yaml")
+    parity_manifest = _manifest("m2_parity_v2.yaml")
     m1_assets = resolve_m1_asset_paths(m1_manifest)
     m2_assets = resolve_m2_asset_paths(m2_manifest)
     benchmark_config = m2_manifest["benchmark"]
@@ -225,15 +225,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     index = int(benchmark_config["sample_index"])
     engine_path = args.engine or m2_assets.engine_directory / "pointpillars_fp16.engine"
     onnx_path = m2_assets.artifact_directory / "pointpillars.onnx"
-    parity_path = args.parity or m2_assets.artifact_directory / "parity.json"
+    parity_path = args.parity or m2_assets.artifact_directory / "parity_v2.json"
     parity = json.loads(parity_path.read_text(encoding="utf-8"))
     frozen_indices = [int(value) for value in parity_manifest["dataset"]["sample_indices"]]
     if (
         parity.get("status") != "pass"
+        or parity.get("protocol_version") != 2
         or parity.get("diagnostic_only") is not False
         or parity.get("dataset", {}).get("sample_indices") != frozen_indices
+        or parity.get("stage_1", {}).get("overall_pass") is not True
     ):
-        raise SystemExit("error: benchmark promotion requires a passing full 20-sample parity run")
+        raise SystemExit(
+            "error: benchmark promotion requires a passing full 20-sample parity-v2 run"
+        )
     current_commit = repository_git_sha(repository_root)
     if parity.get("commit_sha") != current_commit:
         raise SystemExit("error: parity evidence must come from the current implementation commit")

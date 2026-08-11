@@ -117,6 +117,26 @@ class M2Backend(Mmdet3dBackend):
         self.initialize()
         return self._deploy_config
 
+    @property
+    def official_nms_pre(self) -> int:
+        """Return the pinned model's official pre-NMS top-anchor count."""
+
+        self.initialize()
+        test_config = getattr(self._model, "test_cfg", None)
+        if test_config is None:
+            model_config = self._model.cfg.model
+            test_config = model_config.get("test_cfg")
+        if test_config is None:
+            raise RuntimeError("pinned PointPillars model does not expose test_cfg")
+        value = (
+            test_config.get("nms_pre")
+            if hasattr(test_config, "get")
+            else getattr(test_config, "nms_pre", None)
+        )
+        if isinstance(value, bool) or not isinstance(value, int) or value == 0:
+            raise RuntimeError("pinned PointPillars test_cfg has an invalid nms_pre value")
+        return value
+
     def voxelize(self, sample: PreparedMmdet3dSample) -> VoxelizedM2Sample:
         """Apply the official MMDetection3D data preprocessor exactly once."""
 
