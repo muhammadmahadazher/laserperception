@@ -128,6 +128,8 @@ class M2Backend(Mmdet3dBackend):
             test_config = model_config.get("test_cfg")
         if test_config is None:
             raise RuntimeError("pinned PointPillars model does not expose test_cfg")
+        points_config = test_config.get("pts") if hasattr(test_config, "get") else None
+        test_config = points_config if points_config is not None else test_config
         value = (
             test_config.get("nms_pre")
             if hasattr(test_config, "get")

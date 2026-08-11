@@ -1,9 +1,11 @@
 from math import pi
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
+from laserperception.detection.m2_backend import M2Backend
 from laserperception.detection.parity_v2 import (
     aggregate_acceptance_v2,
     axis_yaw_difference_degrees,
@@ -229,3 +231,15 @@ def test_v1_and_v2_manifests_are_separate_and_samples_are_unchanged() -> None:
     assert "minimum_per_detection_pass_fraction: 0.99" in v2
     assert sample_line in v1
     assert sample_line in v2
+
+
+def test_official_nms_pre_uses_pointpillars_pts_test_config() -> None:
+    class BackendWithPinnedConfig(M2Backend):
+        def __init__(self) -> None:
+            self._model = SimpleNamespace(test_cfg={"pts": {"nms_pre": 1000}})
+
+        def initialize(self) -> None:
+            return
+
+    backend = BackendWithPinnedConfig()
+    assert backend.official_nms_pre == 1000
