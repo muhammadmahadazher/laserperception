@@ -15,10 +15,12 @@ The implementation passed TensorRT Gate 0, profiled all 81 `mini_val` samples, c
 ONNX graph, and built/ran the FP16 engine. Parity v1 failed its hard maximum XY, per-dimension size,
 yaw, and score guards and remains failed. The separately preregistered v2 Stage 1 passed every
 per-metric fraction, count, coverage, direction, and class gate using the same 20 samples and
-unchanged engine, then passed again at exact measurement commit
-`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The benchmark from that commit was subsequently rejected because rewritten eager PyTorch was
-not a valid performance baseline. Parity v2 remains valid; exact-commit M2 diagnosis passed and replacement benchmarking awaits review. Exact hashes, metrics, exceptions, and protocol chronology
-are in `docs/TENSORRT.md`.
+unchanged engine. The first benchmark at `e2f9b6babb541d52beaa0bcd58e841a0a56cc851` was rejected
+because rewritten eager PyTorch was not a valid performance baseline; parity v2 was not invalidated.
+At repaired measurement commit `3f240d60569b53a2e4445d34b0905a807cf54879`, parity v2 passed
+again, native and rewritten PyTorch were bit-identical across 235.2 million raw values, and the
+canonical native-PyTorch-versus-TensorRT benchmark completed with no review flags. Exact hashes,
+metrics, exceptions, and protocol chronology are in `docs/TENSORRT.md`.
 
 After activating the M2 environment, the reproducible sequence is:
 
@@ -28,15 +30,17 @@ python scripts/detection/profile_m2_voxels.py
 python scripts/detection/export_m2_onnx.py
 python scripts/detection/build_m2_tensorrt.py
 python scripts/detection/validate_m2_parity.py
+python scripts/detection/diagnose_m2_benchmark.py
 python scripts/detection/benchmark_m2.py
 ```
 
 The parity-v2 command exits zero for a passing full suite and writes external `parity_v2.json`.
 `benchmark_m2.py` requires protocol-v2 passing evidence from the exact current commit and exact
-ONNX/engine hashes. Benchmarking requires a passing native-vs-rewritten fidelity diagnosis from the exact current
-commit. Native MMDetection3D PyTorch is the performance baseline; no replacement canonical result
-is authorized yet. `LASERPERCEPTION_M2_CACHE` selects the external
-cache; its default is `~/.cache/laserperception`.
+ONNX/engine hashes. Benchmarking also requires a passing native-vs-rewritten fidelity diagnosis from
+the exact current commit. Native MMDetection3D PyTorch is the performance baseline. The sanitized
+canonical result is `benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`; its headline
+direct end-to-end median speedup is 1.2991×. `LASERPERCEPTION_M2_CACHE` selects the external cache;
+its default is `~/.cache/laserperception`.
 
 ## M1 status
 

@@ -1,6 +1,6 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **M2 diagnosis complete; parity v2 remains passed and benchmark review is required.**
+Status: **Repaired canonical M2 measurement complete; PR #3 remains draft for final review.**
 
 ## Parity v1 — measured failure
 
@@ -100,11 +100,15 @@ external `parity_v2.json` has SHA256
 SHA256 is `c26fa7a67289c64c607707141a7d6721a2821d8fccbaa54ee1401c6c03a721bc`.
 All 20 frozen indices completed. The engine was not rebuilt and no layer precision changed.
 
-Before benchmarking, the integration fix was frozen as exact measurement commit
-`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The complete 20-sample v2 suite passed again and
-generated a new external parity JSON with SHA256
-`fbecf5493a34bf840d2a71b1fe1851010110e15b1aee78b23a26d2ef4f880634`. ONNX SHA256
-`61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16`, engine SHA256
+Before the first benchmark, the integration fix was frozen as exact measurement commit
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The complete 20-sample v2 suite passed again with
+external JSON SHA256 `fbecf5493a34bf840d2a71b1fe1851010110e15b1aee78b23a26d2ef4f880634`, but the
+subsequent performance measurement was rejected for its rewritten-eager baseline.
+
+For the repaired canonical benchmark, the implementation was frozen again at
+`3f240d60569b53a2e4445d34b0905a807cf54879`. The full v2 suite passed on that exact commit with
+external JSON SHA256 `5e8d49ce3847248f2a1a6d28fd92903d80c118de2cdec7b3c08fcab6c2f58853`.
+ONNX SHA256 `61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16`, engine SHA256
 `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`, and checkpoint SHA256
 `f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0` remained unchanged.
 Stage 1 passed with the same summary below, and Stage 2 was not required.
@@ -186,7 +190,7 @@ satisfied the preregistered parity-v2 acceptance criteria.
 
 All raw tensor shapes and dtypes were consistent between runtimes and across all 20 samples. Stage 2
 was not required, so no pre-NMS survivor tracing was performed and no NMS-swap or other causal
-labels were assigned. Review later authorized the same-commit benchmark documented below.
+labels were assigned. Final reviewer authorization later required another exact-commit parity and fidelity pass before the repaired benchmark documented below.
 
 M2 deploys the exact M1 pretrained PointPillars model through ONNX and TensorRT FP16. It does not
 train, simplify, or replace the model. The frozen scientific configuration is
@@ -279,14 +283,14 @@ review before the benchmark.
 
 ## Rejected performance evidence
 
-The benchmark measured at commit e2f9b6babb541d52beaa0bcd58e841a0a56cc851 is rejected for
+The benchmark measured at commit `e2f9b6babb541d52beaa0bcd58e841a0a56cc851` is rejected for
 publication. It used MMDeploy-rewritten eager PyTorch FP32 as the performance denominator and
 alternated runtimes every measured iteration. Its 2164.527 ms rewritten-PyTorch network median,
 1816.859 ms rewritten-PyTorch end-to-end median, 124.297× network ratio, and 23.101× end-to-end
 ratio are not canonical M2 evidence.
 
-The historical record is retained only at benchmarks/m2/diagnostics/rejected_e2f9b6b.json with
-status rejected_measurement. No file in benchmarks/m2/results presents that run as valid. The
+The historical record is retained only at `benchmarks/m2/diagnostics/rejected_e2f9b6b.json` with
+status `rejected_measurement`. The repaired result does not contain or rely on those values. The
 valid parity-v2 PASS, frozen samples, thresholds, ONNX, and TensorRT engine remain unchanged.
 
 ## Benchmark architecture correction
@@ -294,37 +298,19 @@ valid parity-v2 PASS, frozen samples, thresholds, ONNX, and TensorRT engine rema
 MMDeploy-rewritten PyTorch FP32 remains the parity reference because it exposes the graph that was
 exported. Native MMDetection3D PyTorch FP32 is the performance baseline because it represents the
 normal framework inference modules. Both native PyTorch and TensorRT consume identical
-already-voxelized inputs and use the existing MMDeploy VoxelDetectionModel.postprocess plus the
+already-voxelized inputs and use the existing MMDeploy `VoxelDetectionModel.postprocess` plus the
 same DetectionFrame conversion.
 
 The existing MMDeploy postprocess constructs a bbox head on every call. This cost is measured but
 not optimized in M2. No cached head, custom postprocess, rewritten NMS, C++ postprocess, or custom
 CUDA postprocess is introduced.
 
-## Diagnostic and repaired protocol
-
-Before any new canonical measurement, the diagnostic runner must reproduce M1 in the M2
-environment, prove CUDA device placement, compare native with rewritten PyTorch on all frozen 20
-samples, profile each component, and stop promotion if native-vs-rewritten semantics materially
-differ.
-
-The repaired benchmark uses isolated runtime blocks, not per-iteration alternation. The network
-boundary begins after common voxelization and ends when the three raw head outputs are available.
-The end-to-end boundary runs from dataset preparation through common voxelization, the selected
-network, existing common postprocess, and DetectionFrame conversion. A future canonical run remains
-batch size one, mini_val index 0, 10 warmups, and 100 measured iterations. End-to-end median
-speedup is the headline even if the valid result is small, absent, or negative.
-
-This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O,
-whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production real-time
-guarantee. The diagnostic pass does not authorize a new canonical benchmark; review is required.
-
 ## Exact-commit benchmark diagnosis
 
-The non-canonical diagnostic ran at clean implementation commit
-4e12374dec8eecaf0e772b2b5776e0b266fbe09e. Its full external JSON SHA256 is
-2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2; the sanitized tracked
-summary is benchmarks/m2/diagnostics/diagnosis_4e12374.json. Checkpoint, ONNX, and engine hashes
+The original non-canonical diagnosis ran at clean implementation commit
+`4e12374dec8eecaf0e772b2b5776e0b266fbe09e`. Its full external JSON SHA256 is
+`2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2`; the sanitized tracked
+summary is `benchmarks/m2/diagnostics/diagnosis_4e12374.json`. Checkpoint, ONNX, and engine hashes
 match the frozen parity-v2 artifacts.
 
 The unchanged M1 runner was first executed in the M2 environment with 10 warmups and 30
@@ -332,23 +318,24 @@ measurements. Its model/test-step median was 84.226 ms and end-to-end median was
 historical 52.896 ms and 55.097 ms. These are 1.59× and 1.15× historical respectively, within the
 diagnostic 2× review guideline and nowhere near the rejected two-second scale.
 
-All fail-closed device checks passed. The first model parameter, voxels, num_points, coors, native
-outputs, rewritten outputs, and TensorRT outputs were on cuda:0. Model/voxel/raw floating tensors
-were FP32; num_points and coors were int32. Raw output shapes were [1,140,200,200],
+All fail-closed device checks passed. The first model parameter, voxels, `num_points`, `coors`,
+native outputs, rewritten outputs, and TensorRT outputs were on `cuda:0`. Model/voxel/raw floating
+tensors were FP32; `num_points` and `coors` were int32. Raw output shapes were [1,140,200,200],
 [1,126,200,200], and [1,28,200,200] for class, box, and direction heads.
 
 ### Native-versus-rewritten fidelity
 
-Across all frozen 20 samples, every element of cls_score (112,000,000 values), bbox_pred
-(100,800,000), and dir_cls_pred (22,400,000) was exactly equal in FP32. After the same existing
+Across all frozen 20 samples, every element of `cls_score` (112,000,000 values), `bbox_pred`
+(100,800,000), and `dir_cls_pred` (22,400,000) was exactly equal in FP32. After the same existing
 MMDeploy postprocess, exported counts were 883 versus 883, all 750 high-confidence detections
 matched, all continuous differences were zero, and class agreement was exact. This export-rewrite
 fidelity diagnostic passed. It does not alter or replace parity v2.
 
-### Component profile
+### Component profile retained as diagnostic context
 
-Each component used 20 warmups and 30 measurements on mini_val index 0. CUDA events timed raw GPU
-networks; synchronized wall time covered preparation, voxelization, postprocess, and conversion.
+Each component used 20 warmups and 30 measurements on `mini_val` index 0. CUDA events timed raw GPU
+networks; synchronized wall time covered preparation, voxelization, shared MMDeploy postprocessing,
+and conversion.
 
 | Component | Mean | Median | P95 | Population std. dev. |
 |---|---:|---:|---:|---:|
@@ -357,34 +344,88 @@ networks; synchronized wall time covered preparation, voxelization, postprocess,
 | Native MMDetection3D PyTorch raw | 20.930 ms | 20.800 ms | 21.786 ms | 0.534 ms |
 | MMDeploy-rewritten eager PyTorch raw | 1950.506 ms | 1910.464 ms | 2462.358 ms | 293.910 ms |
 | TensorRT FP16 raw | 6.966 ms | 6.917 ms | 7.452 ms | 0.263 ms |
-| Current MMDeploy postprocess | 24.461 ms | 24.093 ms | 27.919 ms | 1.657 ms |
+| Shared MMDeploy postprocessing | 24.461 ms | 24.093 ms | 27.919 ms | 1.657 ms |
 | Bbox-head construction alone | 1.037 ms | 0.999 ms | 1.244 ms | 0.111 ms |
 | DetectionFrame conversion | 5.251 ms | 5.160 ms | 6.043 ms | 0.464 ms |
 
 TensorRT isolated raw inference was stable: p95/median was 1.077 and population standard deviation
-was 3.78% of the mean. Bbox-head construction accounted for about 4.15% of current postprocess
-median, so construction alone does not explain the full 24.093 ms postprocess cost. No cached
-postprocess candidate was implemented, measured, or equivalence-tested because M2 explicitly
-forbids that optimization.
+was 3.78% of the mean. Bbox-head construction accounted for about 4.15% of the shared postprocess
+median, so construction alone does not explain the full 24.093 ms cost. No cached postprocess
+candidate was implemented, measured, or equivalence-tested.
 
-The rewritten/native raw median ratio was 91.85× even though their outputs were bit-identical.
-Code inspection and timing therefore identify per-call MMDeploy RewriterContext activation and
-rollback in the rejected eager path as the dominant invalid-denominator overhead; it is parity
-machinery, not normal native PyTorch performance.
+The rewritten/native raw median ratio was 91.85× even though outputs were bit-identical. The
+rejected benchmark used MMDeploy's deployment-rewritten eager PyTorch path, which incurred severe
+runtime overhead and was not representative of native PyTorch inference. The diagnostic did not
+isolate the full causal mechanism, so it does not attribute the entire slowdown to RewriterContext
+entry or exit alone.
 
 Summing independent component medians gives 63.976 ms for the native path and 50.093 ms for the
-TensorRT path, a diagnostic-only 1.277× ratio. This is not a direct end-to-end distribution and
-does not establish a publishable end-to-end speedup. Whether TensorRT improves measured
-end-to-end latency remains for the reviewer-approved canonical protocol.
+TensorRT path, a diagnostic-only 1.277× ratio. This sum is not the source of the canonical
+end-to-end speedup.
 
-GPU telemetry was available before and after: 56–58 °C, 8.52–27.72 W, SM clock 690–2655 MHz,
-memory clock 810–8001 MHz, and sampled utilization 35% before / 12% after. WSL2 did not expose the
-power limit.
+## Repaired canonical benchmark
 
-The recommended replacement method retains the unchanged model, engine, samples, precision, and
-common postprocess; uses native PyTorch FP32 as the performance baseline; runs isolated runtime
-blocks with reversed order in a second round if approved; and headlines direct end-to-end median
-speedup. No replacement canonical benchmark was run or promoted in this pass.
+Reviewer authorization required exact evidence at the benchmark implementation commit. At
+`3f240d60569b53a2e4445d34b0905a807cf54879`:
+
+- the full parity-v2 suite passed with SHA256
+  `5e8d49ce3847248f2a1a6d28fd92903d80c118de2cdec7b3c08fcab6c2f58853`;
+- native-versus-rewritten fidelity passed on all 20 samples and 235.2 million bit-identical raw
+  values with evidence SHA256
+  `1a5ccbad83ebee06178d2dfdafbb830eafe3adb3eb1f55b0523a4a47a01783ad`;
+- checkpoint, ONNX, and engine hashes remained `f19d00a3…`, `61ce22a8…`, and `a005f758…`; and
+- every benchmark review flag was empty.
+
+The sanitized result is
+`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`.
+
+### Direct end-to-end result — headline
+
+| Runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Native MMDetection3D PyTorch FP32 | 60.007 ms | 59.289 ms | 62.928 ms | 64.945 ms | 55.384 ms | 74.541 ms | 2.701 ms | 16.867 |
+| TensorRT FP16 | 45.655 ms | 45.637 ms | 48.210 ms | 48.711 ms | 41.354 ms | 50.457 ms | 2.045 ms | 21.912 |
+
+**The headline direct end-to-end median speedup is 1.299134×.** Both paths repeatedly used the same
+`mini_val` index 0 sample, multi-sweep preparation, official voxelization, shared MMDeploy
+postprocessing, and DetectionFrame conversion. Only the network runtime differed. Synchronized wall
+time covered the complete boundary.
+
+### Network-only result — secondary
+
+| Runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Native MMDetection3D PyTorch FP32 | 19.449 ms | 19.189 ms | 20.230 ms | 20.696 ms | 18.747 ms | 22.634 ms | 0.714 ms | 52.114 |
+| TensorRT FP16 | 6.156 ms | 6.126 ms | 6.402 ms | 6.547 ms | 5.810 ms | 7.327 ms | 0.251 ms | 163.250 |
+
+The secondary network-only median speedup is 3.132564×. CUDA events measured identical precomputed
+voxel tensors through availability of `cls_score`, `bbox_pred`, and `dir_cls_pred`.
+
+The run used batch size one, 10 warmups, and 100 measurements per runtime and boundary in one
+same-session process with an isolated native block followed by an isolated TensorRT block. It is a
+warm-cache repeated-single-sample latency microbenchmark, not cold-storage I/O, whole-dataset
+sequential throughput, guaranteed sensor throughput, or production evidence.
+
+The smaller end-to-end gain shows that shared work outside the network dominates much of deployed
+latency. The diagnostic shared MMDeploy postprocess was the largest individually profiled shared
+stage. This is not described as entirely CPU execution because that was not established.
+
+PyTorch peak allocator counters after reset reported 408,934,400 bytes allocated and 427,819,008
+bytes reserved for one native network call, and 413,477,888 bytes allocated and 427,819,008 bytes
+reserved for one native end-to-end call. TensorRT records a 31,519,476-byte serialized engine and
+`ICudaEngine.device_memory_size` of 1,212,340,736 bytes. Comparable process-level GPU memory is
+`Pending measurement`; the methods are not directly interchangeable.
+
+The measured environment was WSL2, Python 3.10.12, PyTorch 2.1.0+cu118, CUDA runtime 11.8,
+MMDetection3D 1.4.0, MMDeploy 1.3.1, ONNX 1.14.1, TensorRT 8.6.1, NVIDIA driver 610.88, and the
+NVIDIA GeForce RTX 4060 Laptop GPU. Pre/post snapshots recorded 52/60 °C, 13.61/24.37 W, SM clocks
+1890/2655 MHz, memory clock 8001 MHz, and sampled utilization 3%/1%; these are spot telemetry, not
+averages over the run.
+
+The scientific chronology is therefore preserved: parity v1 failed; parity v2 passed; the first
+benchmark was rejected; the diagnostic proved native/rewrite fidelity and selected the native
+baseline; and the repaired canonical benchmark directly measured the result above. PR #3 remains
+draft and unmerged for final M2 review.
 
 ## Artifact and portability policy
 
@@ -394,8 +435,8 @@ environment without private absolute paths.
 
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
-engine download. The ONNX and engine metadata above are measured build evidence. M2 evidence is
-complete and awaiting PR review/merge; serialized ONNX and TensorRT binaries remain external.
+engine download. The ONNX and engine metadata above are measured build evidence. M2 measurement evidence is complete and awaiting final PR review; PR #3 remains draft and
+unmerged, while serialized ONNX and TensorRT binaries remain external.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded

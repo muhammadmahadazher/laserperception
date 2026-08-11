@@ -33,13 +33,14 @@ detector, model conversion, ROS 2, or edge deployment.
 - [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
 - [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
 - [x] Pass versioned final-box parity v2 on all frozen samples with shared preprocessing/postprocessing.
-- [ ] Complete reviewer-approved native PyTorch FP32 versus TensorRT FP16 performance measurement.
+- [x] Complete reviewer-approved native PyTorch FP32 versus TensorRT FP16 performance measurement.
 
 Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 remain valid. The
-benchmark at e2f9b6b was rejected because rewritten eager PyTorch was used as the performance
-baseline. Exact-commit native-vs-rewritten fidelity passed and the component diagnosis identified the
-invalid rewritten denominator. Any replacement benchmark awaits methodology review. PR #3 remains
-draft, and M3 has not started.
+benchmark at e2f9b6b remains rejected because rewritten eager PyTorch was used as the performance
+baseline. At repaired measurement commit 3f240d6, exact-commit parity and native-vs-rewritten
+fidelity passed, then the direct benchmark measured a 1.2991× end-to-end median speedup and a
+secondary 3.1326× network-only speedup with no review flags. PR #3 remains draft for final M2
+review, and M3 has not started.
 
 ## M3 — ROS 2
 

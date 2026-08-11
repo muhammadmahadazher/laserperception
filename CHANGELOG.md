@@ -24,6 +24,11 @@ releases begin.
 - Recorded the exact-commit M2 diagnosis: native and rewritten FP32 outputs were element-exact on
   all 20 samples; native/TensorRT raw medians were 20.800/6.917 ms; current postprocess was
   24.093 ms. These diagnostic values are not a replacement canonical benchmark.
+- Reconfirmed parity v2 and native/rewrite fidelity at exact measurement commit 3f240d6, then
+  promoted the repaired RTX 4060 benchmark: native PyTorch FP32 and TensorRT FP16 measured 59.289 ms
+  and 45.637 ms direct end-to-end medians (1.2991× headline speedup), while the corresponding
+  network-only medians were 19.189 ms and 6.126 ms (3.1326× secondary speedup). No benchmark review
+  flags triggered, and the rejected e2f9b6b values remain non-canonical.
 
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
@@ -40,6 +45,10 @@ releases begin.
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
 - Retained the rejected M2 timing record in benchmarks/m2/diagnostics without presenting its
   latency or speedup values as accepted evidence.
+- Sanitized canonical M2 result at
+  `benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`, including exact-commit parity
+  and fidelity hashes, complete latency distributions, environment provenance, limitations, memory
+  accounting methods, and empty review flags.
 - Pinned isolated TensorRT 8.6.1/MMDeploy 1.3.1 setup, executable Gate 0, complete 81-sample voxel
   profiler, official ONNX export and engine builder, shared deployment runtime, deterministic parity
   diagnostics, benchmark promotion guards, sanitized artifact provenance, and synthetic CPU tests.
