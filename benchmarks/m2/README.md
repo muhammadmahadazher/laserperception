@@ -12,7 +12,7 @@ It was measured on the NVIDIA GeForce RTX 4060 Laptop GPU at exact implementatio
 - Parity reference: MMDeploy-rewritten PyTorch FP32.
 - Performance baseline: native MMDetection3D PyTorch FP32.
 - Deployment runtime: TensorRT FP16.
-- Common path: identical multi-sweep preparation, official voxelization, shared MMDeploy
+- Common path: identical configured nuScenes preparation, official voxelization, shared MMDeploy
   postprocessing, and DetectionFrame conversion.
 - Parity v2: PASS, external JSON SHA256
   `5e8d49ce3847248f2a1a6d28fd92903d80c118de2cdec7b3c08fcab6c2f58853`.
@@ -54,6 +54,9 @@ runtime, and CUDA events stop when the three raw head outputs are available.
 
 The run used batch size one, `mini_val` index 0, 10 warmups, and 100 measurements per runtime and
 boundary. Runtime blocks were isolated native then TensorRT blocks in one same-session process.
+Index 0 is a scene-start workload: it contains the current keyframe and zero accumulated historical
+sweeps. The canonical M2 performance measurement therefore does not represent the usual full-history
+10-sweep-plus-current input. This workload qualification does not alter the measured values.
 
 Native network/end-to-end PyTorch peak allocated memory was 0.381/0.385 GiB; both peak reserved
 values were 0.398 GiB. TensorRT records a 31,519,476-byte serialized engine and 1,212,340,736 bytes

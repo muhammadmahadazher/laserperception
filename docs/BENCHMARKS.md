@@ -1,5 +1,23 @@
 # Benchmarks
 
+## Detection workload sweep-history qualification
+
+The pinned nuScenes test pipeline requests 10 historical sweeps in addition to the current
+keyframe. The actual `mini_val` split has 81 samples: indices 0 and 40 are scene starts with zero
+available history, while the other 79 contain all 10 requested historical sweeps plus the current
+keyframe. The dataset and configured multi-sweep pipeline are therefore not broken.
+
+Workloads used by the existing evidence differ:
+
+- M1 performance repeatedly measures scene-start index 0, with zero historical sweeps.
+- M2 canonical performance repeatedly measures the same scene-start zero-history index 0.
+- M2 parity v2 covers 20 frozen samples: 19 full-history samples and scene-start index 0.
+- M3 PointCloud2 round-trip correctness uses those same 20 frozen samples.
+- The failed M3A 20 Hz stress replay repeatedly uses scene-start zero-history index 0.
+
+These qualifications preserve all existing results and clarify their input weight; they do not
+change any timing, parity, engine, model, threshold, precision, or sample selection.
+
 LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
 measurement record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).
@@ -51,9 +69,10 @@ At the final measurement commit, native and rewritten PyTorch were reconfirmed b
 | TensorRT FP16 | 45.655 ms | 45.637 ms | 48.210 ms | 48.711 ms | 41.354 ms | 50.457 ms | 2.045 ms | 21.912 |
 
 **Headline: TensorRT FP16 measured a direct 1.299134× end-to-end median speedup over native
-PyTorch FP32.** Both paths repeatedly used `mini_val` index 0 and identical multi-sweep preparation,
-official voxelization, shared MMDeploy postprocessing, and DetectionFrame conversion. Only the
-network runtime differed. Timing used synchronized `time.perf_counter` wall time.
+PyTorch FP32.** Both paths repeatedly used `mini_val` index 0, a scene-start keyframe with zero
+accumulated historical sweeps, and otherwise identical configured preparation, official
+voxelization, shared MMDeploy postprocessing, and DetectionFrame conversion. Only the network
+runtime differed. Timing used synchronized `time.perf_counter` wall time.
 
 ### 3. Network-only comparison — secondary
 
@@ -117,8 +136,9 @@ The measured PointPillars asset is
 by LaserPerception. The run used `mini_val` index 0, sample token
 `3e8750f331d7499e9b5123e9eb70f2e2`, explicit FP32, batch size one, 10 warm-up iterations, and 50
 measurements per boundary. Warm-ups run before measurements, and every iteration repeats
-`mini_val` index 0. The end-to-end result is therefore a warm-cache, repeated-single-sample latency
-microbenchmark—not cold-storage I/O latency or whole-dataset sequential throughput.
+`mini_val` index 0. This is a scene-start keyframe with zero accumulated historical sweeps. The
+end-to-end result is therefore a warm-cache, repeated-single-sample latency microbenchmark—not
+cold-storage I/O latency or whole-dataset sequential throughput.
 
 | Boundary | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|

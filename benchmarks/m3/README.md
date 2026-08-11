@@ -25,12 +25,17 @@ detections. It passed at implementation commit
 [`diagnostics/roundtrip_d54da83.json`](diagnostics/roundtrip_d54da83.json) with file SHA256
 `bea49823e3d8547e405f1ceef1e4a9a2efe20ba9cff85ddf537171bf332c7462`.
 
+The frozen round-trip suite preserves the M2 parity-v2 workload distribution: 19 of 20 samples have
+10 historical sweeps plus the current keyframe, while `mini_val` index 0 is a scene start with zero
+historical sweeps.
+
 ## Preregistered performance protocol
 
 - hardware: RTX 4060 Laptop GPU;
 - runtime: TensorRT 8.6.1 FP16, frozen engine SHA256
   `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`;
-- input: model-ready nuScenes v1.0-mini `mini_val` index 0 repeated;
+- input: model-ready nuScenes v1.0-mini `mini_val` index 0 repeated (scene start, zero historical
+  sweeps);
 - cadence: synthetic 20 Hz stress replay, not native annotated-keyframe timing;
 - warmups/measured: 20/200;
 - input QoS: volatile best-effort keep-last depth 1;

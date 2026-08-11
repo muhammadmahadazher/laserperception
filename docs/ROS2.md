@@ -130,7 +130,9 @@ python scripts/ros2/validate_m3_roundtrip.py
 
 For each parity-v2 sample it compares exact point hashes, official voxel hashes, TensorRT raw
 output hashes/statistics, and final detections between the original dataset path and the real M3
-PointCloud2 round trip. A mismatch stops benchmarking.
+PointCloud2 round trip. A mismatch stops benchmarking. The frozen suite contains 19 samples with
+10 historical sweeps plus the current keyframe and one scene-start sample, index 0, with zero
+historical sweeps.
 
 The M3 benchmark records two distinct boundaries:
 
@@ -141,8 +143,9 @@ The M3 benchmark records two distinct boundaries:
    scheduling, detector processing, output transport, and sink reception. It is not
    sensor-to-actuator latency.
 
-The protocol repeats mini_val index 0, performs 20 warmups and 200 measured messages at a synthetic
-20 Hz, and reports full distribution, deadline, count, effective-rate, and queue evidence. At exact
+The protocol repeats mini_val index 0—a scene-start keyframe with zero accumulated historical
+sweeps—performs 20 warmups and 200 measured messages at a synthetic 20 Hz, and reports full
+distribution, deadline, count, effective-rate, and queue evidence. At exact
 implementation commit `d54da837602de2924825d3045cb4a17b72c5b7b0`, replay held 19.945 Hz but
 callback median/P95 were 238.255/274.637 ms and same-host loopback median/P95 were
 303.283/352.550 ms. All 200 observations in both boundaries exceeded 50 ms. The detector produced

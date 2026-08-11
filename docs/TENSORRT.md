@@ -98,7 +98,9 @@ The first full v2 run completed at implementation commit
 external `parity_v2.json` has SHA256
 `4b29211e52d4e6e14f379d8aebfd7561341c2fd15f625c31d61ed6b86f5dc15c`; its protocol-config
 SHA256 is `c26fa7a67289c64c607707141a7d6721a2821d8fccbaa54ee1401c6c03a721bc`.
-All 20 frozen indices completed. The engine was not rebuilt and no layer precision changed.
+All 20 frozen indices completed. Nineteen contain the configured 10 historical sweeps plus the
+current keyframe; `mini_val` index 0 is a scene start with zero historical sweeps. The engine was
+not rebuilt and no layer precision changed.
 
 Before the first benchmark, the integration fix was frozen as exact measurement commit
 `e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The complete 20-sample v2 suite passed again with
@@ -387,9 +389,9 @@ The sanitized result is
 | TensorRT FP16 | 45.655 ms | 45.637 ms | 48.210 ms | 48.711 ms | 41.354 ms | 50.457 ms | 2.045 ms | 21.912 |
 
 **The headline direct end-to-end median speedup is 1.299134×.** Both paths repeatedly used the same
-`mini_val` index 0 sample, multi-sweep preparation, official voxelization, shared MMDeploy
-postprocessing, and DetectionFrame conversion. Only the network runtime differed. Synchronized wall
-time covered the complete boundary.
+`mini_val` index 0 scene-start sample, which has zero accumulated historical sweeps, plus identical
+configured preparation, official voxelization, shared MMDeploy postprocessing, and DetectionFrame
+conversion. Only the network runtime differed. Synchronized wall time covered the complete boundary.
 
 ### Network-only result — secondary
 

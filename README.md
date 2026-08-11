@@ -144,15 +144,15 @@ The M1 result remains separate historical context:
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
-| M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
-| M2 native baseline | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 19.189 ms network / 59.289 ms end to end | 52.114 network / 16.867 end to end | 0.381 GiB network / 0.385 GiB end-to-end allocated |
-| M2 TensorRT | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP16 | 6.126 ms network / 45.637 ms end to end | 163.250 network / 21.912 end to end | 31,519,476-byte engine / 1,212,340,736-byte engine device memory |
+| M1 (scene-start index 0; zero history) | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
+| M2 native baseline (scene-start index 0; zero history) | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 19.189 ms network / 59.289 ms end to end | 52.114 network / 16.867 end to end | 0.381 GiB network / 0.385 GiB end-to-end allocated |
+| M2 TensorRT (scene-start index 0; zero history) | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP16 | 6.126 ms network / 45.637 ms end to end | 163.250 network / 21.912 end to end | 31,519,476-byte engine / 1,212,340,736-byte engine device memory |
 
 The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
 complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
-M3A has no canonical result. Its exact-commit diagnostic retained 19.945 Hz replay but measured
+M3A has no canonical result. Its scene-start, zero-history synthetic 20 Hz diagnostic retained 19.945 Hz replay but measured
 238.255 ms callback median, 303.283 ms same-host loopback median, 3.990 Hz output, and 875 bounded-QoS
 input drops. The result is a failed rate-gate record for review, not accepted performance; see
 [`benchmarks/m3/README.md`](benchmarks/m3/README.md).
