@@ -13,12 +13,13 @@ model through the pinned official MMDeploy ONNX/TensorRT FP16 path without chang
 
 M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
 visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
-and merged. M2 is active with its deployment boundary and parity criteria frozen before engine
-evidence; ONNX, TensorRT, parity, and M2 performance remain `Pending measurement`.
+and merged. M2 exported and checked the pinned ONNX graph and built the official TensorRT FP16
+engine, but the unchanged 20-sample final-box parity suite failed four locked guards. M2 is partial,
+its benchmark remains gated, and architecture review is required.
 
 ## Project status
 
-### Active: M2 — TensorRT FP16 deployment
+### Partial: M2 — TensorRT FP16 deployment
 
 M2 is constrained to:
 
@@ -26,7 +27,7 @@ M2 is constrained to:
 - official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
 - official shared voxelization and postprocessing outside the TensorRT network;
 - a frozen 20-sample parity set and immutable engineering tolerances; and
-- same-session PyTorch FP32 versus TensorRT FP16 measurements after parity succeeds.
+- same-session PyTorch FP32 versus TensorRT FP16 measurements only after parity succeeds.
 
 M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
 custom LaserPerception CUDA plugins, C++, or Jetson work. See
@@ -65,7 +66,8 @@ flowchart LR
     E --> G["Official shared postprocessing"]
     F --> G
     G --> H["DetectionFrame parity"]
-    H --> I["Same-session benchmark"]
+    H -->|"Pass"| I["Same-session benchmark"]
+    H -->|"Current result: fail"| J["Architecture review"]
 ```
 
 nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
@@ -124,6 +126,7 @@ generated artifacts must remain outside Git.
 
 The measured record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
+No M2 timing row or result JSON was promoted: the frozen FP16 parity gate failed before benchmarking.
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
@@ -136,7 +139,7 @@ The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fiel
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** active—frozen ONNX/TensorRT FP16 parity and same-session benchmark protocol.
+- **M2:** partial—ONNX/engine pass, frozen FP16 parity fails; architecture review required.
 - **M3:** ROS 2, only after M2 review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.

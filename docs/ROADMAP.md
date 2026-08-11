@@ -29,14 +29,15 @@ detector, model conversion, ROS 2, or edge deployment.
 
 - [x] Freeze the exact M1 asset, official MMDeploy v1.3.1 commit, deployment boundary, 20-sample
   parity set, and acceptance tolerances before engine evidence.
-- [ ] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
-- [ ] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
-- [ ] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
+- [x] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
+- [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
+- [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
 - [ ] Pass final-box parity on all frozen samples with identical preprocessing and postprocessing.
 - [ ] Remeasure the deployable PyTorch FP32 and TensorRT FP16 paths in the same session.
 
-M2 is active. No ONNX, engine, parity, or M2 benchmark result is accepted until measured evidence
-exists; unmeasured fields remain `Pending measurement`.
+M2 is partial. Gate 0, the 81-sample profile, ONNX checking, and FP16 engine build pass, but the
+unchanged 20-sample parity suite fails four high-confidence guards. Benchmark promotion remains
+blocked and architecture review is required; unmeasured fields remain `Pending measurement`.
 
 ## M3 — ROS 2
 

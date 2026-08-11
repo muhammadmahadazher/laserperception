@@ -1,6 +1,57 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **Protocol frozen; implementation and measurements pending.**
+Status: **Partial M2 implementation; ONNX/engine pass, frozen FP16 parity fails.**
+
+## Measured M2 outcome
+
+Gate 0 passed, all 81 `mini_val` samples were profiled, ONNX export/checking passed, and the
+official TensorRT FP16 engine built and executed. The unchanged 20-sample parity suite then failed
+four locked high-confidence guards at implementation commit
+`a9314483e0ba7a191866266080c3147f9d902956`. M2 is therefore partial and requires architecture
+review; no benchmark was run or promoted.
+
+| Evidence | Result |
+|---|---|
+| ONNX | SHA256 `61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16`, 60,711,828 bytes, opset 11, full checker pass |
+| TensorRT engine | SHA256 `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`, 31,519,476 bytes, FP16 requested, INT8 disabled |
+| Engine build | 30.419959327 s on the RTX 4060 Laptop GPU; 1,212,340,736 bytes reported device memory |
+| Parity JSON | External SHA256 `f6474c365f8fc3d8595db813d1d23258574e4d0448e73473d68bf817f297e534`; status `fail` |
+
+The final run completed all fixed indices. Counts and coverage passed: 883 PyTorch versus 885
+TensorRT detections at 0.25; PyTorch-to-TensorRT coverage was 1.0 and the reverse was
+0.9986737401. Z and class guards passed. XY, per-dimension size, yaw, and score guards failed:
+
+| Metric | Median | Maximum | Limit | Result |
+|---|---:|---:|---:|---|
+| XY center displacement | 0.001374 m | 0.978381 m | 0.25 m | Fail |
+| Absolute Z difference | 0.000858 m | 0.105435 m | 0.25 m | Pass |
+| Per-dimension relative size error | 0.000264 | 0.084264 | 0.05 | Fail |
+| Circular yaw difference | 0.035954° | 179.963955° | 5° | Fail |
+| Absolute score difference | 0.001046 | 0.168615 | 0.05 | Fail |
+
+All seven threshold-edge crossings were retained:
+
+| Index | Class | PyTorch score | TensorRT score |
+|---:|---|---:|---:|
+| 25 | bicycle | 0.2504397333 | 0.2494472563 |
+| 33 | car | 0.2505155504 | 0.2490817457 |
+| 33 | truck | 0.2488429695 | 0.2505458593 |
+| 42 | pedestrian | 0.2474979907 | 0.2509127855 |
+| 58 | truck | 0.2497554421 | 0.2531217933 |
+| 71 | car | 0.2495126724 | 0.2542311251 |
+| 80 | car | 0.2562966049 | 0.2440025359 |
+
+The failure is classified as `network_numerical_difference`: both runtimes consume the same
+voxel objects/hashes, every sample fits the verified profile and bindings, and both outputs enter
+the same official postprocessing function. The threshold-edge crossings are recorded separately;
+the count guards still pass.
+
+Bounded diagnostics did not change the protocol. An identical official FP16 rebuild reproduced
+the failure despite different TensorRT tactics/engine hashes. A TensorRT FP32 diagnostic removed
+the XY/yaw/score failures but still exceeded the dimension guard (maximum 0.066682). Building and
+running FP16 with TF32 disabled reproduced the original failed guards. The MMDeploy debugging
+timebox is exhausted, so no layer-precision override, model change, threshold relaxation, or
+benchmark promotion was attempted.
 
 M2 deploys the exact M1 pretrained PointPillars model through ONNX and TensorRT FP16. It does not
 train, simplify, or replace the model. The frozen scientific configuration is
@@ -52,9 +103,10 @@ the MMDetection3D `Det3DDataPreprocessor` from the voxel task's `create_input` f
 equivalents; it must not independently implement voxelization, anchor decoding, NMS, or score
 handling.
 
-The exported graph's actual input/output names, shapes, and dtypes remain `Pending measurement`
-until an exported ONNX graph has been inspected. The expected 64-points-by-4-features family comes
-from the frozen M1 configuration, not from a guessed engine profile.
+The checked ONNX graph has dynamic `FLOAT` `voxels` (`N×64×4`), `INT32` `num_points` (`N`), and
+`INT32` `coors` (`N×4`) inputs. Its `FLOAT` outputs are `cls_score0` (`1×140×200×200`),
+`bbox_pred0` (`1×126×200×200`), and `dir_cls_pred0` (`1×28×200×200`). These are observed graph
+bindings, not guessed profile shapes.
 
 ## Gate 0: TensorRT smoke test
 
@@ -70,12 +122,11 @@ If Gate 0 fails, PointPillars/MMDeploy work stops until the environment is repai
 
 ## Shape profiling
 
-Before the final engine is built, a preprocessing-only command will scan all 81 observed
-`mini_val` samples. It will record minimum, p50, p90, p95, and maximum for every dynamic input
-dimension. Profile selection must combine those observations with the upstream hard limits:
-64 points per voxel, four point features, and at most 40,000 validation voxels. Every frozen parity
-sample must fit before parity begins. Profile overflow is an engine-configuration failure, not a
-numerical-parity failure.
+The preprocessing-only profiler scanned all 81 observed `mini_val` samples. Voxel counts were
+4,352 minimum, 18,207 p50, 20,085 p90, 20,544 p95, and 22,546 maximum. The frozen input profile is
+4,352/18,207/30,000 voxels for minimum/optimum/maximum, with corresponding `num_points` and `coors`
+shapes. The maximum retains the official MMDeploy 30,000-voxel bound, exceeds the measured 25%
+headroom target, and remains below the upstream 40,000 validation limit. Every parity sample fit.
 
 ## Frozen parity protocol
 
@@ -113,8 +164,8 @@ environment without private absolute paths.
 
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
-engine download. No result becomes measured evidence until the real artifact, parity, and
-same-session benchmark have completed successfully.
+engine download. The ONNX and engine metadata above are measured build evidence. M2 itself
+remains partial because parity failed; no same-session benchmark result is accepted or committed.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded

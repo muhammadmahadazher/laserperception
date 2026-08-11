@@ -1,12 +1,40 @@
-# M1 pretrained PointPillars detection
+# PointPillars detection
 
 M1 wraps the upstream pretrained MMDetection3D PointPillars checkpoint used by LaserPerception. The
 model was not trained by LaserPerception. This milestone is inference-only and preserves the
 official nuScenes ten-class taxonomy and multi-sweep preprocessing pipeline.
 
-## Status
+## M2 deployment status
 
-M1 is complete and awaiting review. The official converter observed 323 training and 81 validation
+M2 preserves this exact M1 model and routes its network through the pinned official MMDeploy
+1.3.1 ONNX/TensorRT configuration. Official multi-sweep preparation and MMDetection3D voxelization
+remain outside the engine; both rewritten PyTorch FP32 and TensorRT outputs use the same official
+MMDeploy postprocessing and LaserPerception conversion.
+
+The implementation passed TensorRT Gate 0, profiled all 81 `mini_val` samples, checked the exported
+ONNX graph, and built/ran the FP16 engine. The unchanged 20-sample final-box parity suite failed the
+XY, per-dimension size, yaw, and score guards, so M2 is partial. No benchmark result was run or
+promoted. Exact hashes, metrics, threshold-edge crossings, and debugging disposition are in
+`docs/TENSORRT.md`.
+
+After activating the M2 environment, the reproducible sequence is:
+
+```bash
+python scripts/detection/check_m2_tensorrt.py
+python scripts/detection/profile_m2_voxels.py
+python scripts/detection/export_m2_onnx.py
+python scripts/detection/build_m2_tensorrt.py
+python scripts/detection/validate_m2_parity.py
+```
+
+The parity command intentionally exits nonzero for the current FP16 engine. `benchmark_m2.py`
+requires a passing full parity JSON from the same implementation commit and artifact hashes, so it
+cannot promote a result from this attempt. `LASERPERCEPTION_M2_CACHE` selects the external cache;
+its default is `~/.cache/laserperception`.
+
+## M1 status
+
+M1 is complete and merged. The official converter observed 323 training and 81 validation
 samples. FP32 inference on `mini_val` index 0 (token `3e8750f331d7499e9b5123e9eb70f2e2`)
 produced 182 raw detections and nine at the fixed 0.25 display threshold: four cars and five genuine
 model-predicted pedestrians, with best pedestrian score 0.403. The original 1800×1800 headless BEV

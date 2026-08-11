@@ -8,6 +8,9 @@ releases begin.
 
 ### Changed
 
+- Recorded M2 as partial after the unchanged 20-sample TensorRT FP16 parity suite failed four
+  high-confidence guards; benchmark promotion remains blocked pending architecture review.
+
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
   measured reference hardware.
@@ -21,6 +24,9 @@ releases begin.
 
 - Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
+- Pinned isolated TensorRT 8.6.1/MMDeploy 1.3.1 setup, executable Gate 0, complete 81-sample voxel
+  profiler, official ONNX export and engine builder, shared deployment runtime, deterministic parity
+  diagnostics, benchmark promotion guards, sanitized artifact provenance, and synthetic CPU tests.
 - Real official nuScenes v1.0-mini evidence: 323/81 prepared train/validation samples, successful
   FP32 detection with genuine pedestrian predictions, original BEV output, and a sanitized 50-run
   two-boundary RTX 4060 Laptop GPU benchmark.

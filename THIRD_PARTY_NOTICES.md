@@ -25,6 +25,22 @@ M1 wraps installed copies of:
 No OpenMMLab or PyTorch source is copied into LaserPerception. The setup script clones/installs the
 official packages into an external user cache and environment.
 
+## M2 deployment environment
+
+M2 additionally installs external copies of:
+
+- [MMDeploy 1.3.1](https://github.com/open-mmlab/mmdeploy/tree/v1.3.1), commit
+  `bc75c9d6c8940aa03d0e1e5b5962bd930478ba77`, Apache-2.0;
+- [ONNX 1.14.1](https://github.com/onnx/onnx/tree/v1.14.1), Apache-2.0; and
+- NVIDIA CUDA 11.8 libraries, cuDNN 8.9.7, and
+  [TensorRT 8.6.1](https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-861/pdf/TensorRT-SLA.pdf),
+  governed by NVIDIA's applicable software license terms.
+
+These packages, the generated ONNX file, and serialized TensorRT engines are not vendored or
+redistributed by LaserPerception. The setup script installs them into the isolated WSL environment
+and external cache. A TensorRT engine is environment-specific and is not covered by the
+repository's Apache-2.0 license.
+
 ## Upstream pretrained PointPillars checkpoint
 
 M1 uses the official MMDetection3D nuScenes PointPillars checkpoint

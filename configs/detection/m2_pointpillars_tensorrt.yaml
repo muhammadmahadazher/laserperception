@@ -1,6 +1,6 @@
 schema_version: "1.0"
 milestone: M2
-status: protocol_frozen
+status: partial_parity_failed
 
 cache:
   root_environment_variable: LASERPERCEPTION_M2_CACHE
@@ -28,7 +28,7 @@ deployment:
   official_deployment_config: configs/mmdet3d/voxel-detection/voxel-detection_tensorrt_dynamic-nus-64x4.py
   onnx_opset: 11
   tensorrt_target_version: 8.6.1
-  tensorrt_actual_version: Pending measurement
+  tensorrt_actual_version: 8.6.1
   precision: fp16
   int8: false
   custom_ops_policy: official_mmdeploy_only
@@ -51,10 +51,16 @@ voxel_contract:
     validation: 40000
 
 exported_graph:
-  verification_status: Pending measurement
-  inputs: Pending measurement
-  outputs: Pending measurement
-  onnx_checker: Pending measurement
+  verification_status: pass
+  inputs:
+    - {name: voxels, dtype: FLOAT, shape: [voxels_num, 64, 4]}
+    - {name: num_points, dtype: INT32, shape: [voxels_num]}
+    - {name: coors, dtype: INT32, shape: [voxels_num, 4]}
+  outputs:
+    - {name: cls_score0, dtype: FLOAT, shape: [1, 140, 200, 200]}
+    - {name: bbox_pred0, dtype: FLOAT, shape: [1, 126, 200, 200]}
+    - {name: dir_cls_pred0, dtype: FLOAT, shape: [1, 28, 200, 200]}
+  onnx_checker: pass
 
 profile:
   scan_split: mini_val
@@ -90,14 +96,15 @@ artifacts:
   onnx:
     logical_name: m2/pointpillars.onnx
     committed: false
-    sha256: Pending measurement
-    size_bytes: Pending measurement
+    sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+    size_bytes: 60711828
   engine:
     logical_name: engines/pointpillars_fp16.engine
     committed: false
-    sha256: Pending measurement
-    size_bytes: Pending measurement
-    build_time_seconds: Pending measurement
+    sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+    size_bytes: 31519476
+    build_time_seconds: 30.419959326999997
+    device_memory_size_bytes: 1212340736
 
 benchmark:
   sample_split: mini_val
@@ -121,7 +128,20 @@ memory:
 evidence:
   tensorrt_gate_0: pass
   profile_result: pass
-  onnx_result: Pending measurement
-  engine_result: Pending measurement
-  parity_result: Pending measurement
-  same_session_benchmark_result: Pending measurement
+  onnx_result: pass
+  engine_result: pass
+  parity_result: fail
+  same_session_benchmark_result: not_run_parity_gate_failed
+
+parity_observation:
+  measurement_commit: a9314483e0ba7a191866266080c3147f9d902956
+  generated_at_utc: "2026-08-11T07:29:00.398363+00:00"
+  external_result_sha256: f6474c365f8fc3d8595db813d1d23258574e4d0448e73473d68bf817f297e534
+  failure_classification: network_numerical_difference
+  frozen_samples_completed: 20
+  exported_counts: {pytorch: 883, tensorrt: 885, absolute_difference: 2}
+  high_confidence_coverage: {pytorch_to_tensorrt: 1.0, tensorrt_to_pytorch: 0.9986737400530504}
+  failed_checks: [high_confidence_xy_center, high_confidence_dimensions, high_confidence_yaw, high_confidence_score]
+  threshold_edge_disagreements: 7
+  benchmark_promoted: false
+  disposition: architecture_review_required
