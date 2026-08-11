@@ -4,7 +4,8 @@ M3A wraps the frozen M2 TensorRT FP16 detector with a ROS 2 interface. It consum
 **model-ready multi-sweep** point cloud and publishes canonical `vision_msgs/Detection3DArray`
 messages. It is not a raw physical-LiDAR adapter. The implementation passed the 20-sample
 transport-fidelity gate, but its first 20 Hz rate diagnostic failed the preregistered M3A target.
-M3B performance work requires separate owner/reviewer authorization.
+The subsequently authorized M3B-V1 diagnostic isolated hard voxelization but did not establish a
+production-safe fast path; M3 remains stopped for review.
 
 ## Frozen environment and artifacts
 
@@ -152,9 +153,24 @@ callback median/P95 were 238.255/274.637 ms and same-host loopback median/P95 we
 221 outputs from 1,096 published inputs (875 bounded-QoS input drops), for 3.990 Hz effective output;
 there was no rejected message, detector-to-sink loss, or final processing backlog.
 
-The M3A gate therefore failed. See `benchmarks/m3/README.md` and its diagnostic-only JSON. M3B is
-indicated for review, but no optimization, postprocess change, profiling claim, or bottleneck
-assumption is part of M3A.
+The M3A gate therefore failed. See `benchmarks/m3/README.md` and its diagnostic-only JSON. No
+optimization, postprocess change, profiling claim, or bottleneck assumption is part of M3A.
+
+## M3B-V1 direct voxelization diagnosis
+
+The separately authorized diagnostic used the same model-ready inputs outside the ROS callback to
+isolate the official hard deterministic voxelizer. For the full-history W1 and W2 samples, its
+median direct voxelization-layer cost was 270.937 and 291.729 ms. An in-memory
+`deterministic=False` candidate measured 4.782 and 5.040 ms, but projected no-provenance-hash
+detector-path medians still measured 98.910 and 106.112 ms, so neither demonstrated the 50 ms
+target.
+
+The candidate was not repeatable enough for adoption. Its 30 W2 runs against the deterministic
+reference produced a 0.989834 box-axis-yaw pass fraction (19 failures among 1,869 matched
+high-confidence detections), below the existing 0.99 diagnostic yardstick. No production default,
+postprocess, ROS, or DDS path changed. See
+[`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) for full timing,
+saturation, fidelity, repeatability, and telemetry evidence.
 
 ## Live-sensor limitation
 

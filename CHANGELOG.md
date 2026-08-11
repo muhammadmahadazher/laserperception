@@ -16,8 +16,11 @@ releases begin.
   is intact.
 - Advanced to M3 only after PR #3 merged and preserved every frozen M2 artifact. Exact-commit
   20-sample PointCloud2 fidelity passed, but the M3A 20 Hz diagnostic measured 238.255 ms callback
-  median, 303.283 ms loopback median, 3.990 Hz output, and 875 bounded-QoS input drops. M3B remains
-  unauthorized and no runtime optimization was attempted.
+  median, 303.283 ms loopback median, 3.990 Hz output, and 875 bounded-QoS input drops.
+- Diagnosed official hard voxelization in authorized diagnostic-only M3B-V1. The in-memory
+  nondeterministic candidate greatly reduced direct voxelization time but did not demonstrate 20 Hz
+  end to end and failed W2 repeatability against the existing detector yardstick, so it was not
+  adopted. No model, engine, ONNX, postprocess, ROS/DDS production path, or M4 work changed.
 - Added a strict model-ready multi-sweep PointCloud2 interface that rejects missing `time_lag`,
   performs no TF/history reconstruction, and preserves source headers and detector box semantics.
 

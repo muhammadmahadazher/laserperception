@@ -1,3 +1,5 @@
+import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
@@ -157,3 +159,39 @@ def test_m3b_protocol_freezes_candidate_samples_and_non_adoption() -> None:
     )
     assert "runs_per_sample: 30" in protocol
     assert "default_voxelizer_change_allowed: false" in protocol
+
+
+def test_m3b_diagnostic_record_is_exact_commit_and_fail_closed() -> None:
+    root = Path(__file__).resolve().parents[1]
+    record_path = root / "benchmarks/m3/diagnostics/voxelization_v1_ad0d38b.json"
+    record_bytes = record_path.read_bytes()
+    raw_record = record_bytes.decode("utf-8")
+    record = json.loads(raw_record)
+
+    assert hashlib.sha256(record_bytes).hexdigest() == (
+        "98315416fa148a52ed14f734f923661cb70a70c8c032549fe54bd0dbf4354423"
+    )
+    assert record["status"] == "diagnostic_measurement_not_production"
+    assert record["publication_role"] == "diagnostic_evidence_not_canonical_performance"
+    assert record["measurement_commit"] == "ad0d38b6e926f3a03b471c192d3e815cd07d34d1"
+    assert record["protocol"] == {
+        "logical_name": "configs/detection/m3b_voxelization_fidelity_v1.yaml",
+        "sha256": "03422de2d59e7bffae75eac73dd7c9dd47e40bd1e9daba6588762cdfdbf80019",
+        "status": "protocol_frozen_before_measurement",
+    }
+    assert record["runtime_voxelizer_settings"]["official_deterministic"] is True
+    assert record["runtime_voxelizer_settings"]["experimental_deterministic"] is False
+    assert record["saturation_voxel_and_detector_fidelity"]["sample_count"] == 20
+    assert record["repeatability"]["42"]["runs"] == 30
+    assert record["repeatability"]["49"]["runs"] == 30
+
+    w2_deterministic = record["repeatability"]["49"]["detections_each_run_vs_deterministic"]
+    axis_yaw = w2_deterministic["continuous_metrics"]["axis_yaw_difference_modulo_pi_degrees"]
+    assert w2_deterministic["overall_pass"] is False
+    assert axis_yaw["accepted"] is False
+    assert axis_yaw["failure_count"] == 19
+    assert axis_yaw["pass_fraction"] == pytest.approx(0.9898341359015517)
+    assert all(value is False for value in record["scope_guards"].values())
+    assert "/root/" not in raw_record
+    assert "/mnt/" not in raw_record
+    assert "J:\\" not in raw_record

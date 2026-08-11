@@ -18,6 +18,27 @@ Workloads used by the existing evidence differ:
 These qualifications preserve all existing results and clarify their input weight; they do not
 change any timing, parity, engine, model, threshold, precision, or sample selection.
 
+## M3B-V1 voxelization diagnostic — not canonical performance
+
+The authorized M3B-V1 diagnostic at exact implementation commit
+`ad0d38b6e926f3a03b471c192d3e815cd07d34d1` decomposed official preprocessing, compared the
+official deterministic hard voxelizer with an in-memory `deterministic=False` candidate, and
+measured W0/W1/W2 with 20 warmups and 100 synchronized observations. It did not change the official
+configuration, model, ONNX, engine, postprocess, or ROS/DDS runtime.
+
+The candidate made the direct W1/W2 voxelization layer much faster, but projected no-hash
+end-to-end medians were still 98.910/106.112 ms and did not demonstrate 20 Hz. Across the 20 frozen
+samples, coordinate sets, voxel counts, and non-saturated point multisets matched, while 12,136 of
+16,070 saturated voxels (75.52%) retained a different capped point subset. The single-pass detector
+comparison passed the existing diagnostic yardstick, but the required 30-run W2 comparison against
+the deterministic reference did not: axis-yaw pass fraction was 0.989834 (19 failures in 1,869
+matched high-confidence detections), below the frozen 0.99 fraction.
+
+The candidate is therefore not recommended for production integration. These values are
+diagnostic and must not be treated as accepted M3 performance. See
+[`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) and the sanitized
+[`voxelization_v1_ad0d38b.json`](../benchmarks/m3/diagnostics/voxelization_v1_ad0d38b.json).
+
 LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
 measurement record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).

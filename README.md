@@ -30,9 +30,12 @@ M2 TensorRT FP16 runtime, canonical Detection3DArray output, nuScenes replay, an
 markers. The exact 20-sample PointCloud2 round-trip fidelity gate passes.
 
 The first 20 Hz diagnostic failed the preregistered callback-median and sustained-rate gates, so no
-M3 result is canonical and M3B is not authorized. No postprocessing optimization, raw single-sweep
-adapter, tracking, model change, or M4 work has started. See [`docs/ROS2.md`](docs/ROS2.md) and
-[`benchmarks/m3/README.md`](benchmarks/m3/README.md).
+M3 result is canonical. The authorized diagnostic-only M3B-V1 experiment found the official hard
+deterministic voxelizer to be the dominant W1/W2 stage, but the faster nondeterministic candidate
+did not demonstrate 20 Hz and failed W2 repeatability against the existing detector yardstick. It
+was not adopted. No postprocessing optimization, raw single-sweep adapter, tracking, model change,
+or M4 work has started. See [`docs/ROS2.md`](docs/ROS2.md) and
+[`benchmarks/m3/VOXELIZATION_V1.md`](benchmarks/m3/VOXELIZATION_V1.md).
 
 ### Existing experimental infrastructure
 
@@ -164,7 +167,8 @@ input drops. The result is a failed rate-gate record for review, not accepted pe
 - **M2:** parity v2, native/rewrite fidelity, and the repaired canonical benchmark passed; PR #3
   is merged.
 - **M3:** model-ready ROS 2 Humble interface and 20-sample fidelity pass; M3A rate gate failed and
-  M3B requires explicit review authorization.
+  the diagnostic-only M3B-V1 fast-voxelizer candidate was not adopted after its W2 repeatability
+  check failed. M3 remains stopped for review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.
 

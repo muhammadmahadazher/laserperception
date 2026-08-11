@@ -65,11 +65,32 @@ Therefore:
 
 - there is no accepted/canonical M3 result under `benchmarks/m3/results/`;
 - M3A status is `FAIL — review required`;
-- M3B is indicated but not authorized;
-- no postprocessing or other runtime optimization was attempted; and
-- no bottleneck cause is claimed without a separately authorized measured M3 pipeline profile.
+- M3B-V1 was subsequently authorized as a diagnostic-only hard-voxelization experiment;
+- no candidate voxelizer was adopted and no postprocessing or ROS/DDS optimization was attempted;
+  and
+- the M3B-V1 repeatability evidence requires reviewer inspection before any production change.
 
 The sanitized failed record is
 [`diagnostics/failed_rate_d54da83.json`](diagnostics/failed_rate_d54da83.json), file SHA256
 `47cbd7e58c995ee42a0e4dee4f4d6ac56eaae91baf85425c287847bf5fb5ac43`. These values are diagnostic,
 not accepted M3 performance.
+
+## M3B-V1 hard-voxelization diagnosis
+
+The exact-commit diagnostic at `ad0d38b6e926f3a03b471c192d3e815cd07d34d1` isolated the
+official deterministic hard voxelizer from an in-memory `deterministic=False` candidate. Both used
+the frozen hard-voxel settings, model, engine, samples, postprocess, and ROS-independent detector
+path. The detailed report is [`VOXELIZATION_V1.md`](VOXELIZATION_V1.md); its sanitized record is
+[`diagnostics/voxelization_v1_ad0d38b.json`](diagnostics/voxelization_v1_ad0d38b.json), file SHA256
+`98315416fa148a52ed14f734f923661cb70a70c8c032549fe54bd0dbf4354423`.
+
+The candidate reduced the direct voxelization-layer median from 270.937 to 4.782 ms on W1 and from
+291.729 to 5.040 ms on W2. However, the projected no-provenance-hash end-to-end medians remained
+98.910 and 106.112 ms, respectively, and did not demonstrate 20 Hz. More importantly, 30-run W2
+repeatability against the deterministic reference failed the existing detector yardstick: the
+box-axis-yaw pass fraction was 0.989834, below 0.99, with 19 tolerance failures among 1,869 matched
+high-confidence detections. Saturated voxels retained different point subsets in 75.52% of the
+20-sample comparisons.
+
+Therefore the experimental fast voxelizer is **not recommended for production integration**. This
+is diagnostic evidence only, not a canonical M3 result, and M3 remains stopped for review.
