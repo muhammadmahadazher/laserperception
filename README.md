@@ -17,11 +17,11 @@ and merged. M2 exported and checked the pinned ONNX graph and built the official
 engine. Parity v1 remains an authoritative failure. The separately preregistered parity v2 Stage 1
 passed all gates on the same 20 samples and unchanged engine and remains valid. The subsequent
 FP32/FP16 benchmark was rejected during sanity review because it used MMDeploy-rewritten eager
-PyTorch as the performance baseline. M2 is now in benchmark diagnosis; PR #3 remains draft.
+PyTorch as the performance baseline. M2 diagnosis is complete and awaits benchmark-methodology review; PR #3 remains draft.
 
 ## Project status
 
-### In progress: M2 — TensorRT FP16 benchmark diagnosis
+### Diagnosis complete—awaiting methodology review: M2 — TensorRT FP16 deployment
 
 M2 is constrained to:
 

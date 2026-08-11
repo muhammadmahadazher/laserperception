@@ -1,0 +1,187 @@
+{
+  "artifacts": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "engine_sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+    "onnx_sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16"
+  },
+  "cached_postprocess_candidate": {
+    "equivalence_checked": false,
+    "implemented": false,
+    "measured": false,
+    "reason": "explicitly prohibited for this M2 diagnostic pass"
+  },
+  "commit_sha": "4e12374dec8eecaf0e772b2b5776e0b266fbe09e",
+  "component_profile": {
+    "component_sum_diagnostic_only": {
+      "common_median_ms": 43.176066999976115,
+      "native_path_median_sum_ms": 63.9759231858892,
+      "native_over_tensorrt_ratio_from_median_sums": 1.2771382045855824,
+      "not_a_direct_end_to_end_measurement": true,
+      "tensorrt_path_median_sum_ms": 50.09318721825309
+    },
+    "measurements_per_component": 30,
+    "sample_index": 0,
+    "timing_ms": {
+      "bbox_head_construction": {
+        "mean": 1.037479100004172,
+        "median": 0.9989145000304234,
+        "p95": 1.243915150038788,
+        "population_std": 0.11053630512867256
+      },
+      "current_mmdeploy_postprocess": {
+        "mean": 24.461387566661113,
+        "median": 24.092924499996116,
+        "p95": 27.919368399992095,
+        "population_std": 1.657193254944939
+      },
+      "detection_frame_conversion": {
+        "mean": 5.251339233340484,
+        "median": 5.16041349999341,
+        "p95": 6.0431776000228865,
+        "population_std": 0.4639903239125805
+      },
+      "native_pytorch_raw": {
+        "mean": 20.93032544453939,
+        "median": 20.799856185913086,
+        "p95": 21.78601779937744,
+        "population_std": 0.5340022151581768
+      },
+      "prepare": {
+        "mean": 5.566618933335121,
+        "median": 5.5668429999826685,
+        "p95": 6.2378606500104175,
+        "population_std": 0.3949141522932575
+      },
+      "rewritten_pytorch_raw": {
+        "mean": 1950.5059936523437,
+        "median": 1910.4635009765625,
+        "p95": 2462.3578491210938,
+        "population_std": 293.9097499838408
+      },
+      "tensorrt_raw": {
+        "mean": 6.965556319554647,
+        "median": 6.9171202182769775,
+        "p95": 7.452161765098571,
+        "population_std": 0.2632616032623911
+      },
+      "voxelize": {
+        "mean": 8.431920199999846,
+        "median": 8.35588600000392,
+        "p95": 9.038714699988759,
+        "population_std": 0.30814850508854824
+      }
+    },
+    "warmups_per_component": 20
+  },
+  "conclusions": {
+    "bbox_head_construction_fraction_of_postprocess_median": 0.04146090691607756,
+    "direct_native_vs_tensorrt_end_to_end_improvement_established": false,
+    "m1_environment_sanity": "healthy_within_2x_review_guideline",
+    "native_pytorch_cuda_execution": true,
+    "rewritten_eager_is_valid_performance_baseline": false,
+    "rewritten_over_native_raw_median_ratio": 91.84984184027404,
+    "tensorrt_isolated_network_stable": true,
+    "tensorrt_p95_over_median": 1.077350332210197,
+    "tensorrt_population_std_over_mean": 0.037794770609108096
+  },
+  "device_assertions": {
+    "coors": {"device": "cuda:0", "dtype": "torch.int32", "shape": [4352, 4]},
+    "model_parameter": {"device": "cuda:0", "dtype": "torch.float32", "shape": [64]},
+    "native_outputs": {
+      "bbox_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 126, 200, 200]},
+      "cls_score": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 140, 200, 200]},
+      "dir_cls_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 28, 200, 200]}
+    },
+    "num_points": {"device": "cuda:0", "dtype": "torch.int32", "shape": [4352]},
+    "rewritten_outputs": {
+      "bbox_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 126, 200, 200]},
+      "cls_score": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 140, 200, 200]},
+      "dir_cls_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 28, 200, 200]}
+    },
+    "tensorrt_backend": {
+      "device": "cuda:0",
+      "outputs": {
+        "bbox_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 126, 200, 200]},
+        "cls_score": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 140, 200, 200]},
+        "dir_cls_pred": {"device": "cuda:0", "dtype": "torch.float32", "shape": [1, 28, 200, 200]}
+      }
+    },
+    "voxels": {"device": "cuda:0", "dtype": "torch.float32", "shape": [4352, 64, 4]}
+  },
+  "environment": {
+    "cuda_runtime": "11.8",
+    "driver": "610.88",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "mmdeploy": "1.3.1",
+    "mmdet3d": "1.4.0",
+    "pytorch": "2.1.0+cu118",
+    "tensorrt": "8.6.1"
+  },
+  "external_full_diagnostic_sha256": "2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2",
+  "gpu_telemetry": {
+    "after": {
+      "memory_clock_mhz": 8001,
+      "power_draw_w": 27.72,
+      "power_limit": "unavailable_under_wsl2",
+      "sm_clock_mhz": 2655,
+      "temperature_c": 58,
+      "utilization_percent": 12
+    },
+    "before": {
+      "memory_clock_mhz": 810,
+      "power_draw_w": 8.52,
+      "power_limit": "unavailable_under_wsl2",
+      "sm_clock_mhz": 690,
+      "temperature_c": 56,
+      "utilization_percent": 35
+    }
+  },
+  "m1_reproduction_in_m2_environment": {
+    "end_to_end_median_ms": 63.293906999998484,
+    "historical_end_to_end_median_ms": 55.097,
+    "historical_model_test_step_median_ms": 52.896,
+    "measurements": 30,
+    "model_test_step_median_ms": 84.22556686401367,
+    "source_commit_sha": "418fbb1f7abb0e0193067a5a74bdaa371d6b7bf0",
+    "source_json_sha256": "0ca2afa352abbfbb9cfaf799aa65634b4d790564e7da1d34339b0828f917b963",
+    "warmups": 10
+  },
+  "native_vs_rewritten_fidelity": {
+    "final_detections": {
+      "class_mismatches": 0,
+      "exported_counts": {"native": 883, "rewritten": 883},
+      "high_confidence_matches": 750,
+      "maximum_axis_yaw_difference_degrees": 0.0,
+      "maximum_dimension_relative_error": 0.0,
+      "maximum_score_difference": 0.0,
+      "maximum_xy_difference_m": 0.0,
+      "maximum_z_difference_m": 0.0,
+      "overall_pass": true
+    },
+    "raw_outputs": {
+      "bbox_pred": {"element_count": 100800000, "maximum_absolute_difference": 0.0},
+      "cls_score": {"element_count": 112000000, "maximum_absolute_difference": 0.0},
+      "dir_cls_pred": {"element_count": 22400000, "maximum_absolute_difference": 0.0}
+    },
+    "sample_count": 20,
+    "status": "materially_equivalent"
+  },
+  "parity_v2": {
+    "invalidated": false,
+    "status": "pass"
+  },
+  "publication_eligible": false,
+  "recommended_repaired_benchmark": {
+    "end_to_end_boundary": "prepare_through_common_postprocess_and_detection_frame",
+    "headline": "end_to_end_median_speedup",
+    "measurement_order": "isolated_runtime_blocks_with_order-reversed_rounds_if_approved",
+    "measurements_per_runtime_and_boundary": 100,
+    "network_boundary": "identical_voxels_to_three_raw_outputs",
+    "performance_baseline": "native_mmdetection3d_pytorch_fp32",
+    "sample": "nuscenes_v1.0-mini_mini_val_index_0",
+    "tensorrt_runtime": "fp16",
+    "warmups_per_runtime_and_boundary": 10
+  },
+  "schema_version": "1.0",
+  "status": "diagnostic_measurement_not_canonical"
+}

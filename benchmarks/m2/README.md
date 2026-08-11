@@ -1,6 +1,6 @@
 # M2 benchmark protocol and diagnostic status
 
-Status: **Previous benchmark rejected; diagnostic review required.**
+Status: **Diagnostic complete; reviewer approval required before a replacement benchmark.**
 
 There is no accepted canonical M2 performance result. The run at
 e2f9b6babb541d52beaa0bcd58e841a0a56cc851 is retained only in
@@ -18,6 +18,18 @@ Parity v2 remains valid and PASS. The frozen ONNX and TensorRT engine are unchan
 
 The diagnostic runner performs the 20-sample native-vs-rewritten fidelity check and a
 diagnostic-only component profile. Raw diagnostic output stays in the external cache.
+
+## Exact-commit diagnosis
+
+The full non-canonical diagnostic ran at commit
+4e12374dec8eecaf0e772b2b5776e0b266fbe09e. Its external JSON SHA256 is
+2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2 and its sanitized summary is
+diagnostics/diagnosis_4e12374.json.
+
+Native and rewritten FP32 outputs were exactly equal across all 20 frozen samples. Component
+medians were 5.567 ms prepare, 8.356 ms voxelize, 20.800 ms native raw, 1910.464 ms rewritten raw,
+6.917 ms TensorRT raw, 24.093 ms current postprocess, 0.999 ms bbox-head construction, and 5.160 ms
+DetectionFrame conversion. No direct canonical end-to-end comparison was run.
 
 ## Future measurement boundary
 

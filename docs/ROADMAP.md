@@ -37,8 +37,9 @@ detector, model conversion, ROS 2, or edge deployment.
 
 Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 remain valid. The
 benchmark at e2f9b6b was rejected because rewritten eager PyTorch was used as the performance
-baseline. Native-vs-rewritten fidelity and component diagnosis now precede any replacement
-benchmark. PR #3 remains draft, and M3 has not started.
+baseline. Exact-commit native-vs-rewritten fidelity passed and the component diagnosis identified the
+invalid rewritten denominator. Any replacement benchmark awaits methodology review. PR #3 remains
+draft, and M3 has not started.
 
 ## M3 — ROS 2
 

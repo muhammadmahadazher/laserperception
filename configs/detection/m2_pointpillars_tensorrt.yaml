@@ -1,6 +1,6 @@
 schema_version: "1.0"
 milestone: M2
-status: parity_v2_passed_benchmark_diagnosis_in_progress
+status: parity_v2_passed_benchmark_diagnosis_complete_review_required
 
 cache:
   root_environment_variable: LASERPERCEPTION_M2_CACHE
@@ -133,6 +133,24 @@ evidence:
   parity_v1_result: fail
   parity_v2_result: pass
   same_session_benchmark_result: rejected_measurement_e2f9b6b
+
+benchmark_diagnosis_observation:
+  status: diagnostic_measurement_not_canonical
+  implementation_commit: 4e12374dec8eecaf0e772b2b5776e0b266fbe09e
+  external_result_sha256: 2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2
+  m1_reproduction_median_ms: {model_test_step: 84.22556686401367, end_to_end: 63.293906999998484}
+  native_vs_rewritten_fidelity: {samples: 20, raw_maximum_absolute_difference: 0.0, final_pass: true}
+  component_median_ms:
+    prepare: 5.5668429999826685
+    voxelize: 8.35588600000392
+    native_pytorch_raw: 20.799856185913086
+    rewritten_pytorch_raw: 1910.4635009765625
+    tensorrt_raw: 6.9171202182769775
+    current_postprocess: 24.092924499996116
+    bbox_head_construction: 0.9989145000304234
+    detection_frame_conversion: 5.16041349999341
+  replacement_canonical_benchmark_run: false
+  disposition: reviewer_methodology_approval_required
 
 parity_v1_observation:
   measurement_commit: a9314483e0ba7a191866266080c3147f9d902956

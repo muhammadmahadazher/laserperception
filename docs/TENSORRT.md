@@ -1,6 +1,6 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **M2 benchmark diagnosis in progress; parity v1 failed and parity v2 remains passed.**
+Status: **M2 diagnosis complete; parity v2 remains passed and benchmark review is required.**
 
 ## Parity v1 — measured failure
 
@@ -318,6 +318,73 @@ speedup is the headline even if the valid result is small, absent, or negative.
 This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O,
 whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production real-time
 guarantee. The diagnostic pass does not authorize a new canonical benchmark; review is required.
+
+## Exact-commit benchmark diagnosis
+
+The non-canonical diagnostic ran at clean implementation commit
+4e12374dec8eecaf0e772b2b5776e0b266fbe09e. Its full external JSON SHA256 is
+2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2; the sanitized tracked
+summary is benchmarks/m2/diagnostics/diagnosis_4e12374.json. Checkpoint, ONNX, and engine hashes
+match the frozen parity-v2 artifacts.
+
+The unchanged M1 runner was first executed in the M2 environment with 10 warmups and 30
+measurements. Its model/test-step median was 84.226 ms and end-to-end median was 63.294 ms, versus
+historical 52.896 ms and 55.097 ms. These are 1.59× and 1.15× historical respectively, within the
+diagnostic 2× review guideline and nowhere near the rejected two-second scale.
+
+All fail-closed device checks passed. The first model parameter, voxels, num_points, coors, native
+outputs, rewritten outputs, and TensorRT outputs were on cuda:0. Model/voxel/raw floating tensors
+were FP32; num_points and coors were int32. Raw output shapes were [1,140,200,200],
+[1,126,200,200], and [1,28,200,200] for class, box, and direction heads.
+
+### Native-versus-rewritten fidelity
+
+Across all frozen 20 samples, every element of cls_score (112,000,000 values), bbox_pred
+(100,800,000), and dir_cls_pred (22,400,000) was exactly equal in FP32. After the same existing
+MMDeploy postprocess, exported counts were 883 versus 883, all 750 high-confidence detections
+matched, all continuous differences were zero, and class agreement was exact. This export-rewrite
+fidelity diagnostic passed. It does not alter or replace parity v2.
+
+### Component profile
+
+Each component used 20 warmups and 30 measurements on mini_val index 0. CUDA events timed raw GPU
+networks; synchronized wall time covered preparation, voxelization, postprocess, and conversion.
+
+| Component | Mean | Median | P95 | Population std. dev. |
+|---|---:|---:|---:|---:|
+| Dataset/sample preparation | 5.567 ms | 5.567 ms | 6.238 ms | 0.395 ms |
+| Official voxelization | 8.432 ms | 8.356 ms | 9.039 ms | 0.308 ms |
+| Native MMDetection3D PyTorch raw | 20.930 ms | 20.800 ms | 21.786 ms | 0.534 ms |
+| MMDeploy-rewritten eager PyTorch raw | 1950.506 ms | 1910.464 ms | 2462.358 ms | 293.910 ms |
+| TensorRT FP16 raw | 6.966 ms | 6.917 ms | 7.452 ms | 0.263 ms |
+| Current MMDeploy postprocess | 24.461 ms | 24.093 ms | 27.919 ms | 1.657 ms |
+| Bbox-head construction alone | 1.037 ms | 0.999 ms | 1.244 ms | 0.111 ms |
+| DetectionFrame conversion | 5.251 ms | 5.160 ms | 6.043 ms | 0.464 ms |
+
+TensorRT isolated raw inference was stable: p95/median was 1.077 and population standard deviation
+was 3.78% of the mean. Bbox-head construction accounted for about 4.15% of current postprocess
+median, so construction alone does not explain the full 24.093 ms postprocess cost. No cached
+postprocess candidate was implemented, measured, or equivalence-tested because M2 explicitly
+forbids that optimization.
+
+The rewritten/native raw median ratio was 91.85× even though their outputs were bit-identical.
+Code inspection and timing therefore identify per-call MMDeploy RewriterContext activation and
+rollback in the rejected eager path as the dominant invalid-denominator overhead; it is parity
+machinery, not normal native PyTorch performance.
+
+Summing independent component medians gives 63.976 ms for the native path and 50.093 ms for the
+TensorRT path, a diagnostic-only 1.277× ratio. This is not a direct end-to-end distribution and
+does not establish a publishable end-to-end speedup. Whether TensorRT improves measured
+end-to-end latency remains for the reviewer-approved canonical protocol.
+
+GPU telemetry was available before and after: 56–58 °C, 8.52–27.72 W, SM clock 690–2655 MHz,
+memory clock 810–8001 MHz, and sampled utilization 35% before / 12% after. WSL2 did not expose the
+power limit.
+
+The recommended replacement method retains the unchanged model, engine, samples, precision, and
+common postprocess; uses native PyTorch FP32 as the performance baseline; runs isolated runtime
+blocks with reversed order in a second round if approved; and headlines direct end-to-end median
+speedup. No replacement canonical benchmark was run or promoted in this pass.
 
 ## Artifact and portability policy
 

@@ -17,7 +17,7 @@ yaw, and score guards and remains failed. The separately preregistered v2 Stage 
 per-metric fraction, count, coverage, direction, and class gate using the same 20 samples and
 unchanged engine, then passed again at exact measurement commit
 `e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The benchmark from that commit was subsequently rejected because rewritten eager PyTorch was
-not a valid performance baseline. Parity v2 remains valid; M2 benchmark diagnosis is in progress. Exact hashes, metrics, exceptions, and protocol chronology
+not a valid performance baseline. Parity v2 remains valid; exact-commit M2 diagnosis passed and replacement benchmarking awaits review. Exact hashes, metrics, exceptions, and protocol chronology
 are in `docs/TENSORRT.md`.
 
 After activating the M2 environment, the reproducible sequence is:

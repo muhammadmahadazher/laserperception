@@ -48,6 +48,28 @@ This remains a warm-cache repeated-single-sample latency microbenchmark, not col
 whole-dataset sequential throughput, guaranteed sensor throughput, or production evidence. No
 repaired canonical benchmark will be run or promoted until the methodology is reviewed.
 
+### Exact-commit diagnostic result
+
+At implementation commit 4e12374dec8eecaf0e772b2b5776e0b266fbe09e, the unchanged M1 runner
+measured 84.226 ms model/test-step and 63.294 ms end to end in the M2 environment. All CUDA device
+assertions passed. Native and rewritten PyTorch raw outputs were element-exact across all 20 frozen
+samples, and final postprocessed detections were exact.
+
+| Diagnostic component | Median | P95 |
+|---|---:|---:|
+| Prepare | 5.567 ms | 6.238 ms |
+| Voxelize | 8.356 ms | 9.039 ms |
+| Native PyTorch raw | 20.800 ms | 21.786 ms |
+| Rewritten eager PyTorch raw | 1910.464 ms | 2462.358 ms |
+| TensorRT raw | 6.917 ms | 7.452 ms |
+| Current MMDeploy postprocess | 24.093 ms | 27.919 ms |
+| Bbox-head construction | 0.999 ms | 1.244 ms |
+| DetectionFrame conversion | 5.160 ms | 6.043 ms |
+
+These are diagnostic-only 20-warmup/30-measurement component timings, not a canonical benchmark.
+Independent median sums suggest 63.976 ms native versus 50.093 ms TensorRT paths, but they do not
+replace a direct end-to-end distribution. No cached postprocess was implemented or evaluated.
+
 ### Parity-v2 disclosures retained
 
 All preregistered per-metric Stage 1 gates passed. Separately, 8/753 (1.06%) high-confidence

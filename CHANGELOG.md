@@ -21,6 +21,9 @@ releases begin.
   native MMDetection3D PyTorch performance baseline.
 - Added fail-closed CUDA tensor assertions, a native raw-network path, 20-sample export-rewrite
   fidelity diagnostics, component profiling, and benchmark review flags.
+- Recorded the exact-commit M2 diagnosis: native and rewritten FP32 outputs were element-exact on
+  all 20 samples; native/TensorRT raw medians were 20.800/6.917 ms; current postprocess was
+  24.093 ms. These diagnostic values are not a replacement canonical benchmark.
 
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
