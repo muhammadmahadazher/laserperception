@@ -15,13 +15,13 @@ M1 has verified real FP32 inference, framework-independent detections, an origin
 visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
 and merged. M2 exported and checked the pinned ONNX graph and built the official TensorRT FP16
 engine. Parity v1 remains an authoritative failure. The separately preregistered parity v2 Stage 1
-passed all gates on the same 20 samples and unchanged engine, was reconfirmed at the exact
-measurement commit, and authorized a same-session FP32/FP16 benchmark. M2 evidence is complete and
-awaits PR review and merge.
+passed all gates on the same 20 samples and unchanged engine and remains valid. The subsequent
+FP32/FP16 benchmark was rejected during sanity review because it used MMDeploy-rewritten eager
+PyTorch as the performance baseline. M2 is now in benchmark diagnosis; PR #3 remains draft.
 
 ## Project status
 
-### Complete—awaiting PR review/merge: M2 — TensorRT FP16 deployment
+### In progress: M2 — TensorRT FP16 benchmark diagnosis
 
 M2 is constrained to:
 
@@ -29,7 +29,8 @@ M2 is constrained to:
 - official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
 - official shared voxelization and postprocessing outside the TensorRT network;
 - a frozen 20-sample parity set and immutable engineering tolerances; and
-- same-session PyTorch FP32 versus TensorRT FP16 measurements after same-commit parity approval.
+- MMDeploy-rewritten PyTorch FP32 as the parity reference, but native MMDetection3D PyTorch FP32
+  as the performance baseline for any future reviewer-approved benchmark.
 
 M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
 custom LaserPerception CUDA plugins, C++, or Jetson work. See
@@ -127,19 +128,13 @@ generated artifacts must remain outside Git.
 ## Benchmarks
 
 The historical M1 measured record is
-[`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
-The M2 same-session measured record is
-[`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).
+benchmarks/m1/results/rtx4060_laptop_fp32.json.
 
-| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
-|---|---|---:|---:|---:|---:|
-| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
-| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
-
-**Headline end-to-end median speedup: 23.101×.** Network-only median speedup was 124.297× and is
-secondary. This is a warm-cache repeated-single-sample latency microbenchmark of `mini_val`
-index 0 after warmups—not cold-storage I/O latency, whole-dataset sequential throughput,
-guaranteed LiDAR sensor throughput, or a production real-time guarantee.
+There is currently no accepted canonical M2 performance result. The run measured at
+e2f9b6babb541d52beaa0bcd58e841a0a56cc851 is retained only as
+benchmarks/m2/diagnostics/rejected_e2f9b6b.json. Its 124.297× network speedup, 23.101× end-to-end
+speedup, and associated latency values are rejected and must not be cited as M2 performance
+evidence. Parity v2 remains PASS and is not invalidated.
 
 The M1 result remains separate historical context:
 
@@ -155,7 +150,7 @@ complete statistics, memory definitions, parity disclosures, and acceptance crit
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** evidence complete—ONNX/engine, parity v2, and same-session benchmark; awaiting PR review/merge.
+- **M2:** ONNX/engine and parity v2 retained; rejected benchmark under diagnosis on draft PR #3.
 - **M3:** ROS 2, only after M2 review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.

@@ -16,8 +16,11 @@ releases begin.
 - Tightened benchmark promotion to require protocol-v2, passing, non-diagnostic, exact-commit
   parity evidence for the frozen 20 samples and current ONNX/engine hashes; v1 and malformed
   evidence are rejected by CPU tests.
-- Completed the reviewer-authorized same-session RTX 4060 PyTorch FP32 versus TensorRT FP16
-  benchmark with a measured 23.101× headline end-to-end median speedup.
+- Rejected the M2 benchmark measured at e2f9b6b after sanity review, preserved it as explicit
+  non-canonical diagnostic history, and separated the MMDeploy-rewritten parity reference from the
+  native MMDetection3D PyTorch performance baseline.
+- Added fail-closed CUDA tensor assertions, a native raw-network path, 20-sample export-rewrite
+  fidelity diagnostics, component profiling, and benchmark review flags.
 
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
@@ -32,9 +35,8 @@ releases begin.
 
 - Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
-- Sanitized canonical M2 evidence for the same-session PyTorch FP32 versus TensorRT FP16 benchmark,
-  including full latency statistics, exact boundaries and provenance, independently defined memory
-  metrics, parity-v2 SHA binding, explicit limitations, and retained outlier disclosures.
+- Retained the rejected M2 timing record in benchmarks/m2/diagnostics without presenting its
+  latency or speedup values as accepted evidence.
 - Pinned isolated TensorRT 8.6.1/MMDeploy 1.3.1 setup, executable Gate 0, complete 81-sample voxel
   profiler, official ONNX export and engine builder, shared deployment runtime, deterministic parity
   diagnostics, benchmark promotion guards, sanitized artifact provenance, and synthetic CPU tests.

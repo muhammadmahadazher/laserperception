@@ -61,3 +61,56 @@ def build_parity_v2_benchmark_record(
         "overall_pass": True,
         "stage_1": dict(stage_1),
     }
+
+
+def build_fidelity_diagnostic_record(
+    diagnostic: Mapping[str, Any],
+    diagnostic_bytes: bytes,
+    *,
+    current_commit: str,
+    frozen_indices: Sequence[int],
+    checkpoint_sha256: str,
+    onnx_sha256: str,
+    engine_sha256: str,
+) -> dict[str, object]:
+    """Validate native-vs-rewritten fidelity evidence for future benchmarking."""
+
+    if (
+        diagnostic.get("schema_version") != "1.0"
+        or diagnostic.get("status") != "diagnostic_measurement_not_canonical"
+        or diagnostic.get("publication_eligible") is not False
+        or diagnostic.get("canonical_benchmark_run") is not False
+    ):
+        raise ValueError("benchmarking requires the non-canonical M2 diagnosis record")
+    if diagnostic.get("commit_sha") != current_commit:
+        raise ValueError("fidelity evidence must come from the current implementation commit")
+
+    artifacts = diagnostic.get("artifacts")
+    expected_hashes = {
+        "checkpoint": checkpoint_sha256,
+        "onnx": onnx_sha256,
+        "engine": engine_sha256,
+    }
+    if not isinstance(artifacts, Mapping) or any(
+        not isinstance(artifacts.get(name), Mapping) or artifacts[name].get("sha256") != expected
+        for name, expected in expected_hashes.items()
+    ):
+        raise ValueError("fidelity evidence does not identify the frozen M2 artifacts")
+
+    fidelity = diagnostic.get("native_vs_rewritten_fidelity")
+    expected_indices = [int(value) for value in frozen_indices]
+    if (
+        not isinstance(fidelity, Mapping)
+        or fidelity.get("materially_equivalent") is not True
+        or fidelity.get("sample_indices") != expected_indices
+        or fidelity.get("sample_count") != 20
+    ):
+        raise ValueError("native-vs-rewritten fidelity must pass on all frozen 20 samples")
+
+    return {
+        "status": "pass",
+        "commit_sha": current_commit,
+        "sample_count": 20,
+        "result_sha256": hashlib.sha256(diagnostic_bytes).hexdigest(),
+        "materially_equivalent": True,
+    }

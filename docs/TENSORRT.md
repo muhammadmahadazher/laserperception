@@ -1,6 +1,6 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **M2 evidence complete—awaiting PR review/merge; parity v1 failed and parity v2 passed.**
+Status: **M2 benchmark diagnosis in progress; parity v1 failed and parity v2 remains passed.**
 
 ## Parity v1 — measured failure
 
@@ -277,58 +277,47 @@ geometric axis yaw from direction agreement, and records every exception. A Stag
 triggers only targeted Stage 2 forensics; a Stage 1 pass stops parity investigation and waits for
 review before the benchmark.
 
-## Performance evidence
+## Rejected performance evidence
 
-After parity reconfirmation at measurement commit
-`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`, the reviewer-authorized benchmark compared the
-MMDeploy-rewritten PyTorch FP32 network and TensorRT FP16 in one initialized process. The canonical
-record is
-`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`.
+The benchmark measured at commit e2f9b6babb541d52beaa0bcd58e841a0a56cc851 is rejected for
+publication. It used MMDeploy-rewritten eager PyTorch FP32 as the performance denominator and
+alternated runtimes every measured iteration. Its 2164.527 ms rewritten-PyTorch network median,
+1816.859 ms rewritten-PyTorch end-to-end median, 124.297× network ratio, and 23.101× end-to-end
+ratio are not canonical M2 evidence.
 
-The run repeatedly measured nuScenes v1.0-mini `mini_val` index 0 at batch size one. Each runtime
-and boundary received 10 warmups first and 100 measured iterations, with runtime order alternating
-each iteration.
+The historical record is retained only at benchmarks/m2/diagnostics/rejected_e2f9b6b.json with
+status rejected_measurement. No file in benchmarks/m2/results presents that run as valid. The
+valid parity-v2 PASS, frozen samples, thresholds, ONNX, and TensorRT engine remain unchanged.
 
-| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
-|---|---|---:|---:|---:|---:|
-| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
-| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
+## Benchmark architecture correction
 
-**Headline end-to-end median speedup: 23.101×.** The secondary network-only median speedup is
-124.297×. The historical M1 result was not used in either ratio.
+MMDeploy-rewritten PyTorch FP32 remains the parity reference because it exposes the graph that was
+exported. Native MMDetection3D PyTorch FP32 is the performance baseline because it represents the
+normal framework inference modules. Both native PyTorch and TensorRT consume identical
+already-voxelized inputs and use the existing MMDeploy VoxelDetectionModel.postprocess plus the
+same DetectionFrame conversion.
 
-| Network runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| PyTorch FP32 | 2142.212 ms | 2164.527 ms | 2763.908 ms | 2890.222 ms | 1330.156 ms | 3224.011 ms | 453.387 ms | 0.462 |
-| TensorRT FP16 | 26.619 ms | 17.414 ms | 71.383 ms | 73.785 ms | 6.502 ms | 84.383 ms | 23.906 ms | 57.425 |
+The existing MMDeploy postprocess constructs a bbox head on every call. This cost is measured but
+not optimized in M2. No cached head, custom postprocess, rewritten NMS, C++ postprocess, or custom
+CUDA postprocess is introduced.
 
-| End-to-end runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| PyTorch FP32 | 1856.050 ms | 1816.859 ms | 2448.022 ms | 2552.475 ms | 1160.047 ms | 2725.626 ms | 388.796 ms | 0.550 |
-| TensorRT FP16 | 80.014 ms | 78.647 ms | 96.420 ms | 105.017 ms | 48.957 ms | 120.781 ms | 13.928 ms | 12.715 |
+## Diagnostic and repaired protocol
 
-Network timing begins after common voxelization and ends when raw outputs required by shared
-postprocessing are available; it uses CUDA events with per-iteration end-event synchronization.
-End-to-end timing uses synchronized wall time from official sample loading and multi-sweep
-preparation through official voxelization, runtime, shared official postprocessing, and
-`DetectionFrame`. Imports, environment/model/engine initialization, checkpoint loading, downloads,
-visualization, and JSON/image writes are excluded.
+Before any new canonical measurement, the diagnostic runner must reproduce M1 in the M2
+environment, prove CUDA device placement, compare native with rewritten PyTorch on all frozen 20
+samples, profile each component, and stop promotion if native-vs-rewritten semantics materially
+differ.
 
-This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O
-latency, whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production
-real-time guarantee.
+The repaired benchmark uses isolated runtime blocks, not per-iteration alternation. The network
+boundary begins after common voxelization and ends when the three raw head outputs are available.
+The end-to-end boundary runs from dataset preparation through common voxelization, the selected
+network, existing common postprocess, and DetectionFrame conversion. A future canonical run remains
+batch size one, mini_val index 0, 10 warmups, and 100 measured iterations. End-to-end median
+speedup is the headline even if the valid result is small, absent, or negative.
 
-| Memory metric | Measured value |
-|---|---:|
-| PyTorch network peak allocated / reserved | 408,934,400 / 713,031,680 bytes |
-| PyTorch end-to-end peak allocated / reserved | 413,477,888 / 713,031,680 bytes |
-| TensorRT serialized engine | 31,519,476 bytes |
-| TensorRT `ICudaEngine.device_memory_size` | 1,212,340,736 bytes |
-| Comparable process-level GPU memory | Pending measurement |
-
-PyTorch rows are allocator counters after reset for one call in the initialized process. TensorRT
-rows are the serialized file size and exact engine API metric; they are independent definitions,
-not a generic cross-runtime VRAM comparison.
+This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O,
+whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production real-time
+guarantee. The diagnostic pass does not authorize a new canonical benchmark; review is required.
 
 ## Artifact and portability policy
 

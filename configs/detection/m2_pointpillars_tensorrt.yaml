@@ -1,6 +1,6 @@
 schema_version: "1.0"
 milestone: M2
-status: partial_parity_v2_passed_benchmark_pending_review
+status: parity_v2_passed_benchmark_diagnosis_in_progress
 
 cache:
   root_environment_variable: LASERPERCEPTION_M2_CACHE
@@ -114,7 +114,7 @@ benchmark:
   measured_iterations_per_runtime_and_boundary: 100
   pytorch_precision: fp32
   tensorrt_precision: fp16
-  baseline: same_session_mmdeploy_rewritten_pytorch
+  baseline: native_mmdetection3d_pytorch_fp32
   network_boundary: common_voxelized_inputs_to_raw_network_outputs
   end_to_end_boundary: dataset_loading_through_detection_frame
   headline_metric: end_to_end_speedup
@@ -132,7 +132,7 @@ evidence:
   engine_result: pass
   parity_v1_result: fail
   parity_v2_result: pass
-  same_session_benchmark_result: not_run_awaiting_review_authorization
+  same_session_benchmark_result: rejected_measurement_e2f9b6b
 
 parity_v1_observation:
   measurement_commit: a9314483e0ba7a191866266080c3147f9d902956

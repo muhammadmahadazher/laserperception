@@ -15,6 +15,16 @@
     }
   },
   "batch_size": 1,
+  "publication_eligible": false,
+  "rejection": {
+    "reasons": [
+      "MMDeploy-rewritten eager PyTorch was incorrectly used as the performance baseline",
+      "rewritten PyTorch latency was grossly inconsistent with the historical native M1 scale",
+      "the 124.297x network and 23.101x end-to-end ratios used an invalid denominator",
+      "the alternating per-iteration execution order did not provide isolated stable runtime blocks"
+    ],
+    "review_disposition": "retained only as non-canonical diagnostic history"
+  },
   "commit_sha": "e2f9b6babb541d52beaa0bcd58e841a0a56cc851",
   "dataset": {
     "cache_state": "warm-cache repeated-single-sample microbenchmark",
@@ -1215,6 +1225,6 @@
   },
   "same_session": true,
   "schema_version": "1.0",
-  "status": "measured",
+  "status": "rejected_measurement",
   "warmup_iterations_per_runtime_and_boundary": 10
 }

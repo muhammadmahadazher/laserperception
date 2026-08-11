@@ -9,6 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from laserperception.detection.m2_diagnostics import (
+    RAW_OUTPUT_NAMES,
+    assert_cuda0_model,
+    assert_cuda0_tensor,
+    assert_raw_outputs_cuda0,
+)
 from laserperception.detection.mmdet3d_backend import (
     DetectionEnvironmentError,
     Mmdet3dBackend,
@@ -17,6 +23,11 @@ from laserperception.detection.mmdet3d_backend import (
 from laserperception.detection.types import DetectionFrame
 
 EXPECTED_MMDEPLOY_VERSION = "1.3.1"
+EXPECTED_RAW_OUTPUT_SHAPES = {
+    "cls_score": (1, 140, 200, 200),
+    "bbox_pred": (1, 126, 200, 200),
+    "dir_cls_pred": (1, 28, 200, 200),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -180,6 +191,8 @@ class M2Backend(Mmdet3dBackend):
 
         self.initialize()
         assert self._runtime is not None
+        self.assert_shared_cuda_inputs(sample)
+        assert_cuda0_model(self._model, name="rewritten_pytorch_model")
         rewriter_context = importlib.import_module("mmdeploy.core").RewriterContext
         with (
             self._runtime.torch.inference_mode(),
@@ -194,32 +207,88 @@ class M2Backend(Mmdet3dBackend):
             )
         if not isinstance(raw, tuple) or len(raw) != 3:
             raise RuntimeError("rewritten PointPillars must return exactly three output tensors")
-        return {
+        result = {
             "cls_score": [raw[0]],
             "bbox_pred": [raw[1]],
             "dir_cls_pred": [raw[2]],
         }
+        assert_raw_outputs_cuda0(
+            result,
+            runtime_name="rewritten_pytorch",
+            expected_dtype="torch.float32",
+            expected_shapes=EXPECTED_RAW_OUTPUT_SHAPES,
+        )
+        return result
+
+    def run_native_pytorch_raw(self, sample: VoxelizedM2Sample) -> dict[str, list[Any]]:
+        """Run native MMDetection3D PointPillars modules on shared voxels in FP32."""
+
+        self.initialize()
+        assert self._runtime is not None
+        self.assert_shared_cuda_inputs(sample)
+        assert_cuda0_model(self._model, name="native_pytorch_model")
+        batch_input_metas = [data_sample.metainfo for data_sample in sample.data_samples]
+        with (
+            self._runtime.torch.inference_mode(),
+            self._runtime.torch.autocast(device_type="cuda", enabled=False),
+        ):
+            _, point_features = self._model.extract_feat(self._inputs(sample), batch_input_metas)
+            raw = self._model.pts_bbox_head(point_features)
+        if not isinstance(raw, tuple) or len(raw) != 3:
+            raise RuntimeError("native PointPillars bbox head must return exactly three outputs")
+        result: dict[str, list[Any]] = {}
+        for name, levels in zip(RAW_OUTPUT_NAMES, raw, strict=True):
+            if not isinstance(levels, (list, tuple)) or len(levels) != 1:
+                raise RuntimeError(f"native PointPillars {name} must contain one feature level")
+            result[name] = [levels[0]]
+        assert_raw_outputs_cuda0(
+            result,
+            runtime_name="native_pytorch",
+            expected_dtype="torch.float32",
+            expected_shapes=EXPECTED_RAW_OUTPUT_SHAPES,
+        )
+        return result
 
     def run_tensorrt_raw(
         self, sample: VoxelizedM2Sample, engine_path: str | Path
     ) -> dict[str, list[Any]]:
         """Run one external TensorRT engine through the official MMDeploy wrapper."""
 
+        self.assert_shared_cuda_inputs(sample)
         backend_model = self._backend_model(engine_path)
+        backend_device = str(getattr(backend_model, "device", ""))
+        if backend_device != "cuda:0":
+            found = backend_device or "unknown"
+            raise RuntimeError(f"TensorRT backend must execute on cuda:0, found {found}")
         raw = backend_model.forward(self._inputs(sample), data_samples=None)
         if not isinstance(raw, dict):
             raise RuntimeError("official MMDeploy TensorRT wrapper returned malformed outputs")
+        assert_raw_outputs_cuda0(
+            raw,
+            runtime_name="tensorrt",
+            expected_dtype="torch.float32",
+            expected_shapes=EXPECTED_RAW_OUTPUT_SHAPES,
+        )
         return raw
 
-    def postprocess_raw(
-        self,
-        raw: dict[str, list[Any]],
-        sample: VoxelizedM2Sample,
-        *,
-        backend_name: str,
-        precision: str,
-    ) -> DetectionFrame:
-        """Apply the same official MMDeploy postprocess and LaserPerception conversion."""
+    def assert_shared_cuda_inputs(self, sample: VoxelizedM2Sample) -> dict[str, object]:
+        """Fail closed and record the device, dtype, and shape of shared inputs."""
+
+        return {
+            "model_parameter": assert_cuda0_model(self._model, name="m2_model"),
+            "voxels": assert_cuda0_tensor(
+                sample.voxels,
+                name="voxels",
+                expected_dtype="torch.float32",
+            ),
+            "num_points": assert_cuda0_tensor(sample.num_points, name="num_points"),
+            "coors": assert_cuda0_tensor(sample.coors, name="coors"),
+        }
+
+    def run_official_postprocess_raw(
+        self, raw: dict[str, list[Any]], sample: VoxelizedM2Sample
+    ) -> Any:
+        """Run the existing static MMDeploy postprocess, including head construction."""
 
         self.initialize()
         voxel_model = importlib.import_module(
@@ -233,7 +302,19 @@ class M2Backend(Mmdet3dBackend):
         )
         if len(predictions) != 1:
             raise RuntimeError("official MMDeploy postprocess must return exactly one prediction")
-        frame = self.convert_prediction(predictions[0], sample.prepared)
+        return predictions[0]
+
+    def convert_postprocessed_prediction(
+        self,
+        prediction: Any,
+        sample: VoxelizedM2Sample,
+        *,
+        backend_name: str,
+        precision: str,
+    ) -> DetectionFrame:
+        """Convert one official prediction to the framework-independent output contract."""
+
+        frame = self.convert_prediction(prediction, sample.prepared)
         return DetectionFrame(
             detections=frame.detections,
             sample_id=frame.sample_id,
@@ -245,6 +326,34 @@ class M2Backend(Mmdet3dBackend):
                 "voxel_count": sample.voxel_count,
                 "shared_voxel_hashes": sample.hashes(),
             },
+        )
+
+    def postprocess_raw(
+        self,
+        raw: dict[str, list[Any]],
+        sample: VoxelizedM2Sample,
+        *,
+        backend_name: str,
+        precision: str,
+    ) -> DetectionFrame:
+        """Apply the same official MMDeploy postprocess and LaserPerception conversion."""
+
+        prediction = self.run_official_postprocess_raw(raw, sample)
+        return self.convert_postprocessed_prediction(
+            prediction,
+            sample,
+            backend_name=backend_name,
+            precision=precision,
+        )
+
+    def run_native_pytorch(self, sample: VoxelizedM2Sample) -> DetectionFrame:
+        """Run native PyTorch FP32 and the common official postprocess."""
+
+        return self.postprocess_raw(
+            self.run_native_pytorch_raw(sample),
+            sample,
+            backend_name="native_mmdetection3d_pytorch",
+            precision="fp32",
         )
 
     def run_rewritten_pytorch(self, sample: VoxelizedM2Sample) -> DetectionFrame:

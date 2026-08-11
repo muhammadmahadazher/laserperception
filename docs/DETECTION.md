@@ -16,8 +16,8 @@ ONNX graph, and built/ran the FP16 engine. Parity v1 failed its hard maximum XY,
 yaw, and score guards and remains failed. The separately preregistered v2 Stage 1 passed every
 per-metric fraction, count, coverage, direction, and class gate using the same 20 samples and
 unchanged engine, then passed again at exact measurement commit
-`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The same-session benchmark completed, so M2 evidence
-is complete and awaits PR review/merge. Exact hashes, metrics, exceptions, and protocol chronology
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The benchmark from that commit was subsequently rejected because rewritten eager PyTorch was
+not a valid performance baseline. Parity v2 remains valid; M2 benchmark diagnosis is in progress. Exact hashes, metrics, exceptions, and protocol chronology
 are in `docs/TENSORRT.md`.
 
 After activating the M2 environment, the reproducible sequence is:
@@ -33,8 +33,9 @@ python scripts/detection/benchmark_m2.py
 
 The parity-v2 command exits zero for a passing full suite and writes external `parity_v2.json`.
 `benchmark_m2.py` requires protocol-v2 passing evidence from the exact current commit and exact
-ONNX/engine hashes. Benchmarking still requires explicit reviewer authorization; the canonical M2
-record was produced only after that authorization. `LASERPERCEPTION_M2_CACHE` selects the external
+ONNX/engine hashes. Benchmarking requires a passing native-vs-rewritten fidelity diagnosis from the exact current
+commit. Native MMDetection3D PyTorch is the performance baseline; no replacement canonical result
+is authorized yet. `LASERPERCEPTION_M2_CACHE` selects the external
 cache; its default is `~/.cache/laserperception`.
 
 ## M1 status

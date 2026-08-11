@@ -1,4 +1,4 @@
-"""Same-session M2 benchmark of rewritten PyTorch FP32 and TensorRT FP16."""
+"""M2 benchmark of native PyTorch FP32 and TensorRT FP16 in isolated blocks."""
 
 from __future__ import annotations
 
@@ -20,7 +20,11 @@ from laserperception.detection.benchmark import bytes_to_gib, latency_statistics
 from laserperception.detection.m1_assets import resolve_m1_asset_paths
 from laserperception.detection.m2_assets import resolve_m2_asset_paths
 from laserperception.detection.m2_backend import M2Backend, VoxelizedM2Sample
-from laserperception.detection.m2_benchmark import build_parity_v2_benchmark_record
+from laserperception.detection.m2_benchmark import (
+    build_fidelity_diagnostic_record,
+    build_parity_v2_benchmark_record,
+)
+from laserperception.detection.m2_diagnostics import benchmark_review_flags
 from laserperception.detection.runtime_metadata import (
     nvidia_smi_value,
     repository_git_sha,
@@ -91,30 +95,22 @@ def _measure_networks(
     iterations: int,
     torch: Any,
 ) -> tuple[list[float], list[float]]:
-    for iteration in range(warmup):
-        if iteration % 2 == 0:
-            backend.run_rewritten_pytorch_raw(voxelized)
-            backend.run_tensorrt_raw(voxelized, engine_path)
-        else:
-            backend.run_tensorrt_raw(voxelized, engine_path)
-            backend.run_rewritten_pytorch_raw(voxelized)
+    for _ in range(warmup):
+        backend.run_native_pytorch_raw(voxelized)
     torch.cuda.synchronize(0)
-    pytorch_latencies: list[float] = []
+    native_latencies: list[float] = []
+    for _ in range(iterations):
+        latency, _ = _cuda_measure(torch, lambda: backend.run_native_pytorch_raw(voxelized))
+        native_latencies.append(latency)
+
+    for _ in range(warmup):
+        backend.run_tensorrt_raw(voxelized, engine_path)
+    torch.cuda.synchronize(0)
     tensorrt_latencies: list[float] = []
-    for iteration in range(iterations):
-        order = ("pytorch", "tensorrt") if iteration % 2 == 0 else ("tensorrt", "pytorch")
-        for runtime in order:
-            if runtime == "pytorch":
-                latency, _ = _cuda_measure(
-                    torch, lambda: backend.run_rewritten_pytorch_raw(voxelized)
-                )
-                pytorch_latencies.append(latency)
-            else:
-                latency, _ = _cuda_measure(
-                    torch, lambda: backend.run_tensorrt_raw(voxelized, engine_path)
-                )
-                tensorrt_latencies.append(latency)
-    return pytorch_latencies, tensorrt_latencies
+    for _ in range(iterations):
+        latency, _ = _cuda_measure(torch, lambda: backend.run_tensorrt_raw(voxelized, engine_path))
+        tensorrt_latencies.append(latency)
+    return native_latencies, tensorrt_latencies
 
 
 def _end_to_end_operation(
@@ -129,12 +125,12 @@ def _end_to_end_operation(
     started = time.perf_counter()
     prepared = backend.prepare_sample(data_root, split="mini_val", index=index)
     voxelized = backend.voxelize(prepared)
-    if runtime == "pytorch":
-        raw = backend.run_rewritten_pytorch_raw(voxelized)
+    if runtime == "native_pytorch":
+        raw = backend.run_native_pytorch_raw(voxelized)
         frame = backend.postprocess_raw(
             raw,
             voxelized,
-            backend_name="mmdeploy_rewritten_pytorch",
+            backend_name="native_mmdetection3d_pytorch",
             precision="fp32",
         )
     else:
@@ -159,31 +155,53 @@ def _measure_end_to_end(
     iterations: int,
     torch: Any,
 ) -> tuple[list[float], list[float], DetectionFrame, DetectionFrame]:
-    for iteration in range(warmup):
-        order = ("pytorch", "tensorrt") if iteration % 2 == 0 else ("tensorrt", "pytorch")
-        for runtime in order:
-            _end_to_end_operation(
-                backend, data_root, engine_path, index=index, runtime=runtime, torch=torch
-            )
-    pytorch_latencies: list[float] = []
+    for _ in range(warmup):
+        _end_to_end_operation(
+            backend,
+            data_root,
+            engine_path,
+            index=index,
+            runtime="native_pytorch",
+            torch=torch,
+        )
+    native_latencies: list[float] = []
+    native_frame: DetectionFrame | None = None
+    for _ in range(iterations):
+        latency, native_frame = _end_to_end_operation(
+            backend,
+            data_root,
+            engine_path,
+            index=index,
+            runtime="native_pytorch",
+            torch=torch,
+        )
+        native_latencies.append(float(latency))
+
+    for _ in range(warmup):
+        _end_to_end_operation(
+            backend,
+            data_root,
+            engine_path,
+            index=index,
+            runtime="tensorrt",
+            torch=torch,
+        )
     tensorrt_latencies: list[float] = []
-    pytorch_frame: DetectionFrame | None = None
     tensorrt_frame: DetectionFrame | None = None
-    for iteration in range(iterations):
-        order = ("pytorch", "tensorrt") if iteration % 2 == 0 else ("tensorrt", "pytorch")
-        for runtime in order:
-            latency, frame = _end_to_end_operation(
-                backend, data_root, engine_path, index=index, runtime=runtime, torch=torch
-            )
-            if runtime == "pytorch":
-                pytorch_latencies.append(float(latency))
-                pytorch_frame = frame
-            else:
-                tensorrt_latencies.append(float(latency))
-                tensorrt_frame = frame
-    if pytorch_frame is None or tensorrt_frame is None:
-        raise RuntimeError("same-session benchmark produced no final DetectionFrames")
-    return pytorch_latencies, tensorrt_latencies, pytorch_frame, tensorrt_frame
+    for _ in range(iterations):
+        latency, tensorrt_frame = _end_to_end_operation(
+            backend,
+            data_root,
+            engine_path,
+            index=index,
+            runtime="tensorrt",
+            torch=torch,
+        )
+        tensorrt_latencies.append(float(latency))
+
+    if native_frame is None or tensorrt_frame is None:
+        raise RuntimeError("isolated-block benchmark produced no final DetectionFrames")
+    return native_latencies, tensorrt_latencies, native_frame, tensorrt_frame
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -191,6 +209,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--data-root", help="nuScenes root; defaults to environment variable")
     parser.add_argument("--engine", type=Path, help="override external TensorRT engine")
     parser.add_argument("--parity", type=Path, help="override external full parity JSON")
+    parser.add_argument(
+        "--fidelity", type=Path, help="override external native-vs-rewritten diagnosis JSON"
+    )
     parser.add_argument("--warmup", type=int)
     parser.add_argument("--iterations", type=int)
     parser.add_argument(
@@ -229,6 +250,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parity_path = args.parity or m2_assets.artifact_directory / "parity_v2.json"
     parity_bytes = parity_path.read_bytes()
     parity = json.loads(parity_bytes)
+    fidelity_path = args.fidelity or (
+        m2_assets.artifact_directory / "diagnostics" / "m2_diagnosis.json"
+    )
+    fidelity_bytes = fidelity_path.read_bytes()
+    fidelity = json.loads(fidelity_bytes)
     frozen_indices = [int(value) for value in parity_manifest["dataset"]["sample_indices"]]
     current_commit = repository_git_sha(repository_root)
 
@@ -275,6 +301,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             onnx_sha256=onnx_artifact.sha256,
             engine_sha256=engine_artifact.sha256,
         )
+        fidelity_record = build_fidelity_diagnostic_record(
+            fidelity,
+            fidelity_bytes,
+            current_commit=current_commit,
+            frozen_indices=frozen_indices,
+            checkpoint_sha256=str(checkpoint_info["sha256"]),
+            onnx_sha256=onnx_artifact.sha256,
+            engine_sha256=engine_artifact.sha256,
+        )
     except ValueError as error:
         raise SystemExit(f"error: {error}") from error
 
@@ -291,7 +326,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         expected_profile=profile,
     )
 
-    pytorch_network, tensorrt_network = _measure_networks(
+    native_network, tensorrt_network = _measure_networks(
         backend,
         voxelized,
         engine_path,
@@ -299,7 +334,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         iterations=iterations,
         torch=torch,
     )
-    pytorch_e2e, tensorrt_e2e, pytorch_frame, tensorrt_frame = _measure_end_to_end(
+    native_e2e, tensorrt_e2e, native_frame, tensorrt_frame = _measure_end_to_end(
         backend,
         data_root,
         engine_path,
@@ -310,35 +345,53 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
     torch.cuda.reset_peak_memory_stats(0)
-    backend.run_rewritten_pytorch_raw(voxelized)
+    backend.run_native_pytorch_raw(voxelized)
     torch.cuda.synchronize(0)
     pytorch_network_memory = _torch_memory(
         torch,
         method=(
-            "torch.cuda peak allocator counters after reset for one rewritten-PyTorch "
-            "network call in the already initialized same-session process"
+            "torch.cuda peak allocator counters after reset for one native PyTorch "
+            "network call in the already initialized process"
         ),
     )
     torch.cuda.reset_peak_memory_stats(0)
     _end_to_end_operation(
-        backend, data_root, engine_path, index=index, runtime="pytorch", torch=torch
+        backend,
+        data_root,
+        engine_path,
+        index=index,
+        runtime="native_pytorch",
+        torch=torch,
     )
     pytorch_e2e_memory = _torch_memory(
         torch,
         method=(
-            "torch.cuda peak allocator counters after reset for one rewritten-PyTorch "
-            "end-to-end call in the already initialized same-session process"
+            "torch.cuda peak allocator counters after reset for one native PyTorch "
+            "end-to-end call in the already initialized process"
         ),
     )
 
-    pytorch_network_stats = latency_statistics_ms(pytorch_network)
+    native_network_stats = latency_statistics_ms(native_network)
     tensorrt_network_stats = latency_statistics_ms(tensorrt_network)
-    pytorch_e2e_stats = latency_statistics_ms(pytorch_e2e)
+    native_e2e_stats = latency_statistics_ms(native_e2e)
     tensorrt_e2e_stats = latency_statistics_ms(tensorrt_e2e)
-    network_speedup = float(pytorch_network_stats["median_ms"]) / float(
+    network_speedup = float(native_network_stats["median_ms"]) / float(
         tensorrt_network_stats["median_ms"]
     )
-    e2e_speedup = float(pytorch_e2e_stats["median_ms"]) / float(tensorrt_e2e_stats["median_ms"])
+    e2e_speedup = float(native_e2e_stats["median_ms"]) / float(tensorrt_e2e_stats["median_ms"])
+    review_flags = benchmark_review_flags(
+        native_e2e_median_ms=float(native_e2e_stats["median_ms"]),
+        native_network_median_ms=float(native_network_stats["median_ms"]),
+        tensorrt_e2e_median_ms=float(tensorrt_e2e_stats["median_ms"]),
+        tensorrt_network_median_ms=float(tensorrt_network_stats["median_ms"]),
+        native_e2e_p95_ms=float(native_e2e_stats["p95_ms"]),
+        tensorrt_e2e_p95_ms=float(tensorrt_e2e_stats["p95_ms"]),
+    )
+    if tracked_promotion and review_flags:
+        raise SystemExit(
+            "error: tracked benchmark promotion requires reviewer inspection: "
+            + ", ".join(review_flags)
+        )
     result = {
         "schema_version": "1.0",
         "status": "measured",
@@ -346,7 +399,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "commit_sha": current_commit,
         "milestone": "M2",
         "same_session": True,
-        "measurement_order": "alternating PyTorch/TensorRT order by iteration",
+        "measurement_order": "isolated native-PyTorch block followed by isolated TensorRT block",
+        "baseline_roles": {
+            "parity_reference": "mmdeploy_rewritten_pytorch_fp32",
+            "performance_baseline": "native_mmdetection3d_pytorch_fp32",
+        },
         "warmup_iterations_per_runtime_and_boundary": warmup,
         "measured_iterations_per_runtime_and_boundary": iterations,
         "batch_size": 1,
@@ -377,26 +434,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             "engine": engine_artifact.to_dict(),
         },
         "parity": parity_record,
+        "native_vs_rewritten_fidelity": fidelity_record,
+        "benchmark_sanity": {
+            "review_required": bool(review_flags),
+            "flags": review_flags,
+            "promotion_refused_when_flagged": True,
+        },
         "measurements": {
             "network": {
                 "boundary": str(benchmark_config["network_boundary"]),
                 "clock": "torch.cuda.Event with per-iteration end-event synchronization",
-                "pytorch_fp32": pytorch_network_stats,
+                "native_pytorch_fp32": native_network_stats,
                 "tensorrt_fp16": tensorrt_network_stats,
                 "pytorch_over_tensorrt_median_speedup": network_speedup,
             },
             "end_to_end": {
                 "boundary": str(benchmark_config["end_to_end_boundary"]),
                 "clock": "time.perf_counter with torch.cuda.synchronize before stop",
-                "pytorch_fp32": pytorch_e2e_stats,
+                "native_pytorch_fp32": native_e2e_stats,
                 "tensorrt_fp16": tensorrt_e2e_stats,
                 "pytorch_over_tensorrt_median_speedup": e2e_speedup,
                 "headline": True,
             },
         },
         "memory": {
-            "pytorch_network": pytorch_network_memory,
-            "pytorch_end_to_end": pytorch_e2e_memory,
+            "native_pytorch_network": pytorch_network_memory,
+            "native_pytorch_end_to_end": pytorch_e2e_memory,
             "tensorrt": {
                 "serialized_engine_size_bytes": engine_artifact.size_bytes,
                 "engine_device_memory_size_bytes": engine_inspection[
@@ -407,7 +470,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "comparable_process_level_gpu_memory": "Pending measurement",
         },
         "final_detection_counts": {
-            "pytorch": len(pytorch_frame.detections),
+            "native_pytorch": len(native_frame.detections),
             "tensorrt": len(tensorrt_frame.detections),
         },
         "interpretation_limits": [

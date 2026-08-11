@@ -7,89 +7,54 @@ It records benchmark commit `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, UTC time
 `2026-08-10T09:36:11.151600+00:00`, and the complete software, hardware, sample, asset, timing, and
 memory provenance.
 
-## M2 — same-session PyTorch FP32 versus TensorRT FP16
+## M2 — benchmark diagnosis; no canonical result
 
-The canonical measured record is
-[`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](../benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).
-It was generated at `2026-08-11T10:27:34.536114+00:00` from measurement commit
-`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`.
+The run measured at commit e2f9b6babb541d52beaa0bcd58e841a0a56cc851 failed sanity review.
+It is preserved only as benchmarks/m2/diagnostics/rejected_e2f9b6b.json with
+status rejected_measurement. The reported 124.297× network speedup, 23.101× end-to-end speedup,
+2164.527 ms rewritten-PyTorch network median, and 1816.859 ms rewritten-PyTorch end-to-end median
+are not accepted M2 results.
 
-Parity v1 remains an authoritative failure at commit
-`a9314483e0ba7a191866266080c3147f9d902956`. The separately preregistered parity v2 first passed at
-`6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c`. After the benchmark integration fix, the complete
-20-sample v2 suite passed again at the exact measurement commit with unchanged ONNX and engine.
-The reconfirmed external parity JSON SHA256 is
-`fbecf5493a34bf840d2a71b1fe1851010110e15b1aee78b23a26d2ef4f880634`.
+The failure does not invalidate parity v2. Parity v2 still establishes that TensorRT FP16
+reproduces the MMDeploy-rewritten/exported graph within the preregistered gates. It does not by
+itself establish that rewritten eager PyTorch is a representative performance baseline.
 
-### Parity disclosure retained with the benchmark
+### Correct runtime roles
 
-| Evidence | Result |
-|---|---|
-| Preregistered per-metric Stage 1 gates | **All passed** |
-| Distinct high-confidence matches exceeding at least one continuous tolerance | **8/753 (1.06%)** |
-| Maximum box-axis yaw difference | **47.626393°**, index 50 pedestrian; causal mechanism not established |
-| Raw `cls_score` absolute-difference tail | p99 0.056829; maximum 0.721187 |
+- Parity reference: MMDeploy-rewritten PyTorch FP32.
+- Performance baseline: native MMDetection3D PyTorch FP32 on the same precomputed voxel tensors.
+- Candidate runtime: TensorRT FP16 with the unchanged ONNX and engine.
+- Common work: official preparation, voxelization, existing MMDeploy postprocess, and
+  DetectionFrame conversion.
 
-The 8/753 figure is a separate union diagnostic, not a post-hoc acceptance gate. The frozen
-acceptance rule is per metric, a detection may exceed multiple tolerances, and all eight exceptions
-remain in every applicable metric denominator. The rare 47.63° case is not one of the approximately
-180° full-heading reversals. The classification tensor aligned closely for the great majority of
-elements but has a rare heavier tail relative to p99; its maximum is diagnostic, not a new gate.
+The diagnostic pass first reproduces the original M1 benchmark in the M2 environment, asserts
+CUDA device/dtype/shape metadata, compares native and rewritten outputs on all frozen 20 samples,
+and profiles every component. A future canonical run requires passing parity and
+native-vs-rewritten fidelity evidence from the exact benchmark implementation commit.
 
-### Frozen protocol and timing boundaries
+### Repaired measurement protocol awaiting review
 
-The run repeatedly measured nuScenes v1.0-mini `mini_val` index 0 at batch size one. Each runtime
-and boundary received 10 warmups first and then 100 measurements, with PyTorch-first and
-TensorRT-first order alternating by iteration.
+Any future canonical benchmark will repeatedly measure nuScenes v1.0-mini mini_val index 0 at
+batch size one, with 10 warmups and 100 measurements per runtime and boundary. Runtime blocks are
+isolated rather than alternated per iteration.
 
-- Network: common voxelized tensors through raw network outputs required by shared postprocessing;
-  CUDA events with per-iteration end-event synchronization.
-- End to end: official sample loading and multi-sweep preparation through official voxelization,
-  runtime, shared official postprocessing, and `DetectionFrame`; `time.perf_counter` with CUDA
-  synchronization before stopping.
+- Network: identical precomputed voxel tensors through raw cls_score, bbox_pred, and dir_cls_pred;
+  CUDA-event timing.
+- End to end: sample preparation through official voxelization, the selected network, existing
+  common MMDeploy postprocess, and DetectionFrame; synchronized wall-clock timing.
+- Headline: end-to-end median speedup. Network-only speedup remains secondary.
 
-Imports, environment/model/engine initialization, checkpoint loading, downloads, visualization,
-and JSON/image writes were excluded.
+This remains a warm-cache repeated-single-sample latency microbenchmark, not cold-storage I/O,
+whole-dataset sequential throughput, guaranteed sensor throughput, or production evidence. No
+repaired canonical benchmark will be run or promoted until the methodology is reviewed.
 
-### Measured same-session result
+### Parity-v2 disclosures retained
 
-| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
-|---|---|---:|---:|---:|---:|
-| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
-| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
-
-**Headline end-to-end median speedup: 23.101×.** The secondary network-only median speedup is
-124.297×.
-
-| Network runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| PyTorch FP32 | 2142.212 ms | 2164.527 ms | 2763.908 ms | 2890.222 ms | 1330.156 ms | 3224.011 ms | 453.387 ms | 0.462 |
-| TensorRT FP16 | 26.619 ms | 17.414 ms | 71.383 ms | 73.785 ms | 6.502 ms | 84.383 ms | 23.906 ms | 57.425 |
-
-| End-to-end runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| PyTorch FP32 | 1856.050 ms | 1816.859 ms | 2448.022 ms | 2552.475 ms | 1160.047 ms | 2725.626 ms | 388.796 ms | 0.550 |
-| TensorRT FP16 | 80.014 ms | 78.647 ms | 96.420 ms | 105.017 ms | 48.957 ms | 120.781 ms | 13.928 ms | 12.715 |
-
-This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O
-latency, whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production
-real-time guarantee.
-
-### Memory and environment
-
-| Metric | Measured value | Definition |
-|---|---:|---|
-| PyTorch network peak allocated / reserved | 408,934,400 / 713,031,680 bytes | Torch allocator counters after reset for one network call |
-| PyTorch end-to-end peak allocated / reserved | 413,477,888 / 713,031,680 bytes | Torch allocator counters after reset for one end-to-end call |
-| TensorRT serialized engine | 31,519,476 bytes | External engine file size |
-| TensorRT engine device memory | 1,212,340,736 bytes | `ICudaEngine.device_memory_size` |
-| Comparable process-level GPU memory | Pending measurement | No common reliable method was used |
-
-Hardware was the NVIDIA GeForce RTX 4060 Laptop GPU with 8,585,216,000 bytes total memory and
-NVIDIA driver 610.88 under WSL2 kernel 6.18.33.2. The measured stack was Python 3.10.12,
-PyTorch 2.1.0+cu118/CUDA 11.8, MMDeploy 1.3.1 at
-`bc75c9d6c8940aa03d0e1e5b5962bd930478ba77`, MMDetection3D 1.4.0, MMCV 2.1.0, MMEngine 0.10.7,
-MMDetection 3.2.0, ONNX 1.14.1, and TensorRT 8.6.1.
+All preregistered per-metric Stage 1 gates passed. Separately, 8/753 (1.06%) high-confidence
+matched detections exceeded at least one continuous tolerance; all exceptions remain in applicable
+denominators. One index-50 pedestrian match had a 47.626393° box-axis difference whose causal
+mechanism was not established. The raw classification tensor had p99 absolute difference 0.056829
+and a rare maximum tail of 0.721187. These facts remain diagnostic and do not create post-hoc gates.
 
 ## M1 — PointPillars FP32
 
