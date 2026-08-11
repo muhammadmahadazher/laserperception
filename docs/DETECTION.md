@@ -12,10 +12,11 @@ remain outside the engine; both rewritten PyTorch FP32 and TensorRT outputs use 
 MMDeploy postprocessing and LaserPerception conversion.
 
 The implementation passed TensorRT Gate 0, profiled all 81 `mini_val` samples, checked the exported
-ONNX graph, and built/ran the FP16 engine. The unchanged 20-sample final-box parity suite failed the
-XY, per-dimension size, yaw, and score guards, so M2 is partial. No benchmark result was run or
-promoted. Exact hashes, metrics, threshold-edge crossings, and debugging disposition are in
-`docs/TENSORRT.md`.
+ONNX graph, and built/ran the FP16 engine. Parity v1 failed its hard maximum XY, per-dimension size,
+yaw, and score guards and remains failed. The separately preregistered v2 Stage 1 passed every
+99%-fraction, count, coverage, direction, and class gate using the same 20 samples and unchanged
+engine. M2 remains partial because no benchmark result was run or promoted. Exact hashes, metrics,
+exceptions, and protocol chronology are in `docs/TENSORRT.md`.
 
 After activating the M2 environment, the reproducible sequence is:
 
@@ -27,10 +28,10 @@ python scripts/detection/build_m2_tensorrt.py
 python scripts/detection/validate_m2_parity.py
 ```
 
-The parity command intentionally exits nonzero for the current FP16 engine. `benchmark_m2.py`
-requires a passing full parity JSON from the same implementation commit and artifact hashes, so it
-cannot promote a result from this attempt. `LASERPERCEPTION_M2_CACHE` selects the external cache;
-its default is `~/.cache/laserperception`.
+The parity-v2 command exits zero for the measured full suite and writes external `parity_v2.json`.
+`benchmark_m2.py` requires that passing artifact and exact hashes, but must not be run until a
+reviewer explicitly authorizes benchmarking. `LASERPERCEPTION_M2_CACHE` selects the external
+cache; its default is `~/.cache/laserperception`.
 
 ## M1 status
 

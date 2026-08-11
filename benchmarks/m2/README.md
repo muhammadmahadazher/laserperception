@@ -1,6 +1,6 @@
 # M2 same-session benchmark protocol
 
-Status: **Not run or promoted because the frozen 20-sample FP16 parity gate failed.**
+Status: **Parity v2 passed; benchmark not run or promoted pending reviewer authorization.**
 
 The implemented benchmark compares the MMDeploy-rewritten PyTorch FP32 network with the
 TensorRT FP16 network in one initialized process. It refuses tracked-result promotion unless the
@@ -28,8 +28,8 @@ generic cross-runtime VRAM comparison.
 
 The only promotable path is
 `benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`, produced on the canonical
-NVIDIA GeForce RTX 4060 Laptop GPU after passing parity. No such file exists for the current M2
-attempt. Raw/debug output belongs under ignored `benchmarks/m2/raw/` or the external M2 cache.
+NVIDIA GeForce RTX 4060 Laptop GPU after passing parity and review approval. No such file exists for
+the current M2 attempt. Raw/debug output belongs under ignored `benchmarks/m2/raw/` or the external M2 cache.
 
-See `docs/TENSORRT.md` for the exact artifact hashes, parity failure, and architecture-review
-disposition.
+See `docs/TENSORRT.md` for the exact artifact hashes, permanent v1 failure, v2 Stage 1 pass, and
+review disposition.

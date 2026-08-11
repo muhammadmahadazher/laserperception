@@ -32,12 +32,13 @@ detector, model conversion, ROS 2, or edge deployment.
 - [x] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
 - [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
 - [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
-- [ ] Pass final-box parity on all frozen samples with identical preprocessing and postprocessing.
+- [x] Pass versioned final-box parity v2 on all frozen samples with shared preprocessing/postprocessing.
 - [ ] Remeasure the deployable PyTorch FP32 and TensorRT FP16 paths in the same session.
 
-M2 is partial. Gate 0, the 81-sample profile, ONNX checking, and FP16 engine build pass, but the
-unchanged 20-sample parity suite fails four high-confidence guards. Benchmark promotion remains
-blocked and architecture review is required; unmeasured fields remain `Pending measurement`.
+M2 is partial. Gate 0, the 81-sample profile, ONNX checking, and FP16 engine build pass. Parity v1
+remains failed; after architecture review, the separately preregistered v2 Stage 1 passed on the
+unchanged engine and samples. Same-session benchmarking remains unrun pending reviewer
+authorization, and all benchmark fields remain `Pending measurement`.
 
 ## M3 — ROS 2
 

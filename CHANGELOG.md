@@ -10,9 +10,10 @@ releases begin.
 
 - Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate
   staged parity v2 protocol with unchanged samples, artifacts, thresholds, and numerical
-  tolerances plus per-detection 99% acceptance and explicit direction diagnostics.
-- Recorded M2 as partial after the unchanged 20-sample TensorRT FP16 parity suite failed four
-  high-confidence guards; benchmark promotion remains blocked pending architecture review.
+  tolerances plus per-detection 99% acceptance and explicit direction diagnostics. Stage 1 passed
+  every gate on the unchanged 20-sample suite and existing FP16 engine.
+- Kept M2 partial and all benchmark fields at `Pending measurement` while same-session
+  benchmarking awaits explicit reviewer authorization.
 
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical

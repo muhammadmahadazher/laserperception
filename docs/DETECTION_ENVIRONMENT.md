@@ -41,9 +41,10 @@ detected GPU, builds/serializes/deserializes a trivial FP16 network, creates an 
 executes it, and compares its output. A different usable NVIDIA CUDA GPU is allowed for setup; the
 RTX 4060 Laptop GPU is required only for promotion of the canonical result filename.
 
-The exact environment passed Gate 0 and built the official PointPillars ONNX/FP16 engine, but the
-frozen 20-sample parity suite failed. Therefore M2 benchmarking and result promotion were not run.
-See `TENSORRT.md` for the evidence and architecture-review disposition.
+The exact environment passed Gate 0 and built the official PointPillars ONNX/FP16 engine. Parity v1
+failed and remains historical evidence; separately preregistered parity v2 Stage 1 passed on the
+unchanged engine. M2 benchmarking and result promotion were not run pending reviewer authorization.
+See `TENSORRT.md` for both versioned results and the review disposition.
 
 ## M1 verified matrix
 

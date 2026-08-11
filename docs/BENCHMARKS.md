@@ -9,11 +9,12 @@ memory provenance.
 
 ## M2 — no promoted benchmark
 
-The official MMDeploy 1.3.1 ONNX export and TensorRT 8.6.1 FP16 engine built successfully, but the
-frozen 20-sample final-box parity suite failed at commit
-`a9314483e0ba7a191866266080c3147f9d902956`. The benchmark command therefore remained gated and
-`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json` was not created. There are no M2
-latency, FPS, speedup, or process-level memory claims.
+The official MMDeploy 1.3.1 ONNX export and TensorRT 8.6.1 FP16 engine built successfully. Parity v1
+failed at commit `a9314483e0ba7a191866266080c3147f9d902956` and remains failed. The separately
+preregistered v2 Stage 1 then passed on the same 20 samples and unchanged engine at commit
+`6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c`. The benchmark was deliberately not run because
+reviewer authorization is still required. The promoted result file does not exist, and there are no
+M2 latency, FPS, speedup, or process-level memory claims.
 
 The implemented protocol would repeatedly measure `mini_val` index 0 at batch size one after 10
 warmups, with 100 measurements for each runtime and boundary. It is a warm-cache,
@@ -28,7 +29,7 @@ through `DetectionFrame`. See [`benchmarks/m2/README.md`](../benchmarks/m2/READM
 | Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | Model P95 | End-to-end P95 | Model FPS | Peak CUDA memory |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---:|
 | PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | NVIDIA GeForce RTX 4060 Laptop GPU | 52.896 ms | 55.097 ms | 60.729 ms | 62.568 ms | 18.905 | 0.381 GiB allocated / 0.400 GiB reserved |
-| TensorRT (M2 parity failed) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
+| TensorRT (M2 benchmark pending review) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 | Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 
 The measured PointPillars asset is

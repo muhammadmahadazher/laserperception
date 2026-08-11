@@ -1,6 +1,6 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **Partial M2; parity v1 failed, and parity v2 is preregistered but not yet run.**
+Status: **Partial M2; parity v1 failed, parity v2 Stage 1 passed, benchmark awaiting review.**
 
 ## Parity v1 — measured failure
 
@@ -53,7 +53,7 @@ running FP16 with TF32 disabled reproduced the original failed guards. The MMDep
 timebox is exhausted, so no layer-precision override, model change, threshold relaxation, or
 benchmark promotion was attempted.
 
-## Architecture review and preregistered parity v2
+## Architecture review and parity v2
 
 Architecture review found that v1 applied hard per-box maxima after discontinuous decisions,
 including the two-class direction argmax and NMS. The microscopic v1 medians and rare large maxima
@@ -90,6 +90,70 @@ targeted Stage 2 diagnosis after a Stage 1 failure; no output is labeled an NMS 
 without competing-candidate, suppression, survivor, and ordering evidence. The first v2 run must
 reuse engine SHA256 `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`.
 No mixed precision or rebuild is authorized. Even if v2 passes, benchmarking waits for review.
+
+### Parity v2 — Stage 1 PASS
+
+The first full v2 run completed at implementation commit
+`6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c` using the unchanged ONNX and FP16 engine. The
+external `parity_v2.json` has SHA256
+`4b29211e52d4e6e14f379d8aebfd7561341c2fd15f625c31d61ed6b86f5dc15c`; its protocol-config
+SHA256 is `c26fa7a67289c64c607707141a7d6721a2821d8fccbaa54ee1401c6c03a721bc`.
+All 20 frozen indices completed. The engine was not rebuilt and no layer precision changed.
+
+Both count guards passed with the same 883 PyTorch and 885 TensorRT exported detections seen in v1.
+High-confidence coverage was 750/750 (1.0) PyTorch-to-TensorRT and 753/754
+(0.9986737401) TensorRT-to-PyTorch. All 753 high-confidence matches were retained:
+
+| Stage 1 metric | Pass count | Pass fraction | P99 | Maximum | Unchanged tolerance | Result |
+|---|---:|---:|---:|---:|---:|---|
+| XY center | 749/753 | 0.9946879150 | 0.084380 m | 0.978381 m | 0.25 m | Pass |
+| Absolute Z | 753/753 | 1.0 | 0.024166 m | 0.105435 m | 0.25 m | Pass |
+| All L/W/H per detection | 750/753 | 0.9960159363 | 0.020420 | 0.084264 | 0.05 | Pass |
+| Absolute score | 751/753 | 0.9973439575 | 0.008387 | 0.168615 | 0.05 | Pass |
+| Axis yaw modulo pi | 751/753 | 0.9973439575 | 1.433365° | 47.626393° | 5° | Pass |
+| Heading/direction agreement | 751/753 | 0.9973439575 | — | 179.963955° full-heading error | 0.99 agreement | Pass |
+| Class-name mismatches | 0 | — | — | — | zero | Pass |
+
+Maxima remain diagnostics and every failed detection remains recorded. Eight distinct matches
+(8/753, 0.0106241700) failed at least one continuous metric; each is counted once in this distinct
+diagnostic even if it failed several metrics. The seven threshold-edge crossings remain separately
+recorded.
+
+Two final matched detections were geometrically axis-equivalent but heading-divergent:
+
+| Index | Class | Full heading difference | Axis difference modulo pi |
+|---:|---|---:|---:|
+| 4 | pedestrian | 179.818776° | 0.181224° |
+| 80 | car | 179.963955° | 0.036045° |
+
+The final detection contract has no anchor provenance, so these two final flips are not assigned
+specific anchor direction classes or logits. The separately measured raw direction-head populations
+are diagnostic and are not claimed as causal links to those final boxes:
+
+| Population | Anchors | Argmax disagreements | Disagreement fraction |
+|---|---:|---:|---:|
+| All anchors | 11,200,000 | 48,180 | 0.0043017857 |
+| Official `nms_pre` union | 20,114 | 35 | 0.0017400815 |
+
+For all-anchor disagreements, PyTorch/TensorRT winning-margin medians were
+0.00676051/0.00672913, p95 values were 0.03467448/0.03463020, p99 values were
+0.05970200/0.06039749, and maxima were 0.23807795/0.31640625. For decision-relevant
+disagreements, the corresponding medians were 0.01447149/0.00955200, p95 values were
+0.05222656/0.06074982, p99 values were 0.05962952/0.08803162, and maxima were
+0.05977241/0.09899902. The external JSON also retains p90 values and all 35 decision-relevant
+disagreement records.
+
+Raw network absolute differences across all samples were:
+
+| Tensor | Count | Median | P95 | P99 | Maximum | Mean |
+|---|---:|---:|---:|---:|---:|---:|
+| `cls_score` | 112,000,000 | 0.007844925 | 0.032186508 | 0.056829453 | 0.721186638 | 0.011085223 |
+| `bbox_pred` | 100,800,000 | 0.000608385 | 0.007675864 | 0.018442094 | 0.427443326 | 0.001848617 |
+| `dir_cls_pred` | 22,400,000 | 0.003826864 | 0.017819986 | 0.030509621 | 0.173043281 | 0.005795913 |
+
+All raw tensor shapes and dtypes were consistent between runtimes and across all 20 samples. Stage 2
+was not required, so no pre-NMS survivor tracing was performed and no NMS-swap or other causal
+labels were assigned. The benchmark was not run; reviewer authorization is still required.
 
 M2 deploys the exact M1 pretrained PointPillars model through ONNX and TensorRT FP16. It does not
 train, simplify, or replace the model. The frozen scientific configuration is
@@ -205,7 +269,7 @@ environment without private absolute paths.
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
 engine download. The ONNX and engine metadata above are measured build evidence. M2 itself
-remains partial because v2 has not run; no same-session benchmark result is accepted or committed.
+remains partial because the benchmark awaits review; no same-session result is accepted or committed.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded
