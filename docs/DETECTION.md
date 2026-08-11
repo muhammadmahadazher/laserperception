@@ -14,9 +14,11 @@ MMDeploy postprocessing and LaserPerception conversion.
 The implementation passed TensorRT Gate 0, profiled all 81 `mini_val` samples, checked the exported
 ONNX graph, and built/ran the FP16 engine. Parity v1 failed its hard maximum XY, per-dimension size,
 yaw, and score guards and remains failed. The separately preregistered v2 Stage 1 passed every
-99%-fraction, count, coverage, direction, and class gate using the same 20 samples and unchanged
-engine. M2 remains partial because no benchmark result was run or promoted. Exact hashes, metrics,
-exceptions, and protocol chronology are in `docs/TENSORRT.md`.
+per-metric fraction, count, coverage, direction, and class gate using the same 20 samples and
+unchanged engine, then passed again at exact measurement commit
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The same-session benchmark completed, so M2 evidence
+is complete and awaits PR review/merge. Exact hashes, metrics, exceptions, and protocol chronology
+are in `docs/TENSORRT.md`.
 
 After activating the M2 environment, the reproducible sequence is:
 
@@ -26,11 +28,13 @@ python scripts/detection/profile_m2_voxels.py
 python scripts/detection/export_m2_onnx.py
 python scripts/detection/build_m2_tensorrt.py
 python scripts/detection/validate_m2_parity.py
+python scripts/detection/benchmark_m2.py
 ```
 
-The parity-v2 command exits zero for the measured full suite and writes external `parity_v2.json`.
-`benchmark_m2.py` requires that passing artifact and exact hashes, but must not be run until a
-reviewer explicitly authorizes benchmarking. `LASERPERCEPTION_M2_CACHE` selects the external
+The parity-v2 command exits zero for a passing full suite and writes external `parity_v2.json`.
+`benchmark_m2.py` requires protocol-v2 passing evidence from the exact current commit and exact
+ONNX/engine hashes. Benchmarking still requires explicit reviewer authorization; the canonical M2
+record was produced only after that authorization. `LASERPERCEPTION_M2_CACHE` selects the external
 cache; its default is `~/.cache/laserperception`.
 
 ## M1 status

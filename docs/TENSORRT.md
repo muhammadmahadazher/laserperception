@@ -1,14 +1,14 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **Partial M2; parity v1 failed, parity v2 Stage 1 passed, benchmark awaiting review.**
+Status: **M2 evidence complete—awaiting PR review/merge; parity v1 failed and parity v2 passed.**
 
 ## Parity v1 — measured failure
 
 Gate 0 passed, all 81 `mini_val` samples were profiled, ONNX export/checking passed, and the
 official TensorRT FP16 engine built and executed. The unchanged 20-sample parity suite then failed
 four locked high-confidence guards at implementation commit
-`a9314483e0ba7a191866266080c3147f9d902956`. M2 is therefore partial. This authoritative v1
-result remains failed, and no benchmark was run or promoted.
+`a9314483e0ba7a191866266080c3147f9d902956`. At that stage M2 remained partial. This authoritative
+v1 result remains failed, and no benchmark was run or promoted from v1 evidence.
 
 | Evidence | Result |
 |---|---|
@@ -89,7 +89,7 @@ Stage 1 alone determines v2 PASS/FAIL. Detailed pre-NMS survivor provenance is r
 targeted Stage 2 diagnosis after a Stage 1 failure; no output is labeled an NMS survivor swap
 without competing-candidate, suppression, survivor, and ordering evidence. The first v2 run must
 reuse engine SHA256 `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`.
-No mixed precision or rebuild is authorized. Even if v2 passes, benchmarking waits for review.
+No mixed precision or rebuild was authorized. The first passing v2 run then awaited benchmark review.
 
 ### Parity v2 — Stage 1 PASS
 
@@ -99,6 +99,15 @@ external `parity_v2.json` has SHA256
 `4b29211e52d4e6e14f379d8aebfd7561341c2fd15f625c31d61ed6b86f5dc15c`; its protocol-config
 SHA256 is `c26fa7a67289c64c607707141a7d6721a2821d8fccbaa54ee1401c6c03a721bc`.
 All 20 frozen indices completed. The engine was not rebuilt and no layer precision changed.
+
+Before benchmarking, the integration fix was frozen as exact measurement commit
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`. The complete 20-sample v2 suite passed again and
+generated a new external parity JSON with SHA256
+`fbecf5493a34bf840d2a71b1fe1851010110e15b1aee78b23a26d2ef4f880634`. ONNX SHA256
+`61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16`, engine SHA256
+`a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`, and checkpoint SHA256
+`f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0` remained unchanged.
+Stage 1 passed with the same summary below, and Stage 2 was not required.
 
 Both count guards passed with the same 883 PyTorch and 885 TensorRT exported detections seen in v1.
 High-confidence coverage was 750/750 (1.0) PyTorch-to-TensorRT and 753/754
@@ -114,10 +123,29 @@ High-confidence coverage was 750/750 (1.0) PyTorch-to-TensorRT and 753/754
 | Heading/direction agreement | 751/753 | 0.9973439575 | — | 179.963955° full-heading error | 0.99 agreement | Pass |
 | Class-name mismatches | 0 | — | — | — | zero | Pass |
 
-Maxima remain diagnostics and every failed detection remains recorded. Eight distinct matches
-(8/753, 0.0106241700) failed at least one continuous metric; each is counted once in this distinct
-diagnostic even if it failed several metrics. The seven threshold-edge crossings remain separately
+Maxima remain diagnostics and every failed detection remains recorded.
+
+| Separate retained-exception diagnostic | Result |
+|---|---:|
+| High-confidence matches exceeding at least one continuous tolerance | **8/753 (1.06%)** |
+| Fraction | **0.0106241700** |
+
+**All preregistered per-metric Stage 1 gates passed. Separately, 8/753 (1.06%) high-confidence
+matched detections exceeded at least one continuous tolerance; these exceptions are retained in all
+applicable metric denominators.** This does not contradict the preregistered pass because the frozen
+acceptance rule is per metric, not a union-of-all-errors gate. One match may exceed several metrics.
+No post-hoc union gate was introduced. The seven threshold-edge crossings remain separately
 recorded.
+
+One rare high-confidence matched detection had a 47.63° box-axis difference:
+
+| Index | Class | XY difference | Axis-yaw difference | Full-heading difference | Relative L/W/H size difference | Score difference | BEV IoU |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 50 | pedestrian | 0.182466 m | 47.626393° | 47.626393° | 0.044505 / 0.027293 / 0.012218 | 0.000269 | 0.508165 |
+
+This is not one of the approximately 180° heading reversals listed below: its box axis itself differs
+materially. Its causal mechanism was not established; it is not labeled harmless, a direction-bit
+flip, or an NMS survivor swap, and it remains fully retained in the parity statistics.
 
 Two final matched detections were geometrically axis-equivalent but heading-divergent:
 
@@ -151,9 +179,14 @@ Raw network absolute differences across all samples were:
 | `bbox_pred` | 100,800,000 | 0.000608385 | 0.007675864 | 0.018442094 | 0.427443326 | 0.001848617 |
 | `dir_cls_pred` | 22,400,000 | 0.003826864 | 0.017819986 | 0.030509621 | 0.173043281 | 0.005795913 |
 
+The raw classification tensor was closely aligned for the great majority of elements (p99 absolute
+difference 0.0568) but showed a rare heavier tail (maximum 0.7212). The maximum is not described as
+harmless and was not promoted into a new acceptance criterion. Final detector outputs nevertheless
+satisfied the preregistered parity-v2 acceptance criteria.
+
 All raw tensor shapes and dtypes were consistent between runtimes and across all 20 samples. Stage 2
 was not required, so no pre-NMS survivor tracing was performed and no NMS-swap or other causal
-labels were assigned. The benchmark was not run; reviewer authorization is still required.
+labels were assigned. Review later authorized the same-commit benchmark documented below.
 
 M2 deploys the exact M1 pretrained PointPillars model through ONNX and TensorRT FP16. It does not
 train, simplify, or replace the model. The frozen scientific configuration is
@@ -244,21 +277,58 @@ geometric axis yaw from direction agreement, and records every exception. A Stag
 triggers only targeted Stage 2 forensics; a Stage 1 pass stops parity investigation and waits for
 review before the benchmark.
 
-## Performance protocol
+## Performance evidence
 
-M2 will remeasure the MMDeploy-rewritten PyTorch FP32 network and TensorRT FP16 in the same session,
-using the same voxelized inputs and common postprocessing. It will not use the archived M1 latency
-to calculate speedup. Each runtime and boundary receives 10 warmups and 100 measurements at batch
-size one on `mini_val` index 0.
+After parity reconfirmation at measurement commit
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`, the reviewer-authorized benchmark compared the
+MMDeploy-rewritten PyTorch FP32 network and TensorRT FP16 in one initialized process. The canonical
+record is
+`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`.
 
-The headline result is end-to-end detection speedup. Network-only speedup is reported separately
-because voxelization and postprocessing remain outside TensorRT. Both are warm-cache,
-repeated-single-sample latency microbenchmarks—not cold-storage latency, whole-dataset throughput,
-or a sensor-throughput guarantee.
+The run repeatedly measured nuScenes v1.0-mini `mini_val` index 0 at batch size one. Each runtime
+and boundary received 10 warmups first and 100 measured iterations, with runtime order alternating
+each iteration.
 
-PyTorch allocator counters and TensorRT engine/context memory are independent metrics. A generic
-cross-runtime VRAM comparison remains `Pending measurement` unless a reliable, consistently defined
-process-level method is available.
+| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
+|---|---|---:|---:|---:|---:|
+| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
+| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
+
+**Headline end-to-end median speedup: 23.101×.** The secondary network-only median speedup is
+124.297×. The historical M1 result was not used in either ratio.
+
+| Network runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PyTorch FP32 | 2142.212 ms | 2164.527 ms | 2763.908 ms | 2890.222 ms | 1330.156 ms | 3224.011 ms | 453.387 ms | 0.462 |
+| TensorRT FP16 | 26.619 ms | 17.414 ms | 71.383 ms | 73.785 ms | 6.502 ms | 84.383 ms | 23.906 ms | 57.425 |
+
+| End-to-end runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PyTorch FP32 | 1856.050 ms | 1816.859 ms | 2448.022 ms | 2552.475 ms | 1160.047 ms | 2725.626 ms | 388.796 ms | 0.550 |
+| TensorRT FP16 | 80.014 ms | 78.647 ms | 96.420 ms | 105.017 ms | 48.957 ms | 120.781 ms | 13.928 ms | 12.715 |
+
+Network timing begins after common voxelization and ends when raw outputs required by shared
+postprocessing are available; it uses CUDA events with per-iteration end-event synchronization.
+End-to-end timing uses synchronized wall time from official sample loading and multi-sweep
+preparation through official voxelization, runtime, shared official postprocessing, and
+`DetectionFrame`. Imports, environment/model/engine initialization, checkpoint loading, downloads,
+visualization, and JSON/image writes are excluded.
+
+This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O
+latency, whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production
+real-time guarantee.
+
+| Memory metric | Measured value |
+|---|---:|
+| PyTorch network peak allocated / reserved | 408,934,400 / 713,031,680 bytes |
+| PyTorch end-to-end peak allocated / reserved | 413,477,888 / 713,031,680 bytes |
+| TensorRT serialized engine | 31,519,476 bytes |
+| TensorRT `ICudaEngine.device_memory_size` | 1,212,340,736 bytes |
+| Comparable process-level GPU memory | Pending measurement |
+
+PyTorch rows are allocator counters after reset for one call in the initialized process. TensorRT
+rows are the serialized file size and exact engine API metric; they are independent definitions,
+not a generic cross-runtime VRAM comparison.
 
 ## Artifact and portability policy
 
@@ -268,8 +338,8 @@ environment without private absolute paths.
 
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
-engine download. The ONNX and engine metadata above are measured build evidence. M2 itself
-remains partial because the benchmark awaits review; no same-session result is accepted or committed.
+engine download. The ONNX and engine metadata above are measured build evidence. M2 evidence is
+complete and awaiting PR review/merge; serialized ONNX and TensorRT binaries remain external.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded

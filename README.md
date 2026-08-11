@@ -15,12 +15,13 @@ M1 has verified real FP32 inference, framework-independent detections, an origin
 visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
 and merged. M2 exported and checked the pinned ONNX graph and built the official TensorRT FP16
 engine. Parity v1 remains an authoritative failure. The separately preregistered parity v2 Stage 1
-passed all gates on the same 20 samples and unchanged engine. M2 is partial, and its benchmark
-awaits reviewer authorization.
+passed all gates on the same 20 samples and unchanged engine, was reconfirmed at the exact
+measurement commit, and authorized a same-session FP32/FP16 benchmark. M2 evidence is complete and
+awaits PR review and merge.
 
 ## Project status
 
-### Partial: M2 — TensorRT FP16 deployment
+### Complete—awaiting PR review/merge: M2 — TensorRT FP16 deployment
 
 M2 is constrained to:
 
@@ -28,7 +29,7 @@ M2 is constrained to:
 - official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
 - official shared voxelization and postprocessing outside the TensorRT network;
 - a frozen 20-sample parity set and immutable engineering tolerances; and
-- same-session PyTorch FP32 versus TensorRT FP16 measurements only after parity and review approval.
+- same-session PyTorch FP32 versus TensorRT FP16 measurements after same-commit parity approval.
 
 M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
 custom LaserPerception CUDA plugins, C++, or Jetson work. See
@@ -67,8 +68,8 @@ flowchart LR
     E --> G["Official shared postprocessing"]
     F --> G
     G --> H["DetectionFrame parity"]
-    H -->|"V2 pass"| I["Reviewer authorization"]
-    I --> J["Same-session benchmark"]
+    H -->|"V2 pass"| I["Exact-commit reconfirmation"]
+    I --> J["Same-session benchmark evidence"]
 ```
 
 nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
@@ -125,22 +126,36 @@ generated artifacts must remain outside Git.
 
 ## Benchmarks
 
-The measured record is
+The historical M1 measured record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
-No M2 timing row or result JSON was promoted: v2 passed, but benchmarking awaits review approval.
+The M2 same-session measured record is
+[`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).
+
+| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
+|---|---|---:|---:|---:|---:|
+| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
+| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
+
+**Headline end-to-end median speedup: 23.101×.** Network-only median speedup was 124.297× and is
+secondary. This is a warm-cache repeated-single-sample latency microbenchmark of `mini_val`
+index 0 after warmups—not cold-storage I/O latency, whole-dataset sequential throughput,
+guaranteed LiDAR sensor throughput, or a production real-time guarantee.
+
+The M1 result remains separate historical context:
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
 | M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
 
 The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
-`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for acceptance criteria.
+`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
+complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
 ## Roadmap
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** partial—ONNX/engine and parity v2 pass; same-session benchmark awaits review.
+- **M2:** evidence complete—ONNX/engine, parity v2, and same-session benchmark; awaiting PR review/merge.
 - **M3:** ROS 2, only after M2 review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.

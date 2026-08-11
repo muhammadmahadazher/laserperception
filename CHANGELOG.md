@@ -8,12 +8,16 @@ releases begin.
 
 ### Changed
 
-- Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate
-  staged parity v2 protocol with unchanged samples, artifacts, thresholds, and numerical
-  tolerances plus per-detection 99% acceptance and explicit direction diagnostics. Stage 1 passed
-  every gate on the unchanged 20-sample suite and existing FP16 engine.
-- Kept M2 partial and all benchmark fields at `Pending measurement` while same-session
-  benchmarking awaits explicit reviewer authorization.
+- Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate parity
+  v2 protocol with unchanged samples, artifacts, thresholds, and numerical tolerances plus
+  per-detection 99% acceptance and explicit direction diagnostics. Stage 1 passed every gate on the
+  unchanged 20-sample suite and existing FP16 engine, then passed again at the exact benchmark
+  implementation commit.
+- Tightened benchmark promotion to require protocol-v2, passing, non-diagnostic, exact-commit
+  parity evidence for the frozen 20 samples and current ONNX/engine hashes; v1 and malformed
+  evidence are rejected by CPU tests.
+- Completed the reviewer-authorized same-session RTX 4060 PyTorch FP32 versus TensorRT FP16
+  benchmark with a measured 23.101× headline end-to-end median speedup.
 
 - Centralized M1 external cache resolution around `LASERPERCEPTION_M1_CACHE` with a portable default,
   and made setup accept any usable CUDA GPU while retaining the RTX 4060 Laptop GPU as the canonical
@@ -28,6 +32,9 @@ releases begin.
 
 - Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.
+- Sanitized canonical M2 evidence for the same-session PyTorch FP32 versus TensorRT FP16 benchmark,
+  including full latency statistics, exact boundaries and provenance, independently defined memory
+  metrics, parity-v2 SHA binding, explicit limitations, and retained outlier disclosures.
 - Pinned isolated TensorRT 8.6.1/MMDeploy 1.3.1 setup, executable Gate 0, complete 81-sample voxel
   profiler, official ONNX export and engine builder, shared deployment runtime, deterministic parity
   diagnostics, benchmark promotion guards, sanitized artifact provenance, and synthetic CPU tests.

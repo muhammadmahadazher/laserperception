@@ -33,12 +33,13 @@ detector, model conversion, ROS 2, or edge deployment.
 - [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
 - [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
 - [x] Pass versioned final-box parity v2 on all frozen samples with shared preprocessing/postprocessing.
-- [ ] Remeasure the deployable PyTorch FP32 and TensorRT FP16 paths in the same session.
+- [x] Remeasure the deployable PyTorch FP32 and TensorRT FP16 paths in the same session.
 
-M2 is partial. Gate 0, the 81-sample profile, ONNX checking, and FP16 engine build pass. Parity v1
-remains failed; after architecture review, the separately preregistered v2 Stage 1 passed on the
-unchanged engine and samples. Same-session benchmarking remains unrun pending reviewer
-authorization, and all benchmark fields remain `Pending measurement`.
+M2 evidence is complete and awaits PR review/merge. Gate 0, the 81-sample profile, ONNX checking,
+and FP16 engine build passed. Parity v1 remains an authoritative failure; after architecture
+review, the separately preregistered v2 Stage 1 passed on the unchanged engine and samples, then
+passed again at the exact benchmark implementation commit. The same-session benchmark completed
+with a measured 23.101× headline end-to-end median speedup. M3 has not started.
 
 ## M3 — ROS 2
 

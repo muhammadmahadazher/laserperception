@@ -7,29 +7,95 @@ It records benchmark commit `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, UTC time
 `2026-08-10T09:36:11.151600+00:00`, and the complete software, hardware, sample, asset, timing, and
 memory provenance.
 
-## M2 — no promoted benchmark
+## M2 — same-session PyTorch FP32 versus TensorRT FP16
 
-The official MMDeploy 1.3.1 ONNX export and TensorRT 8.6.1 FP16 engine built successfully. Parity v1
-failed at commit `a9314483e0ba7a191866266080c3147f9d902956` and remains failed. The separately
-preregistered v2 Stage 1 then passed on the same 20 samples and unchanged engine at commit
-`6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c`. The benchmark was deliberately not run because
-reviewer authorization is still required. The promoted result file does not exist, and there are no
-M2 latency, FPS, speedup, or process-level memory claims.
+The canonical measured record is
+[`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](../benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).
+It was generated at `2026-08-11T10:27:34.536114+00:00` from measurement commit
+`e2f9b6babb541d52beaa0bcd58e841a0a56cc851`.
 
-The implemented protocol would repeatedly measure `mini_val` index 0 at batch size one after 10
-warmups, with 100 measurements for each runtime and boundary. It is a warm-cache,
-repeated-single-sample latency microbenchmark—not cold-storage I/O latency, whole-dataset
-sequential throughput, or a sensor-throughput guarantee. Network timing spans common voxel tensors
-to raw network outputs; end-to-end timing spans official sample loading/multi-sweep preparation
-through `DetectionFrame`. See [`benchmarks/m2/README.md`](../benchmarks/m2/README.md) and
-[`docs/TENSORRT.md`](TENSORRT.md).
+Parity v1 remains an authoritative failure at commit
+`a9314483e0ba7a191866266080c3147f9d902956`. The separately preregistered parity v2 first passed at
+`6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c`. After the benchmark integration fix, the complete
+20-sample v2 suite passed again at the exact measurement commit with unchanged ONNX and engine.
+The reconfirmed external parity JSON SHA256 is
+`fbecf5493a34bf840d2a71b1fe1851010110e15b1aee78b23a26d2ef4f880634`.
+
+### Parity disclosure retained with the benchmark
+
+| Evidence | Result |
+|---|---|
+| Preregistered per-metric Stage 1 gates | **All passed** |
+| Distinct high-confidence matches exceeding at least one continuous tolerance | **8/753 (1.06%)** |
+| Maximum box-axis yaw difference | **47.626393°**, index 50 pedestrian; causal mechanism not established |
+| Raw `cls_score` absolute-difference tail | p99 0.056829; maximum 0.721187 |
+
+The 8/753 figure is a separate union diagnostic, not a post-hoc acceptance gate. The frozen
+acceptance rule is per metric, a detection may exceed multiple tolerances, and all eight exceptions
+remain in every applicable metric denominator. The rare 47.63° case is not one of the approximately
+180° full-heading reversals. The classification tensor aligned closely for the great majority of
+elements but has a rare heavier tail relative to p99; its maximum is diagnostic, not a new gate.
+
+### Frozen protocol and timing boundaries
+
+The run repeatedly measured nuScenes v1.0-mini `mini_val` index 0 at batch size one. Each runtime
+and boundary received 10 warmups first and then 100 measurements, with PyTorch-first and
+TensorRT-first order alternating by iteration.
+
+- Network: common voxelized tensors through raw network outputs required by shared postprocessing;
+  CUDA events with per-iteration end-event synchronization.
+- End to end: official sample loading and multi-sweep preparation through official voxelization,
+  runtime, shared official postprocessing, and `DetectionFrame`; `time.perf_counter` with CUDA
+  synchronization before stopping.
+
+Imports, environment/model/engine initialization, checkpoint loading, downloads, visualization,
+and JSON/image writes were excluded.
+
+### Measured same-session result
+
+| Runtime | Precision | Network median | End-to-end median | End-to-end P95 | End-to-end FPS |
+|---|---|---:|---:|---:|---:|
+| MMDeploy-rewritten PyTorch | FP32 | 2164.527 ms | 1816.859 ms | 2552.475 ms | 0.550 |
+| TensorRT | FP16 | 17.414 ms | 78.647 ms | 105.017 ms | 12.715 |
+
+**Headline end-to-end median speedup: 23.101×.** The secondary network-only median speedup is
+124.297×.
+
+| Network runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PyTorch FP32 | 2142.212 ms | 2164.527 ms | 2763.908 ms | 2890.222 ms | 1330.156 ms | 3224.011 ms | 453.387 ms | 0.462 |
+| TensorRT FP16 | 26.619 ms | 17.414 ms | 71.383 ms | 73.785 ms | 6.502 ms | 84.383 ms | 23.906 ms | 57.425 |
+
+| End-to-end runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PyTorch FP32 | 1856.050 ms | 1816.859 ms | 2448.022 ms | 2552.475 ms | 1160.047 ms | 2725.626 ms | 388.796 ms | 0.550 |
+| TensorRT FP16 | 80.014 ms | 78.647 ms | 96.420 ms | 105.017 ms | 48.957 ms | 120.781 ms | 13.928 ms | 12.715 |
+
+This is a warm-cache repeated-single-sample latency microbenchmark. It is not cold-storage I/O
+latency, whole-dataset sequential throughput, guaranteed LiDAR sensor throughput, or a production
+real-time guarantee.
+
+### Memory and environment
+
+| Metric | Measured value | Definition |
+|---|---:|---|
+| PyTorch network peak allocated / reserved | 408,934,400 / 713,031,680 bytes | Torch allocator counters after reset for one network call |
+| PyTorch end-to-end peak allocated / reserved | 413,477,888 / 713,031,680 bytes | Torch allocator counters after reset for one end-to-end call |
+| TensorRT serialized engine | 31,519,476 bytes | External engine file size |
+| TensorRT engine device memory | 1,212,340,736 bytes | `ICudaEngine.device_memory_size` |
+| Comparable process-level GPU memory | Pending measurement | No common reliable method was used |
+
+Hardware was the NVIDIA GeForce RTX 4060 Laptop GPU with 8,585,216,000 bytes total memory and
+NVIDIA driver 610.88 under WSL2 kernel 6.18.33.2. The measured stack was Python 3.10.12,
+PyTorch 2.1.0+cu118/CUDA 11.8, MMDeploy 1.3.1 at
+`bc75c9d6c8940aa03d0e1e5b5962bd930478ba77`, MMDetection3D 1.4.0, MMCV 2.1.0, MMEngine 0.10.7,
+MMDetection 3.2.0, ONNX 1.14.1, and TensorRT 8.6.1.
 
 ## M1 — PointPillars FP32
 
 | Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | Model P95 | End-to-end P95 | Model FPS | Peak CUDA memory |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---:|
 | PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | NVIDIA GeForce RTX 4060 Laptop GPU | 52.896 ms | 55.097 ms | 60.729 ms | 62.568 ms | 18.905 | 0.381 GiB allocated / 0.400 GiB reserved |
-| TensorRT (M2 benchmark pending review) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 | Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 
 The measured PointPillars asset is
