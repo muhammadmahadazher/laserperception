@@ -1,0 +1,198 @@
+schema_version: "1.0"
+milestone: M2
+status: parity_v2_passed_benchmark_diagnosis_complete_review_required
+
+cache:
+  root_environment_variable: LASERPERCEPTION_M2_CACHE
+  default_root: ~/.cache/laserperception
+  mmdeploy_checkout_relative: mmdeploy-v1.3.1
+  artifact_directory_relative: m2
+  engine_directory_relative: engines
+
+source_model:
+  reference: M1 official pretrained PointPillars
+  manifest: configs/detection/m1_pointpillars_nuscenes.yaml
+  framework: MMDetection3D
+  framework_version: 1.4.0
+  framework_commit: fe25f7a51d36e3702f961e198894580d83c4387b
+  config: configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py
+  checkpoint_filename: hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  training: false
+
+deployment:
+  exporter: MMDeploy
+  exporter_version: 1.3.1
+  exporter_tag: v1.3.1
+  exporter_commit: bc75c9d6c8940aa03d0e1e5b5962bd930478ba77
+  official_deployment_config: configs/mmdet3d/voxel-detection/voxel-detection_tensorrt_dynamic-nus-64x4.py
+  onnx_opset: 11
+  tensorrt_target_version: 8.6.1
+  tensorrt_actual_version: 8.6.1
+  precision: fp16
+  int8: false
+  custom_ops_policy: official_mmdeploy_only
+  support_status: officially_listed_less_thoroughly_demonstrated
+
+architecture_boundary:
+  preprocessing: official_nuscenes_multi_sweep_outside_engine
+  voxelization: official_mmdet3d_data_preprocessor_outside_engine
+  network: mmdeploy_rewritten_pointpillars_tensorrt
+  postprocessing: official_mmdeploy_voxel_detection_model_postprocess_outside_engine
+  output_contract: laserperception_detection_frame
+
+voxel_contract:
+  point_features: 4
+  max_points_per_voxel: 64
+  voxel_size_m: [0.25, 0.25, 8.0]
+  point_cloud_range_m: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+  upstream_max_voxels:
+    training: 30000
+    validation: 40000
+
+exported_graph:
+  verification_status: pass
+  inputs:
+    - {name: voxels, dtype: FLOAT, shape: [voxels_num, 64, 4]}
+    - {name: num_points, dtype: INT32, shape: [voxels_num]}
+    - {name: coors, dtype: INT32, shape: [voxels_num, 4]}
+  outputs:
+    - {name: cls_score0, dtype: FLOAT, shape: [1, 140, 200, 200]}
+    - {name: bbox_pred0, dtype: FLOAT, shape: [1, 126, 200, 200]}
+    - {name: dir_cls_pred0, dtype: FLOAT, shape: [1, 28, 200, 200]}
+  onnx_checker: pass
+
+profile:
+  scan_split: mini_val
+  preferred_samples_scanned: 81
+  minimum_required_samples: frozen_parity_set_plus_benchmark_sample
+  observed_voxel_counts:
+    samples_scanned: 81
+    minimum: 4352
+    p50_nearest_rank: 18207
+    p90_nearest_rank: 20085
+    p95_nearest_rank: 20544
+    maximum: 22546
+    upstream_validation_limit: 40000
+  selected_min_shapes:
+    voxels: [4352, 64, 4]
+    num_points: [4352]
+    coors: [4352, 4]
+  selected_opt_shapes:
+    voxels: [18207, 64, 4]
+    num_points: [18207]
+    coors: [18207, 4]
+  selected_max_shapes:
+    voxels: [30000, 64, 4]
+    num_points: [30000]
+    coors: [30000, 4]
+  rationale: >-
+    The profile uses the exact observed minimum and nearest-rank p50 from all 81 mini_val
+    samples. The official MMDeploy 64x4 maximum of 30000 is retained because it exceeds a
+    25 percent measured-headroom target and remains below the upstream validation limit of
+    40000 voxels.
+
+artifacts:
+  onnx:
+    logical_name: m2/pointpillars.onnx
+    committed: false
+    sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+    size_bytes: 60711828
+  engine:
+    logical_name: engines/pointpillars_fp16.engine
+    committed: false
+    sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+    size_bytes: 31519476
+    build_time_seconds: 30.419959326999997
+    device_memory_size_bytes: 1212340736
+
+benchmark:
+  sample_split: mini_val
+  sample_index: 0
+  batch_size: 1
+  warmup_iterations_per_runtime_and_boundary: 10
+  measured_iterations_per_runtime_and_boundary: 100
+  pytorch_precision: fp32
+  tensorrt_precision: fp16
+  baseline: native_mmdetection3d_pytorch_fp32
+  network_boundary: common_voxelized_inputs_to_raw_network_outputs
+  end_to_end_boundary: dataset_loading_through_detection_frame
+  headline_metric: end_to_end_speedup
+  cache_state: warm_cache_repeated_single_sample
+
+memory:
+  pytorch: torch_cuda_peak_allocated_and_reserved
+  tensorrt: engine_size_and_reported_device_or_context_memory
+  comparable_process_level_gpu_memory: Pending measurement
+
+evidence:
+  tensorrt_gate_0: pass
+  profile_result: pass
+  onnx_result: pass
+  engine_result: pass
+  parity_v1_result: fail
+  parity_v2_result: pass
+  same_session_benchmark_result: rejected_measurement_e2f9b6b
+
+benchmark_diagnosis_observation:
+  status: diagnostic_measurement_not_canonical
+  implementation_commit: 4e12374dec8eecaf0e772b2b5776e0b266fbe09e
+  external_result_sha256: 2b537a4415cc981c6cc64f0b617726e82ca38a92c5fafd440c42c06baffb16c2
+  m1_reproduction_median_ms: {model_test_step: 84.22556686401367, end_to_end: 63.293906999998484}
+  native_vs_rewritten_fidelity: {samples: 20, raw_maximum_absolute_difference: 0.0, final_pass: true}
+  component_median_ms:
+    prepare: 5.5668429999826685
+    voxelize: 8.35588600000392
+    native_pytorch_raw: 20.799856185913086
+    rewritten_pytorch_raw: 1910.4635009765625
+    tensorrt_raw: 6.9171202182769775
+    current_postprocess: 24.092924499996116
+    bbox_head_construction: 0.9989145000304234
+    detection_frame_conversion: 5.16041349999341
+  replacement_canonical_benchmark_run: false
+  disposition: reviewer_methodology_approval_required
+
+parity_v1_observation:
+  measurement_commit: a9314483e0ba7a191866266080c3147f9d902956
+  generated_at_utc: "2026-08-11T07:29:00.398363+00:00"
+  external_result_sha256: f6474c365f8fc3d8595db813d1d23258574e4d0448e73473d68bf817f297e534
+  failure_classification: network_numerical_difference
+  frozen_samples_completed: 20
+  exported_counts: {pytorch: 883, tensorrt: 885, absolute_difference: 2}
+  high_confidence_coverage: {pytorch_to_tensorrt: 1.0, tensorrt_to_pytorch: 0.9986737400530504}
+  failed_checks: [high_confidence_xy_center, high_confidence_dimensions, high_confidence_yaw, high_confidence_score]
+  threshold_edge_disagreements: 7
+  benchmark_promoted: false
+  disposition: architecture_review_required
+
+parity_v2_observation:
+  protocol_version: 2
+  measurement_commit: 6258d53c89ff8d9ffe2d13393b636f8c00ba9a6c
+  generated_at_utc: "2026-08-11T09:31:34.055578+00:00"
+  protocol_config_sha256: c26fa7a67289c64c607707141a7d6721a2821d8fccbaa54ee1401c6c03a721bc
+  external_result_sha256: 4b29211e52d4e6e14f379d8aebfd7561341c2fd15f625c31d61ed6b86f5dc15c
+  onnx_sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+  engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+  frozen_samples_completed: 20
+  stage_1_status: pass
+  stage_2_required: false
+  high_confidence_match_denominator: 753
+  exported_counts: {pytorch: 883, tensorrt: 885, absolute_difference: 2}
+  high_confidence_coverage: {pytorch_to_tensorrt: 1.0, tensorrt_to_pytorch: 0.9986737400530504}
+  continuous_metrics:
+    xy: {pass_fraction: 0.9946879150066401, p99: 0.0843801747545135, maximum: 0.9783807353381204}
+    z: {pass_fraction: 1.0, p99: 0.024166131019592405, maximum: 0.10543465614318848}
+    dimensions: {pass_fraction: 0.9960159362549801, p99: 0.020420119900794443, maximum: 0.08426384291455075}
+    score: {pass_fraction: 0.99734395750332, p99: 0.008386510610580458, maximum: 0.1686149537563324}
+    axis_yaw_degrees: {pass_fraction: 0.99734395750332, p99: 1.4333649211043344, maximum: 47.626393403216575}
+  distinct_continuous_outliers: {count: 8, denominator: 753}
+  heading_direction_agreement: {fraction: 0.99734395750332, disagreements: 2}
+  class_name_mismatches: 0
+  direction_population:
+    all_anchors: {count: 11200000, disagreements: 48180, fraction: 0.004301785714285715}
+    decision_relevant: {count: 20114, disagreements: 35, fraction: 0.0017400815352490802}
+  threshold_edge_disagreements: 7
+  engine_rebuilt_for_v2: false
+  layer_precision_changes: false
+  benchmark_promoted: false
+  disposition: reviewer_inspection_required_before_benchmark

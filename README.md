@@ -8,27 +8,34 @@
 [![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
 
 LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment. The active goal is a narrow, evidence-gated path from an official
-pretrained PointPillars model on nuScenes to measured RTX 4060 inference, then TensorRT FP16 and
-ROS 2 in later milestones.
+object detection and deployment. The active goal is to deploy the exact verified M1 PointPillars
+model through the pinned official MMDeploy ONNX/TensorRT FP16 path without changing model semantics.
 
-M1 now has verified real FP32 inference, framework-independent detections, an original pedestrian
-BEV visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is
-complete and awaiting review; M2 TensorRT work has not started.
+M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
+visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
+and merged. M2 exported and checked the pinned ONNX graph and built the official TensorRT FP16
+engine. Parity v1 remains an authoritative failure. The separately preregistered parity v2 Stage 1
+passed all gates on the same 20 samples and unchanged engine and remains valid. The first M2
+benchmark was rejected because it used MMDeploy-rewritten eager PyTorch as the performance
+baseline. The repaired exact-commit benchmark uses native MMDetection3D PyTorch FP32 and measures a
+direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 remains draft for final review.
 
 ## Project status
 
-### Active: M1 — PointPillars first sight
+### Canonical measurement complete—awaiting final review: M2 — TensorRT FP16 deployment
 
-M1 currently provides:
+M2 is constrained to:
 
-- reproduces one official pretrained MMDetection3D PointPillars model on nuScenes v1.0-mini;
-- exports a small, framework-independent 3D detection result contract;
-- renders original headless bird's-eye-view prediction visualizations; and
-- measures real FP32 latency and peak GPU memory on an NVIDIA GeForce RTX 4060 Laptop GPU.
+- the exact M1 MMDetection3D 1.4.0 PointPillars config and checkpoint;
+- official MMDeploy v1.3.1 at its pinned full commit and TensorRT 8.6.x;
+- official shared voxelization and postprocessing outside the TensorRT network;
+- a frozen 20-sample parity set and immutable engineering tolerances; and
+- MMDeploy-rewritten PyTorch FP32 as the parity reference, but native MMDetection3D PyTorch FP32
+  as the measured performance baseline.
 
-M1 is inference-only. It does not include training, a second detector, ONNX, TensorRT, mixed
-precision, INT8, ROS 2, camera fusion, custom CUDA, or Jetson work.
+M2 does not include training, INT8, a second detector, altered anchors/NMS, ROS 2, camera fusion,
+custom LaserPerception CUDA plugins, C++, or Jetson work. See
+[`docs/TENSORRT.md`](docs/TENSORRT.md) for the frozen boundary and acceptance protocol.
 
 ### Existing experimental infrastructure
 
@@ -50,18 +57,23 @@ historical Experiment 001 config remains at
 
 ## Architecture
 
-The lightweight core and standard CI remain CPU-only. M1 GPU dependencies live in an isolated WSL
-environment and are imported only by the optional detector backend.
+The lightweight core and standard CI remain CPU-only. M1 and M2 GPU dependencies live in isolated
+WSL environments and are imported only by optional detector/deployment backends.
 
 ```mermaid
 flowchart LR
     A["nuScenes v1.0-mini"] --> B["Official MMDetection3D multi-sweep pipeline"]
-    B --> C["Official pretrained PointPillars"]
-    C --> D["LaserPerception result adapter"]
-    D --> E["DetectionFrame"]
-    E --> F["JSON / concise table"]
-    E --> G["Headless BEV visualization"]
-    C --> H["FP32 latency and memory benchmark"]
+    B --> C["Official MMDetection3D voxelization"]
+    C --> D["Shared voxel tensors"]
+    D --> E["MMDeploy-rewritten PyTorch FP32 (parity reference)"]
+    D --> F["TensorRT FP16 network"]
+    D --> K["Native MMDetection3D PyTorch FP32 (performance baseline)"]
+    E --> G["Official shared postprocessing"]
+    F --> G
+    K --> G
+    G --> H["Parity and fidelity evidence"]
+    H -->|"V2 pass"| I["Exact-commit reconfirmation"]
+    I --> J["Same-session benchmark evidence"]
 ```
 
 nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
@@ -118,21 +130,37 @@ generated artifacts must remain outside Git.
 
 ## Benchmarks
 
-The measured record is
-[`benchmarks/m1/results/rtx4060_laptop_fp32.json`](benchmarks/m1/results/rtx4060_laptop_fp32.json).
+The historical M1 measured record is
+benchmarks/m1/results/rtx4060_laptop_fp32.json.
+
+The repaired M2 measured record is
+benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json. At exact measurement commit
+`3f240d60569b53a2e4445d34b0905a807cf54879`, native PyTorch FP32 measured a 59.289 ms end-to-end
+median and TensorRT FP16 measured 45.637 ms, a direct 1.2991× median speedup. The corresponding
+network-only medians were 19.189 ms and 6.126 ms, a secondary 3.1326× speedup.
+
+The earlier run at `e2f9b6babb541d52beaa0bcd58e841a0a56cc851` remains rejected and is retained
+only as benchmarks/m2/diagnostics/rejected_e2f9b6b.json. Its 124.297× network and 23.101×
+end-to-end ratios are not canonical evidence. Parity v2 remains PASS and is not invalidated.
+
+The M1 result remains separate historical context:
 
 | Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
 |---|---|---|---|---|---|---|---|
 | M1 | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
+| M2 native baseline | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 19.189 ms network / 59.289 ms end to end | 52.114 network / 16.867 end to end | 0.381 GiB network / 0.385 GiB end-to-end allocated |
+| M2 TensorRT | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP16 | 6.126 ms network / 45.637 ms end to end | 163.250 network / 21.912 end to end | 31,519,476-byte engine / 1,212,340,736-byte engine device memory |
 
 The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
-`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for acceptance criteria.
+`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
+complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
 ## Roadmap
 
 - **M0:** project direction and governance transition.
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** ONNX and TensorRT FP16, only after M1 review.
+- **M2:** parity v2 and native/rewrite fidelity passed; repaired canonical benchmark measured on
+  draft PR #3, which remains open for final review.
 - **M3:** ROS 2, only after M2 review.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.

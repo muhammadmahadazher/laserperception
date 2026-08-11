@@ -8,10 +8,10 @@ modifying the repository. User instructions take precedence when they explicitly
 LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
 object detection and deployment engineering.
 
-The current milestone is **M1 — PointPillars first sight**: run an official pretrained
-MMDetection3D PointPillars model on nuScenes v1.0-mini, export a small LaserPerception-owned
-detection result contract, produce headless BEV visualizations, and measure honest FP32 latency and
-GPU memory on the available NVIDIA GeForce RTX 4060 Laptop GPU. M1 is inference-only.
+The current milestone is **M2 — TensorRT FP16 deployment**: deploy the exact verified M1
+PointPillars checkpoint through the pinned official MMDeploy ONNX/TensorRT path, prove final-box
+parity against frozen tolerances, and measure same-session PyTorch FP32 versus TensorRT FP16
+performance on the available NVIDIA GeForce RTX 4060 Laptop GPU. M1 is complete and merged.
 
 Existing SemanticKITTI-to-DALES semantic-segmentation adapters, ontology, configuration, and audit
 pipeline remain built, tested, documented, and supported as parked experimental infrastructure.
@@ -29,7 +29,7 @@ They are not the active development line before detection v0.1 and must not be d
 
 Before v0.1, do not add training, a second detector architecture, INT8 optimization, camera fusion,
 foundation models, custom CUDA kernels, Jetson-specific tuning, or unrelated features unless the
-owner explicitly changes scope. Do not begin M2 or M3 work during M1.
+owner explicitly changes scope. Do not begin M3 work during M2.
 
 ## Detection architecture rules
 
@@ -50,8 +50,8 @@ owner explicitly changes scope. Do not begin M2 or M3 work during M1.
 ## Dependency and environment policy
 
 - The core package must remain lightweight, CPU-testable, and importable without GPU libraries.
-- PyTorch, CUDA, and the verified MMDetection3D/OpenMMLab stack are permitted for M1 only as
-  optional, isolated detection dependencies.
+- PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, and TensorRT are permitted for M1/M2 only as
+  optional, isolated detection/deployment dependencies.
 - Heavy GPU dependencies must not become core requirements or be imported by core modules.
 - Standard GitHub CI must continue to run without a GPU or detection dependencies. GPU integration
   tests are manual/local and must skip cleanly when their environment is absent.
@@ -78,7 +78,8 @@ owner explicitly changes scope. Do not begin M2 or M3 work during M1.
 - Never commit datasets, point-cloud tiles, downloaded archives, checkpoints, weights, caches,
   training outputs, generated visualizations, raw benchmark outputs, or logs.
 - Use environment/configuration variables for dataset roots; do not hard-code machine paths.
-- M1 uses nuScenes v1.0-mini only. Respect its official access terms and never redistribute it.
+- M1 and M2 use nuScenes v1.0-mini only. Respect its official access terms and never redistribute
+  it.
 - Download checkpoints only from an official upstream source, keep them outside the repository,
   and record the source, version/commit, license note, and SHA256 after download.
 - Do not copy third-party dataset or model tooling without verifying license and attribution.
@@ -97,6 +98,8 @@ owner explicitly changes scope. Do not begin M2 or M3 work during M1.
   version/split, sample selection, precision, thresholds, warmup/measured counts, timing boundaries,
   environment, hardware, timestamp, metrics, and memory method for measured runs.
 - FP32 M1 benchmarking must explicitly disable autocast and use correct CUDA synchronization/events.
+- M2 speedup must use a same-session MMDeploy-rewritten PyTorch FP32 baseline and TensorRT FP16
+  runtime with common voxelization and postprocessing; the historical M1 result is context only.
 - Do not claim SOTA, universality, production readiness, deployment suitability, or safety around
   people without evidence and certification.
 
@@ -104,9 +107,9 @@ owner explicitly changes scope. Do not begin M2 or M3 work during M1.
 
 - Use type hints, focused docstrings, deterministic behavior, defensive validation, and clear
   exceptions.
-- Add synthetic CPU tests for the detection contract, conversion, geometry, visualization helpers,
-  lazy optional-dependency failures, and benchmark statistics. Tests must never download datasets or
-  checkpoints.
+- Add synthetic CPU tests for the detection contract, conversion, geometry, parity, visualization
+  helpers, lazy optional-dependency failures, artifact metadata, and benchmark statistics. Tests
+  must never download datasets or checkpoints.
 - Run `ruff check .`, `ruff format --check .`, `mypy src`, `python -m pytest`, and
   `python -m build` before a major push.
 - Keep base dependencies minimal and CPU-testable. Document optional detection dependency behavior

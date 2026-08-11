@@ -7,12 +7,108 @@ It records benchmark commit `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, UTC time
 `2026-08-10T09:36:11.151600+00:00`, and the complete software, hardware, sample, asset, timing, and
 memory provenance.
 
+## M2 — repaired canonical RTX 4060 measurement
+
+The canonical measured record is
+[`benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](../benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).
+It was measured at exact implementation commit
+`3f240d60569b53a2e4445d34b0905a807cf54879` on the NVIDIA GeForce RTX 4060 Laptop GPU. The
+parity reference remains MMDeploy-rewritten PyTorch FP32; the performance baseline is native
+MMDetection3D PyTorch FP32; the deployment runtime is TensorRT FP16.
+
+### 1. Component breakdown and bottleneck context
+
+The retained diagnostic at commit `4e12374dec8eecaf0e772b2b5776e0b266fbe09e` first established
+that the native GPU path was healthy and that rewritten eager PyTorch was not a representative
+performance denominator. Its 20-warmup/30-measurement component profile was:
+
+| Diagnostic component | Median | P95 |
+|---|---:|---:|
+| Prepare | 5.567 ms | 6.238 ms |
+| Voxelize | 8.356 ms | 9.039 ms |
+| Native PyTorch raw | 20.800 ms | 21.786 ms |
+| Rewritten eager PyTorch raw | 1910.464 ms | 2462.358 ms |
+| TensorRT raw | 6.917 ms | 7.452 ms |
+| Shared MMDeploy postprocessing | 24.093 ms | 27.919 ms |
+| Bbox-head construction | 0.999 ms | 1.244 ms |
+| DetectionFrame conversion | 5.160 ms | 6.043 ms |
+
+These values are diagnostic context, not inputs to the published end-to-end calculation. The shared
+MMDeploy postprocessing was the largest individually profiled shared stage, while preparation,
+voxelization, and DetectionFrame conversion added further work outside the network. No cached or
+custom postprocess was implemented. Independent component medians must not be summed to replace the
+direct distributions below.
+
+At the final measurement commit, native and rewritten PyTorch were reconfirmed bit-identical on all
+20 frozen samples and 235.2 million raw values. The exact-commit fidelity JSON SHA256 is
+`1a5ccbad83ebee06178d2dfdafbb830eafe3adb3eb1f55b0523a4a47a01783ad`.
+
+### 2. Direct end-to-end comparison — headline
+
+| Runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Native MMDetection3D PyTorch FP32 | 60.007 ms | 59.289 ms | 62.928 ms | 64.945 ms | 55.384 ms | 74.541 ms | 2.701 ms | 16.867 |
+| TensorRT FP16 | 45.655 ms | 45.637 ms | 48.210 ms | 48.711 ms | 41.354 ms | 50.457 ms | 2.045 ms | 21.912 |
+
+**Headline: TensorRT FP16 measured a direct 1.299134× end-to-end median speedup over native
+PyTorch FP32.** Both paths repeatedly used `mini_val` index 0 and identical multi-sweep preparation,
+official voxelization, shared MMDeploy postprocessing, and DetectionFrame conversion. Only the
+network runtime differed. Timing used synchronized `time.perf_counter` wall time.
+
+### 3. Network-only comparison — secondary
+
+| Runtime | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Native MMDetection3D PyTorch FP32 | 19.449 ms | 19.189 ms | 20.230 ms | 20.696 ms | 18.747 ms | 22.634 ms | 0.714 ms | 52.114 |
+| TensorRT FP16 | 6.156 ms | 6.126 ms | 6.402 ms | 6.547 ms | 5.810 ms | 7.327 ms | 0.251 ms | 163.250 |
+
+The secondary network-only median speedup is 3.132564×. Both paths received the same precomputed
+voxel tensors; CUDA events ended when `cls_score`, `bbox_pred`, and `dir_cls_pred` were available.
+The smaller end-to-end gain shows that shared work outside the TensorRT network dominates much of
+the deployed latency.
+
+### Exact evidence, memory, and limitations
+
+The full 20-sample parity-v2 suite passed at the same commit with external JSON SHA256
+`5e8d49ce3847248f2a1a6d28fd92903d80c118de2cdec7b3c08fcab6c2f58853`. The checkpoint, ONNX, and
+engine SHA256 values remained `f19d00a3…`, `61ce22a8…`, and `a005f758…`; no artifact was rebuilt.
+All benchmark review flags were empty.
+
+PyTorch peak allocator counters after a reset and one call reported 408,934,400 bytes (0.381 GiB)
+allocated and 427,819,008 bytes (0.398 GiB) reserved for the native network, and 413,477,888 bytes
+(0.385 GiB) allocated and 427,819,008 bytes (0.398 GiB) reserved for native end to end. TensorRT
+records a 31,519,476-byte serialized engine and `ICudaEngine.device_memory_size` of 1,212,340,736
+bytes. Comparable process-level GPU memory is `Pending measurement`; these methods are not directly
+interchangeable.
+
+The run used batch size one, 10 warmups, and 100 measurements for each runtime and boundary in one
+same-session process with isolated native then TensorRT blocks. It is a warm-cache,
+repeated-single-sample latency microbenchmark—not cold-storage I/O, whole-dataset sequential
+throughput, guaranteed sensor throughput, or production evidence.
+
+### Scientific chronology and retained parity disclosures
+
+- M2 parity v1 failed and remains failed.
+- The separately preregistered parity v2 passed on the unchanged engine.
+- The first benchmark at `e2f9b6babb541d52beaa0bcd58e841a0a56cc851` was rejected because it
+  used MMDeploy-rewritten eager PyTorch as the performance denominator. Its 124.297× network,
+  23.101× end-to-end, 2164.527 ms rewritten-network, and 1816.859 ms rewritten-end-to-end values
+  are retained only in `benchmarks/m2/diagnostics/rejected_e2f9b6b.json` and are not canonical.
+- The diagnostic proved native and rewritten outputs bit-identical, then selected native PyTorch as
+  the performance baseline.
+- The repaired canonical benchmark above used that approved baseline and direct distributions.
+
+All preregistered per-metric parity-v2 Stage 1 gates passed. Separately, 8/753 (1.06%)
+high-confidence matched detections exceeded at least one continuous tolerance; all exceptions remain
+in applicable denominators. One index-50 pedestrian match had a 47.626393° box-axis difference whose
+causal mechanism was not established. The raw classification tensor had p99 absolute difference
+0.056829 and a rare maximum tail of 0.721187. These facts do not create post-hoc gates.
+
 ## M1 — PointPillars FP32
 
 | Backend | Model | Dataset | Precision | GPU | Model median | End-to-end median | Model P95 | End-to-end P95 | Model FPS | Peak CUDA memory |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---:|
 | PyTorch/MMDetection3D 1.4.0 | Official pretrained PointPillars | nuScenes v1.0-mini | FP32 | NVIDIA GeForce RTX 4060 Laptop GPU | 52.896 ms | 55.097 ms | 60.729 ms | 62.568 ms | 18.905 | 0.381 GiB allocated / 0.400 GiB reserved |
-| TensorRT (future M2) | PointPillars | nuScenes v1.0-mini | FP16 | RTX 4060 Laptop GPU | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 | Jetson (conditional M5) | Pending measurement | Pending measurement | Pending measurement | Physical hardware unavailable | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement | Pending measurement |
 
 The measured PointPillars asset is

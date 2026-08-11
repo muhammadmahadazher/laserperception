@@ -38,11 +38,14 @@ tensorboard/
 outputs/
 artifacts/
 /benchmarks/m1/raw/
+/benchmarks/m2/raw/
 *.pt
 *.pth
 *.ckpt
 *.onnx
 *.engine
+*.plan
+TensorRT-*.tar.gz
 
 # Temporary and cache data
 tmp/

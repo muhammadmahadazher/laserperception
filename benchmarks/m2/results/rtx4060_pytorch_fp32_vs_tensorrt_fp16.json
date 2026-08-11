@@ -1,0 +1,1234 @@
+{
+  "artifacts": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "engine": {
+      "committed": false,
+      "logical_name": "engines/pointpillars_fp16.engine",
+      "sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+      "size_bytes": 31519476
+    },
+    "onnx": {
+      "committed": false,
+      "logical_name": "m2/pointpillars.onnx",
+      "sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+      "size_bytes": 60711828
+    }
+  },
+  "baseline_roles": {
+    "parity_reference": "mmdeploy_rewritten_pytorch_fp32",
+    "performance_baseline": "native_mmdetection3d_pytorch_fp32"
+  },
+  "batch_size": 1,
+  "benchmark_sanity": {
+    "flags": [],
+    "promotion_refused_when_flagged": true,
+    "review_required": false
+  },
+  "commit_sha": "3f240d60569b53a2e4445d34b0905a807cf54879",
+  "dataset": {
+    "cache_state": "warm-cache repeated-single-sample microbenchmark",
+    "name": "nuScenes",
+    "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+    "sample_index": 0,
+    "split": "mini_val",
+    "version": "v1.0-mini"
+  },
+  "environment": {
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_memory_bytes": 8585216000,
+    "mmcv": "2.1.0",
+    "mmdeploy": "1.3.1",
+    "mmdeploy_commit": "bc75c9d6c8940aa03d0e1e5b5962bd930478ba77",
+    "mmdet": "3.2.0",
+    "mmdet3d": "1.4.0",
+    "mmengine": "0.10.7",
+    "nvidia_driver": "610.88",
+    "onnx": "1.14.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "tensorrt": "8.6.1",
+    "torch": "2.1.0+cu118",
+    "torch_cuda_runtime": "11.8"
+  },
+  "final_detection_counts": {
+    "native_pytorch": 182,
+    "tensorrt": 176
+  },
+  "generated_at_utc": "2026-08-11T12:58:14.151443+00:00",
+  "interpretation_limits": [
+    "not cold-storage I/O latency",
+    "not whole-dataset sequential throughput",
+    "FPS derived from median latency is not a sensor-throughput guarantee"
+  ],
+  "measured_iterations_per_runtime_and_boundary": 100,
+  "measurement_order": "isolated native-PyTorch block followed by isolated TensorRT block",
+  "measurements": {
+    "end_to_end": {
+      "boundary": "dataset_loading_through_detection_frame",
+      "clock": "time.perf_counter with torch.cuda.synchronize before stop",
+      "headline": true,
+      "native_pytorch_fp32": {
+        "count": 100,
+        "fps_from_median_latency": 16.86658787889703,
+        "max_ms": 74.54057699999339,
+        "mean_ms": 60.00736518999702,
+        "median_ms": 59.28881450000745,
+        "min_ms": 55.38358100000096,
+        "p90_ms": 62.92832459998863,
+        "p95_ms": 64.94499910001537,
+        "population_std_ms": 2.701057533946247
+      },
+      "pytorch_over_tensorrt_median_speedup": 1.2991337372182707,
+      "tensorrt_fp16": {
+        "count": 100,
+        "fps_from_median_latency": 21.911953345231883,
+        "max_ms": 50.4571679999799,
+        "mean_ms": 45.65548969999668,
+        "median_ms": 45.63719100002572,
+        "min_ms": 41.35350599995036,
+        "p90_ms": 48.21006989992611,
+        "p95_ms": 48.71105190002254,
+        "population_std_ms": 2.0452673415912663
+      }
+    },
+    "network": {
+      "boundary": "common_voxelized_inputs_to_raw_network_outputs",
+      "clock": "torch.cuda.Event with per-iteration end-event synchronization",
+      "native_pytorch_fp32": {
+        "count": 100,
+        "fps_from_median_latency": 52.11390692877358,
+        "max_ms": 22.634496688842773,
+        "mean_ms": 19.4489688873291,
+        "median_ms": 19.188735961914062,
+        "min_ms": 18.747392654418945,
+        "p90_ms": 20.230319595336915,
+        "p95_ms": 20.69588327407837,
+        "population_std_ms": 0.7140482630095247
+      },
+      "pytorch_over_tensorrt_median_speedup": 3.132564276065832,
+      "tensorrt_fp16": {
+        "count": 100,
+        "fps_from_median_latency": 163.25016313129572,
+        "max_ms": 7.326720237731934,
+        "mean_ms": 6.156056318283081,
+        "median_ms": 6.125568151473999,
+        "min_ms": 5.810175895690918,
+        "p90_ms": 6.402339124679566,
+        "p95_ms": 6.547153830528259,
+        "population_std_ms": 0.2512593610240269
+      }
+    }
+  },
+  "memory": {
+    "comparable_process_level_gpu_memory": "Pending measurement",
+    "native_pytorch_end_to_end": {
+      "method": "torch.cuda peak allocator counters after reset for one native PyTorch end-to-end call in the already initialized process",
+      "peak_allocated_bytes": 413477888,
+      "peak_allocated_gib": 0.38508129119873047,
+      "peak_reserved_bytes": 427819008,
+      "peak_reserved_gib": 0.3984375
+    },
+    "native_pytorch_network": {
+      "method": "torch.cuda peak allocator counters after reset for one native PyTorch network call in the already initialized process",
+      "peak_allocated_bytes": 408934400,
+      "peak_allocated_gib": 0.38084983825683594,
+      "peak_reserved_bytes": 427819008,
+      "peak_reserved_gib": 0.3984375
+    },
+    "tensorrt": {
+      "engine_device_memory_size_bytes": 1212340736,
+      "method": "TensorRT serialized file size and ICudaEngine.device_memory_size",
+      "serialized_engine_size_bytes": 31519476
+    }
+  },
+  "milestone": "M2",
+  "native_vs_rewritten_fidelity": {
+    "commit_sha": "3f240d60569b53a2e4445d34b0905a807cf54879",
+    "materially_equivalent": true,
+    "result_sha256": "1a5ccbad83ebee06178d2dfdafbb830eafe3adb3eb1f55b0523a4a47a01783ad",
+    "sample_count": 20,
+    "status": "pass"
+  },
+  "parity": {
+    "commit_sha": "3f240d60569b53a2e4445d34b0905a807cf54879",
+    "overall_pass": true,
+    "protocol_version": 2,
+    "result_sha256": "5e8d49ce3847248f2a1a6d28fd92903d80c118de2cdec7b3c08fcab6c2f58853",
+    "sample_count": 20,
+    "stage_1": {
+      "checks": {
+        "aggregate_exported_counts": true,
+        "high_confidence_axis_yaw": true,
+        "high_confidence_classes": true,
+        "high_confidence_dimensions_per_detection": true,
+        "high_confidence_heading_direction_agreement": true,
+        "high_confidence_score": true,
+        "high_confidence_xy_center": true,
+        "high_confidence_z_center": true,
+        "per_sample_exported_counts": true,
+        "pytorch_to_tensorrt_high_confidence_coverage": true,
+        "tensorrt_to_pytorch_high_confidence_coverage": true
+      },
+      "class_name_mismatches": 0,
+      "continuous_metrics": {
+        "absolute_score_difference": {
+          "accepted": true,
+          "count": 753,
+          "failure_count": 2,
+          "maximum": 0.1686149537563324,
+          "mean": 0.0018366679727318752,
+          "median": 0.0010460317134857178,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.004493695497512816,
+          "p99": 0.008386510610580458,
+          "pass_count": 751,
+          "pass_fraction": 0.99734395750332,
+          "tolerance": 0.05
+        },
+        "absolute_z_center_difference_m": {
+          "accepted": true,
+          "count": 753,
+          "failure_count": 0,
+          "maximum": 0.10543465614318848,
+          "mean": 0.0020541742661718035,
+          "median": 0.0008579492568969727,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.004976809024810789,
+          "p99": 0.024166131019592405,
+          "pass_count": 753,
+          "pass_fraction": 1.0,
+          "tolerance": 0.25
+        },
+        "axis_yaw_difference_modulo_pi_degrees": {
+          "accepted": true,
+          "count": 753,
+          "failure_count": 2,
+          "maximum": 47.626393403216575,
+          "mean": 0.17806801854651835,
+          "median": 0.03595411579094712,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.4053416744079084,
+          "p99": 1.4333649211043344,
+          "pass_count": 751,
+          "pass_fraction": 0.99734395750332,
+          "tolerance": 5.0
+        },
+        "maximum_dimension_relative_error_per_detection": {
+          "accepted": true,
+          "count": 753,
+          "failure_count": 3,
+          "maximum": 0.08426384291455075,
+          "mean": 0.001153805721750044,
+          "median": 0.0004947767536661802,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.0016264450876020973,
+          "p99": 0.020420119900794443,
+          "pass_count": 750,
+          "pass_fraction": 0.9960159362549801,
+          "tolerance": 0.05
+        },
+        "xy_center_displacement_m": {
+          "accepted": true,
+          "count": 753,
+          "failure_count": 4,
+          "maximum": 0.9783807353381204,
+          "mean": 0.006249871620497502,
+          "median": 0.0013735972831203053,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.005948484277023815,
+          "p99": 0.0843801747545135,
+          "pass_count": 749,
+          "pass_fraction": 0.9946879150066401,
+          "tolerance": 0.25
+        }
+      },
+      "distinct_high_confidence_continuous_outliers": {
+        "count": 8,
+        "denominator": 753,
+        "detections": [
+          {
+            "axis_yaw_difference_degrees": 1.1111590798397695,
+            "class_name": "truck",
+            "failed_metrics": [
+              "dimensions"
+            ],
+            "full_heading_difference_degrees": 1.1111590798397695,
+            "match": {
+              "bev_iou": 0.8876334988813769,
+              "candidate": {
+                "center_xyz": [
+                  32.526954650878906,
+                  -2.0491456985473633,
+                  -0.24365973472595215
+                ],
+                "class_id": 1,
+                "class_name": "truck",
+                "score": 0.42727720737457275,
+                "size_lwh": [
+                  5.956967830657959,
+                  2.3835079669952393,
+                  2.3768351078033447
+                ],
+                "velocity_xy": [
+                  -0.005130767822265625,
+                  -0.00202178955078125
+                ],
+                "yaw_rad": -0.107421875
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.23685077383815686,
+              "center_displacement_xy_m": 0.2120891849003653,
+              "center_displacement_z_absolute_m": 0.10543465614318848,
+              "circular_yaw_difference_degrees": 1.1111590798397695,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0022111237049102783,
+              "dimension_relative_error_lwh": [
+                0.05304111675754091,
+                0.04793949801477028,
+                0.08426384291455075
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  32.73904037475586,
+                  -2.0503573417663574,
+                  -0.13822507858276367
+                ],
+                "class_id": 1,
+                "class_name": "truck",
+                "score": 0.4250660836696625,
+                "size_lwh": [
+                  6.290629863739014,
+                  2.503525733947754,
+                  2.595545768737793
+                ],
+                "velocity_xy": [
+                  -0.003787505440413952,
+                  -0.008136039599776268
+                ],
+                "yaw_rad": -0.12681525945663452
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+            "sample_index": 8
+          },
+          {
+            "axis_yaw_difference_degrees": 0.22479518596345965,
+            "class_name": "car",
+            "failed_metrics": [
+              "xy",
+              "score"
+            ],
+            "full_heading_difference_degrees": 0.22479518596345965,
+            "match": {
+              "bev_iou": 0.6022881308196562,
+              "candidate": {
+                "center_xyz": [
+                  -8.99965763092041,
+                  33.390602111816406,
+                  0.7828924059867859
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.35264748334884644,
+                "size_lwh": [
+                  4.665759086608887,
+                  1.9263689517974854,
+                  1.6260570287704468
+                ],
+                "velocity_xy": [
+                  0.004669189453125,
+                  0.0078277587890625
+                ],
+                "yaw_rad": 4.695448875427246
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.8008740731852594,
+              "center_displacement_xy_m": 0.7970469488842091,
+              "center_displacement_z_absolute_m": 0.0782012939453125,
+              "circular_yaw_difference_degrees": 0.22479518596345965,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.07417497038841248,
+              "dimension_relative_error_lwh": [
+                0.020273981058709825,
+                0.0154387394538498,
+                0.008914160725458451
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -8.826898574829102,
+                  32.61250305175781,
+                  0.7046911120414734
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.4268224537372589,
+                "size_lwh": [
+                  4.573045253753662,
+                  1.897080421447754,
+                  1.6116901636123657
+                ],
+                "velocity_xy": [
+                  0.010648710653185844,
+                  0.0013104814570397139
+                ],
+                "yaw_rad": 4.699372291564941
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "0d0700a2284e477db876c3ee1d864668",
+            "sample_index": 12
+          },
+          {
+            "axis_yaw_difference_degrees": 0.547453322354862,
+            "class_name": "car",
+            "failed_metrics": [
+              "xy",
+              "score"
+            ],
+            "full_heading_difference_degrees": 0.547453322354862,
+            "match": {
+              "bev_iou": 0.5167107839920894,
+              "candidate": {
+                "center_xyz": [
+                  -9.023857116699219,
+                  30.45105743408203,
+                  0.6567174792289734
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.42250463366508484,
+                "size_lwh": [
+                  4.496612071990967,
+                  1.9114946126937866,
+                  1.6468318700790405
+                ],
+                "velocity_xy": [
+                  0.0118255615234375,
+                  0.004459381103515625
+                ],
+                "yaw_rad": 4.603987693786621
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.9796821579509017,
+              "center_displacement_xy_m": 0.9783807353381204,
+              "center_displacement_z_absolute_m": 0.05048036575317383,
+              "circular_yaw_difference_degrees": 0.547453322354862,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.1686149537563324,
+              "dimension_relative_error_lwh": [
+                0.018196520215674458,
+                0.016520991844010343,
+                0.008078472984074185
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -8.875118255615234,
+                  29.48404884338379,
+                  0.6062371134757996
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.25388967990875244,
+                "size_lwh": [
+                  4.4162516593933105,
+                  1.8804280757904053,
+                  1.660244107246399
+                ],
+                "velocity_xy": [
+                  0.012173985131084919,
+                  0.0025673608761280775
+                ],
+                "yaw_rad": 4.594432830810547
+              },
+              "reference_high_confidence": false
+            },
+            "sample_id": "0d0700a2284e477db876c3ee1d864668",
+            "sample_index": 12
+          },
+          {
+            "axis_yaw_difference_degrees": 7.6278937933677105,
+            "class_name": "pedestrian",
+            "failed_metrics": [
+              "axis_yaw"
+            ],
+            "full_heading_difference_degrees": 7.6278937933677105,
+            "match": {
+              "bev_iou": 0.8219605139849708,
+              "candidate": {
+                "center_xyz": [
+                  -7.254531383514404,
+                  12.07950496673584,
+                  -0.5886131525039673
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.446977436542511,
+                "size_lwh": [
+                  0.6679640412330627,
+                  0.6032664775848389,
+                  1.7072598934173584
+                ],
+                "velocity_xy": [
+                  0.82958984375,
+                  0.058807373046875
+                ],
+                "yaw_rad": -0.6507030725479126
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.04588592031942113,
+              "center_displacement_xy_m": 0.04587172435871414,
+              "center_displacement_z_absolute_m": 0.0011413097381591797,
+              "circular_yaw_difference_degrees": 7.6278937933677105,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0004369020462036133,
+              "dimension_relative_error_lwh": [
+                0.009311649951347306,
+                0.010899715980936484,
+                0.0034082800901961818
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -7.286824703216553,
+                  12.112083435058594,
+                  -0.5897544622421265
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.4465405344963074,
+                "size_lwh": [
+                  0.6618015766143799,
+                  0.59676194190979,
+                  1.701460838317871
+                ],
+                "velocity_xy": [
+                  0.818046510219574,
+                  0.053973324596881866
+                ],
+                "yaw_rad": -0.517571210861206
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+            "sample_index": 46
+          },
+          {
+            "axis_yaw_difference_degrees": 0.31545911700620893,
+            "class_name": "pedestrian",
+            "failed_metrics": [
+              "dimensions"
+            ],
+            "full_heading_difference_degrees": 0.31545911700620893,
+            "match": {
+              "bev_iou": 0.5972381689812626,
+              "candidate": {
+                "center_xyz": [
+                  -6.311980247497559,
+                  5.854746341705322,
+                  -0.8293226957321167
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.43014734983444214,
+                "size_lwh": [
+                  0.8220612406730652,
+                  0.6980523467063904,
+                  1.7547476291656494
+                ],
+                "velocity_xy": [
+                  0.56396484375,
+                  1.1923828125
+                ],
+                "yaw_rad": 1.258476734161377
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.17544681993684705,
+              "center_displacement_xy_m": 0.16938701859828376,
+              "center_displacement_z_absolute_m": 0.045712411403656006,
+              "circular_yaw_difference_degrees": 0.31545911700620893,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.00034549832344055176,
+              "dimension_relative_error_lwh": [
+                0.03732346023615678,
+                0.05227182264248253,
+                0.013256713574639006
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -6.300329208374023,
+                  6.0237321853637695,
+                  -0.7836102843284607
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.4298018515110016,
+                "size_lwh": [
+                  0.7924830317497253,
+                  0.6633764505386353,
+                  1.7783223390579224
+                ],
+                "velocity_xy": [
+                  0.5658776164054871,
+                  1.3655565977096558
+                ],
+                "yaw_rad": 1.2529709339141846
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+            "sample_index": 46
+          },
+          {
+            "axis_yaw_difference_degrees": 47.626393403216575,
+            "class_name": "pedestrian",
+            "failed_metrics": [
+              "axis_yaw"
+            ],
+            "full_heading_difference_degrees": 47.626393403216575,
+            "match": {
+              "bev_iou": 0.5081654126280877,
+              "candidate": {
+                "center_xyz": [
+                  -8.758014678955078,
+                  1.4125902652740479,
+                  -0.793602466583252
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.44601210951805115,
+                "size_lwh": [
+                  0.6599000692367554,
+                  0.6320249438285828,
+                  1.7736449241638184
+                ],
+                "velocity_xy": [
+                  0.263916015625,
+                  -0.4501953125
+                ],
+                "yaw_rad": 1.211113452911377
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.20448340700975004,
+              "center_displacement_xy_m": 0.18246621899944102,
+              "center_displacement_z_absolute_m": 0.0923013687133789,
+              "circular_yaw_difference_degrees": 47.626393403216575,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.00026917457580566406,
+              "dimension_relative_error_lwh": [
+                0.04450518705933865,
+                0.027292739356366457,
+                0.012218462173356636
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -8.642654418945312,
+                  1.5539618730545044,
+                  -0.701301097869873
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.4462812840938568,
+                "size_lwh": [
+                  0.6317824721336365,
+                  0.6497586369514465,
+                  1.7955842018127441
+                ],
+                "velocity_xy": [
+                  0.12900970876216888,
+                  -0.15579581260681152
+                ],
+                "yaw_rad": 0.3798760771751404
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+            "sample_index": 50
+          },
+          {
+            "axis_yaw_difference_degrees": 2.913512813117319,
+            "class_name": "car",
+            "failed_metrics": [
+              "xy",
+              "dimensions"
+            ],
+            "full_heading_difference_degrees": 2.913512813117319,
+            "match": {
+              "bev_iou": 0.7028786785354296,
+              "candidate": {
+                "center_xyz": [
+                  5.4887237548828125,
+                  33.198055267333984,
+                  0.570918619632721
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.545285701751709,
+                "size_lwh": [
+                  4.4744367599487305,
+                  1.8858551979064941,
+                  1.7065390348434448
+                ],
+                "velocity_xy": [
+                  0.000514984130859375,
+                  0.000774383544921875
+                ],
+                "yaw_rad": 0.7045897841453552
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.32970600274272377,
+              "center_displacement_xy_m": 0.3296394609982684,
+              "center_displacement_z_absolute_m": 0.006623744964599609,
+              "circular_yaw_difference_degrees": 2.913512813117319,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.003081083297729492,
+              "dimension_relative_error_lwh": [
+                0.05633134973571754,
+                0.03736031647714415,
+                0.001326241072411465
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  5.484837055206299,
+                  33.527671813964844,
+                  0.5642948746681213
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.5483667850494385,
+                "size_lwh": [
+                  4.7415337562561035,
+                  1.9590457677841187,
+                  1.7088053226470947
+                ],
+                "velocity_xy": [
+                  0.011128909885883331,
+                  0.007663417607545853
+                ],
+                "yaw_rad": 0.6537393927574158
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+            "sample_index": 71
+          },
+          {
+            "axis_yaw_difference_degrees": 1.6106473987482168,
+            "class_name": "car",
+            "failed_metrics": [
+              "xy"
+            ],
+            "full_heading_difference_degrees": 1.6106473987482168,
+            "match": {
+              "bev_iou": 0.7886217815396124,
+              "candidate": {
+                "center_xyz": [
+                  9.503546714782715,
+                  23.637786865234375,
+                  0.20921725034713745
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.5117166042327881,
+                "size_lwh": [
+                  4.5812788009643555,
+                  1.9225956201553345,
+                  1.6450234651565552
+                ],
+                "velocity_xy": [
+                  0.00628662109375,
+                  0.00449371337890625
+                ],
+                "yaw_rad": 0.4543456435203552
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.3215859206410301,
+              "center_displacement_xy_m": 0.31510973365141687,
+              "center_displacement_z_absolute_m": 0.06421339511871338,
+              "circular_yaw_difference_degrees": 1.6106473987482168,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0012150406837463379,
+              "dimension_relative_error_lwh": [
+                0.005305256831268934,
+                0.0057731840808563865,
+                0.02670385368498073
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  9.190272331237793,
+                  23.60382652282715,
+                  0.27343064546585083
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.5129316449165344,
+                "size_lwh": [
+                  4.557102203369141,
+                  1.9337595701217651,
+                  1.690157175064087
+                ],
+                "velocity_xy": [
+                  0.005919317714869976,
+                  0.003764438908547163
+                ],
+                "yaw_rad": 0.4824567437171936
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+            "sample_index": 75
+          }
+        ],
+        "fraction": 0.010624169986719787
+      },
+      "exported_counts": {
+        "absolute_difference": 2,
+        "per_sample_disagreements": [
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 3,
+            "pytorch_count": 56,
+            "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+            "sample_index": 25,
+            "tensorrt_count": 55
+          },
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 2,
+            "pytorch_count": 34,
+            "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+            "sample_index": 42,
+            "tensorrt_count": 35
+          },
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 3,
+            "pytorch_count": 48,
+            "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+            "sample_index": 58,
+            "tensorrt_count": 49
+          },
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 3,
+            "pytorch_count": 45,
+            "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+            "sample_index": 71,
+            "tensorrt_count": 46
+          },
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 3,
+            "pytorch_count": 47,
+            "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+            "sample_index": 75,
+            "tensorrt_count": 48
+          },
+          {
+            "absolute_difference": 1,
+            "allowed_difference": 3,
+            "pytorch_count": 41,
+            "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+            "sample_index": 80,
+            "tensorrt_count": 40
+          }
+        ],
+        "pytorch_total": 883,
+        "relative_difference_from_pytorch": 0.0022650056625141564,
+        "tensorrt_total": 885
+      },
+      "failed_checks": [],
+      "full_heading_diagnostics": {
+        "accepted": true,
+        "agreement_count": 751,
+        "agreement_fraction": 0.99734395750332,
+        "count": 753,
+        "direction_flips": [
+          {
+            "anchor_provenance_recovered": false,
+            "axis_yaw_difference_modulo_pi_degrees": 0.1812238153861988,
+            "class_name": "pedestrian",
+            "classification": "geometrically_axis_equivalent_but_heading_divergent",
+            "full_circular_yaw_difference_degrees": 179.8187761846138,
+            "pytorch_direction_class": null,
+            "pytorch_direction_logits": null,
+            "pytorch_final_yaw_rad": 4.05364465713501,
+            "pytorch_winning_logit_margin": null,
+            "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+            "sample_index": 4,
+            "tensorrt_direction_class": null,
+            "tensorrt_direction_logits": null,
+            "tensorrt_final_yaw_rad": 0.9152149558067322,
+            "tensorrt_winning_logit_margin": null
+          },
+          {
+            "anchor_provenance_recovered": false,
+            "axis_yaw_difference_modulo_pi_degrees": 0.03604472948299277,
+            "class_name": "car",
+            "classification": "geometrically_axis_equivalent_but_heading_divergent",
+            "full_circular_yaw_difference_degrees": 179.963955270517,
+            "pytorch_direction_class": null,
+            "pytorch_direction_logits": null,
+            "pytorch_final_yaw_rad": 2.012035369873047,
+            "pytorch_winning_logit_margin": null,
+            "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+            "sample_index": 80,
+            "tensorrt_direction_class": null,
+            "tensorrt_direction_logits": null,
+            "tensorrt_final_yaw_rad": 5.152998924255371,
+            "tensorrt_winning_logit_margin": null
+          }
+        ],
+        "disagreement_count": 2,
+        "maximum": 179.963955270517,
+        "mean": 0.6555785934605445,
+        "median": 0.03595411579094712,
+        "minimum_agreement_fraction": 0.99,
+        "p95": 0.4206003170137172,
+        "p99": 1.5420321379689714
+      },
+      "high_confidence_coverage": {
+        "pytorch_matched": 750,
+        "pytorch_to_tensorrt": 1.0,
+        "pytorch_total": 750,
+        "tensorrt_matched": 753,
+        "tensorrt_to_pytorch": 0.9986737400530504,
+        "tensorrt_total": 754
+      },
+      "high_confidence_match_denominator": 753,
+      "overall_pass": true,
+      "recommended_next_experiment": null,
+      "stage": 1,
+      "stage_2_required": false,
+      "threshold_edge_disagreements": [
+        {
+          "bev_iou": 0.9969944951305963,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              -11.553874969482422,
+              -0.7355841994285583,
+              -1.6078944206237793
+            ],
+            "class_id": 5,
+            "class_name": "bicycle",
+            "score": 0.25043973326683044,
+            "size_lwh": [
+              1.449522614479065,
+              0.7131124138832092,
+              1.4664673805236816
+            ],
+            "velocity_xy": [
+              0.12433004379272461,
+              -0.9436637759208679
+            ],
+            "yaw_rad": 4.882864475250244
+          },
+          "sample_index": 25,
+          "tensorrt": {
+            "center_xyz": [
+              -11.55405044555664,
+              -0.7361682653427124,
+              -1.6066277027130127
+            ],
+            "class_id": 5,
+            "class_name": "bicycle",
+            "score": 0.24944725632667542,
+            "size_lwh": [
+              1.4514394998550415,
+              0.712347149848938,
+              1.4682685136795044
+            ],
+            "velocity_xy": [
+              0.125732421875,
+              -0.9453125
+            ],
+            "yaw_rad": 4.881514549255371
+          }
+        },
+        {
+          "bev_iou": 0.9997511516101307,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              28.745492935180664,
+              -15.646676063537598,
+              -0.3538705110549927
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.25051555037498474,
+            "size_lwh": [
+              4.431562423706055,
+              1.9262478351593018,
+              1.7027809619903564
+            ],
+            "velocity_xy": [
+              -0.001979525899514556,
+              0.0029949448071420193
+            ],
+            "yaw_rad": -0.0580601692199707
+          },
+          "sample_index": 33,
+          "tensorrt": {
+            "center_xyz": [
+              28.745807647705078,
+              -15.646615028381348,
+              -0.35310202836990356
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.24908174574375153,
+            "size_lwh": [
+              4.431224346160889,
+              1.926207423210144,
+              1.7033909559249878
+            ],
+            "velocity_xy": [
+              -0.001956939697265625,
+              0.0030193328857421875
+            ],
+            "yaw_rad": -0.0579833984375
+          }
+        },
+        {
+          "bev_iou": 0.997988181332167,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              -8.819912910461426,
+              29.084043502807617,
+              0.11929547786712646
+            ],
+            "class_id": 1,
+            "class_name": "truck",
+            "score": 0.2488429695367813,
+            "size_lwh": [
+              5.499638080596924,
+              2.086381196975708,
+              2.0313892364501953
+            ],
+            "velocity_xy": [
+              -0.0018711031880229712,
+              -0.000668760621920228
+            ],
+            "yaw_rad": 4.723176002502441
+          },
+          "sample_index": 33,
+          "tensorrt": {
+            "center_xyz": [
+              -8.819302558898926,
+              29.081289291381836,
+              0.12284070253372192
+            ],
+            "class_id": 1,
+            "class_name": "truck",
+            "score": 0.250545859336853,
+            "size_lwh": [
+              5.502573490142822,
+              2.0857324600219727,
+              2.0332629680633545
+            ],
+            "velocity_xy": [
+              -0.0018978118896484375,
+              -0.000659942626953125
+            ],
+            "yaw_rad": 4.722495079040527
+          }
+        },
+        {
+          "bev_iou": 0.9939465746282291,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              7.016941547393799,
+              22.952781677246094,
+              -0.17560124397277832
+            ],
+            "class_id": 7,
+            "class_name": "pedestrian",
+            "score": 0.24749799072742462,
+            "size_lwh": [
+              0.6407124400138855,
+              0.6123796105384827,
+              1.6972641944885254
+            ],
+            "velocity_xy": [
+              0.15677697956562042,
+              -0.004329254850745201
+            ],
+            "yaw_rad": 1.1430377960205078
+          },
+          "sample_index": 42,
+          "tensorrt": {
+            "center_xyz": [
+              7.017366409301758,
+              22.951717376708984,
+              -0.17101842164993286
+            ],
+            "class_id": 7,
+            "class_name": "pedestrian",
+            "score": 0.25091278553009033,
+            "size_lwh": [
+              0.642061173915863,
+              0.613065779209137,
+              1.6995662450790405
+            ],
+            "velocity_xy": [
+              0.1573486328125,
+              -0.00421905517578125
+            ],
+            "yaw_rad": 1.1396484375
+          }
+        },
+        {
+          "bev_iou": 0.9962970045588008,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              26.415538787841797,
+              -0.2564632296562195,
+              -0.673834502696991
+            ],
+            "class_id": 1,
+            "class_name": "truck",
+            "score": 0.24975544214248657,
+            "size_lwh": [
+              5.285972595214844,
+              2.1932716369628906,
+              1.8685566186904907
+            ],
+            "velocity_xy": [
+              -0.0070153516717255116,
+              -0.000724907498806715
+            ],
+            "yaw_rad": 2.6476805210113525
+          },
+          "sample_index": 58,
+          "tensorrt": {
+            "center_xyz": [
+              26.41876220703125,
+              -0.25607040524482727,
+              -0.6714796423912048
+            ],
+            "class_id": 1,
+            "class_name": "truck",
+            "score": 0.2531217932701111,
+            "size_lwh": [
+              5.294357776641846,
+              2.195455551147461,
+              1.8745020627975464
+            ],
+            "velocity_xy": [
+              -0.007061004638671875,
+              -0.0007762908935546875
+            ],
+            "yaw_rad": 2.6464755535125732
+          }
+        },
+        {
+          "bev_iou": 0.9944570622787927,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              -3.7018182277679443,
+              35.564125061035156,
+              1.197028636932373
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.2495126724243164,
+            "size_lwh": [
+              4.655320167541504,
+              1.9933820962905884,
+              1.786492943763733
+            ],
+            "velocity_xy": [
+              0.004434951115399599,
+              0.006773144006729126
+            ],
+            "yaw_rad": 1.8791916370391846
+          },
+          "sample_index": 71,
+          "tensorrt": {
+            "center_xyz": [
+              -3.6996939182281494,
+              35.566139221191406,
+              1.197587013244629
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.25423112511634827,
+            "size_lwh": [
+              4.657792568206787,
+              1.9916170835494995,
+              1.7866919040679932
+            ],
+            "velocity_xy": [
+              0.0042266845703125,
+              0.006175994873046875
+            ],
+            "yaw_rad": 1.882744312286377
+          }
+        },
+        {
+          "bev_iou": 0.9867227942764382,
+          "kind": "matched_threshold_crossing",
+          "pytorch": {
+            "center_xyz": [
+              -32.04561233520508,
+              -27.574092864990234,
+              -1.4017271995544434
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.2562966048717499,
+            "size_lwh": [
+              4.469222068786621,
+              1.9531090259552002,
+              1.6690616607666016
+            ],
+            "velocity_xy": [
+              0.036053743213415146,
+              -0.08401733636856079
+            ],
+            "yaw_rad": 5.01585578918457
+          },
+          "sample_index": 80,
+          "tensorrt": {
+            "center_xyz": [
+              -32.045169830322266,
+              -27.575674057006836,
+              -1.4083446264266968
+            ],
+            "class_id": 0,
+            "class_name": "car",
+            "score": 0.2440025359392166,
+            "size_lwh": [
+              4.468296051025391,
+              1.9537513256072998,
+              1.6655323505401611
+            ],
+            "velocity_xy": [
+              0.080078125,
+              -0.1627197265625
+            ],
+            "yaw_rad": 5.006026268005371
+          }
+        }
+      ]
+    },
+    "status": "pass"
+  },
+  "same_session": true,
+  "schema_version": "1.0",
+  "status": "measured",
+  "warmup_iterations_per_runtime_and_boundary": 10
+}

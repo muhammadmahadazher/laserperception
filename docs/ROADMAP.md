@@ -22,13 +22,25 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
   fixed 0.25 threshold.
 - [x] Measure and promote a sanitized, two-boundary RTX 4060 FP32 latency and CUDA-memory result.
 
-M1 is complete and awaiting review. It remains inference-only and does not include training, a
-second detector, model conversion, ROS 2, or edge deployment.
+M1 is complete and merged. It remains inference-only and does not include training, a second
+detector, model conversion, ROS 2, or edge deployment.
 
 ## M2 — TensorRT FP16
 
-Convert and benchmark the verified M1 model with ONNX and TensorRT FP16. This work begins only after
-M1 review.
+- [x] Freeze the exact M1 asset, official MMDeploy v1.3.1 commit, deployment boundary, 20-sample
+  parity set, and acceptance tolerances before engine evidence.
+- [x] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
+- [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
+- [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
+- [x] Pass versioned final-box parity v2 on all frozen samples with shared preprocessing/postprocessing.
+- [x] Complete reviewer-approved native PyTorch FP32 versus TensorRT FP16 performance measurement.
+
+Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 remain valid. The
+benchmark at e2f9b6b remains rejected because rewritten eager PyTorch was used as the performance
+baseline. At repaired measurement commit 3f240d6, exact-commit parity and native-vs-rewritten
+fidelity passed, then the direct benchmark measured a 1.2991× end-to-end median speedup and a
+secondary 3.1326× network-only speedup with no review flags. PR #3 remains draft for final M2
+review, and M3 has not started.
 
 ## M3 — ROS 2
 

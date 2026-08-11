@@ -1,10 +1,52 @@
-# M1 detection environment
+# Detection environments
 
-This document records the isolated environment that was actually validated for M1. The base
+This document records the isolated environments actually validated for M1 and M2. The base
 LaserPerception package remains lightweight; none of these CUDA packages are mandatory core
 dependencies.
 
-## Verified matrix
+## M2 verified matrix and setup
+
+| Component | Verified value |
+|---|---|
+| Host | Windows 11 with WSL 2.7.11.0 |
+| Linux | Ubuntu 22.04.5 LTS, WSL kernel 6.18.33.2 |
+| Python | 3.10.12 in `~/.venvs/laserperception-m2` |
+| GPU | NVIDIA GeForce RTX 4060 Laptop GPU |
+| NVIDIA driver | 610.88 |
+| PyTorch / CUDA runtime | 2.1.0+cu118 / 11.8 |
+| TensorRT | 8.6.1 (`8.6.1.6-1+cuda11.8` system packages) |
+| cuDNN | 8.9.7.29 for CUDA 11.8 |
+| ONNX | 1.14.1 |
+| MMDeploy | 1.3.1, commit `bc75c9d6c8940aa03d0e1e5b5962bd930478ba77` |
+| MMDetection3D | 1.4.0, commit `fe25f7a51d36e3702f961e198894580d83c4387b` |
+
+From the repository root inside WSL, the setup requires administrator access for pinned NVIDIA
+APT packages and leaves the M1 virtual environment untouched:
+
+```bash
+bash scripts/setup_detection_m2.sh
+source ~/.venvs/laserperception-m2/bin/activate
+```
+
+`LASERPERCEPTION_M2_CACHE` selects the M2 cache root; the default is
+`~/.cache/laserperception`. The MMDeploy checkout is `<cache>/mmdeploy-v1.3.1`, while ONNX,
+engine, metadata, parity, and diagnostic files live under `<cache>/m2`. M1 assets continue to use
+`LASERPERCEPTION_M1_CACHE` independently. Heavy environments and generated artifacts stay outside
+the Google Drive repository.
+
+The setup installs only the exact CUDA 11.8-compatible TensorRT/cuDNN packages, links the official
+Python TensorRT binding into the isolated Python 3.10 environment, installs the pinned OpenMMLab
+stack, verifies the checkpoint, and runs TensorRT Gate 0. Gate 0 checks CUDA visibility, prints the
+detected GPU, builds/serializes/deserializes a trivial FP16 network, creates an execution context,
+executes it, and compares its output. A different usable NVIDIA CUDA GPU is allowed for setup; the
+RTX 4060 Laptop GPU is required only for promotion of the canonical result filename.
+
+The exact environment passed Gate 0 and built the official PointPillars ONNX/FP16 engine. Parity v1
+failed and remains historical evidence; separately preregistered parity v2 Stage 1 passed on the
+unchanged engine. M2 benchmarking and result promotion were not run pending reviewer authorization.
+See `TENSORRT.md` for both versioned results and the review disposition.
+
+## M1 verified matrix
 
 | Component | Verified value |
 |---|---|
@@ -53,7 +95,7 @@ cd /mnt/j/path/to/laserperception
 
 The drive letter and repository path are local choices, not assumptions in source code.
 
-## Reproduce the environment
+## Reproduce the M1 environment
 
 From the repository root inside WSL:
 
@@ -85,7 +127,7 @@ The setup script requires network access to the official PyTorch, OpenMMLab, Git
 package sources. It never creates a virtual environment, framework clone, checkpoint, or cache in
 the repository.
 
-## Verify an existing environment
+## Verify an existing M1 environment
 
 ```bash
 source ~/.venvs/laserperception-m1/bin/activate
