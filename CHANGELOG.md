@@ -8,8 +8,9 @@ releases begin.
 
 ### Changed
 
-- Advanced to M3 only after PR #3 merged, preserved every frozen M2 artifact, and recorded that the
-  first M3A 20 Hz diagnostic failed its callback-median and sustained-rate gates. M3B remains
+- Advanced to M3 only after PR #3 merged and preserved every frozen M2 artifact. Exact-commit
+  20-sample PointCloud2 fidelity passed, but the M3A 20 Hz diagnostic measured 238.255 ms callback
+  median, 303.283 ms loopback median, 3.990 Hz output, and 875 bounded-QoS input drops. M3B remains
   unauthorized and no runtime optimization was attempted.
 - Added a strict model-ready multi-sweep PointCloud2 interface that rejects missing `time_lag`,
   performs no TF/history reconstruction, and preserves source headers and detector box semantics.

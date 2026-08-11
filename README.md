@@ -152,6 +152,11 @@ The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fiel
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
 complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
+M3A has no canonical result. Its exact-commit diagnostic retained 19.945 Hz replay but measured
+238.255 ms callback median, 303.283 ms same-host loopback median, 3.990 Hz output, and 875 bounded-QoS
+input drops. The result is a failed rate-gate record for review, not accepted performance; see
+[`benchmarks/m3/README.md`](benchmarks/m3/README.md).
+
 ## Roadmap
 
 - **M0:** project direction and governance transition.

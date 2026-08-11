@@ -1,0 +1,2278 @@
+{
+  "engine_sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+  "gate": "ros_pointcloud2_roundtrip_fidelity",
+  "generated_at_utc": "2026-08-11T14:31:58.938720+00:00",
+  "implementation_commit": "d54da837602de2924825d3045cb4a17b72c5b7b0",
+  "milestone": "M3A",
+  "point_contract": [
+    "x",
+    "y",
+    "z",
+    "time_lag"
+  ],
+  "sample_count": 20,
+  "samples": [
+    {
+      "adapter_detection_count": 176,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.7421875,
+          "mean": 0.10117078539643969,
+          "minimum": -6.82421875,
+          "sha256": "69fd719c389a6c93a55fbe5a3791a3312a8bcd730fcd697736606f59f5c50e11",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 1.76171875,
+          "mean": -11.186201688929966,
+          "minimum": -63.09375,
+          "sha256": "f0f5518e959c9c19172abc84ae4d4764d39780c7a4fbb55079488e0f18a7a1fa",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5234375,
+          "mean": 0.0011984394882406507,
+          "minimum": -10.671875,
+          "sha256": "9c7aa156b86751d05f3a8da2f9a8c92ff7e273f806ca787da646c002a4436584",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 4352,
+      "adapter_voxel_hashes": {
+        "coors": "63e353942e0d66e20905607cf4b86060bf52bb724b5a4f9e1f01649f19d4bbe8",
+        "num_points": "9808940e52695febdc6d9dd3f025735880376f32f139ec7a1ef31022850eca5a",
+        "voxels": "c948b451b855db787715a4035612f56b2eaf762504b80509b1ee307c1eb601ec"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 176,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.7421875,
+          "mean": 0.10117078539643969,
+          "minimum": -6.82421875,
+          "sha256": "69fd719c389a6c93a55fbe5a3791a3312a8bcd730fcd697736606f59f5c50e11",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 1.76171875,
+          "mean": -11.186201688929966,
+          "minimum": -63.09375,
+          "sha256": "f0f5518e959c9c19172abc84ae4d4764d39780c7a4fbb55079488e0f18a7a1fa",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5234375,
+          "mean": 0.0011984394882406507,
+          "minimum": -10.671875,
+          "sha256": "9c7aa156b86751d05f3a8da2f9a8c92ff7e273f806ca787da646c002a4436584",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 4352,
+      "original_voxel_hashes": {
+        "coors": "63e353942e0d66e20905607cf4b86060bf52bb724b5a4f9e1f01649f19d4bbe8",
+        "num_points": "9808940e52695febdc6d9dd3f025735880376f32f139ec7a1ef31022850eca5a",
+        "voxels": "c948b451b855db787715a4035612f56b2eaf762504b80509b1ee307c1eb601ec"
+      },
+      "point_count": 33587,
+      "point_dtype": "float32",
+      "point_shape": [
+        33587,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "4da6843d2f4fcca676705ecd440047e0d0371efa53ee8d4bed305c72d8e1def4",
+      "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+      "sample_index": 0,
+      "source_point_sha256": "4da6843d2f4fcca676705ecd440047e0d0371efa53ee8d4bed305c72d8e1def4",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 226,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 12.3671875,
+          "mean": 0.08163797340118696,
+          "minimum": -11.828125,
+          "sha256": "bf1ee5e4ca83f7e8491254335f51e18ce829d6bc0a9271aa4b006f9d7950b98b",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.1484375,
+          "mean": -10.942630810023717,
+          "minimum": -63.09375,
+          "sha256": "519b50554c0ba6114542023bb16b6819eef60c4d888d8030cc39ecb8c998ff6d",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.53125,
+          "mean": -0.00019051249027252198,
+          "minimum": -10.6796875,
+          "sha256": "b482d4a037a11c43569dc602a5f801b46010eeec7cec46909f412e4f834203aa",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 16203,
+      "adapter_voxel_hashes": {
+        "coors": "44fe043139b65d8904f088dc2d504d5db2e401aa89bd3ecb17b61e3d49f53e36",
+        "num_points": "5dfd1f9e38a34243613c73468ac4dbcda9c4594697ed4d3e0ec3a55a95cf5597",
+        "voxels": "acdc8471e733ada7ceee86a591e0a332fb85b9209b63080589b9db51b46712fd"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 226,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 12.3671875,
+          "mean": 0.08163797340118696,
+          "minimum": -11.828125,
+          "sha256": "bf1ee5e4ca83f7e8491254335f51e18ce829d6bc0a9271aa4b006f9d7950b98b",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.1484375,
+          "mean": -10.942630810023717,
+          "minimum": -63.09375,
+          "sha256": "519b50554c0ba6114542023bb16b6819eef60c4d888d8030cc39ecb8c998ff6d",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.53125,
+          "mean": -0.00019051249027252198,
+          "minimum": -10.6796875,
+          "sha256": "b482d4a037a11c43569dc602a5f801b46010eeec7cec46909f412e4f834203aa",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 16203,
+      "original_voxel_hashes": {
+        "coors": "44fe043139b65d8904f088dc2d504d5db2e401aa89bd3ecb17b61e3d49f53e36",
+        "num_points": "5dfd1f9e38a34243613c73468ac4dbcda9c4594697ed4d3e0ec3a55a95cf5597",
+        "voxels": "acdc8471e733ada7ceee86a591e0a332fb85b9209b63080589b9db51b46712fd"
+      },
+      "point_count": 370352,
+      "point_dtype": "float32",
+      "point_shape": [
+        370352,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "9a4f2609184a1c3b1fa38f1ea3ff39d725c8cfaeb028ab28d88f6b264c040477",
+      "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+      "sample_index": 4,
+      "source_point_sha256": "9a4f2609184a1c3b1fa38f1ea3ff39d725c8cfaeb028ab28d88f6b264c040477",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 168,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.953125,
+          "mean": 0.0870145027288014,
+          "minimum": -11.7578125,
+          "sha256": "7ccfb188ee86958eed3ddf07ec2774fa06f51577d5d215b614eccfd5cae521df",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.74609375,
+          "mean": -10.349647663225447,
+          "minimum": -63.03125,
+          "sha256": "07184861ecdad642ef9f4446b1d5a1eab218584b333ae7509d66412a2cbe5710",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0003883246208940234,
+          "minimum": -10.6640625,
+          "sha256": "75da1c5ad26597fb5252a81b9d8668c7fe9b671d585ccd7ffacc949626a55c47",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19512,
+      "adapter_voxel_hashes": {
+        "coors": "735d386402e06e91055f2a6b06bc692c120f13c63e7327b7b6bcb702de01918a",
+        "num_points": "61b103df1b5da18ffa3efc56e05eb716df2a75a235cf64e864888483eb347267",
+        "voxels": "f8840a9a144ebbe93c50725a131116d30a268b20088251351f30b62509d7c3b0"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 168,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.953125,
+          "mean": 0.0870145027288014,
+          "minimum": -11.7578125,
+          "sha256": "7ccfb188ee86958eed3ddf07ec2774fa06f51577d5d215b614eccfd5cae521df",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.74609375,
+          "mean": -10.349647663225447,
+          "minimum": -63.03125,
+          "sha256": "07184861ecdad642ef9f4446b1d5a1eab218584b333ae7509d66412a2cbe5710",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0003883246208940234,
+          "minimum": -10.6640625,
+          "sha256": "75da1c5ad26597fb5252a81b9d8668c7fe9b671d585ccd7ffacc949626a55c47",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19512,
+      "original_voxel_hashes": {
+        "coors": "735d386402e06e91055f2a6b06bc692c120f13c63e7327b7b6bcb702de01918a",
+        "num_points": "61b103df1b5da18ffa3efc56e05eb716df2a75a235cf64e864888483eb347267",
+        "voxels": "f8840a9a144ebbe93c50725a131116d30a268b20088251351f30b62509d7c3b0"
+      },
+      "point_count": 366395,
+      "point_dtype": "float32",
+      "point_shape": [
+        366395,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "ef358e083e1dd0759cf6429760eb38fb2f710f313c192ef5a334c6eb17973530",
+      "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+      "sample_index": 8,
+      "source_point_sha256": "ef358e083e1dd0759cf6429760eb38fb2f710f313c192ef5a334c6eb17973530",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 159,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.609375,
+          "mean": 0.08055058759322005,
+          "minimum": -11.1875,
+          "sha256": "5b8e586e464a9b05826a73435e1275e784a8c631cd205a84c04f77047879d8c1",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.5078125,
+          "mean": -10.098841094098772,
+          "minimum": -62.4375,
+          "sha256": "e9e8ddf9bae9843b58aa93337ab2330c5765bcfeb636b6b66c2407df08c796ad",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.3828125,
+          "mean": 0.0002925916544028691,
+          "minimum": -10.515625,
+          "sha256": "382a8974924d5fe2a09ab41c7697a97178f71dac1f60dab04d2480656533bcf3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19579,
+      "adapter_voxel_hashes": {
+        "coors": "0f904ec3690cc454f39ae717bdd9c3d85dd613291396c0b0df9001a2b4026a5a",
+        "num_points": "6fab964bc79bc241ca934e51db253f8e936b09fbddbc182664d3733e842c50b3",
+        "voxels": "2c25505b7a90f67111802f318762ba2d980c55b521c1607f86e030b8373c4872"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 159,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.609375,
+          "mean": 0.08055058759322005,
+          "minimum": -11.1875,
+          "sha256": "5b8e586e464a9b05826a73435e1275e784a8c631cd205a84c04f77047879d8c1",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.5078125,
+          "mean": -10.098841094098772,
+          "minimum": -62.4375,
+          "sha256": "e9e8ddf9bae9843b58aa93337ab2330c5765bcfeb636b6b66c2407df08c796ad",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.3828125,
+          "mean": 0.0002925916544028691,
+          "minimum": -10.515625,
+          "sha256": "382a8974924d5fe2a09ab41c7697a97178f71dac1f60dab04d2480656533bcf3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19579,
+      "original_voxel_hashes": {
+        "coors": "0f904ec3690cc454f39ae717bdd9c3d85dd613291396c0b0df9001a2b4026a5a",
+        "num_points": "6fab964bc79bc241ca934e51db253f8e936b09fbddbc182664d3733e842c50b3",
+        "voxels": "2c25505b7a90f67111802f318762ba2d980c55b521c1607f86e030b8373c4872"
+      },
+      "point_count": 367096,
+      "point_dtype": "float32",
+      "point_shape": [
+        367096,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "dd8ac20a7d5705cc4a63e9b3762d8660c007d00f8d3fd9e83cd47e1164924650",
+      "sample_id": "0d0700a2284e477db876c3ee1d864668",
+      "sample_index": 12,
+      "source_point_sha256": "dd8ac20a7d5705cc4a63e9b3762d8660c007d00f8d3fd9e83cd47e1164924650",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 171,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.671875,
+          "mean": 0.09308930780259626,
+          "minimum": -7.125,
+          "sha256": "dd670a7e30beae357b3dd5994bfb9654aaf2c58ed52ca9d630972f9240d19848",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.31640625,
+          "mean": -10.173093285086496,
+          "minimum": -62.75,
+          "sha256": "5f91b32188bca5e1b634a08c883259daf4cd0e2405f629946bcb52ad6cb8bc98",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.453125,
+          "mean": 0.00014748994026865278,
+          "minimum": -10.6015625,
+          "sha256": "862dc1c6b3ca526f95271ac46f9e683d67fb9e48a73ea5018801b6ea6c584c79",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 15037,
+      "adapter_voxel_hashes": {
+        "coors": "df371d6eee1a4f249200be6d3f06cacf97d8f2f299d6cbfd883ec5f0a100a45b",
+        "num_points": "bdf9af70d1cf354cf1e112cac695d84a5d888e692138bc4f93035da26b27d225",
+        "voxels": "9e1b14f38b1eb9d75f18ffcecaffb462540aaf1a511061f0e6a34dcd4444eca0"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 171,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.671875,
+          "mean": 0.09308930780259626,
+          "minimum": -7.125,
+          "sha256": "dd670a7e30beae357b3dd5994bfb9654aaf2c58ed52ca9d630972f9240d19848",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.31640625,
+          "mean": -10.173093285086496,
+          "minimum": -62.75,
+          "sha256": "5f91b32188bca5e1b634a08c883259daf4cd0e2405f629946bcb52ad6cb8bc98",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.453125,
+          "mean": 0.00014748994026865278,
+          "minimum": -10.6015625,
+          "sha256": "862dc1c6b3ca526f95271ac46f9e683d67fb9e48a73ea5018801b6ea6c584c79",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 15037,
+      "original_voxel_hashes": {
+        "coors": "df371d6eee1a4f249200be6d3f06cacf97d8f2f299d6cbfd883ec5f0a100a45b",
+        "num_points": "bdf9af70d1cf354cf1e112cac695d84a5d888e692138bc4f93035da26b27d225",
+        "voxels": "9e1b14f38b1eb9d75f18ffcecaffb462540aaf1a511061f0e6a34dcd4444eca0"
+      },
+      "point_count": 366359,
+      "point_dtype": "float32",
+      "point_shape": [
+        366359,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "c67e2eefa7e60d89c07cff534a186fa3bc51d26affa124f958d3b5b09116b426",
+      "sample_id": "0a0d6b8c2e884134a3b48df43d54c36a",
+      "sample_index": 16,
+      "source_point_sha256": "c67e2eefa7e60d89c07cff534a186fa3bc51d26affa124f958d3b5b09116b426",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 150,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09318908355217131,
+          "minimum": -6.875,
+          "sha256": "cce7412dcc31ebcfec1327f8cb0f8f7ac3ac52bc36778f9328dd270c818eee7e",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.12890625,
+          "mean": -10.6548555242048,
+          "minimum": -63.03125,
+          "sha256": "5c5684a6c4669caaad7110e01a1df0a8611a9088654c267e5c75729637e338cd",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5078125,
+          "mean": 0.0005362556883266994,
+          "minimum": -10.6640625,
+          "sha256": "f40394cf65bebd4421d5f62d74965f91ceb10458fec5d9b1a35773964128a35b",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 13606,
+      "adapter_voxel_hashes": {
+        "coors": "95699fada704acd2aee5e7fc2ddcd7f67d6406ebb9f53d4334f24e4bbf5b19b6",
+        "num_points": "7185cc069e19e8e339238a06964cfd7da2d726044805918a30b591612dd38511",
+        "voxels": "30abad648045424eeec95a54227b01d4172e5851b1bac485f2d40acd2df03732"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 150,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09318908355217131,
+          "minimum": -6.875,
+          "sha256": "cce7412dcc31ebcfec1327f8cb0f8f7ac3ac52bc36778f9328dd270c818eee7e",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.12890625,
+          "mean": -10.6548555242048,
+          "minimum": -63.03125,
+          "sha256": "5c5684a6c4669caaad7110e01a1df0a8611a9088654c267e5c75729637e338cd",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5078125,
+          "mean": 0.0005362556883266994,
+          "minimum": -10.6640625,
+          "sha256": "f40394cf65bebd4421d5f62d74965f91ceb10458fec5d9b1a35773964128a35b",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 13606,
+      "original_voxel_hashes": {
+        "coors": "95699fada704acd2aee5e7fc2ddcd7f67d6406ebb9f53d4334f24e4bbf5b19b6",
+        "num_points": "7185cc069e19e8e339238a06964cfd7da2d726044805918a30b591612dd38511",
+        "voxels": "30abad648045424eeec95a54227b01d4172e5851b1bac485f2d40acd2df03732"
+      },
+      "point_count": 364175,
+      "point_dtype": "float32",
+      "point_shape": [
+        364175,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "fd2d34ef023e0dd6ccf35856597be4589677f089ef4a85cf6ac964d8940f5203",
+      "sample_id": "d0ecf474e0e64950aa265cd44b9c9d75",
+      "sample_index": 21,
+      "source_point_sha256": "fd2d34ef023e0dd6ccf35856597be4589677f089ef4a85cf6ac964d8940f5203",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 138,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09742285332909179,
+          "minimum": -8.2109375,
+          "sha256": "8c00817f329f86eb1a3e723a87e620e43fb7a9a67cea997926fcff6eef90a305",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.0625,
+          "mean": -10.559829415806362,
+          "minimum": -63.0625,
+          "sha256": "50fba3a2223a70f26a3fadec66e8985825131ea1e79d757975ed75610fe91627",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.000329330655506679,
+          "minimum": -10.671875,
+          "sha256": "e63437e4e617e435e91c26c0b7a3623a79a39f8e9c4cb7b860a8dc6ee2e71d80",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 17453,
+      "adapter_voxel_hashes": {
+        "coors": "398f67fddeec0862b7e324b9e225f01db4a13cec5fe6f041e72563c3496c1210",
+        "num_points": "cfff24700200695732ecfd191328b1164d603e39837a87c8b4a73f158137c321",
+        "voxels": "025b64dbf500ea9ddacb1b66f8adf70cd64c4ce0e35f2025155aa7a0e032ab74"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 138,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09742285332909179,
+          "minimum": -8.2109375,
+          "sha256": "8c00817f329f86eb1a3e723a87e620e43fb7a9a67cea997926fcff6eef90a305",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.0625,
+          "mean": -10.559829415806362,
+          "minimum": -63.0625,
+          "sha256": "50fba3a2223a70f26a3fadec66e8985825131ea1e79d757975ed75610fe91627",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.000329330655506679,
+          "minimum": -10.671875,
+          "sha256": "e63437e4e617e435e91c26c0b7a3623a79a39f8e9c4cb7b860a8dc6ee2e71d80",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 17453,
+      "original_voxel_hashes": {
+        "coors": "398f67fddeec0862b7e324b9e225f01db4a13cec5fe6f041e72563c3496c1210",
+        "num_points": "cfff24700200695732ecfd191328b1164d603e39837a87c8b4a73f158137c321",
+        "voxels": "025b64dbf500ea9ddacb1b66f8adf70cd64c4ce0e35f2025155aa7a0e032ab74"
+      },
+      "point_count": 362081,
+      "point_dtype": "float32",
+      "point_shape": [
+        362081,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "9d056f3a5c40b758d9f2089e4acaa9ba1c602c70a4fc5dc7791a354068ad4a34",
+      "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+      "sample_index": 25,
+      "source_point_sha256": "9d056f3a5c40b758d9f2089e4acaa9ba1c602c70a4fc5dc7791a354068ad4a34",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 126,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.7265625,
+          "mean": 0.10283442944173539,
+          "minimum": -8.7265625,
+          "sha256": "80846117c42b6e9617f46ab0532113da9a2dab5cff2262988364856661d9e783",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.15234375,
+          "mean": -10.618370121547153,
+          "minimum": -63.0,
+          "sha256": "cbe7b321f578cb5489badf8ac2135245f124489257f5a0592fad439b003395d9",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0007519471091883524,
+          "minimum": -10.6640625,
+          "sha256": "af472d3ebdd6b84e6314ab483f0ef30644a559ddf30ce84016ec1adc2ecea6cb",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19589,
+      "adapter_voxel_hashes": {
+        "coors": "b4e52df10101c0b2529929dcbdc2edef552bcefedd5c6f1eff269a48849d7e79",
+        "num_points": "1ca364f4fe989288d69dced09c4dddbf9008855abdadbaf453af4a432a316b3c",
+        "voxels": "a520975cce5747708656bf10b72d9b3dc4d8bb7ea842954bd81b641ba1fb7ab5"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 126,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.7265625,
+          "mean": 0.10283442944173539,
+          "minimum": -8.7265625,
+          "sha256": "80846117c42b6e9617f46ab0532113da9a2dab5cff2262988364856661d9e783",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.15234375,
+          "mean": -10.618370121547153,
+          "minimum": -63.0,
+          "sha256": "cbe7b321f578cb5489badf8ac2135245f124489257f5a0592fad439b003395d9",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0007519471091883524,
+          "minimum": -10.6640625,
+          "sha256": "af472d3ebdd6b84e6314ab483f0ef30644a559ddf30ce84016ec1adc2ecea6cb",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19589,
+      "original_voxel_hashes": {
+        "coors": "b4e52df10101c0b2529929dcbdc2edef552bcefedd5c6f1eff269a48849d7e79",
+        "num_points": "1ca364f4fe989288d69dced09c4dddbf9008855abdadbaf453af4a432a316b3c",
+        "voxels": "a520975cce5747708656bf10b72d9b3dc4d8bb7ea842954bd81b641ba1fb7ab5"
+      },
+      "point_count": 356035,
+      "point_dtype": "float32",
+      "point_shape": [
+        356035,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "ca92dbf8ed4670b7aa6cab88a2b1c85780fbbdd3a77a957fa2db17a4bc84c072",
+      "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+      "sample_index": 29,
+      "source_point_sha256": "ca92dbf8ed4670b7aa6cab88a2b1c85780fbbdd3a77a957fa2db17a4bc84c072",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 114,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.71875,
+          "mean": 0.09330196561749492,
+          "minimum": -9.953125,
+          "sha256": "7998a7098efce0c9992fc5932849c1e1f1db39a1edd6c1fac2515a179636d673",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.71484375,
+          "mean": -10.376548419538226,
+          "minimum": -63.0,
+          "sha256": "9643a88457f12bbfc00c8d72f4437e9760c9d22c4a25a21357d41d6f448bb016",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5,
+          "mean": 0.00042749189904757906,
+          "minimum": -10.65625,
+          "sha256": "383cf4fa0446655f9c946021f9115231912c6107efacd1bb5b714ab2d6950789",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 18130,
+      "adapter_voxel_hashes": {
+        "coors": "abf8d14936d672b6997eeaee31e71f01ca7a712257e3b5d46623651c900f5960",
+        "num_points": "372390e05bfc219c264daa807f2ec090a65b54f60a03b3cd3321361e2cff2fc9",
+        "voxels": "6009b8aa154993f5e19165ee7aa48faefb44203d92311fcf612525843e8e614d"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 114,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.71875,
+          "mean": 0.09330196561749492,
+          "minimum": -9.953125,
+          "sha256": "7998a7098efce0c9992fc5932849c1e1f1db39a1edd6c1fac2515a179636d673",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.71484375,
+          "mean": -10.376548419538226,
+          "minimum": -63.0,
+          "sha256": "9643a88457f12bbfc00c8d72f4437e9760c9d22c4a25a21357d41d6f448bb016",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5,
+          "mean": 0.00042749189904757906,
+          "minimum": -10.65625,
+          "sha256": "383cf4fa0446655f9c946021f9115231912c6107efacd1bb5b714ab2d6950789",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 18130,
+      "original_voxel_hashes": {
+        "coors": "abf8d14936d672b6997eeaee31e71f01ca7a712257e3b5d46623651c900f5960",
+        "num_points": "372390e05bfc219c264daa807f2ec090a65b54f60a03b3cd3321361e2cff2fc9",
+        "voxels": "6009b8aa154993f5e19165ee7aa48faefb44203d92311fcf612525843e8e614d"
+      },
+      "point_count": 357519,
+      "point_dtype": "float32",
+      "point_shape": [
+        357519,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "ca08def92d1e6568d0d872013b53451e09331ace300beee000eb24a24ae93719",
+      "sample_id": "9fcdc52b791045e99c623c5fc643331f",
+      "sample_index": 33,
+      "source_point_sha256": "ca08def92d1e6568d0d872013b53451e09331ace300beee000eb24a24ae93719",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 104,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.10062060867313828,
+          "minimum": -8.9921875,
+          "sha256": "60943cd4663433a1fa06cdaccf06f035232c4ab2448d658141d1f5f9aa8421af",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.203125,
+          "mean": -10.550734990408762,
+          "minimum": -63.03125,
+          "sha256": "1d59aecf1c491ee56d9f5244919f72fddc04b79defdcb724fe91e2ce2c1aa5e4",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0008207942817892348,
+          "minimum": -10.671875,
+          "sha256": "ea7adb0d36cab2a201c31acd3b41187498d5b69c0705e6d7e86eb99fc8a419b4",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 16270,
+      "adapter_voxel_hashes": {
+        "coors": "628b8b7101bbbd4cc12d8a5f9a752ee83877291e4c84795cd4ae5b1f7e760126",
+        "num_points": "1cea96273f0c4f1fae044943121909153a4441f36ad2f552eb00a46691e9f360",
+        "voxels": "be93cf77c100d373df6da8f63f3880e2f0c43665c9b894fe56e8955beb19ff8d"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 104,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.10062060867313828,
+          "minimum": -8.9921875,
+          "sha256": "60943cd4663433a1fa06cdaccf06f035232c4ab2448d658141d1f5f9aa8421af",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.203125,
+          "mean": -10.550734990408762,
+          "minimum": -63.03125,
+          "sha256": "1d59aecf1c491ee56d9f5244919f72fddc04b79defdcb724fe91e2ce2c1aa5e4",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.515625,
+          "mean": 0.0008207942817892348,
+          "minimum": -10.671875,
+          "sha256": "ea7adb0d36cab2a201c31acd3b41187498d5b69c0705e6d7e86eb99fc8a419b4",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 16270,
+      "original_voxel_hashes": {
+        "coors": "628b8b7101bbbd4cc12d8a5f9a752ee83877291e4c84795cd4ae5b1f7e760126",
+        "num_points": "1cea96273f0c4f1fae044943121909153a4441f36ad2f552eb00a46691e9f360",
+        "voxels": "be93cf77c100d373df6da8f63f3880e2f0c43665c9b894fe56e8955beb19ff8d"
+      },
+      "point_count": 364318,
+      "point_dtype": "float32",
+      "point_shape": [
+        364318,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "0686a9d175fa0e49b734c7713f8c1f13e2af1975d3996d4295ee0d5a3a16232a",
+      "sample_id": "87e772078a494d42bd34cd16172808bc",
+      "sample_index": 37,
+      "source_point_sha256": "0686a9d175fa0e49b734c7713f8c1f13e2af1975d3996d4295ee0d5a3a16232a",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 185,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09440186775182448,
+          "minimum": -6.5078125,
+          "sha256": "5552f8d6e20bb9d48601da2b964194b5855ad48c0d0936d9152d6286b454945e",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.189453125,
+          "mean": -10.597011619873047,
+          "minimum": -63.03125,
+          "sha256": "7b6d91afde499c7d1a669e8ff26de8348e24e067f9681a0491f83ae8818cd979",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5,
+          "mean": 0.0013541238571916309,
+          "minimum": -10.6640625,
+          "sha256": "b422899566c3bbe0c3ca50183aeefce54792b5fc5b0151542bc6da5158deed31",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 18207,
+      "adapter_voxel_hashes": {
+        "coors": "031d04f610ed7923c32999816be44437aaa8537b096b2d359c19499795d59dc2",
+        "num_points": "b08aedad718f69be86709f7b77a1e34d8f464d56743b35321e71709f1d933cec",
+        "voxels": "9bc33407b8cff8219454eac5e7ee449b9d0f6da270ca2a42f8f2c0906929cd87"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 185,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.734375,
+          "mean": 0.09440186775182448,
+          "minimum": -6.5078125,
+          "sha256": "5552f8d6e20bb9d48601da2b964194b5855ad48c0d0936d9152d6286b454945e",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.189453125,
+          "mean": -10.597011619873047,
+          "minimum": -63.03125,
+          "sha256": "7b6d91afde499c7d1a669e8ff26de8348e24e067f9681a0491f83ae8818cd979",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.5,
+          "mean": 0.0013541238571916309,
+          "minimum": -10.6640625,
+          "sha256": "b422899566c3bbe0c3ca50183aeefce54792b5fc5b0151542bc6da5158deed31",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 18207,
+      "original_voxel_hashes": {
+        "coors": "031d04f610ed7923c32999816be44437aaa8537b096b2d359c19499795d59dc2",
+        "num_points": "b08aedad718f69be86709f7b77a1e34d8f464d56743b35321e71709f1d933cec",
+        "voxels": "9bc33407b8cff8219454eac5e7ee449b9d0f6da270ca2a42f8f2c0906929cd87"
+      },
+      "point_count": 354182,
+      "point_dtype": "float32",
+      "point_shape": [
+        354182,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a",
+      "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+      "sample_index": 42,
+      "source_point_sha256": "5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 135,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 10.2265625,
+          "mean": 0.06942714288341148,
+          "minimum": -7.4765625,
+          "sha256": "39b609c99c3a3c7b4bb2cbec82b195e9eff9456396272bd39a3ea0047a5646b2",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.0078125,
+          "mean": -9.995317527029854,
+          "minimum": -56.0625,
+          "sha256": "2f616d821d704c046bf72abb1a3e7882d075fd5f8443f475afb82638402a9ec4",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 9.0859375,
+          "mean": 0.0012162982753344946,
+          "minimum": -9.203125,
+          "sha256": "d6739d43bcd0be7a6dc56228ac1495b731d540f99626e2937e5b65c7996c1117",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 22546,
+      "adapter_voxel_hashes": {
+        "coors": "7e80deee2a6350b3cfde25c2aa5ec7dabb963e9bba780e535d925f22a444d756",
+        "num_points": "852ba3566e5adccd60350078ab69def8850862ed3222232ffa5652c39ab06d55",
+        "voxels": "71b903f549329aa2862f7dda05f4a3c6ab65e6f7a6607c532c56e3bd392805cd"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 135,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 10.2265625,
+          "mean": 0.06942714288341148,
+          "minimum": -7.4765625,
+          "sha256": "39b609c99c3a3c7b4bb2cbec82b195e9eff9456396272bd39a3ea0047a5646b2",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.0078125,
+          "mean": -9.995317527029854,
+          "minimum": -56.0625,
+          "sha256": "2f616d821d704c046bf72abb1a3e7882d075fd5f8443f475afb82638402a9ec4",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 9.0859375,
+          "mean": 0.0012162982753344946,
+          "minimum": -9.203125,
+          "sha256": "d6739d43bcd0be7a6dc56228ac1495b731d540f99626e2937e5b65c7996c1117",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 22546,
+      "original_voxel_hashes": {
+        "coors": "7e80deee2a6350b3cfde25c2aa5ec7dabb963e9bba780e535d925f22a444d756",
+        "num_points": "852ba3566e5adccd60350078ab69def8850862ed3222232ffa5652c39ab06d55",
+        "voxels": "71b903f549329aa2862f7dda05f4a3c6ab65e6f7a6607c532c56e3bd392805cd"
+      },
+      "point_count": 346729,
+      "point_dtype": "float32",
+      "point_shape": [
+        346729,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "a870c2d96020e61e21e721ec9e8c3e1e73c428c9004c951a2f51edef57ba640b",
+      "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+      "sample_index": 46,
+      "source_point_sha256": "a870c2d96020e61e21e721ec9e8c3e1e73c428c9004c951a2f51edef57ba640b",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 142,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.296875,
+          "mean": 0.07960155653508882,
+          "minimum": -7.87109375,
+          "sha256": "c3b96c79ada8d30d8a65dbe388d05975c3afb24efff691d93d78e5af0a8df65f",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.57421875,
+          "mean": -9.69162002092634,
+          "minimum": -47.53125,
+          "sha256": "9505470e60fcbfce398eca5a2c1dcf05663eacca111befe552a0769fc9bad80d",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 7.6640625,
+          "mean": 0.001215417218208313,
+          "minimum": -7.75,
+          "sha256": "27804b31dca242a0ff7f5fe9a3b6c37ab85442e6ed000a9267c15636e50a62c2",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19974,
+      "adapter_voxel_hashes": {
+        "coors": "4700e48c62ca3c2ac67d08818b3468e327e2e8808f7a8c768f20ca09d65f2fdd",
+        "num_points": "a5aaed313eea5809fc01544bdb226828fd5d557a2e9cd5e096408e8354b5cd89",
+        "voxels": "27a67be2cc77d3f08fe2ad68c5daa4f1ce7b567347ae7869d98fd3bea631f91d"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 142,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.296875,
+          "mean": 0.07960155653508882,
+          "minimum": -7.87109375,
+          "sha256": "c3b96c79ada8d30d8a65dbe388d05975c3afb24efff691d93d78e5af0a8df65f",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.57421875,
+          "mean": -9.69162002092634,
+          "minimum": -47.53125,
+          "sha256": "9505470e60fcbfce398eca5a2c1dcf05663eacca111befe552a0769fc9bad80d",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 7.6640625,
+          "mean": 0.001215417218208313,
+          "minimum": -7.75,
+          "sha256": "27804b31dca242a0ff7f5fe9a3b6c37ab85442e6ed000a9267c15636e50a62c2",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19974,
+      "original_voxel_hashes": {
+        "coors": "4700e48c62ca3c2ac67d08818b3468e327e2e8808f7a8c768f20ca09d65f2fdd",
+        "num_points": "a5aaed313eea5809fc01544bdb226828fd5d557a2e9cd5e096408e8354b5cd89",
+        "voxels": "27a67be2cc77d3f08fe2ad68c5daa4f1ce7b567347ae7869d98fd3bea631f91d"
+      },
+      "point_count": 346436,
+      "point_dtype": "float32",
+      "point_shape": [
+        346436,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "6dc2a26035bbda328f4cd89bcc8170b3ce8b2f64f03f19f1fa7c6103935bbc4c",
+      "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+      "sample_index": 50,
+      "source_point_sha256": "6dc2a26035bbda328f4cd89bcc8170b3ce8b2f64f03f19f1fa7c6103935bbc4c",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 138,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.234375,
+          "mean": 0.10011039905606045,
+          "minimum": -6.85546875,
+          "sha256": "88b9e6d6b9ee4218629caf29cfca61c4279e4d6dc55085351f2a5702448903d4",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.1328125,
+          "mean": -10.027256741594588,
+          "minimum": -60.84375,
+          "sha256": "548f9da2de4c44d9ce6a1406a898288a9ac5cdb5ae061079b4072a46a5661aac",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.09375,
+          "mean": 0.0005873275910105024,
+          "minimum": -10.2265625,
+          "sha256": "7696e335e59a67e2086ccdab2d70b4dadf98e4a1ff59e9d1522cabbf1feda5a5",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 18207,
+      "adapter_voxel_hashes": {
+        "coors": "1622d05aa62bf9a00769858c6365a8fc8ce68bcfbba36cc6757c011aac65085d",
+        "num_points": "e2ea2f79737df033643e72764f572e17583816cb032fba4c1b1535f5f47f7860",
+        "voxels": "ef3030cf0322a939f53f4ed2d54926cf5cbafd6cba9f7bf7048163e7c31b8cf1"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 138,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 11.234375,
+          "mean": 0.10011039905606045,
+          "minimum": -6.85546875,
+          "sha256": "88b9e6d6b9ee4218629caf29cfca61c4279e4d6dc55085351f2a5702448903d4",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.1328125,
+          "mean": -10.027256741594588,
+          "minimum": -60.84375,
+          "sha256": "548f9da2de4c44d9ce6a1406a898288a9ac5cdb5ae061079b4072a46a5661aac",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 10.09375,
+          "mean": 0.0005873275910105024,
+          "minimum": -10.2265625,
+          "sha256": "7696e335e59a67e2086ccdab2d70b4dadf98e4a1ff59e9d1522cabbf1feda5a5",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 18207,
+      "original_voxel_hashes": {
+        "coors": "1622d05aa62bf9a00769858c6365a8fc8ce68bcfbba36cc6757c011aac65085d",
+        "num_points": "e2ea2f79737df033643e72764f572e17583816cb032fba4c1b1535f5f47f7860",
+        "voxels": "ef3030cf0322a939f53f4ed2d54926cf5cbafd6cba9f7bf7048163e7c31b8cf1"
+      },
+      "point_count": 347495,
+      "point_dtype": "float32",
+      "point_shape": [
+        347495,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "18826e0168d64293438f4a4acf3d99f211f3c3838994600e47b376efc2724d55",
+      "sample_id": "609d5177362340458a3bfd4949cd1e64",
+      "sample_index": 54,
+      "source_point_sha256": "18826e0168d64293438f4a4acf3d99f211f3c3838994600e47b376efc2724d55",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 117,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.7421875,
+          "mean": 0.09383930402019668,
+          "minimum": -13.578125,
+          "sha256": "775c0850b9f5a2bf2dc59b5077accfd03a101aeb1535de18cff8a82c1868310f",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.732421875,
+          "mean": -9.178208443603516,
+          "minimum": -32.90625,
+          "sha256": "1b3ef207890310f0e3943faccd93d363b67151edd982bdb0b83fcb015c04b8f8",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.46875,
+          "mean": -8.736500399453299e-05,
+          "minimum": -5.45703125,
+          "sha256": "238a47f866f47b392f344324cce711d670dda17e8c7bc7dd6d08d4c3238e2fd4",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19134,
+      "adapter_voxel_hashes": {
+        "coors": "5131fbed222f8b99176f31477d193e9345c23f2292def027d4144e0701b58adb",
+        "num_points": "6b230fcd1756db9575d0f931cfc105922aeedb35a96167f315a672a1a04fd758",
+        "voxels": "9f6c68d9ad6876d759310e6c4e99ff65c2a1ec8367f6daa7fcaf7c1d321e793e"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 117,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.7421875,
+          "mean": 0.09383930402019668,
+          "minimum": -13.578125,
+          "sha256": "775c0850b9f5a2bf2dc59b5077accfd03a101aeb1535de18cff8a82c1868310f",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 2.732421875,
+          "mean": -9.178208443603516,
+          "minimum": -32.90625,
+          "sha256": "1b3ef207890310f0e3943faccd93d363b67151edd982bdb0b83fcb015c04b8f8",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.46875,
+          "mean": -8.736500399453299e-05,
+          "minimum": -5.45703125,
+          "sha256": "238a47f866f47b392f344324cce711d670dda17e8c7bc7dd6d08d4c3238e2fd4",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19134,
+      "original_voxel_hashes": {
+        "coors": "5131fbed222f8b99176f31477d193e9345c23f2292def027d4144e0701b58adb",
+        "num_points": "6b230fcd1756db9575d0f931cfc105922aeedb35a96167f315a672a1a04fd758",
+        "voxels": "9f6c68d9ad6876d759310e6c4e99ff65c2a1ec8367f6daa7fcaf7c1d321e793e"
+      },
+      "point_count": 349245,
+      "point_dtype": "float32",
+      "point_shape": [
+        349245,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "9e78b54a2cc0cf07e468cac9d837a031b55f8c892bb4cacd1ddcf06361c80d3e",
+      "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+      "sample_index": 58,
+      "source_point_sha256": "9e78b54a2cc0cf07e468cac9d837a031b55f8c892bb4cacd1ddcf06361c80d3e",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 79,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.68359375,
+          "mean": 0.08366957260455404,
+          "minimum": -12.5859375,
+          "sha256": "b58fdf58fa46784167a727da0c983495735eb3659138cf9919b3b47b99174223",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.126953125,
+          "mean": -9.089556774379185,
+          "minimum": -27.890625,
+          "sha256": "b89257fbea695498fc3618ba694751d01faa8ba1a90bdbb9d98400c598570168",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.65234375,
+          "mean": 0.002010265885932105,
+          "minimum": -5.7421875,
+          "sha256": "e9a7ed70765a782f9bb9783a84afb66fa0571a0dbd4b9f6e7e29f16772d373b7",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 16074,
+      "adapter_voxel_hashes": {
+        "coors": "2a382bbd4c817860801a2727382aa8a7d5a921977d7d39028564d67ed728bada",
+        "num_points": "3ec7cff94a6800e29ed5d284bd004b86462a2d064bb7d18a423bb5cabc2f1e71",
+        "voxels": "6f73c6dca03b9c692d1703de14ec5e45e39bddbdad7197cadde9963c084ea0d2"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 79,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.68359375,
+          "mean": 0.08366957260455404,
+          "minimum": -12.5859375,
+          "sha256": "b58fdf58fa46784167a727da0c983495735eb3659138cf9919b3b47b99174223",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.126953125,
+          "mean": -9.089556774379185,
+          "minimum": -27.890625,
+          "sha256": "b89257fbea695498fc3618ba694751d01faa8ba1a90bdbb9d98400c598570168",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.65234375,
+          "mean": 0.002010265885932105,
+          "minimum": -5.7421875,
+          "sha256": "e9a7ed70765a782f9bb9783a84afb66fa0571a0dbd4b9f6e7e29f16772d373b7",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 16074,
+      "original_voxel_hashes": {
+        "coors": "2a382bbd4c817860801a2727382aa8a7d5a921977d7d39028564d67ed728bada",
+        "num_points": "3ec7cff94a6800e29ed5d284bd004b86462a2d064bb7d18a423bb5cabc2f1e71",
+        "voxels": "6f73c6dca03b9c692d1703de14ec5e45e39bddbdad7197cadde9963c084ea0d2"
+      },
+      "point_count": 340767,
+      "point_dtype": "float32",
+      "point_shape": [
+        340767,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "8342b3e74498c9b2a78223abe7151f381f1f9f5d8f44d89088f834783ee40148",
+      "sample_id": "8573a885a7cb41d185c05029eeb9a54e",
+      "sample_index": 63,
+      "source_point_sha256": "8342b3e74498c9b2a78223abe7151f381f1f9f5d8f44d89088f834783ee40148",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 84,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.4140625,
+          "mean": 0.055352421776016084,
+          "minimum": -7.6328125,
+          "sha256": "9d7eacddf3a036bd0f905fbc4c08a2c2a5573ad670224d9217e31b3bc50016a8",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.220703125,
+          "mean": -9.048190534842355,
+          "minimum": -28.96875,
+          "sha256": "185a6c676e2adac1364e6373c95b3b538c62e78a6d9cea174b4bcd2b6e36e92b",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 6.6328125,
+          "mean": 0.00237170102255685,
+          "minimum": -6.66796875,
+          "sha256": "4fa4250377fe6029947018f7f90349218924f38c20b37165915e188c10bd97f3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 17921,
+      "adapter_voxel_hashes": {
+        "coors": "0c8e6d63072cee46873a40b343996d10e86a238e42dfc74442a379a7d6f6826f",
+        "num_points": "0ad8071cf69fedc0118e1e12a663fc95df915e945fc879e4610969b637d4e41b",
+        "voxels": "f6a47b7ea41559cfd84c8268cd78b904e1ba8b317644a188fee88977df69a0d1"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 84,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.4140625,
+          "mean": 0.055352421776016084,
+          "minimum": -7.6328125,
+          "sha256": "9d7eacddf3a036bd0f905fbc4c08a2c2a5573ad670224d9217e31b3bc50016a8",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.220703125,
+          "mean": -9.048190534842355,
+          "minimum": -28.96875,
+          "sha256": "185a6c676e2adac1364e6373c95b3b538c62e78a6d9cea174b4bcd2b6e36e92b",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 6.6328125,
+          "mean": 0.00237170102255685,
+          "minimum": -6.66796875,
+          "sha256": "4fa4250377fe6029947018f7f90349218924f38c20b37165915e188c10bd97f3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 17921,
+      "original_voxel_hashes": {
+        "coors": "0c8e6d63072cee46873a40b343996d10e86a238e42dfc74442a379a7d6f6826f",
+        "num_points": "0ad8071cf69fedc0118e1e12a663fc95df915e945fc879e4610969b637d4e41b",
+        "voxels": "f6a47b7ea41559cfd84c8268cd78b904e1ba8b317644a188fee88977df69a0d1"
+      },
+      "point_count": 342907,
+      "point_dtype": "float32",
+      "point_shape": [
+        342907,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "8ead2602074f8b2eb66efa14a773dde3140298e768daf6bc13a947bdea30b32c",
+      "sample_id": "7bebe3c9be714f02837f8617c56df122",
+      "sample_index": 67,
+      "source_point_sha256": "8ead2602074f8b2eb66efa14a773dde3140298e768daf6bc13a947bdea30b32c",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 85,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.1953125,
+          "mean": 0.06605044237143463,
+          "minimum": -8.28125,
+          "sha256": "86ac461755f28be0e04da4dd6c7744371cf3180845651531bceff659e90b7fd5",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.376953125,
+          "mean": -9.16254568359375,
+          "minimum": -26.65625,
+          "sha256": "0170f1e12099d4d710dd28ead6f00eb7ae363a01e36f813babfebf2d62ace377",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.765625,
+          "mean": 0.0017015483711447035,
+          "minimum": -5.796875,
+          "sha256": "05b8161719c8d3e1b30f52d902013b717d73d7b2b289ee1b1fde1b97dc968ce3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 18602,
+      "adapter_voxel_hashes": {
+        "coors": "b0db2f5d5fa0b551a47d23f89681bf1603ff1f745883797c51fc4e9313a96367",
+        "num_points": "1561c4b232d988dbfe611392ff44119b8c651d232862579cb87b5e8b51654642",
+        "voxels": "d9d810eca51679193a98d9dd4ee81962dd50eaac936bd258c2db313066c1afc6"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 85,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 8.1953125,
+          "mean": 0.06605044237143463,
+          "minimum": -8.28125,
+          "sha256": "86ac461755f28be0e04da4dd6c7744371cf3180845651531bceff659e90b7fd5",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.376953125,
+          "mean": -9.16254568359375,
+          "minimum": -26.65625,
+          "sha256": "0170f1e12099d4d710dd28ead6f00eb7ae363a01e36f813babfebf2d62ace377",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 5.765625,
+          "mean": 0.0017015483711447035,
+          "minimum": -5.796875,
+          "sha256": "05b8161719c8d3e1b30f52d902013b717d73d7b2b289ee1b1fde1b97dc968ce3",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 18602,
+      "original_voxel_hashes": {
+        "coors": "b0db2f5d5fa0b551a47d23f89681bf1603ff1f745883797c51fc4e9313a96367",
+        "num_points": "1561c4b232d988dbfe611392ff44119b8c651d232862579cb87b5e8b51654642",
+        "voxels": "d9d810eca51679193a98d9dd4ee81962dd50eaac936bd258c2db313066c1afc6"
+      },
+      "point_count": 338012,
+      "point_dtype": "float32",
+      "point_shape": [
+        338012,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "e586073c24cd4964f9e7bdd6403bc29c7034288152053826b82a652db457c10e",
+      "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+      "sample_index": 71,
+      "source_point_sha256": "e586073c24cd4964f9e7bdd6403bc29c7034288152053826b82a652db457c10e",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 91,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.02734375,
+          "mean": 0.08529175745090321,
+          "minimum": -5.5625,
+          "sha256": "b9eb96115fb074a0f00e56973637b6bf8955602bf4af737b34ff417a57f7d0b6",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.083984375,
+          "mean": -9.11463230154855,
+          "minimum": -26.125,
+          "sha256": "7672f2c4305be8f8297b7085c5c3101ebab104f8009728790587aeebe6a68276",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 6.29296875,
+          "mean": 0.0015506850361824036,
+          "minimum": -6.33984375,
+          "sha256": "45ecfafdbc53bac9beb76c2b92a693c4bf00bf356a0e3c5ab888f51d692ad551",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 19262,
+      "adapter_voxel_hashes": {
+        "coors": "4c504ac81409e7b000f01ffa95a14be5b50f392c1df4ea538c87b0d55ca05e24",
+        "num_points": "d42f7941d5d7e07ddbfaf757829e98de14f1876a8e4b59aa28a5cbde8b74ea2c",
+        "voxels": "4b5de84b2b4ff1c3db339c73190e7a3774adb3bb4ef826b90626e64b8d5dc0b5"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 91,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.02734375,
+          "mean": 0.08529175745090321,
+          "minimum": -5.5625,
+          "sha256": "b9eb96115fb074a0f00e56973637b6bf8955602bf4af737b34ff417a57f7d0b6",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 3.083984375,
+          "mean": -9.11463230154855,
+          "minimum": -26.125,
+          "sha256": "7672f2c4305be8f8297b7085c5c3101ebab104f8009728790587aeebe6a68276",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 6.29296875,
+          "mean": 0.0015506850361824036,
+          "minimum": -6.33984375,
+          "sha256": "45ecfafdbc53bac9beb76c2b92a693c4bf00bf356a0e3c5ab888f51d692ad551",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 19262,
+      "original_voxel_hashes": {
+        "coors": "4c504ac81409e7b000f01ffa95a14be5b50f392c1df4ea538c87b0d55ca05e24",
+        "num_points": "d42f7941d5d7e07ddbfaf757829e98de14f1876a8e4b59aa28a5cbde8b74ea2c",
+        "voxels": "4b5de84b2b4ff1c3db339c73190e7a3774adb3bb4ef826b90626e64b8d5dc0b5"
+      },
+      "point_count": 337553,
+      "point_dtype": "float32",
+      "point_shape": [
+        337553,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "874fe1dc5d6dcca95642b859d2ca93b0f225038b0427d7ecd4d7caa1aa517829",
+      "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+      "sample_index": 75,
+      "source_point_sha256": "874fe1dc5d6dcca95642b859d2ca93b0f225038b0427d7ecd4d7caa1aa517829",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    },
+    {
+      "adapter_detection_count": 134,
+      "adapter_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.28125,
+          "mean": 0.06235611447253161,
+          "minimum": -8.2109375,
+          "sha256": "5e3b499bdd4eaf2072bef64db059cd2ba95873938b7cf55c3dae40f26e4128a9",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 1.99609375,
+          "mean": -8.95280069859096,
+          "minimum": -28.0625,
+          "sha256": "d69fc7fb8d1098ff02a683f2b8cc47c90172c20494e01481afdebc6211f83b07",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 4.57421875,
+          "mean": 0.0011214316070079803,
+          "minimum": -4.6015625,
+          "sha256": "43cd00c3a00a00a6d59d14b9cf71f038452d6e0c5d868ff98791a807736e7b07",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "adapter_voxel_count": 18528,
+      "adapter_voxel_hashes": {
+        "coors": "c3bfcf6c15f46db087c1289b11092e2579c962f87ecc46eea89c2dd0ad2e45ce",
+        "num_points": "c9cfbab9024c00a4150aa8132536c266931336727a67526ef4713e0deff4bee6",
+        "voxels": "a6b4f87e39106e65c56d38d42caa1bad09d6b1555fccfc0038fa467ae678095e"
+      },
+      "final_detections_exact": true,
+      "original_detection_count": 134,
+      "original_raw_outputs": {
+        "bbox_pred": {
+          "dtype": "float32",
+          "maximum": 7.28125,
+          "mean": 0.06235611447253161,
+          "minimum": -8.2109375,
+          "sha256": "5e3b499bdd4eaf2072bef64db059cd2ba95873938b7cf55c3dae40f26e4128a9",
+          "shape": [
+            1,
+            126,
+            200,
+            200
+          ]
+        },
+        "cls_score": {
+          "dtype": "float32",
+          "maximum": 1.99609375,
+          "mean": -8.95280069859096,
+          "minimum": -28.0625,
+          "sha256": "d69fc7fb8d1098ff02a683f2b8cc47c90172c20494e01481afdebc6211f83b07",
+          "shape": [
+            1,
+            140,
+            200,
+            200
+          ]
+        },
+        "dir_cls_pred": {
+          "dtype": "float32",
+          "maximum": 4.57421875,
+          "mean": 0.0011214316070079803,
+          "minimum": -4.6015625,
+          "sha256": "43cd00c3a00a00a6d59d14b9cf71f038452d6e0c5d868ff98791a807736e7b07",
+          "shape": [
+            1,
+            28,
+            200,
+            200
+          ]
+        }
+      },
+      "original_voxel_count": 18528,
+      "original_voxel_hashes": {
+        "coors": "c3bfcf6c15f46db087c1289b11092e2579c962f87ecc46eea89c2dd0ad2e45ce",
+        "num_points": "c9cfbab9024c00a4150aa8132536c266931336727a67526ef4713e0deff4bee6",
+        "voxels": "a6b4f87e39106e65c56d38d42caa1bad09d6b1555fccfc0038fa467ae678095e"
+      },
+      "point_count": 340695,
+      "point_dtype": "float32",
+      "point_shape": [
+        340695,
+        4
+      ],
+      "point_values_exact": true,
+      "raw_outputs_exact": true,
+      "ros_roundtrip_point_sha256": "00d92867af44efbc0dc0dc488376ffce162b7f955b1db8f36422bafbce5f8a61",
+      "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+      "sample_index": 80,
+      "source_point_sha256": "00d92867af44efbc0dc0dc488376ffce162b7f955b1db8f36422bafbce5f8a61",
+      "status": "pass",
+      "voxel_hashes_exact": true
+    }
+  ],
+  "schema_version": "1.0",
+  "status": "pass"
+}

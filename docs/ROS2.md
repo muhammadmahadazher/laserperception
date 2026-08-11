@@ -142,10 +142,16 @@ The M3 benchmark records two distinct boundaries:
    sensor-to-actuator latency.
 
 The protocol repeats mini_val index 0, performs 20 warmups and 200 measured messages at a synthetic
-20 Hz, and reports full distribution, deadline, count, effective-rate, and queue evidence. The
-first diagnostic failed both the callback-median and sustained-rate gates; see
-`benchmarks/m3/README.md`. M3B is indicated for review, but no optimization, postprocess change, or
-bottleneck assumption is part of M3A.
+20 Hz, and reports full distribution, deadline, count, effective-rate, and queue evidence. At exact
+implementation commit `d54da837602de2924825d3045cb4a17b72c5b7b0`, replay held 19.945 Hz but
+callback median/P95 were 238.255/274.637 ms and same-host loopback median/P95 were
+303.283/352.550 ms. All 200 observations in both boundaries exceeded 50 ms. The detector produced
+221 outputs from 1,096 published inputs (875 bounded-QoS input drops), for 3.990 Hz effective output;
+there was no rejected message, detector-to-sink loss, or final processing backlog.
+
+The M3A gate therefore failed. See `benchmarks/m3/README.md` and its diagnostic-only JSON. M3B is
+indicated for review, but no optimization, postprocess change, profiling claim, or bottleneck
+assumption is part of M3A.
 
 ## Live-sensor limitation
 

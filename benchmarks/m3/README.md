@@ -20,8 +20,10 @@ official nuScenes multi-sweep preparation
 ```
 
 The gate requires exact point values/hashes, voxel hashes, raw output hashes/statistics, and final
-detections. Generated full evidence stays in the external M3 cache until a sanitized exact-commit
-diagnostic record is reviewed.
+detections. It passed at implementation commit
+`d54da837602de2924825d3045cb4a17b72c5b7b0`; the sanitized record is
+[`diagnostics/roundtrip_d54da83.json`](diagnostics/roundtrip_d54da83.json) with file SHA256
+`bea49823e3d8547e405f1ceef1e4a9a2efe20ba9cff85ddf537171bf332c7462`.
 
 ## Preregistered performance protocol
 
@@ -41,14 +43,28 @@ separate sink's reception time. Boundary B is not sensor-to-actuator latency.
 
 ## M3A rate-gate disposition
 
-The first diagnostic completed all messages without a final backlog or processing-induced loss,
-but failed the preregistered callback-median and approximately-20-Hz rate requirements. Therefore:
+The exact-commit diagnostic at `d54da837602de2924825d3045cb4a17b72c5b7b0` failed every
+rate/deadline criterion while the replay itself held 19.945 Hz:
+
+| Boundary | Count | Mean | Median | P90 | P95 | Min | Max | Population std | >50 ms |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Callback processing | 200 | 239.026 ms | 238.255 ms | 267.840 ms | 274.637 ms | 191.421 ms | 344.951 ms | 22.306 ms | 200 (100%) |
+| Same-host loopback | 200 | 312.519 ms | 303.283 ms | 348.865 ms | 352.550 ms | 266.044 ms | 468.693 ms | 30.699 ms | 200 (100%) |
+
+The replay published 1,096 messages; the detector received/accepted/published 221 and the sink
+received all 221 outputs. Bounded best-effort input QoS discarded 875 stale messages. There was no
+rejection, detector-to-sink transport loss, or final processing backlog. Effective output rate was
+3.990 Hz (19.95% of requested sensor rate).
+
+Therefore:
 
 - there is no accepted/canonical M3 result under `benchmarks/m3/results/`;
 - M3A status is `FAIL — review required`;
 - M3B is indicated but not authorized;
 - no postprocessing or other runtime optimization was attempted; and
-- no bottleneck cause is claimed without a separate measured M3 pipeline profile.
+- no bottleneck cause is claimed without a separately authorized measured M3 pipeline profile.
 
-An exact-commit sanitized failed diagnostic will be retained under `benchmarks/m3/diagnostics/` for
-review. Failed diagnostic values must not be marketed as accepted M3 performance.
+The sanitized failed record is
+[`diagnostics/failed_rate_d54da83.json`](diagnostics/failed_rate_d54da83.json), file SHA256
+`47cbd7e58c995ee42a0e4dee4f4d6ac56eaae91baf85425c287847bf5fb5ac43`. These values are diagnostic,
+not accepted M3 performance.
