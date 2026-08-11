@@ -1,14 +1,14 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **Partial M2 implementation; ONNX/engine pass, frozen FP16 parity fails.**
+Status: **Partial M2; parity v1 failed, and parity v2 is preregistered but not yet run.**
 
-## Measured M2 outcome
+## Parity v1 — measured failure
 
 Gate 0 passed, all 81 `mini_val` samples were profiled, ONNX export/checking passed, and the
 official TensorRT FP16 engine built and executed. The unchanged 20-sample parity suite then failed
 four locked high-confidence guards at implementation commit
-`a9314483e0ba7a191866266080c3147f9d902956`. M2 is therefore partial and requires architecture
-review; no benchmark was run or promoted.
+`a9314483e0ba7a191866266080c3147f9d902956`. M2 is therefore partial. This authoritative v1
+result remains failed, and no benchmark was run or promoted.
 
 | Evidence | Result |
 |---|---|
@@ -53,10 +53,49 @@ running FP16 with TF32 disabled reproduced the original failed guards. The MMDep
 timebox is exhausted, so no layer-precision override, model change, threshold relaxation, or
 benchmark promotion was attempted.
 
+## Architecture review and preregistered parity v2
+
+Architecture review found that v1 applied hard per-box maxima after discontinuous decisions,
+including the two-class direction argmax and NMS. The microscopic v1 medians and rare large maxima
+motivated a separately versioned protocol; they do not invalidate v1 and do not make it pass. The
+PointPillars direction head adds pi to final yaw according to its selected direction class, so a
+near-tied two-logit argmax can yield an approximately 180-degree heading change even when the
+rectangular box axes remain nearly identical. Such a result is described as **geometrically
+axis-equivalent but heading-divergent**, not harmless.
+
+Parity v2 is frozen in `configs/detection/m2_parity_v2.yaml` before its first run. It keeps the
+same 20 indices, checkpoint, upstream commits, ONNX, FP16 engine, preprocessing, voxelization,
+postprocessing, class-wise matching, 0.50 BEV IoU, score thresholds, count guards, 0.99 coverage,
+and numerical tolerances. Its Stage 1 gate changes only the aggregate continuous rule:
+
+- at least 99% of high-confidence matched detections must meet the unchanged 0.25 m XY tolerance;
+- at least 99% must meet the unchanged 0.25 m absolute-Z tolerance;
+- at least 99% must have all three L/W/H relative errors at or below the unchanged 5% tolerance;
+- at least 99% must meet the unchanged 0.05 score tolerance;
+- at least 99% must meet the unchanged 5° modulo-pi geometric box-axis yaw tolerance;
+- final heading/direction agreement must be at least 99%; and
+- class-name mismatches remain forbidden.
+
+Every failed detection stays in its metric denominator and is recorded. A distinct-outlier count
+also counts one matched detection once when it violates multiple continuous metrics. Full circular
+heading error remains separately visible from modulo-pi axis error.
+
+The low-cost direction diagnostic covers all anchors and the union of the official `nms_pre`
+candidate pools selected by either runtime. It reports direction argmax disagreements and PyTorch
+and TensorRT winning-logit margins. Raw `cls_score`, `bbox_pred`, and `dir_cls_pred` differences
+report count, median, p95, p99, maximum, and mean with shape/dtype consistency.
+
+Stage 1 alone determines v2 PASS/FAIL. Detailed pre-NMS survivor provenance is required only for
+targeted Stage 2 diagnosis after a Stage 1 failure; no output is labeled an NMS survivor swap
+without competing-candidate, suppression, survivor, and ordering evidence. The first v2 run must
+reuse engine SHA256 `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b`.
+No mixed precision or rebuild is authorized. Even if v2 passes, benchmarking waits for review.
+
 M2 deploys the exact M1 pretrained PointPillars model through ONNX and TensorRT FP16. It does not
 train, simplify, or replace the model. The frozen scientific configuration is
-`configs/detection/m2_pointpillars_tensorrt.yaml`; the acceptance policy is
-`configs/detection/m2_parity.yaml`.
+`configs/detection/m2_pointpillars_tensorrt.yaml`. The byte-identical historical v1 policy is
+`configs/detection/m2_parity_v1.yaml`; the preregistered current policy is
+`configs/detection/m2_parity_v2.yaml`.
 
 ## Upstream support and pins
 
@@ -128,17 +167,18 @@ The preprocessing-only profiler scanned all 81 observed `mini_val` samples. Voxe
 shapes. The maximum retains the official MMDeploy 30,000-voxel bound, exceeds the measured 25%
 headroom target, and remains below the upstream 40,000 validation limit. Every parity sample fit.
 
-## Frozen parity protocol
+## Frozen samples and shared execution
 
 The parity set is fixed at indices 0, 4, 8, 12, 16, 21, 25, 29, 33, 37, 42, 46, 50, 54, 58, 63,
 67, 71, 75, and 80. Final boxes are matched class-wise, deterministically and one-to-one, with a
 minimum candidate BEV IoU of 0.50. The exported threshold is 0.25, the symmetric high-confidence
 guard is 0.30, and the threshold-edge diagnostic band is 0.20–0.30 inclusive.
 
-The exact count, coverage, center, size, yaw, score, and class-name acceptance limits live in the
-parity configuration. They cannot be relaxed after observing FP16 output. Failed evidence must be
-classified as preprocessing mismatch, profile/binding failure, network numerical difference,
-postprocessing mismatch, or threshold-edge difference.
+The exact v1 and v2 acceptance semantics live in their versioned parity configurations. V2 does
+not loosen any numerical threshold: it preregisters a 99% per-detection aggregate rule, separates
+geometric axis yaw from direction agreement, and records every exception. A Stage 1 failure
+triggers only targeted Stage 2 forensics; a Stage 1 pass stops parity investigation and waits for
+review before the benchmark.
 
 ## Performance protocol
 
@@ -165,7 +205,7 @@ environment without private absolute paths.
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
 engine download. The ONNX and engine metadata above are measured build evidence. M2 itself
-remains partial because parity failed; no same-session benchmark result is accepted or committed.
+remains partial because v2 has not run; no same-session benchmark result is accepted or committed.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded

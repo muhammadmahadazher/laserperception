@@ -8,6 +8,9 @@ releases begin.
 
 ### Changed
 
+- Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate
+  staged parity v2 protocol with unchanged samples, artifacts, thresholds, and numerical
+  tolerances plus per-detection 99% acceptance and explicit direction diagnostics.
 - Recorded M2 as partial after the unchanged 20-sample TensorRT FP16 parity suite failed four
   high-confidence guards; benchmark promotion remains blocked pending architecture review.
 

@@ -1,0 +1,133 @@
+schema_version: "2.0"
+protocol_version: 2
+milestone: M2
+status: protocol_frozen_before_measurement
+
+reference_to:
+  protocol_v1: configs/detection/m2_parity_v1.yaml
+  v1_status: failed
+  v1_measurement_commit: a9314483e0ba7a191866266080c3147f9d902956
+  v1_external_result_sha256: f6474c365f8fc3d8595db813d1d23258574e4d0448e73473d68bf817f297e534
+
+rationale: >-
+  Protocol v1 applied hard maximum continuous-error bounds to final detections after
+  discontinuous direction argmax and NMS operations. Its evidence showed microscopic medians
+  with rare large maxima. PointPillars uses a two-class direction head, and final yaw adds pi
+  according to the selected direction class; a near-tied direction-logit argmax can therefore
+  produce an approximately 180-degree heading difference while retaining an almost identical
+  geometric box axis. Protocol v2 preserves every sample, artifact, execution path, threshold,
+  matching rule, and numerical tolerance. It changes only the aggregate continuous acceptance
+  rule to a per-detection 99-percent pass fraction, separates modulo-pi box-axis yaw from heading
+  agreement, and retains every exception. This refinement does not retroactively alter or pass
+  the authoritative v1 failure.
+
+frozen_artifacts:
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  onnx_sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+  tensorrt_fp16_engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+  engine_rebuild_before_first_v2_run: false
+  layer_precision_changes: false
+
+dataset:
+  name: nuScenes
+  version: v1.0-mini
+  split: mini_val
+  observed_split_size: 81
+  sample_indices: [0, 4, 8, 12, 16, 21, 25, 29, 33, 37, 42, 46, 50, 54, 58, 63, 67, 71, 75, 80]
+  replacement_allowed: false
+
+thresholds:
+  exported_detection: 0.25
+  high_confidence_guard: 0.30
+  threshold_edge_band:
+    minimum_inclusive: 0.20
+    maximum_inclusive: 0.30
+
+matching:
+  class_wise: true
+  reference: pytorch
+  reference_order: descending_score_then_detection_sort_key
+  candidate_selection: maximum_bev_iou_among_unmatched_tensorrt_detections
+  minimum_bev_iou: 0.50
+  one_to_one: true
+  scipy_required: false
+
+stage_1_acceptance:
+  count_guards:
+    per_sample_maximum_absolute_difference: max(1,ceil(0.05*pytorch_count))
+    aggregate_maximum_relative_difference: 0.05
+  high_confidence_match_coverage:
+    pytorch_to_tensorrt_minimum: 0.99
+    tensorrt_to_pytorch_minimum: 0.99
+  matched_high_confidence:
+    minimum_per_detection_pass_fraction: 0.99
+    maximum_xy_center_displacement_m: 0.25
+    maximum_absolute_z_center_difference_m: 0.25
+    maximum_relative_error_per_lwh_dimension: 0.05
+    dimensions_detection_passes_only_if_all_lwh_pass: true
+    maximum_absolute_score_difference: 0.05
+    maximum_axis_yaw_difference_degrees_modulo_pi: 5.0
+    minimum_heading_direction_agreement: 0.99
+    maximum_class_name_mismatches: 0
+  distinct_continuous_outlier_policy:
+    count_each_detection_match_once: true
+    retained_in_denominator: true
+    record_failed_metrics: true
+
+direction_diagnostics:
+  output_name: dir_cls_pred
+  classes_per_anchor: 2
+  direction_class: argmax_two_logits
+  winning_margin: abs(logit_0_minus_logit_1)
+  all_anchors: true
+  decision_relevant_population: union_of_official_nms_pre_candidate_pools
+  nms_pre_source: pinned_mmdetection3d_model_test_config
+  arbitrary_candidate_threshold_allowed: false
+  final_heading_disagreement_rule: full_circular_yaw_difference_greater_than_90_degrees
+  heading_divergence_description: geometrically_axis-equivalent_but_heading-divergent
+
+raw_network_diagnostics:
+  tensors: [cls_score, bbox_pred, dir_cls_pred]
+  absolute_difference_statistics: [count, median, p95, p99, maximum, mean]
+  report_shape_consistency: true
+  report_dtype_consistency: true
+
+threshold_edge_policy:
+  classification_allowed_only_when_either_score_is_in_band: true
+  record_every_disagreement: true
+  excluded_from_high_confidence_coverage: false
+
+shared_execution_requirements:
+  identical_source_sample_and_sweeps: true
+  identical_official_voxelization: true
+  identical_voxel_tensors: true
+  identical_official_postprocessing: true
+  frozen_samples_must_fit_engine_profile: true
+  profile_overflow_is_parity_failure: false
+  profile_overflow_classification: profile_or_binding_failure
+
+stage_2_forensics:
+  required_only_after_stage_1_failure: true
+  confirmed_nms_survivor_swap_requires_pre_nms_evidence: true
+  missing_causal_evidence_must_not_be_labeled_nms_swap: true
+  failure_to_implement_full_traceability_is_not_a_parity_failure: true
+
+contingency:
+  targeted_direction_head_fp32_diagnostic:
+    preregistered: true
+    authorized: false
+    eligible_only_if_heading_direction_agreement_is_the_only_failed_stage_1_gate: true
+  blanket_mixed_precision_authorized: false
+
+policy:
+  v1_result_may_be_reinterpreted_as_pass: false
+  numerical_tolerances_may_change_after_evidence: false
+  samples_may_be_removed: false
+  classes_may_be_removed: false
+  preprocessing_may_change: false
+  voxelization_may_change: false
+  postprocessing_may_change: false
+  matching_may_change: false
+  nms_may_change: false
+  engine_may_be_rebuilt_before_first_v2_run: false
+  benchmark_allowed_in_protocol_commit: false
