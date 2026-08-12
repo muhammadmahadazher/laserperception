@@ -172,14 +172,49 @@ detector_fidelity:
   aggregate_maximum_exported_count_relative_difference: 0.005
 
 performance:
+  status: frozen_before_full_measurement
   warmups: 20
   measurements: 100
   sustained_gpu_warmup_seconds: 30
   timing: synchronized_time_perf_counter_wall_clock
   telemetry_interval_seconds: 0.5
   telemetry_during_measured_blocks: true
+  require_ac_power_when_host_state_is_available: true
+  clock_locking_required: false
+  clock_capability_and_setting_recorded: true
   reject_obvious_reference_candidate_gpu_state_mismatch: true
-
+  gpu_state_rejection:
+    rule: disjoint_performance_states_corroborated_by_disjoint_observed_clock_ranges
+    universal_mhz_threshold: null
+  hard_voxel_layer_inputs: same_pre_collated_cuda_points
+  complete_preprocessing_boundary:
+    start: prepared_model_ready_sample_before_collation
+    end: voxelized_sample_with_padded_batch_coordinates
+  direct_e2e_boundary:
+    start: model_ready_point_cloud
+    end: detection_frame_with_selected_provenance_metadata
+  direct_e2e_paths:
+    reference: official_deterministic_voxelizer_then_frozen_tensorrt
+    candidate: exact_fast_candidate_voxelizer_then_frozen_tensorrt
+  provenance_modes:
+    full: historical_exact_voxel_hash_metadata
+    live: lightweight_semantic_metadata_without_per_frame_full_voxel_hashes
+  candidate_component_ledger_workloads: [W1, W2]
+  candidate_component_ledger:
+    - model_ready_preparation
+    - cpu_to_cuda_collation
+    - candidate_voxelization
+    - tensorrt_raw
+    - official_postprocess
+    - detection_frame_semantic_conversion
+    - provenance
+    - unattributed_residual
+    - total_e2e
+  direct_e2e_classification_ms:
+    direct_20_hz_feasibility_demonstrated: [0, 50]
+    close_subsequent_measured_bottleneck_optimization_may_be_justified: [50, 75]
+    meaningful_acceleration_20_hz_not_demonstrated: [75, 100]
+    insufficient_for_current_20_hz_goal: [100, null]
 scope:
   production_candidate_adoption_allowed: false
   deterministic_false_allowed: false

@@ -61,6 +61,10 @@ releases begin.
 
 ### Added
 
+- Added the diagnostic-only M3B-V2 exact deterministic GPU-tensor voxelizer prototype, with
+  fail-closed 81-sample/repeatability/detector gates and a telemetry-backed same-session
+  performance/component-ledger protocol. The candidate remains outside production runtime.
+
 - Isolated ROS 2 Humble Python package with one-time TensorRT initialization, bounded QoS,
   Detection3DArray conversion, nuScenes replay, per-frame visualization markers, launch/config,
   official setup, and ROS-native tests without adding ROS to the core wheel.
