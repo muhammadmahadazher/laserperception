@@ -23,19 +23,23 @@ direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 merged as
 
 ## Project status
 
-### Review required: M3A — ROS 2 interface rate gate failed
+### Review required: M3B-V2 — exact candidate measured, not integrated
 
 M3A adds a ROS 2 Humble Python package for model-ready multi-sweep PointCloud2 input, the unchanged
 M2 TensorRT FP16 runtime, canonical Detection3DArray output, nuScenes replay, and RViz/Foxglove
-markers. The exact 20-sample PointCloud2 round-trip fidelity gate passes.
+markers. The exact 20-sample PointCloud2 round-trip fidelity gate passes, but the first 20 Hz ROS
+diagnostic failed its callback-median and sustained-rate gates, so no M3 result is canonical.
 
-The first 20 Hz diagnostic failed the preregistered callback-median and sustained-rate gates, so no
-M3 result is canonical. The authorized diagnostic-only M3B-V1 experiment found the official hard
-deterministic voxelizer to be the dominant W1/W2 stage, but the faster nondeterministic candidate
-did not demonstrate 20 Hz and failed W2 repeatability against the existing detector yardstick. It
-was not adopted. No postprocessing optimization, raw single-sweep adapter, tracking, model change,
-or M4 work has started. See [`docs/ROS2.md`](docs/ROS2.md) and
-[`benchmarks/m3/VOXELIZATION_V1.md`](benchmarks/m3/VOXELIZATION_V1.md).
+M3B-V1 identified deterministic hard voxelization as the full-history bottleneck; its
+deterministic=False candidate was rejected after W2 repeatability/fidelity failed. M3B-V2 then
+measured a PyTorch/MMCV exact-semantics candidate at commit
+85b6488c92eda266f049ff142fc06bdab658d7ed: all 81 voxel samples, both 30-run repeatability suites,
+and all 20 detector samples were exact. Candidate W1/W2 direct E2E medians were 55.416/57.854 ms
+with historical full provenance and 43.168/45.971 ms with explicit live provenance. The candidate
+is promising but remains experimental pending reviewer authorization and a new ROS rate gate. No
+postprocess or ROS/DDS optimization, raw single-sweep adapter, tracking, model change, or M4 work
+has started. See [docs/ROS2.md](docs/ROS2.md) and
+[benchmarks/m3/VOXELIZATION_V2.md](benchmarks/m3/VOXELIZATION_V2.md).
 
 ### Existing experimental infrastructure
 
@@ -155,10 +159,12 @@ The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fiel
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
 complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
-M3A has no canonical result. Its scene-start, zero-history synthetic 20 Hz diagnostic retained 19.945 Hz replay but measured
-238.255 ms callback median, 303.283 ms same-host loopback median, 3.990 Hz output, and 875 bounded-QoS
-input drops. The result is a failed rate-gate record for review, not accepted performance; see
-[`benchmarks/m3/README.md`](benchmarks/m3/README.md).
+M3A has no canonical result. Its scene-start, zero-history synthetic 20 Hz diagnostic retained
+19.945 Hz replay but measured 238.255 ms callback median, 303.283 ms same-host loopback median,
+3.990 Hz output, and 875 bounded-QoS input drops. M3B-V2 subsequently demonstrated exact
+full-history direct-path medians below 50 ms only with explicit live provenance, but the candidate
+is not integrated and no new ROS callback/rate result exists. See
+[benchmarks/m3/README.md](benchmarks/m3/README.md).
 
 ## Roadmap
 
@@ -166,9 +172,9 @@ input drops. The result is a failed rate-gate record for review, not accepted pe
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
 - **M2:** parity v2, native/rewrite fidelity, and the repaired canonical benchmark passed; PR #3
   is merged.
-- **M3:** model-ready ROS 2 Humble interface and 20-sample fidelity pass; M3A rate gate failed and
-  the diagnostic-only M3B-V1 fast-voxelizer candidate was not adopted after its W2 repeatability
-  check failed. M3 remains stopped for review.
+- **M3:** model-ready ROS 2 Humble interface and 20-sample fidelity pass; M3A rate gate failed,
+  M3B-V1 deterministic=False remains rejected, and M3B-V2 produced an exact, repeatable, promising
+  diagnostic candidate that is not yet integrated. No canonical M3 result exists.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.
 

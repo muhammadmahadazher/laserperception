@@ -94,3 +94,22 @@ high-confidence detections. Saturated voxels retained different point subsets in
 
 Therefore the experimental fast voxelizer is **not recommended for production integration**. This
 is diagnostic evidence only, not a canonical M3 result, and M3 remains stopped for review.
+
+## M3B-V2 exact deterministic voxelization
+
+The final diagnostic at commit 85b6488c92eda266f049ff142fc06bdab658d7ed used pinned
+MMCV dynamic voxel coordinates plus PyTorch tensor grouping to reproduce the official
+deterministic hard-voxel semantics exactly. All 81 mini_val samples were bit-identical in
+voxels/coors/num_points, W1 and W2 were exact across 30 candidate runs each, raw TensorRT outputs
+were repeatable, and the frozen 20 detector samples had exact raw outputs and final frames.
+
+Under one telemetry-eligible 20-warmup/100-measurement session, full-history layer medians changed
+from 238.910 to 1.758 ms on W1 and from 261.918 to 1.918 ms on W2. Candidate direct E2E medians were
+55.416/57.854 ms with historical full provenance and 43.168/45.971 ms with explicit live
+provenance. The latter demonstrates isolated direct-path 20 Hz feasibility, not a ROS callback or
+sustained ROS-rate pass.
+
+The exact-fast candidate is eligible for separate integration review but was not adopted. No
+canonical M3 result exists, and PR #4 remains draft. See
+[VOXELIZATION_V2.md](VOXELIZATION_V2.md) and
+[diagnostics/deterministic_voxelization_v2_85b6488.json](diagnostics/deterministic_voxelization_v2_85b6488.json).

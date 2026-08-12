@@ -54,9 +54,16 @@ the prerequisite for M3.
 - [x] Add bounded QoS, nuScenes replay, RViz/Foxglove markers, setup, launch, CPU tests, and ROS-native
   tests.
 - [ ] Pass the preregistered M3A callback-median and sustained 20 Hz rate gate.
+- [x] Diagnose the deterministic full-history voxelization bottleneck and reject the
+  nondeterministic V1 candidate after its repeatability/fidelity failure.
+- [x] Demonstrate an experimental exact deterministic V2 candidate across all 81 voxel samples,
+  both 30-run repeatability suites, and the frozen 20 detector samples.
+- [ ] Obtain reviewer authorization before production integration and rerun the ROS rate gate.
 
-The first M3A rate diagnostic failed, so no M3 benchmark is canonical. M3B is indicated for owner
-and reviewer consideration but is not authorized. No optimization or M4 work has started.
+The first M3A rate diagnostic failed, so no M3 benchmark is canonical. M3B-V2 demonstrated
+isolated direct-path 20 Hz feasibility with explicit live provenance, but the candidate is not
+integrated and M3 remains stopped for review. No postprocess or ROS/DDS optimization or M4 work
+has started.
 
 ## M4 — v0.1
 

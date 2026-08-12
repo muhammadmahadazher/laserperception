@@ -4,8 +4,11 @@ M3A wraps the frozen M2 TensorRT FP16 detector with a ROS 2 interface. It consum
 **model-ready multi-sweep** point cloud and publishes canonical `vision_msgs/Detection3DArray`
 messages. It is not a raw physical-LiDAR adapter. The implementation passed the 20-sample
 transport-fidelity gate, but its first 20 Hz rate diagnostic failed the preregistered M3A target.
-The subsequently authorized M3B-V1 diagnostic isolated hard voxelization but did not establish a
-production-safe fast path; M3 remains stopped for review.
+
+M3B-V1 rejected the nondeterministic fast voxelizer. M3B-V2 subsequently demonstrated an exact,
+repeatable PyTorch/MMCV candidate and isolated direct-path W1/W2 medians below 50 ms with explicit
+live provenance. The candidate remains outside the production runtime and has not been retested
+through the ROS callback/rate gate, so M3 remains non-canonical and stopped for review.
 
 ## Frozen environment and artifacts
 
@@ -171,6 +174,24 @@ high-confidence detections), below the existing 0.99 diagnostic yardstick. No pr
 postprocess, ROS, or DDS path changed. See
 [`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) for full timing,
 saturation, fidelity, repeatability, and telemetry evidence.
+
+## M3B-V2 exact deterministic candidate
+
+The V2 candidate reproduces the official deterministic hard-voxel selection, ordering, and
+zero-padding semantics using the pinned dynamic coordinate operation and PyTorch tensor grouping.
+It passed all 81 exact voxel samples, 30 W1 and 30 W2 repeatability runs, and the frozen 20 detector
+samples exactly.
+
+The separately committed `provenance_mode` option has two policies. `full` is the historical default
+and retains per-frame voxel SHA256 metadata. `live` must be requested explicitly and records
+lightweight semantic metadata without hashing full voxel tensors. Detection values remain exact.
+The standard ROS YAML still defaults to full.
+
+In the eligible isolated direct-path session, candidate W1/W2 medians were 55.416/57.854 ms under
+full and 43.168/45.971 ms under live. The live values demonstrate direct-path 20 Hz feasibility,
+not ROS callback or transport performance. No production voxelizer default, postprocess, ROS, or
+DDS behavior was changed. Full evidence is in
+[benchmarks/m3/VOXELIZATION_V2.md](../benchmarks/m3/VOXELIZATION_V2.md).
 
 ## Live-sensor limitation
 

@@ -39,6 +39,25 @@ diagnostic and must not be treated as accepted M3 performance. See
 [`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) and the sanitized
 [`voxelization_v1_ad0d38b.json`](../benchmarks/m3/diagnostics/voxelization_v1_ad0d38b.json).
 
+## M3B-V2 exact deterministic diagnostic — not canonical performance
+
+M3B-V2 at exact measurement commit 85b6488c92eda266f049ff142fc06bdab658d7ed used the pinned
+dynamic voxel-coordinate CUDA operation plus PyTorch tensor grouping. The candidate did not use
+deterministic=False or add custom CUDA. It matched the official deterministic voxel tensors
+bit-for-bit on all 81 mini_val samples, repeated exactly for 30 W1 and 30 W2 runs, and produced
+exact raw TensorRT outputs and final frames on the frozen 20 detector samples.
+
+In one 20-warmup/100-measurement telemetry-eligible session, W1/W2 hard-layer medians were
+238.910/261.918 ms for the official reference and 1.758/1.918 ms for the exact candidate.
+Candidate direct E2E medians were 55.416/57.854 ms with historical full provenance and
+43.168/45.971 ms with explicit live provenance. Live mode skips per-frame full voxel hashing but
+does not change detection values; full remains the default.
+
+These values demonstrate exact direct-path feasibility, not a ROS callback or sustained ROS-rate
+pass. The candidate was not integrated, there is no canonical M3 result, and PR #4 remains draft.
+See [VOXELIZATION_V2.md](../benchmarks/m3/VOXELIZATION_V2.md) and the structured
+[diagnostic JSON](../benchmarks/m3/diagnostics/deterministic_voxelization_v2_85b6488.json).
+
 LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
 measurement record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).

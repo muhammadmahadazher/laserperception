@@ -8,6 +8,13 @@ releases begin.
 
 ### Changed
 
+- Completed M3B-V2 at exact measurement commit
+  85b6488c92eda266f049ff142fc06bdab658d7ed: 81/81 voxel samples, both 30-run
+  repeatability suites, and all 20 detector samples were exact. Full-history candidate layer
+  medians were 1.758/1.918 ms on W1/W2; direct E2E was 55.416/57.854 ms with full provenance and
+  43.168/45.971 ms with explicit live provenance. The result is diagnostic, the candidate was not
+  integrated, no canonical M3 result exists, and PR #4 remains draft.
+
 - Added an explicit voxel-provenance policy for TensorRT output metadata: **full** remains the
   historical default with exact tensor hashes, while opt-in ROS **live** mode records only
   lightweight semantic metadata and deliberately omits the hashing cost.
