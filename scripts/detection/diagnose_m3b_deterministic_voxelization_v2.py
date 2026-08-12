@@ -848,6 +848,14 @@ def _performance_profile(
             label=candidate_layer_label,
         )
 
+        eligibility_pairs.append(
+            (
+                f"{name}.hard_voxel_layer",
+                reference_layer_label,
+                candidate_layer_label,
+            )
+        )
+
         reference_preprocessing_label = f"{name}.complete_preprocessing.reference"
         candidate_preprocessing_label = f"{name}.complete_preprocessing.candidate"
         reference_preprocessing, reference_voxels = _time_block(
