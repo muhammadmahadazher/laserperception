@@ -9,6 +9,7 @@ laserperception_detector:
     output_qos_depth: 5
     output_reliability: reliable
     engine_path: ""
+    provenance_mode: full
 
 laserperception_replay:
   ros__parameters:

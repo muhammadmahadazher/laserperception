@@ -10,7 +10,11 @@ from ament_index_python.packages import get_package_share_directory
 
 from laserperception.detection.m1_assets import resolve_m1_asset_paths
 from laserperception.detection.m2_assets import resolve_m2_asset_paths
-from laserperception.detection.m2_backend import M2Backend
+from laserperception.detection.m2_backend import (
+    M2Backend,
+    ProvenanceMode,
+    validate_provenance_mode,
+)
 from laserperception.detection.mmdet3d_backend import sha256_file
 from laserperception.detection.ros2_contract import ModelReadyPointCloud
 from laserperception.detection.types import DetectionFrame
@@ -83,7 +87,8 @@ def create_backend(assets: M3Assets) -> M2Backend:
 class M3DetectorRuntime:
     """Initialized-once in-memory PointCloud2-to-DetectionFrame runtime."""
 
-    def __init__(self, *, engine_override: str = "") -> None:
+    def __init__(self, *, engine_override: str = "", provenance_mode: str = "full") -> None:
+        self.provenance_mode: ProvenanceMode = validate_provenance_mode(provenance_mode)
         self.assets = resolve_m3_assets(engine_override=engine_override)
         if not self.assets.engine_path.is_file():
             raise FileNotFoundError("frozen TensorRT engine is missing from the external M2 cache")
@@ -114,4 +119,8 @@ class M3DetectorRuntime:
             coordinate_frame=coordinate_frame,
         )
         voxelized = self.backend.voxelize(prepared)
-        return self.backend.run_tensorrt(voxelized, self.assets.engine_path)
+        return self.backend.run_tensorrt(
+            voxelized,
+            self.assets.engine_path,
+            provenance_mode=self.provenance_mode,
+        )

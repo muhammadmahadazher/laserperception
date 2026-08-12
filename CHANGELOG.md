@@ -8,6 +8,10 @@ releases begin.
 
 ### Changed
 
+- Added an explicit voxel-provenance policy for TensorRT output metadata: **full** remains the
+  historical default with exact tensor hashes, while opt-in ROS **live** mode records only
+  lightweight semantic metadata and deliberately omits the hashing cost.
+
 - Qualified the frozen detection evidence by actual sweep history: M1 and canonical M2 performance
   repeatedly use scene-start `mini_val` index 0 with zero historical sweeps; M2 parity v2 and M3
   round-trip correctness use 19 full-history samples plus that scene-start sample; and the failed

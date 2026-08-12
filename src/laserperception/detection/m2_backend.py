@@ -7,7 +7,7 @@ import importlib
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 
 from laserperception.detection.m2_diagnostics import (
     RAW_OUTPUT_NAMES,
@@ -28,6 +28,15 @@ EXPECTED_RAW_OUTPUT_SHAPES = {
     "bbox_pred": (1, 126, 200, 200),
     "dir_cls_pred": (1, 28, 200, 200),
 }
+ProvenanceMode = Literal["full", "live"]
+
+
+def validate_provenance_mode(value: str) -> ProvenanceMode:
+    """Validate the explicit full-fidelity or lightweight live metadata policy."""
+
+    if value not in {"full", "live"}:
+        raise ValueError("provenance_mode must be full or live")
+    return cast(ProvenanceMode, value)
 
 
 @dataclass(frozen=True, slots=True)
@@ -311,10 +320,41 @@ class M2Backend(Mmdet3dBackend):
         *,
         backend_name: str,
         precision: str,
+        provenance_mode: ProvenanceMode = "full",
     ) -> DetectionFrame:
         """Convert one official prediction to the framework-independent output contract."""
 
         frame = self.convert_prediction(prediction, sample.prepared)
+        return self.attach_runtime_metadata(
+            frame,
+            sample,
+            backend_name=backend_name,
+            precision=precision,
+            provenance_mode=provenance_mode,
+        )
+
+    @staticmethod
+    def attach_runtime_metadata(
+        frame: DetectionFrame,
+        sample: VoxelizedM2Sample,
+        *,
+        backend_name: str,
+        precision: str,
+        provenance_mode: ProvenanceMode = "full",
+    ) -> DetectionFrame:
+        """Attach runtime metadata under an explicit provenance-cost policy."""
+
+        mode = validate_provenance_mode(provenance_mode)
+        provenance: dict[str, object]
+        if mode == "full":
+            provenance = {"shared_voxel_hashes": sample.hashes()}
+        else:
+            provenance = {
+                "voxel_provenance_mode": "live",
+                "voxel_provenance_scope": "lightweight_semantic_metadata_only",
+                "shared_voxel_hashes_omitted": True,
+                "shared_voxel_shapes": sample.shapes,
+            }
         return DetectionFrame(
             detections=frame.detections,
             sample_id=frame.sample_id,
@@ -324,7 +364,7 @@ class M2Backend(Mmdet3dBackend):
                 "backend": backend_name,
                 "precision": precision,
                 "voxel_count": sample.voxel_count,
-                "shared_voxel_hashes": sample.hashes(),
+                **provenance,
             },
         )
 
@@ -335,6 +375,7 @@ class M2Backend(Mmdet3dBackend):
         *,
         backend_name: str,
         precision: str,
+        provenance_mode: ProvenanceMode = "full",
     ) -> DetectionFrame:
         """Apply the same official MMDeploy postprocess and LaserPerception conversion."""
 
@@ -344,6 +385,7 @@ class M2Backend(Mmdet3dBackend):
             sample,
             backend_name=backend_name,
             precision=precision,
+            provenance_mode=provenance_mode,
         )
 
     def run_native_pytorch(self, sample: VoxelizedM2Sample) -> DetectionFrame:
@@ -366,7 +408,13 @@ class M2Backend(Mmdet3dBackend):
             precision="fp32",
         )
 
-    def run_tensorrt(self, sample: VoxelizedM2Sample, engine_path: str | Path) -> DetectionFrame:
+    def run_tensorrt(
+        self,
+        sample: VoxelizedM2Sample,
+        engine_path: str | Path,
+        *,
+        provenance_mode: ProvenanceMode = "full",
+    ) -> DetectionFrame:
         """Run TensorRT FP16 and the common official postprocess."""
 
         return self.postprocess_raw(
@@ -374,6 +422,7 @@ class M2Backend(Mmdet3dBackend):
             sample,
             backend_name="tensorrt",
             precision="fp16",
+            provenance_mode=provenance_mode,
         )
 
     @staticmethod

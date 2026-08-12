@@ -34,6 +34,7 @@ class LaserPerceptionDetectorNode(Node):
         self.declare_parameter("output_qos_depth", 5)
         self.declare_parameter("output_reliability", "reliable")
         self.declare_parameter("engine_path", "")
+        self.declare_parameter("provenance_mode", "full")
 
         input_qos = _qos(
             depth=int(self.get_parameter("input_qos_depth").value),
@@ -56,7 +57,8 @@ class LaserPerceptionDetectorNode(Node):
             )
 
         self._runtime = runtime or M3DetectorRuntime(
-            engine_override=str(self.get_parameter("engine_path").value)
+            engine_override=str(self.get_parameter("engine_path").value),
+            provenance_mode=str(self.get_parameter("provenance_mode").value),
         )
         self.callback_latencies_ms: list[float] = []
         self.received_count = 0
