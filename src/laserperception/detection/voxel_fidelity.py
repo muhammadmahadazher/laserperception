@@ -3,9 +3,47 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
+
+
+def first_exact_array_mismatch(
+    reference: np.ndarray,
+    candidate: np.ndarray,
+    *,
+    name: str,
+) -> dict[str, Any] | None:
+    """Describe the first shape, dtype, or value mismatch between two arrays."""
+
+    reference_array = np.asarray(reference)
+    candidate_array = np.asarray(candidate)
+    if reference_array.shape != candidate_array.shape:
+        return {
+            "tensor": name,
+            "kind": "shape",
+            "reference_shape": list(reference_array.shape),
+            "candidate_shape": list(candidate_array.shape),
+        }
+    if reference_array.dtype != candidate_array.dtype:
+        return {
+            "tensor": name,
+            "kind": "dtype",
+            "reference_dtype": str(reference_array.dtype),
+            "candidate_dtype": str(candidate_array.dtype),
+        }
+    unequal = np.flatnonzero(reference_array.reshape(-1) != candidate_array.reshape(-1))
+    if unequal.size == 0:
+        return None
+    flat_index = int(unequal[0])
+    index = tuple(int(value) for value in np.unravel_index(flat_index, reference_array.shape))
+    return {
+        "tensor": name,
+        "kind": "value",
+        "index": list(index),
+        "reference_value": reference_array[index].item(),
+        "candidate_value": candidate_array[index].item(),
+    }
 
 
 def valid_point_count(points: np.ndarray, point_cloud_range: Sequence[float]) -> int:

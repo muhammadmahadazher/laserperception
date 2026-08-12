@@ -7,6 +7,7 @@ import pytest
 
 from laserperception.detection.voxel_fidelity import (
     compare_canonical_voxels,
+    first_exact_array_mismatch,
     saturation_statistics,
     valid_point_count,
 )
@@ -140,6 +141,33 @@ def test_voxel_validation_rejects_duplicate_coordinates() -> None:
             coors,
             max_num_points=2,
         )
+
+
+def test_first_exact_array_mismatch_reports_shape_dtype_and_first_value() -> None:
+    reference = np.asarray([[1, 2], [3, 4]], dtype=np.int32)
+
+    assert first_exact_array_mismatch(reference, reference.copy(), name="coors") is None
+    assert first_exact_array_mismatch(reference, reference[:, :1], name="coors") == {
+        "tensor": "coors",
+        "kind": "shape",
+        "reference_shape": [2, 2],
+        "candidate_shape": [2, 1],
+    }
+    assert first_exact_array_mismatch(reference, reference.astype(np.int64), name="coors") == {
+        "tensor": "coors",
+        "kind": "dtype",
+        "reference_dtype": "int32",
+        "candidate_dtype": "int64",
+    }
+    candidate = reference.copy()
+    candidate[1, 0] = 99
+    assert first_exact_array_mismatch(reference, candidate, name="coors") == {
+        "tensor": "coors",
+        "kind": "value",
+        "index": [1, 0],
+        "reference_value": 3,
+        "candidate_value": 99,
+    }
 
 
 def test_m3b_protocol_freezes_candidate_samples_and_non_adoption() -> None:
