@@ -65,10 +65,12 @@ def _qos(*, reliability: ReliabilityPolicy, depth: int) -> QoSProfile:
 class _StressPublisher(Node):
     def __init__(self, points: object, *, rate_hz: float, timer_enabled: bool = True) -> None:
         super().__init__("laserperception_m3_benchmark_replay")
-        self._points = points
         self.published_count = 0
         self.publication_perf_ns: list[int] = []
         self.publication_ros_ns: list[int] = []
+        header = Header()
+        header.frame_id = "nuscenes_lidar_top"
+        self._message = model_ready_to_pointcloud2(points, header)
         self._publisher = self.create_publisher(
             PointCloud2,
             "/laserperception/points_model_ready",
@@ -80,10 +82,8 @@ class _StressPublisher(Node):
 
     def _publish(self) -> None:
         now = self.get_clock().now()
-        header = Header()
-        header.stamp = now.to_msg()
-        header.frame_id = "nuscenes_lidar_top"
-        self._publisher.publish(model_ready_to_pointcloud2(self._points, header))
+        self._message.header.stamp = now.to_msg()
+        self._publisher.publish(self._message)
         self.publication_perf_ns.append(time.perf_counter_ns())
         self.publication_ros_ns.append(now.nanoseconds)
         self.published_count += 1
@@ -467,6 +467,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             "output_qos": "keep_last_depth_5_reliable_volatile",
             "markers_enabled": False,
             "executor": "three_thread_same_process_separate_ros_nodes",
+            "replay_payload_construction": (
+                "PointCloud2 payload built once before timing; only its source timestamp is "
+                "refreshed immediately before each publish"
+            ),
             "callback_boundary": (
                 "PointCloud2 callback entry through Detection3DArray publish return"
             ),
@@ -523,6 +527,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "limitations": [
             "same-host loopback is not sensor-to-actuator latency",
             "input is already model-ready multi-sweep data; no TF or sweep accumulation is timed",
+            "loopback excludes one-time construction of the immutable replay PointCloud2 payload",
             "telemetry establishes eligibility but does not prove clock causality",
         ],
     }
