@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import tomllib
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -12,11 +10,13 @@ def _text(relative: str) -> str:
 
 
 def test_v0_1_release_metadata_is_consistent() -> None:
-    project = tomllib.loads(_text("pyproject.toml"))["project"]
-    assert project["version"] == "0.1.0"
-    assert project["description"] == (
-        "Reproducible 3D LiDAR detection, TensorRT deployment, and ROS 2 integration."
+    pyproject = _text("pyproject.toml")
+    assert 'version = "0.1.0"' in pyproject
+    description = (
+        'description = "Reproducible 3D LiDAR detection, TensorRT deployment, '
+        'and ROS 2 integration."'
     )
+    assert description in pyproject
 
     citation = _text("CITATION.cff")
     assert "version: 0.1.0" in citation
