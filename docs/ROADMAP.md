@@ -2,86 +2,56 @@
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
 
-## M0 — project transition
+## Completed foundations
 
-- [x] Position LaserPerception around reproducible real-time 3D LiDAR object detection.
-- [x] Preserve the existing SemanticKITTI/DALES segmentation and audit infrastructure as parked,
-  supported work.
-- [x] Define an optional GPU dependency policy that keeps the core package and CI CPU-testable.
+- [x] **M0 — project transition:** position LaserPerception around reproducible 3D LiDAR detection
+  and deployment while preserving the parked SemanticKITTI/DALES infrastructure.
+- [x] **M1 — PointPillars first sight:** pinned official pretrained PointPillars, nuScenes
+  v1.0-mini preparation, framework-independent detections, original BEV output, and real RTX 4060
+  Laptop FP32 evidence.
+- [x] **M2 — TensorRT FP16:** pinned MMDeploy export/build path, preserved parity-v1 failure,
+  parity-v2 pass, native/rewrite fidelity, rejected first benchmark, and repaired canonical
+  native-PyTorch-versus-TensorRT measurement.
+- [x] **M3 — ROS 2:** model-ready multi-sweep `PointCloud2`, exact output conversion, bounded QoS,
+  replay/visualization, the rejected nondeterministic voxelizer, accepted exact-fast replacement,
+  production correctness gates, and representative full-history ROS evidence.
 
-## M1 — PointPillars first sight
+M3 closed honestly: representative W1 (10 historical sweeps plus current, 354,182 points) sustained
+10 Hz cleanly; 15 Hz and 20 Hz were not sustained. This result does not authorize additional M3
+optimization.
 
-- [x] Reproduce the isolated official MMDetection3D stack and initialize the pinned pretrained
-  PointPillars checkpoint on the RTX 4060 Laptop GPU.
-- [x] Export framework-independent 3D detections with documented box conventions and upstream class
-  names.
-- [x] Prepare official nuScenes v1.0-mini metadata with the ten-sweep upstream converter (323 train,
-  81 validation samples observed).
-- [x] Run real FP32 inference and inspect the converted output.
-- [x] Produce original headless BEV output with genuine model-predicted pedestrian detections at the
-  fixed 0.25 threshold.
-- [x] Measure and promote a sanitized, two-boundary RTX 4060 FP32 latency and CUDA-memory result.
+## M4 — v0.1.0 release
 
-M1 is complete and merged. It remains inference-only and does not include training, a second
-detector, model conversion, ROS 2, or edge deployment.
+The release-candidate work prepares the accepted implementation without changing measured runtime
+behavior:
 
-## M2 — TensorRT FP16
+- [x] align version, citation, governance, package metadata, and release history;
+- [x] provide stranger-first release documentation and an external-asset-aware demo path;
+- [x] preserve and clearly separate M1, M2, M3B-V2, and M3 evidence;
+- [ ] merge the reviewed release PR into `main`, then create tag `v0.1.0` from that merged commit.
 
-- [x] Freeze the exact M1 asset, official MMDeploy v1.3.1 commit, deployment boundary, 20-sample
-  parity set, and acceptance tolerances before engine evidence.
-- [x] Pass the standalone TensorRT 8.6.x FP16 build/serialize/execute smoke gate.
-- [x] Measure all 81 `mini_val` voxel shapes and justify the final optimization profile.
-- [x] Export and validate the pinned PointPillars ONNX graph and build the external FP16 engine.
-- [x] Pass versioned final-box parity v2 on all frozen samples with shared preprocessing/postprocessing.
-- [x] Complete reviewer-approved native PyTorch FP32 versus TensorRT FP16 performance measurement.
+The tag, GitHub release, and any package publication happen only after final release review. They are
+not created from the release branch.
 
-Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 remain valid. The
-benchmark at e2f9b6b remains rejected because rewritten eager PyTorch was used as the performance
-baseline. At repaired measurement commit 3f240d6, exact-commit parity and native-vs-rewritten
-fidelity passed, then the direct benchmark measured a 1.2991× end-to-end median speedup and a
-secondary 3.1326× network-only speedup with no review flags. PR #3 merged at b1d42a0, satisfying
-the prerequisite for M3.
+## M5 — conditional physical Jetson measurement
 
-## M3 — ROS 2
+Measure and tune for Jetson only if target hardware is physically available. No Jetson figure will
+be estimated, simulated, or inferred from the RTX 4060 Laptop result.
 
-- [x] Prove ROS 2 Humble and the frozen M2 detector coexist in Python 3.10 on Ubuntu 22.04.
-- [x] Implement the strict model-ready `x/y/z/time_lag` PointCloud2 contract and official in-memory
-  MMDetection3D preprocessing adapter.
-- [x] Preserve headers and exact geometric-center/LWH/yaw/class/score semantics in
-  Detection3DArray, with empty tracking IDs.
-- [x] Pass exact 20-sample PointCloud2 transport fidelity through voxels, TensorRT raw outputs, and
-  final detections.
-- [x] Add bounded QoS, nuScenes replay, RViz/Foxglove markers, setup, launch, CPU tests, and ROS-native
-  tests.
-- [x] Record the preregistered M3A callback/rate failure without treating it as canonical
-  representative full-history performance.
-- [x] Diagnose the deterministic full-history voxelization bottleneck and reject the
-  nondeterministic V1 candidate after its repeatability/fidelity failure.
-- [x] Demonstrate the exact deterministic V2 candidate across all 81 voxel samples, both 30-run
-  repeatability suites, and the frozen 20 detector samples.
-- [x] Integrate exact-fast/live fail-closed into the deployed ROS path while preserving
-  official/full historical M2 behavior.
-- [x] Reconfirm 81/81 and frozen-20 exactness through production, then publish the representative
-  W1 ROS result and bounded sustainable-rate characterization.
+## Post-v0.1 backlog — not started
 
-M3 is complete. The eligible representative W1 run did not sustain 20 Hz: callback median was
-75.701 ms, loopback median was 134.250 ms, effective output was 10.825 Hz, and 159/359 measured
-inputs dropped with first-to-second-half deterioration. Bounded characterization sustained 10 Hz
-and did not sustain 15 Hz. No postprocess, ROS/DDS/executor, custom CUDA, or M4 work was started.
+These are separate future proposals, not v0.1 commitments:
 
-## M4 — v0.1
-
-Publish an evidence-backed open-source release with reproducible setup, measurements, limitations,
-and safety wording.
-
-## M5 — conditional Jetson measurements
-
-Measure and tune for Jetson only if the target physical hardware becomes available. No hardware
-figures will be estimated or simulated.
+- MMDeploy postprocessing profiling and optimization;
+- ROS/DDS/executor profiling and tuning;
+- further exact-fast tuning;
+- custom CUDA only if later evidence justifies it;
+- INT8;
+- additional detector architectures; and
+- training infrastructure.
 
 ## Parked experimental infrastructure
 
-The earlier Experiment 001 data foundation—`PointCloud`, I/O, SemanticKITTI and DALES adapters,
-explicit normalization, ontology mappings, and dataset audits—remains tested and supported. Its
-modeling, training, and zero-shot semantic-segmentation evaluation are inactive before detection
-v0.1. See [VISION.md](VISION.md).
+The earlier Experiment 001 foundation—`PointCloud`, I/O, SemanticKITTI and DALES adapters, explicit
+normalization, ontology mappings, and dataset audits—remains tested and supported. Its model,
+training, and accuracy evaluation remain `Pending measurement` and outside the v0.1 detection line.

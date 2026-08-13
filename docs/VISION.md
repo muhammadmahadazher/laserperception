@@ -1,29 +1,30 @@
 # Vision — evidence before deployment claims
 
-LaserPerception aims to become an open-source 3D LiDAR perception toolkit for reproducible,
-real-time object detection and deployment engineering. The near-term path is deliberately narrow:
-reproduce one official pretrained PointPillars model on nuScenes, measure it honestly on available
-hardware, then evaluate TensorRT FP16 and ROS 2 in later gated milestones.
+LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit. Its
+v0.1 path deliberately freezes one official pretrained PointPillars detector, verifies TensorRT
+FP16 deployment, preserves deterministic voxel semantics, and exposes the result through ROS 2.
+The project values auditable correctness, honest hardware-specific measurements, and visible
+failure records over broad or unqualified performance claims.
 
-The project favors small framework-independent result contracts, explicit coordinate and box
-conventions, isolated optional GPU dependencies, headless visual evidence, and benchmark records
-whose provenance can be audited. It is a research, benchmarking, and demonstration toolkit—not a
-safety-certified perception system or a certified system for operation around people.
+The accepted release is a research, benchmarking, and demonstration toolkit—not a novel detector,
+a trained LaserPerception model, a production-ready autonomy stack, or a safety-certified system.
 
-## Active sequence
+## Evidence-gated sequence
 
-1. M1: pretrained PointPillars, nuScenes v1.0-mini, RTX 4060 FP32 measurements, and BEV output.
-2. M2: ONNX and TensorRT FP16, only after M1 review.
-3. M3: ROS 2 integration, only after M2 review.
-4. M4: v0.1 with evidence-backed capabilities and limitations.
-5. M5: Jetson measurements only if physical hardware is available.
+1. M0: project direction and governance transition — complete.
+2. M1: pretrained PointPillars, nuScenes v1.0-mini, RTX 4060 FP32 evidence, and BEV output —
+   complete.
+3. M2: ONNX/TensorRT FP16, parity/fidelity evidence, and repaired performance baseline — complete.
+4. M3: ROS 2 interface, exact-fast deployment, correctness gates, and representative W1 rate
+   evidence — complete.
+5. M4: v0.1.0 release engineering — active until review, merge, and tag.
+6. M5: physical Jetson measurements only if hardware is actually available.
 
-Training, additional detector architectures, INT8, camera fusion, foundation models, custom CUDA
-kernels, and Jetson tuning are outside the pre-v0.1 plan unless the owner revises scope.
+Future post-v0.1 work is separately scoped. Training, additional detectors, INT8, tracking, camera
+fusion, custom CUDA, and ROS/DDS optimization are not part of v0.1.0.
 
 ## Parked semantic-transfer research
 
-The SemanticKITTI-to-DALES Experiment 001 infrastructure remains valuable, tested, and supported as
-existing code. Its cross-view semantic-segmentation model and benchmark remain unimplemented and
-all results remain `Pending measurement`. It is not the active development line before detection
-v0.1 and may be revisited through a separately reviewed roadmap.
+The SemanticKITTI-to-DALES Experiment 001 infrastructure remains valuable, tested, and supported.
+Its semantic-segmentation model and benchmark remain unimplemented, and all result fields remain
+`Pending measurement`. It is not the active v0.1 product line.

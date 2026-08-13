@@ -1,6 +1,6 @@
 # M2 benchmark protocol and canonical result
 
-Status: **Repaired canonical measurement complete; PR #3 remains draft for final review.**
+Status: **M2 complete; repaired canonical measurement merged in PR #3.**
 
 The canonical record is
 [`results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json`](results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json).

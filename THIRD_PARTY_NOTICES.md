@@ -41,6 +41,23 @@ redistributed by LaserPerception. The setup script installs them into the isolat
 and external cache. A TensorRT engine is environment-specific and is not covered by the
 repository's Apache-2.0 license.
 
+## M3 ROS 2 and middleware environment
+
+M3 installs ROS 2 Humble packages from the official ROS apt distribution. LaserPerception wraps but
+does not vendor these external components:
+
+- [rclpy](https://github.com/ros2/rclpy), the ROS 2 Python client library, Apache-2.0;
+- [ROS 2 common interfaces](https://github.com/ros2/common_interfaces), including `sensor_msgs`,
+  `std_msgs`, and `visualization_msgs`, under their recorded Apache-2.0 package licenses;
+- [vision_msgs](https://github.com/ros-perception/vision_msgs), Apache-2.0;
+- [rmw_fastrtps](https://github.com/ros2/rmw_fastrtps) and
+  [eProsima Fast DDS](https://github.com/eProsima/Fast-DDS), Apache-2.0; and
+- [RViz](https://github.com/ros2/rviz), BSD-3-Clause-Clear.
+
+These components and their transitive dependencies remain under their own upstream terms. ROS 2,
+its message definitions, Fast DDS, and RViz are installed externally and are not relicensed by
+LaserPerception. The recorded M3 system used `rmw_fastrtps_cpp`; the repository does not redistribute
+that middleware.
 ## Upstream pretrained PointPillars checkpoint
 
 M1 uses the official MMDetection3D nuScenes PointPillars checkpoint

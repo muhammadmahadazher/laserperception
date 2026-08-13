@@ -1,227 +1,209 @@
 # LaserPerception
 
-> Reproducible real-time 3D LiDAR object detection and deployment engineering.
+> Reproducible 3D LiDAR detection, TensorRT deployment, and ROS 2 integration.
 
 [![CI](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-4c1.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
-[![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment. M3 now provides an evidence-gated ROS 2 Humble interface around
-the exact verified M2 PointPillars TensorRT FP16 runtime without changing model semantics.
+LaserPerception v0.1.0 is an open-source research toolkit that runs one frozen, official pretrained
+PointPillars detector on nuScenes, deploys its network through TensorRT FP16, preserves deterministic
+voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble.
+LaserPerception did **not** train PointPillars or introduce a new detector architecture.
 
-M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
-visualization, and a sanitized RTX 4060 Laptop GPU benchmark on nuScenes v1.0-mini. M1 is complete
-and merged. M2 exported and checked the pinned ONNX graph and built the official TensorRT FP16
-engine. Parity v1 remains an authoritative failure. The separately preregistered parity v2 Stage 1
-passed all gates on the same 20 samples and unchanged engine and remains valid. The first M2
-benchmark was rejected because it used MMDeploy-rewritten eager PyTorch as the performance
-baseline. The repaired exact-commit benchmark uses native MMDetection3D PyTorch FP32 and measures a
-direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 merged as
-`b1d42a0d62646b5d38a9839e69a50fe0d2917a70`.
+**Measured release status:** on representative full-history W1 (10 historical sweeps plus current,
+354,182 points), 10 Hz was the highest tested clean sustained ROS rate. Fifteen hertz and 20 Hz
+were not sustained. This failure is part of the release evidence, not hidden.
 
-## Project status
+[Run the detection/ROS quickstart](docs/QUICKSTART_V0_1.md) ·
+[Read the v0.1.0 release notes](docs/releases/v0.1.0.md) ·
+[Inspect the benchmark evidence](docs/BENCHMARKS.md)
 
-### M3 complete — final review
+## What v0.1.0 does—and what was measured
 
-M3 production now uses the supported LaserPerception `exact_fast` voxelization policy with explicit
-`live` provenance; historical M2 evidence remains on the default `official` voxelizer with `full`
-provenance. Startup fails closed if `exact_fast` cannot initialize—there is no fallback to a
-semantics-changing voxelizer.
+| Engineering story | Shipped behavior | Measured evidence |
+|---|---|---|
+| TensorRT deployment | Frozen pretrained PointPillars, pinned MMDeploy export, TensorRT 8.6.1 FP16 | Parity-v2 gates passed; repaired scene-start M2 median was 59.289 ms native PyTorch vs 45.637 ms TensorRT end to end (1.2991×) |
+| Deterministic voxelization | `exact_fast` preserves pinned official deterministic retained-point semantics | 81/81 validation samples bit-exact; frozen raw/final detector outputs exact; W1 hard layer 238.910 → 1.758 ms (≈136×, hard layer only) |
+| ROS 2 integration | Model-ready multi-sweep `PointCloud2` → `Detection3DArray` plus RViz/Foxglove markers | W1 sustained 10 Hz cleanly; 15 Hz and 20 Hz were not sustained |
 
-Official deterministic hard voxelization became the dominant full-history bottleneck. The easy
-upstream `deterministic=False` path was rejected because saturated voxels retained different point
-subsets and observable detector repeatability changed. LaserPerception instead implemented an exact
-deterministic tensor path using pinned MMCV dynamic coordinates plus PyTorch grouping. It reproduced
-all 81/81 validation samples bit-for-bit, and the frozen 20 detector cases retained exact raw
-TensorRT outputs and final detections. In the accepted V2 diagnostic, representative W1 direct-live
-median latency fell from 333.137 ms to 43.168 ms; that ~43 ms figure is **direct runtime evidence**,
-not ROS callback or transport latency.
+The accepted M3B-V2 direct W1 live diagnostic changed from about 333 ms to 43.168 ms. The ~43 ms
+figure is **direct runtime evidence, not ROS callback or loopback latency**. The ≈136× ratio applies
+only to the hard voxel layer, not whole LiDAR inference.
 
-The final representative W1 ROS session is reported separately. At 20 Hz, callback median was
-75.701 ms, same-host loopback median was 134.250 ms, effective output was 10.825 Hz, and 159/359
-measured inputs were dropped; first-to-second-half entry medians and drops both grew, so 20 Hz was
-not sustained. Bounded characterization sustained 10 Hz cleanly and did not sustain 15 Hz. M3 is
-complete with this honest result; PR #4 remains open for final review. No postprocess, DDS,
-executor, or custom CUDA optimization was added. See [docs/ROS2.md](docs/ROS2.md) and the
-[canonical M3 record](benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
+## Reproducibility scope
 
-### Existing experimental infrastructure
+Correctness claims—exact-fast 81/81 bit-exact voxel outputs, frozen detector exactness, and ROS
+message-contract correctness—are semantic/software evidence intended to be reproducible when the
+pinned software stack and inputs are reproduced.
 
-The earlier SemanticKITTI-to-DALES semantic-segmentation work remains in the repository as tested,
-supported infrastructure, but it is parked rather than the active development line before
-detection v0.1. It currently provides:
+Performance claims are measurements from **one system**: an NVIDIA GeForce RTX 4060 Laptop GPU,
+WSL2, driver 610.88, and the pinned CUDA/TensorRT/OpenMMLab environment. **Timings are measurements
+of this specific environment, not portable hardware capability guarantees.** They do not promise
+10 Hz on every RTX 4060 laptop or equivalent behavior on another GPU, Windows native, native Linux,
+Jetson, or another environment.
 
-- a validated float32 `PointCloud` representation;
-- KITTI/SemanticKITTI and LAS/optional LAZ I/O;
-- official-split SemanticKITTI and chunked DALES directory adapters;
-- explicit, non-mutating `min_xyz` normalization;
-- verified mappings into a six-class experimental ontology;
-- deterministic DALES grid patching and CPU-only dataset audit tooling; and
-- synthetic tests that download no datasets.
-
-No semantic-segmentation model, training run, or accuracy benchmark has been implemented. The
-historical Experiment 001 config remains at
-[`configs/experiments/exp001_semkitti_to_dales.yaml`](configs/experiments/exp001_semkitti_to_dales.yaml).
-
-## Architecture
-
-The lightweight core and standard CI remain CPU-only. M1 and M2 GPU dependencies live in isolated
-WSL environments and are imported only by optional detector/deployment backends.
+## Current architecture
 
 ```mermaid
-flowchart LR
-    A["nuScenes v1.0-mini"] --> B["Official MMDetection3D multi-sweep pipeline"]
-    B --> C["Official MMDetection3D voxelization"]
-    C --> D["Shared voxel tensors"]
-    D --> E["MMDeploy-rewritten PyTorch FP32 (parity reference)"]
-    D --> F["TensorRT FP16 network"]
-    D --> K["Native MMDetection3D PyTorch FP32 (performance baseline)"]
-    E --> G["Official shared postprocessing"]
-    F --> G
-    K --> G
-    G --> H["Parity and fidelity evidence"]
-    H -->|"V2 pass"| I["Exact-commit reconfirmation"]
-    I --> J["Same-session benchmark evidence"]
+flowchart TD
+    A["Model-ready multi-sweep PointCloud2"] --> B["exact_fast deterministic voxelization"]
+    B --> C["Frozen TensorRT FP16 PointPillars network"]
+    C --> D["Unchanged MMDeploy postprocess"]
+    D --> E["Framework-independent DetectionFrame"]
+    E --> F["Detection3DArray"]
+    E --> G["RViz / Foxglove markers"]
 ```
 
-nuScenes is not routed through the existing single-scan `PointCloud`: PointPillars inference keeps
-the official calibrated, multi-sweep upstream pipeline. See
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+The ROS input already contains `x`, `y`, `z`, and `time_lag`. v0.1.0 does not build sweep history
+from a raw physical-LiDAR topic.
 
-## Core installation
+Two explicit policies preserve historical evidence and deployed semantics:
 
-LaserPerception supports Python 3.10–3.13 in CPU CI. The base package has no CUDA, PyTorch, or
-MMDetection3D dependency.
+| Use | Voxelization | Provenance |
+|---|---|---|
+| Historical/core evidence | `official` pinned deterministic hard voxelization | `full` tensor hashes |
+| ROS deployment | `exact_fast` LaserPerception implementation | `live` lightweight metadata |
+
+`exact_fast` uses the pinned MMCV dynamic-coordinate CUDA operation plus PyTorch tensor grouping.
+It is a LaserPerception deployment optimization, not an upstream MMDetection3D implementation. It
+fails closed; there is no silent fallback to `deterministic=False`.
+
+## Quickstart
+
+### Lightweight CPU package
+
+The Python wheel supports Python 3.10–3.13 and does not depend on CUDA, PyTorch, OpenMMLab,
+TensorRT, or ROS 2:
 
 ```bash
 git clone https://github.com/muhammadmahadazher/laserperception.git
 cd laserperception
 python -m venv .venv
+source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e .
+python -m pip install .
 ```
-
-Install `laserperception[laz]` for compressed LAZ support, `laserperception[viz]` for the optional
-headless renderer, or `laserperception[dev,laz]` for local development. No dataset or model is
-downloaded by core installation. The reproducible M1 GPU setup is documented in
-[`docs/DETECTION_ENVIRONMENT.md`](docs/DETECTION_ENVIRONMENT.md) and does not make heavy libraries
-core requirements. See [`docs/DETECTION.md`](docs/DETECTION.md) for data preparation and commands.
-
-## Existing CPU quickstart
 
 ```python
 import numpy as np
-from laserperception import PointCloud
+from laserperception import PointCloud, __version__
 
-cloud = PointCloud(
-    xyz=np.array([[10.0, 20.0, 2.0], [11.5, 19.0, 3.0]]),
-    labels=np.array([0, 1]),
-    attributes={"intensity": np.array([120, 240])},
-    metadata={"source": "synthetic"},
-)
-print(len(cloud), cloud.xyz.dtype)  # 2 float32
+cloud = PointCloud(xyz=np.array([[0.0, 0.0, 0.0]], dtype=np.float32))
+print(__version__, len(cloud), cloud.xyz.dtype)
 ```
 
-Load existing point-cloud formats and normalize explicitly:
+### GPU detector and ROS demo
 
-```python
-from laserperception.io import load_kitti_bin, load_las
-from laserperception.transforms import normalize_coordinates
+The validated deployment stack is Ubuntu 22.04 under WSL2, Python 3.10, CUDA 11.8, TensorRT 8.6.1,
+and ROS 2 Humble. nuScenes, the official checkpoint, ONNX, and TensorRT engine are external and are
+not committed or included in the wheel.
 
-kitti = load_kitti_bin("sequences/00/velodyne/000000.bin")
-las = load_las("tile.las")
-normalized = normalize_coordinates(kitti, mode="min_xyz")
+After completing the [v0.1.0 quickstart](docs/QUICKSTART_V0_1.md), launch the real W1 replay and
+actual predicted boxes with:
+
+```bash
+bash scripts/run_v0_1_demo.sh
 ```
 
-Dataset paths come from configuration or environment variables; datasets, checkpoints, and
-generated artifacts must remain outside Git.
+The wrapper verifies cache roots, frozen hashes, prepared nuScenes mini data, the installed
+`exact_fast` / `live` config, pinned versions, and a CUDA operation before delegating to the existing
+M3 launch. Missing prerequisites fail with actionable instructions; no licensed dataset is silently
+downloaded and no engine is rebuilt.
 
-## Benchmarks
+## Three evidence-backed engineering stories
 
-The historical M1 measured record is
-benchmarks/m1/results/rtx4060_laptop_fp32.json.
+### 1. TensorRT without changing the detector
 
-The repaired M2 measured record is
-benchmarks/m2/results/rtx4060_pytorch_fp32_vs_tensorrt_fp16.json. At exact measurement commit
-`3f240d60569b53a2e4445d34b0905a807cf54879`, native PyTorch FP32 measured a 59.289 ms end-to-end
-median and TensorRT FP16 measured 45.637 ms, a direct 1.2991× median speedup. The corresponding
-network-only medians were 19.189 ms and 6.126 ms, a secondary 3.1326× speedup.
+M2 froze the pretrained checkpoint, ONNX, engine, samples, thresholds, and deployment boundary.
+The parity reference is MMDeploy-rewritten PyTorch FP32; the performance baseline is native
+MMDetection3D PyTorch FP32. Rewritten eager PyTorch is deliberately **not** the speedup denominator.
 
-The earlier run at `e2f9b6babb541d52beaa0bcd58e841a0a56cc851` remains rejected and is retained
-only as benchmarks/m2/diagnostics/rejected_e2f9b6b.json. Its 124.297× network and 23.101×
-end-to-end ratios are not canonical evidence. Parity v2 remains PASS and is not invalidated.
+Parity v1 failed and remains preserved. The separately preregistered parity v2 passed all Stage 1
+per-metric gates on the unchanged 20-sample suite and engine. The first M2 benchmark was rejected
+because it used the wrong denominator; the repaired result is the only canonical M2 performance
+record.
 
-The M1 result remains separate historical context:
+### 2. Exact fast voxelization after rejecting the easy shortcut
 
-| Milestone | Model | Dataset | Hardware | Precision | Latency | FPS | Peak VRAM |
-|---|---|---|---|---|---|---|---|
-| M1 (scene-start index 0; zero history) | Official MMDetection3D PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 52.896 ms model / 55.097 ms end to end | 18.905 model / 18.150 end to end | 0.381 GiB allocated / 0.400 GiB reserved |
-| M2 native baseline (scene-start index 0; zero history) | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP32 | 19.189 ms network / 59.289 ms end to end | 52.114 network / 16.867 end to end | 0.381 GiB network / 0.385 GiB end-to-end allocated |
-| M2 TensorRT (scene-start index 0; zero history) | Same PointPillars | nuScenes v1.0-mini | RTX 4060 Laptop GPU | FP16 | 6.126 ms network / 45.637 ms end to end | 163.250 network / 21.912 end to end | 31,519,476-byte engine / 1,212,340,736-byte engine device memory |
+Official deterministic hard voxelization dominated representative full-history latency. Upstream
+`deterministic=False` was fast, but saturated voxels retained different point subsets and frozen
+repeatability exposed observable detection changes, so M3B-V1 rejected it.
 
-The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fields also remain
-`Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
-complete statistics, memory definitions, parity disclosures, and acceptance criteria.
+M3B-V2 then implemented `ExactDeterministicVoxelizer` without custom CUDA/C++. It reproduced all
+81 validation voxel tensors bit-for-bit, repeated exactly on W1/W2, and retained exact raw TensorRT
+and final detection outputs on the frozen suite. Its direct diagnostics are useful bottleneck
+evidence, but they are not ROS timing.
 
-The canonical M3 measured record is
-benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json, measured at exact commit
-`a129b3507597b25f44ab1a833562f68883ebe8ce` on representative full-history `mini_val` index 42
-(354,182 points). The eligible 20 Hz test did not sustain its offered rate: callback median/P95
-were 75.701/89.197 ms, loopback median/P95 were 134.250/165.446 ms, effective output was 10.825 Hz,
-and 159/359 measured inputs dropped. Bounded follow-up sustained 10 Hz with zero drops and did not
-sustain 15 Hz (21/221 measured drops). This failure is canonical evidence and still closes M3.
+### 3. Honest representative ROS behavior
 
-Historical M3A scene-start failure, M3B-V1 `deterministic=False` rejection, and M3B-V2 exact
-diagnostic evidence remain preserved. See [benchmarks/m3/README.md](benchmarks/m3/README.md).
+The final canonical M3 workload is `mini_val` index 42 with 10 historical sweeps plus the current
+keyframe. The full run records callback entry through `publish()` return, same-host publisher-stamp
+to sink reception, drops, effective output rate, GPU telemetry, and first/second-half backlog
+behavior.
 
-## Roadmap
+- 10 Hz: sustained cleanly, 9.949 Hz useful output, 0/200 measured input drops.
+- 15 Hz: not sustained, about 13.34 Hz useful output, 21/221 drops.
+- 20 Hz: not sustained, about 10.83 Hz useful output, 159/359 drops; entry intervals and drops grew
+  between run halves.
 
-- **M0:** project direction and governance transition.
-- **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
-- **M2:** parity v2, native/rewrite fidelity, and the repaired canonical benchmark passed; PR #3
-  is merged.
-- **M3:** complete: model-ready ROS 2 Humble interface, production `exact_fast`/`live` deployment,
-  exact 81-sample and frozen-20 correctness gates, and canonical representative W1 measurement.
-  The final 20 Hz test did not sustain; 10 Hz was the highest tested clean bounded rate.
-- **M4:** evidence-backed v0.1 release.
-- **M5:** Jetson measurements only if physical hardware is available.
+This is behavior consistent with overload in the measured ROS configuration. The evidence does not
+establish DDS, executor, or thermal behavior as a single cause.
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md). Capabilities are not promised before their evidence gate.
+## Benchmark map
+
+The release separates workloads and evidence types rather than combining incompatible sessions:
+
+- **M1:** historical FP32 warm-cache scene-start index 0, zero historical sweeps.
+- **M2:** canonical same-session native PyTorch FP32 vs TensorRT FP16 on that same scene-start input.
+- **M3B-V2:** direct diagnostic evidence for exact-fast correctness and component latency.
+- **M3:** canonical ROS result on representative full-history W1 index 42.
+
+Start with [BENCHMARKS.md](docs/BENCHMARKS.md), then inspect the sanitized records under
+[`benchmarks/`](benchmarks/). The rejected M2 run, failed M3A rate test, rejected M3B-V1 candidate,
+and accepted M3B-V2 diagnostics remain visible in the scientific chronology.
+
+## Known issues and limitations
+
+Observed issues include material GPU session-to-session timing variability, an uncontrolled later
+M1-style reproduction that differed from the archived M1 result, and decreasing useful output under
+15/20 Hz offered-rate overload. Causes were not isolated. See the separate
+[Known issues section](docs/releases/v0.1.0.md#known-issues).
+
+v0.1.0 does not include training, tracking, camera fusion, a second detector, INT8, a raw LiDAR
+history builder, or Jetson measurements. It is research/demo software, not a safety-certified
+perception system.
 
 ## Repository map
 
 ```text
-configs/experiments/   Parked semantic-transfer research configurations
-ros2/                  Isolated ROS 2 Humble Python package, launch, config, and native tests
-scripts/ros2/          M3 round-trip and latency evidence tooling
-docs/                  Architecture, environment, benchmarks, roadmap, and research documentation
-src/laserperception/   Lightweight core, I/O, datasets, audits, and optional detection surface
-tests/                 Synthetic CPU tests, including ROS-independent M3 contracts
-.github/               CPU CI, security analysis, and contribution templates
+src/laserperception/   Lightweight CPU core and optional detector/deployment surface
+ros2/                  Isolated ROS 2 Humble package, config, launch, and native tests
+scripts/                Setup, evidence, validation, and demo entry points
+configs/                Frozen detector/deployment protocols and parked experiment config
+benchmarks/             Sanitized canonical results and intentionally retained diagnostics
+docs/                   Quickstart, architecture, evidence, roadmap, and release notes
+tests/                  Synthetic CPU regression suite
 ```
 
-## Safety and scientific integrity
+## Parked experimental infrastructure
 
-LaserPerception v0.1 is for research, benchmarking and demo use. It is NOT safety-certified and
-must not be treated as a certified perception system for operation around humans. Predictions can
-be missed, misclassified, or poorly localized.
+The earlier SemanticKITTI-to-DALES `PointCloud`, I/O, transforms, ontology, adapters, and audit
+pipeline remain tested and supported, but they are not the v0.1 product line. No segmentation model
+or training result exists; those fields remain `Pending measurement`.
 
-No accuracy, latency, throughput, memory, hardware, or dataset statistic is published unless it was
-actually measured with documented provenance. Unknown fields use `Pending measurement`.
+## Safety, citation, and licensing
 
-## Contributing, citation, and licensing
-
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md). Do not commit datasets,
-point-cloud archives, checkpoints, generated visualizations, raw benchmark outputs, or secrets.
-
-- Questions: [GitHub Discussions](https://github.com/muhammadmahadazher/laserperception/discussions)
-- Bugs and features: [GitHub Issues](https://github.com/muhammadmahadazher/laserperception/issues)
-- Security: [`SECURITY.md`](SECURITY.md)
+Predictions can be missed, misclassified, or poorly localized. Do not treat LaserPerception as a
+certified component for operation around people or vehicles.
 
 Original LaserPerception code is [Apache-2.0](LICENSE). That license does not relicense nuScenes,
-SemanticKITTI, KITTI, DALES, MMDetection3D, external weights, papers, or other third-party assets.
-See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). Citation metadata is in
-[`CITATION.cff`](CITATION.cff); until a release or paper exists, cite the repository URL and exact
-commit rather than inferring a DOI.
+external weights, TensorRT engines, ROS/OpenMMLab/NVIDIA components, datasets, or papers. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.1.0 and, where
+reproducibility matters, the exact commit; no DOI is claimed. Citation metadata is in
+[CITATION.cff](CITATION.cff).
+
+Questions and contributions: [CONTRIBUTING.md](CONTRIBUTING.md) ·
+[GitHub Discussions](https://github.com/muhammadmahadazher/laserperception/discussions) ·
+[Security policy](SECURITY.md)
