@@ -12,6 +12,10 @@ PointPillars detector on nuScenes, deploys its network through TensorRT FP16, pr
 voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble.
 LaserPerception did **not** train PointPillars or introduce a new detector architecture.
 
+![Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.](docs/assets/v0_1_ros_demo.png)
+
+*Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.*
+
 **Measured release status:** on representative full-history W1 (10 historical sweeps plus current,
 354,182 points), 10 Hz was the highest tested clean sustained ROS rate. Fifteen hertz and 20 Hz
 were not sustained. This failure is part of the release evidence, not hidden.
