@@ -1,9 +1,11 @@
 cff-version: 1.2.0
 message: >-
-  If you use LaserPerception, cite this repository and the exact commit used. No DOI or software
-  release exists yet.
+  If you use LaserPerception, cite LaserPerception v0.1.0 and, where reproducibility matters, the
+  exact commit used.
 type: software
 title: LaserPerception
+version: 0.1.0
+date-released: 2026-08-13
 authors:
   - given-names: Mahad
     family-names: Azher
@@ -12,12 +14,14 @@ repository-code: https://github.com/muhammadmahadazher/laserperception
 url: https://github.com/muhammadmahadazher/laserperception
 license: Apache-2.0
 abstract: >-
-  An open-source research framework for studying cross-view and cross-domain semantic understanding
-  across heterogeneous automotive and airborne 3D LiDAR point clouds.
+  An open-source 3D LiDAR object-detection and deployment-engineering toolkit built around a
+  pretrained PointPillars detector on nuScenes, TensorRT FP16 deployment, exact deterministic
+  deployment voxelization, and a ROS 2 interface.
 keywords:
   - LiDAR
   - point cloud
-  - semantic segmentation
-  - domain generalization
-  - SemanticKITTI
-  - DALES
+  - 3D object detection
+  - PointPillars
+  - nuScenes
+  - TensorRT
+  - ROS 2

@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "laserperception"
-version = "0.1.0.dev0"
-description = "Research toolkit for reproducible real-time 3D LiDAR object detection."
+version = "0.1.0"
+description = "Reproducible 3D LiDAR detection, TensorRT deployment, and ROS 2 integration."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -17,7 +17,9 @@ keywords = [
   "point-cloud",
   "3d-object-detection",
   "pointpillars",
-  "autonomous-driving-perception",
+  "tensorrt",
+  "ros2",
+  "deployment-engineering",
 ]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",

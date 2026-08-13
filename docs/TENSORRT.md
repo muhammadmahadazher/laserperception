@@ -1,6 +1,6 @@
 # M2 ONNX and TensorRT FP16 deployment
 
-Status: **Repaired canonical M2 measurement complete; PR #3 remains draft for final review.**
+Status: **M2 complete; repaired canonical measurement merged in PR #3.**
 
 ## Parity v1 — measured failure
 
@@ -426,8 +426,8 @@ averages over the run.
 
 The scientific chronology is therefore preserved: parity v1 failed; parity v2 passed; the first
 benchmark was rejected; the diagnostic proved native/rewrite fidelity and selected the native
-baseline; and the repaired canonical benchmark directly measured the result above. PR #3 remains
-draft and unmerged for final M2 review.
+baseline; and the repaired canonical benchmark directly measured the result above. PR #3 was
+merged after final M2 review.
 
 ## Artifact and portability policy
 
@@ -437,8 +437,8 @@ environment without private absolute paths.
 
 A serialized TensorRT engine is tied to its build/runtime environment and is not a generally
 portable model file. The repository will provide reproducible build instructions rather than an
-engine download. The ONNX and engine metadata above are measured build evidence. M2 measurement evidence is complete and awaiting final PR review; PR #3 remains draft and
-unmerged, while serialized ONNX and TensorRT binaries remain external.
+engine download. The ONNX and engine metadata above are measured build evidence. M2 is complete;
+serialized ONNX and TensorRT binaries remain external.
 
 MMDeploy integration is limited to five materially distinct failed attempts or approximately six
 focused hours, whichever comes first. At that boundary the exact failure and attempts are recorded

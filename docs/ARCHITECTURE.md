@@ -1,82 +1,96 @@
 # Architecture
 
-LaserPerception keeps its lightweight CPU core separate from optional detector backends and their
-heavy CUDA environments.
+LaserPerception v0.1.0 keeps a lightweight CPU package separate from an optional, pinned GPU/ROS
+deployment stack. The deployed detector is an official pretrained MMDetection3D PointPillars model;
+LaserPerception did not train or reimplement it.
+
+## v0.1 deployment path
+
+```mermaid
+flowchart TD
+    A["Model-ready multi-sweep PointCloud2"] --> B["exact_fast deterministic voxelization"]
+    B --> C["Frozen TensorRT FP16 PointPillars network"]
+    C --> D["Unchanged MMDeploy postprocess"]
+    D --> E["LaserPerception DetectionFrame"]
+    E --> F["vision_msgs / Detection3DArray"]
+    E --> G["RViz / Foxglove markers"]
+```
+
+The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. It is
+model-ready: v0.1 does not reconstruct history, perform TF lookup, or accept a raw single-sweep
+physical-LiDAR topic.
+
+The TensorRT network produces `cls_score`, `bbox_pred`, and `dir_cls_pred`. The existing MMDeploy
+postprocess remains unchanged and is shared by evidence paths. LaserPerception converts final
+predictions into a framework-independent `DetectionFrame`, then the ROS package converts that
+contract to `Detection3DArray` and visualization markers.
+
+## Voxelization and provenance policy
 
 ```mermaid
 flowchart LR
-    A["Official nuScenes multi-sweep input"] --> B["Official MMDetection3D preprocessing"]
-    B --> C["Official pretrained PointPillars"]
-    C --> D["Upstream prediction objects"]
-    D --> E["LaserPerception conversion adapter"]
-    E --> F["Framework-independent DetectionFrame"]
-    F --> G["JSON/table export"]
-    F --> H["Original headless BEV visualization"]
-    C --> I["FP32 benchmark boundaries"]
+    P["Explicit policy"] -->|"Historical / evidence"| O["official + full"]
+    P -->|"ROS deployment"| X["exact_fast + live"]
+    O --> T["Frozen TensorRT FP16 network"]
+    X --> T
 ```
 
-M1 uses the upstream MMDetection3D nuScenes pipeline, model implementation, voxelization, and NMS.
-LaserPerception does not reproduce those algorithms. Its owned surface is intentionally small: an
-asset manifest, lazy backend wrapper, documented result contract, visualization geometry, and
-benchmark/reporting helpers.
+- `official` is the historical/core evidence default and uses pinned deterministic MMCV hard
+  voxelization.
+- `exact_fast` is the ROS deployment choice. `ExactDeterministicVoxelizer` is a LaserPerception
+  implementation that uses pinned MMCV dynamic coordinates plus PyTorch grouping and was proven
+  bit-exact against official outputs on all 81 validation samples.
+- `full` provenance includes exact tensor hashes and remains the evidence default.
+- `live` provenance records lightweight semantic metadata and is selected explicitly by ROS.
+- Initialization fails closed. The upstream `deterministic=False` shortcut remains rejected and is
+  never a fallback.
+
+No custom CUDA/C++ kernel, voxel geometry change, model change, ONNX re-export, engine rebuild, or
+postprocess replacement was introduced by the accepted exact-fast path.
+
+## Detector and evidence boundaries
+
+M1 preserves the official calibrated nuScenes multi-sweep pipeline and exposes a small
+LaserPerception-owned result contract. nuScenes is not routed through the parked single-scan
+`PointCloud` abstraction.
+
+M2 separates two roles:
+
+- parity reference: MMDeploy-rewritten PyTorch FP32 versus TensorRT FP16;
+- performance baseline: native MMDetection3D PyTorch FP32 versus TensorRT FP16.
+
+The rewritten eager graph is needed to validate export semantics but is not the runtime speedup
+denominator. Historical scene-start benchmark inputs and representative full-history ROS inputs are
+reported separately.
 
 ## Dependency boundary
 
-`laserperception.core`, I/O, datasets, transforms, ontology, and audit remain importable and tested
-with the base CPU dependencies. Detection data types and geometry helpers must also remain CPU-only.
-The MMDetection3D adapter imports PyTorch and OpenMMLab lazily and raises an actionable error when
-the isolated detection environment is unavailable. Standard CI does not install GPU dependencies.
+The wheel packages `src/laserperception` only. Core types, I/O, datasets, transforms, ontology,
+audit, detection contracts, and geometry remain CPU-testable. PyTorch, CUDA, MMDetection3D,
+MMDeploy, ONNX, TensorRT, and ROS 2 are installed in isolated external environments and are imported
+only by optional paths.
+
+Standard GitHub CI does not install GPU or ROS dependencies. Manual integration gates validate the
+pinned WSL2 environment, external artifact hashes, CUDA device execution, clean colcon build,
+ROS-native tests, and production-path smoke.
 
 ## Detection result boundary
 
-MMDetection3D predictions are converted into a LaserPerception-owned `DetectionFrame`; public
-results do not contain upstream classes or tensors. The contract documents coordinate frame, XYZ
-axes, one fixed dimension order, yaw convention, class identity, scores, and optional velocity.
-Raw upstream class names are preserved. Export/visualization score filtering occurs after model
-execution and therefore does not redefine the benchmarked model path.
+Public detections document coordinate frame, XYZ axes, length-width-height order, geometric center,
+yaw, source class, score, and optional velocity. Raw upstream class names are preserved. Display or
+export filtering occurs after model execution and does not redefine the measured detector path.
 
-## nuScenes is not a `PointCloud` adapter
-
-Official nuScenes PointPillars inference uses calibrated sensor metadata and a multi-sweep pipeline.
-M1 preserves that upstream representation and does not route it through the existing single-scan
-`PointCloud` or its normalization transforms. Dataset roots, prepared metadata, checkpoints, caches,
-and artifacts stay outside the repository.
-
-## M3 deployment boundary
-
-M3 introduces an explicit voxelization policy without changing historical evidence:
-
-- `official` remains the M1/M2 and core/evidence default;
-- `exact_fast` is the fail-closed M3 ROS deployment choice; and
-- `full` provenance remains the evidence default while deployed ROS explicitly selects `live`.
-
-`ExactDeterministicVoxelizer` is a LaserPerception deployment implementation. It uses the pinned
-MMCV dynamic-coordinate CUDA operation plus PyTorch grouping to reproduce the pinned deterministic
-hard-voxel outputs exactly. It does not duplicate the model, voxel geometry, NMS, or postprocessing,
-and it adds no custom CUDA/C++ kernel.
-
-```mermaid
-flowchart LR
-    R["Model-ready PointCloud2"] --> P["Explicit policy"]
-    P -->|"Historical/evidence"| O["Official deterministic voxelization + full provenance"]
-    P -->|"M3 ROS"| X["Exact-fast voxelization + live provenance"]
-    O --> T["Frozen TensorRT FP16 network"]
-    X --> T
-    T --> U["Unchanged MMDeploy postprocess"]
-    U --> V["DetectionFrame / Detection3DArray"]
-```
 ## Parked segmentation architecture
 
 ```mermaid
 flowchart LR
-    J["SemanticKITTI / DALES hierarchy"] --> K["Directory adapter"]
-    K --> L["Raw scan or patch PointCloud"]
-    L --> M["Explicit normalization"]
-    M --> N["Explicit ontology mapping"]
-    N --> O["Dataset audit"]
+    A["SemanticKITTI / DALES"] --> B["Directory adapters"]
+    B --> C["PointCloud"]
+    C --> D["Explicit normalization"]
+    D --> E["Explicit ontology mapping"]
+    E --> F["Dataset audit"]
 ```
 
-Readers preserve point-level information and never silently translate, center, scale, crop,
-voxelize, or augment coordinates. LAS remains interchange/storage rather than a neural runtime
-representation. `min_xyz` remains explicit and non-mutating. This pipeline is tested and supported,
-but its future semantic-segmentation model is inactive before detection v0.1.
+This earlier infrastructure remains tested and supported. Readers preserve point-level data and do
+not silently normalize, crop, voxelize, or augment. Its semantic-segmentation model, training, and
+accuracy results remain `Pending measurement` and outside the v0.1 detector line.

@@ -5,122 +5,129 @@ modifying the repository. User instructions take precedence when they explicitly
 
 ## Active project and current milestone
 
-LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment engineering.
+LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit. The
+current milestone is **M4 — v0.1.0 release engineering**. M0, M1, M2, and M3 are complete. M4 may
+prepare, validate, document, and package the accepted implementation; it must not expand product or
+performance scope.
 
-The current milestone is **M2 — TensorRT FP16 deployment**: deploy the exact verified M1
-PointPillars checkpoint through the pinned official MMDeploy ONNX/TensorRT path, prove final-box
-parity against frozen tolerances, and measure same-session PyTorch FP32 versus TensorRT FP16
-performance on the available NVIDIA GeForce RTX 4060 Laptop GPU. M1 is complete and merged.
+The accepted v0.1 path uses an official pretrained MMDetection3D PointPillars checkpoint on
+nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, and a
+ROS 2 Humble interface. The earlier SemanticKITTI-to-DALES adapters, ontology, configuration, and
+audit pipeline remain tested, supported, parked experimental infrastructure and must not be
+deleted.
 
-Existing SemanticKITTI-to-DALES semantic-segmentation adapters, ontology, configuration, and audit
-pipeline remain built, tested, documented, and supported as parked experimental infrastructure.
-They are not the active development line before detection v0.1 and must not be deleted.
+## Branch ownership and collaboration
 
-## Roadmap scope
+- One coding implementer works on a feature or release branch at a time; the owner assigns that
+  implementer.
+- Other AI systems are review and specification participants unless the owner explicitly assigns
+  them as the implementer.
+- Never use two coding agents simultaneously on the same branch.
+- Review comments may guide the assigned implementer, but reviewers must not make uncoordinated
+  edits to that branch.
 
-- M0: transition project governance and documentation to the detection direction.
-- M1: official pretrained PointPillars, nuScenes v1.0-mini, FP32 CUDA inference, original BEV
-  visualization, and real RTX 4060 measurements.
-- M2 only: ONNX and TensorRT FP16 conversion and benchmarking.
-- M3 only: ROS 2 integration.
-- M4: evidence-backed v0.1 release.
-- M5 only if physical hardware is available: Jetson measurements and tuning.
+## Roadmap and scope
 
-Before v0.1, do not add training, a second detector architecture, INT8 optimization, camera fusion,
-foundation models, custom CUDA kernels, Jetson-specific tuning, or unrelated features unless the
-owner explicitly changes scope. Do not begin M3 work during M2.
+- M0: project direction and governance transition — complete.
+- M1: official pretrained PointPillars, nuScenes v1.0-mini, FP32 CUDA inference, BEV visualization,
+  and RTX 4060 measurements — complete.
+- M2: official MMDeploy ONNX/TensorRT FP16 path, parity/fidelity evidence, and repaired same-session
+  performance comparison — complete.
+- M3: ROS 2 Humble interface, exact deterministic deployment voxelization, correctness evidence,
+  and representative full-history ROS measurement — complete.
+- M4: evidence-backed v0.1.0 release — active release-engineering scope only.
+- M5: physical Jetson measurements only if target hardware is actually available.
 
-## Detection architecture rules
+Do not add training, a second detector, INT8, tracking, camera fusion, a raw single-sweep history
+builder, custom CUDA, Jetson tuning without hardware, or unrelated features unless the owner
+explicitly changes scope. During M4, do not optimize postprocessing, DDS, executors, voxelization,
+or any measured runtime path.
 
-- Use the official pretrained MMDetection3D PointPillars implementation and nuScenes pipeline. Do
-  not reimplement PointPillars, voxelization, NMS, CUDA operations, or training infrastructure.
-- Keep the LaserPerception-owned detection output contract small and independent of MMDetection3D
-  types. Document coordinate frame, axes, dimension order, and yaw convention; never silently swap
-  length and width.
-- Preserve official nuScenes class names in raw converted results. Any future taxonomy mapping must
-  be explicit and versioned.
-- Keep model output separate from export and visualization filtering. A display threshold must not
-  alter the model execution used for latency measurement.
-- nuScenes inference must preserve the official multi-sweep MMDetection3D preprocessing pipeline.
-  Do not force it through the existing single-scan `PointCloud` abstraction.
-- Generated visualizations and raw benchmark outputs belong in ignored artifact directories. Only
-  a reviewed, sanitized, real benchmark result may be committed.
+## Detection and deployment architecture
+
+- Use the official pretrained MMDetection3D PointPillars model and pinned nuScenes preprocessing.
+  LaserPerception did not train the detector and must not claim that it did.
+- Keep the framework-independent `DetectionFrame` contract small and explicit. Document coordinate
+  frame, axes, length-width-height order, yaw convention, classes, scores, and optional velocity;
+  never silently swap length and width.
+- Preserve official nuScenes class names in raw converted results. Future taxonomy changes must be
+  explicit, versioned, and evidence-gated.
+- Keep export and visualization filtering separate from model execution. Display thresholds must
+  not redefine benchmarked inference.
+- Preserve the official multi-sweep nuScenes path. Do not force it through the parked single-scan
+  `PointCloud` abstraction.
+- The historical/core evidence voxelization default is `official` with `full` provenance.
+- The ROS deployment policy is explicitly `exact_fast` with `live` provenance. `exact_fast` is a
+  LaserPerception implementation proven bit-exact against the pinned official deterministic hard
+  voxelization by the accepted 81-sample and frozen-detector gates.
+- The upstream `deterministic=False` shortcut remains rejected because it changed saturated
+  retained-point subsets and observable detections. Never silently fall back to it or substitute
+  another semantics-changing voxelizer without a new explicit evidence gate.
+- Do not duplicate the detector, voxel geometry, NMS, postprocessing, or the validated exact-fast
+  algorithm.
 
 ## Dependency and environment policy
 
-- The core package must remain lightweight, CPU-testable, and importable without GPU libraries.
-- PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, and TensorRT are permitted for M1/M2 only as
-  optional, isolated detection/deployment dependencies.
-- Heavy GPU dependencies must not become core requirements or be imported by core modules.
-- Standard GitHub CI must continue to run without a GPU or detection dependencies. GPU integration
-  tests are manual/local and must skip cleanly when their environment is absent.
-- Put CUDA-specific installation in dedicated setup and environment documentation. Keep the heavy
-  environment, datasets, checkpoints, caches, logs, and generated outputs outside the Google Drive
-  repository, preferably on the WSL ext4 filesystem.
-- ONNX and TensorRT are permitted starting in M2 only. ROS 2 is permitted starting in M3 only.
-
-## Parked segmentation architecture
-
-- Use the Python `src` layout and keep the public package import as `laserperception`.
-- Keep `PointCloud` simple: float32 `(N, 3)` geometry, optional point labels, separate attributes,
-  and metadata. Avoid inheritance and speculative abstraction.
-- File readers decode and preserve data. They must not normalize, crop, voxelize, or augment.
-- Coordinate normalization is an explicit, non-mutating transform. `min_xyz` means
-  `xyz - xyz.min(axis=0)` and must record its parameters.
-- Keep LAS as storage/interchange, not a required neural representation.
-- Experiment 001 retains its geometry-only six-class ontology: Ground, Building, Natural, Vehicle,
-  Pole, Fence. Its input policy is `x`, `y`, `z`; `min_xyz`; 0.30 m reference voxel size; and mIoU
-  plus per-class IoU. Its model and every unmeasured result remain `Pending measurement`.
+- The core wheel remains lightweight, CPU-testable, and importable without GPU or ROS libraries.
+- PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, TensorRT, and ROS 2 remain optional, isolated
+  deployment dependencies. Standard GitHub CI must run without them.
+- Heavy environments, datasets, checkpoints, ONNX files, TensorRT engines, caches, logs, and
+  generated outputs stay outside the repository, preferably on the WSL ext4 filesystem.
+- GPU and ROS integration tests are manual/local and must skip cleanly when their environment is
+  absent. Setup failures must be actionable and fail closed.
 
 ## Dataset and asset rules
 
-- Never commit datasets, point-cloud tiles, downloaded archives, checkpoints, weights, caches,
-  training outputs, generated visualizations, raw benchmark outputs, or logs.
-- Use environment/configuration variables for dataset roots; do not hard-code machine paths.
-- M1 and M2 use nuScenes v1.0-mini only. Respect its official access terms and never redistribute
-  it.
-- Download checkpoints only from an official upstream source, keep them outside the repository,
-  and record the source, version/commit, license note, and SHA256 after download.
-- Do not copy third-party dataset or model tooling without verifying license and attribution.
-- Verify source class IDs from authoritative dataset material before changing mappings. Cite the
-  source and test ignored/unmapped behavior.
-- Treat ontology or detector-class mapping changes as scientifically material preprocessing changes.
-- Apache-2.0 does not relicense nuScenes, SemanticKITTI, KITTI, DALES, external weights, papers, or
-  third-party assets.
+- Never commit datasets, point-cloud tiles, archives, checkpoints, weights, ONNX files, TensorRT
+  engines, caches, virtual environments, generated raw logs, or unreviewed visualizations.
+- Use environment variables or config for dataset/cache roots; never hard-code private machine
+  paths.
+- v0.1 detection evidence uses nuScenes v1.0-mini. Respect its terms and never redistribute it.
+- Download checkpoints only from the recorded official upstream source, store them externally, and
+  verify the recorded SHA256.
+- Apache-2.0 does not relicense nuScenes, SemanticKITTI, KITTI, DALES, external weights, engines,
+  papers, or third-party software.
 
 ## Scientific integrity and reproducibility
 
-- Never fabricate detections, accuracy, latency, throughput, memory, dataset statistics, hardware
-  data, citations, authors, DOIs, or novelty claims.
-- Use the exact text `Pending measurement` for unmeasured benchmark fields.
-- Record commit SHA, manifest/config, exact upstream versions/commits, checkpoint checksum, dataset
-  version/split, sample selection, precision, thresholds, warmup/measured counts, timing boundaries,
-  environment, hardware, timestamp, metrics, and memory method for measured runs.
-- FP32 M1 benchmarking must explicitly disable autocast and use correct CUDA synchronization/events.
-- M2 speedup must use a same-session MMDeploy-rewritten PyTorch FP32 baseline and TensorRT FP16
-  runtime with common voxelization and postprocessing; the historical M1 result is context only.
-- Do not claim SOTA, universality, production readiness, deployment suitability, or safety around
-  people without evidence and certification.
+- Never fabricate detections, accuracy, parity, latency, throughput, memory, dataset statistics,
+  hardware data, citations, authors, DOIs, or novelty claims. Use `Pending measurement` for
+  genuinely unmeasured benchmark fields.
+- Preserve failed and rejected evidence with its status. Do not promote diagnostics or compare
+  uncontrolled sessions as though they were same-session measurements.
+- Record commit SHA, config, upstream versions, artifact hashes, dataset/split/sample, sweep history,
+  precision, thresholds, warmups, measurements, timing boundaries, environment, hardware,
+  timestamp, statistics, and memory method for measured runs.
+- M2 parity reference: MMDeploy-rewritten PyTorch FP32 versus TensorRT FP16.
+- M2 performance baseline: native MMDetection3D PyTorch FP32 versus TensorRT FP16. Rewritten eager
+  PyTorch is not the performance denominator.
+- Correctness evidence and one-system performance measurements are distinct. Do not present RTX
+  4060 Laptop/WSL2 timings as portable hardware guarantees.
+- Do not claim SOTA, universality, production readiness, deployment safety, or autonomous-driving
+  certification.
 
-## Code, tests, and dependencies
+## Parked segmentation architecture
+
+- Keep the Python `src` layout and public package import `laserperception`.
+- Keep `PointCloud` as float32 `(N, 3)` geometry with optional labels, separate attributes, and
+  metadata. Readers preserve data and do not normalize, crop, voxelize, or augment.
+- `min_xyz` remains an explicit, non-mutating transform recorded in metadata. LAS remains storage
+  and interchange rather than a required neural representation.
+- Experiment 001 retains its geometry-only six-class ontology and `Pending measurement` model and
+  result fields.
+
+## Code, tests, packaging, and release discipline
 
 - Use type hints, focused docstrings, deterministic behavior, defensive validation, and clear
   exceptions.
-- Add synthetic CPU tests for the detection contract, conversion, geometry, parity, visualization
-  helpers, lazy optional-dependency failures, artifact metadata, and benchmark statistics. Tests
-  must never download datasets or checkpoints.
-- Run `ruff check .`, `ruff format --check .`, `mypy src`, `python -m pytest`, and
-  `python -m build` before a major push.
-- Keep base dependencies minimal and CPU-testable. Document optional detection dependency behavior
-  and skip optional-backend tests cleanly.
-
-## Licensing, citations, and contributions
-
-- Original LaserPerception code is Apache-2.0. Preserve `LICENSE` and `NOTICE`.
-- Record incorporated third-party material and required attribution in `THIRD_PARTY_NOTICES.md`.
-- Cite authoritative file specifications, framework documentation, model sources, and scientific
-  sources; do not invent bibliographic data.
-- Prefer Conventional Commit messages such as `feat(detection): ...`, `test: ...`, and `docs: ...`.
-- Keep commits logical, inspect staged content for secrets and large files, and update
-  `CHANGELOG.md` for user-visible changes.
+- Keep synthetic CPU tests free of downloads and heavy optional dependencies. Add regression tests
+  for release metadata or wrappers where they materially prevent drift.
+- Run `ruff check .`, `ruff format --check .`, `mypy src`, `python -m pytest`, `python -m build`, and
+  `git diff --check` before a major push. Run clean colcon and ROS-native smoke/tests for ROS release
+  validation.
+- Audit wheel and sdist separately. The wheel contains only the lightweight Python package; the
+  sdist may retain reviewed, sanitized benchmark evidence.
+- Preserve `LICENSE`, `NOTICE`, and `THIRD_PARTY_NOTICES.md`; verify rather than invent third-party
+  terms. Do not add a DOI unless one actually exists.
+- Prefer Conventional Commit messages, inspect staged content for secrets and large files, and keep
+  `CHANGELOG.md` current.
