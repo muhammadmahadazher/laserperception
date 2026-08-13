@@ -24,6 +24,11 @@ were not sustained. This failure is part of the release evidence, not hidden.
 [Read the v0.1.0 release notes](docs/releases/v0.1.0.md) ·
 [Inspect the benchmark evidence](docs/BENCHMARKS.md)
 
+**Post-v0.1 offline reconstruction:** M4.5a can now reproduce the model-ready XYZT cloud from raw
+nuScenes sweeps plus known calibration/ego poses. It matched the pinned official pipeline exactly
+on 81/81 mini-val samples and preserved all frozen 20-sample detector outputs. This is an offline
+library, not live physical-sensor ingestion. [Read the multi-sweep contract and evidence](docs/MULTISWEEP.md).
+
 ## What v0.1.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |
@@ -60,8 +65,9 @@ flowchart TD
     E --> G["RViz / Foxglove markers"]
 ```
 
-The ROS input already contains `x`, `y`, `z`, and `time_lag`. v0.1.0 does not build sweep history
-from a raw physical-LiDAR topic.
+The ROS input already contains `x`, `y`, `z`, and `time_lag`. The post-v0.1 M4.5a library can build
+that matrix offline from raw sweeps and known poses, but the ROS path still does not build live
+history from a raw physical-LiDAR topic. PointCloud2/TF/history integration remains planned M4.5b.
 
 Two explicit policies preserve historical evidence and deployed semantics:
 

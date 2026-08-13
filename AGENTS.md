@@ -6,9 +6,10 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Active project and current milestone
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit. The
-current milestone is **M4 — v0.1.0 release engineering**. M0, M1, M2, and M3 are complete. M4 may
-prepare, validate, document, and package the accepted implementation; it must not expand product or
-performance scope.
+current milestone is **M4.5a — offline raw-sweep multi-sweep reconstruction**. M0 through M4 are
+complete and v0.1.0 remains released. M4.5a is limited to pinned-upstream discovery,
+ROS-independent raw-sweep contracts, offline temporal reconstruction, parity evidence, tests, and
+documentation. It must not expand detector or performance scope.
 
 The accepted v0.1 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, and a
@@ -35,13 +36,15 @@ deleted.
   performance comparison — complete.
 - M3: ROS 2 Humble interface, exact deterministic deployment voxelization, correctness evidence,
   and representative full-history ROS measurement — complete.
-- M4: evidence-backed v0.1.0 release — active release-engineering scope only.
+- M4: evidence-backed v0.1.0 release — complete.
+- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — active.
+- M4.5b: raw `PointCloud2`, tf2, and live history integration — planned, not started.
 - M5: physical Jetson measurements only if target hardware is actually available.
 
-Do not add training, a second detector, INT8, tracking, camera fusion, a raw single-sweep history
-builder, custom CUDA, Jetson tuning without hardware, or unrelated features unless the owner
-explicitly changes scope. During M4, do not optimize postprocessing, DDS, executors, voxelization,
-or any measured runtime path.
+Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
+without hardware, or unrelated features unless the owner explicitly changes scope. During M4.5a,
+do not add ROS nodes, tf2, live buffering, physical-sensor adapters, postprocessing/DDS/executor/
+voxelization optimization, or changes to any measured runtime path.
 
 ## Detection and deployment architecture
 
@@ -56,6 +59,10 @@ or any measured runtime path.
   not redefine benchmarked inference.
 - Preserve the official multi-sweep nuScenes path. Do not force it through the parked single-scan
   `PointCloud` abstraction.
+- The M4.5a production builder is NumPy-only and returns the existing `ModelReadyPointCloud`.
+  MMDetection3D is its manual parity oracle only, not a runtime dependency. Preserve exact sweep
+  and source-row order, timestamp arithmetic, transform cast/write-back points, and strict range
+  semantics recorded in `docs/m45/UPSTREAM_MULTISWEEP_CONTRACT.md`.
 - The historical/core evidence voxelization default is `official` with `full` provenance.
 - The ROS deployment policy is explicitly `exact_fast` with `live` provenance. `exact_fast` is a
   LaserPerception implementation proven bit-exact against the pinned official deterministic hard

@@ -146,15 +146,12 @@ suffix for the current keyframe, its exact sequence is:
 l2e_r_s_mat = Quaternion(l2e_r_s).rotation_matrix
 e2g_r_s_mat = Quaternion(e2g_r_s).rotation_matrix
 
-R = (l2e_r_s_mat.T @ e2g_r_s_mat.T) @ (
-    np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T
+R = (l2e_r_s_mat.T @ e2g_r_s_mat.T) @ (np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T)
+T = (l2e_t_s @ e2g_r_s_mat.T + e2g_t_s) @ (np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T)
+T -= (
+    e2g_t @ (np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T)
+    + l2e_t @ np.linalg.inv(l2e_r_mat).T
 )
-T = (l2e_t_s @ e2g_r_s_mat.T + e2g_t_s) @ (
-    np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T
-)
-T -= e2g_t @ (
-    np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T
-) + l2e_t @ np.linalg.inv(l2e_r_mat).T
 
 sensor2lidar_rotation = R.T
 sensor2lidar_translation = T
@@ -168,9 +165,9 @@ shown; a parity implementation must not algebraically simplify it before proving
 The v2 converter turns that transform into the field named `lidar2sensor`:
 
 ```python
-lidar2sensor = np.eye(4)                         # float64
-rot = sensor2lidar_rotation                     # float64
-trans = sensor2lidar_translation                # float64
+lidar2sensor = np.eye(4)  # float64
+rot = sensor2lidar_rotation  # float64
+trans = sensor2lidar_translation  # float64
 lidar2sensor[:3, :3] = rot.T
 lidar2sensor[:3, 3:4] = -1 * np.matmul(rot.T, trans.reshape(3, 1))
 stored = lidar2sensor.astype(np.float32).tolist()

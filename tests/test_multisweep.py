@@ -96,6 +96,22 @@ def test_transform_from_poses_reproduces_translation() -> None:
     assert np.array_equal(transform.lidar2sensor, expected)
 
 
+def test_transform_from_poses_reproduces_rotation() -> None:
+    rotation = np.array(
+        [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+        dtype=np.float64,
+    )
+    transform = SweepTransform.from_poses(
+        source_id="history",
+        target_id="current",
+        sweep_pose=_pose(l2e_rotation=rotation),
+        current_pose=_pose(),
+    )
+    expected = np.eye(4, dtype=np.float32)
+    expected[:3, :3] = rotation.T.astype(np.float32)
+    assert np.array_equal(transform.lidar2sensor, expected)
+
+
 def test_builder_applies_rotation_then_translation_with_upstream_casts() -> None:
     current = _raw("current", 2_000_001, [[20.0, 20.0, 0.0, 1.0, 7.0]])
     history = _raw(
