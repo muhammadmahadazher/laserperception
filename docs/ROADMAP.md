@@ -53,17 +53,21 @@ the prerequisite for M3.
   final detections.
 - [x] Add bounded QoS, nuScenes replay, RViz/Foxglove markers, setup, launch, CPU tests, and ROS-native
   tests.
-- [ ] Pass the preregistered M3A callback-median and sustained 20 Hz rate gate.
+- [x] Record the preregistered M3A callback/rate failure without treating it as canonical
+  representative full-history performance.
 - [x] Diagnose the deterministic full-history voxelization bottleneck and reject the
   nondeterministic V1 candidate after its repeatability/fidelity failure.
-- [x] Demonstrate an experimental exact deterministic V2 candidate across all 81 voxel samples,
-  both 30-run repeatability suites, and the frozen 20 detector samples.
-- [ ] Obtain reviewer authorization before production integration and rerun the ROS rate gate.
+- [x] Demonstrate the exact deterministic V2 candidate across all 81 voxel samples, both 30-run
+  repeatability suites, and the frozen 20 detector samples.
+- [x] Integrate exact-fast/live fail-closed into the deployed ROS path while preserving
+  official/full historical M2 behavior.
+- [x] Reconfirm 81/81 and frozen-20 exactness through production, then publish the representative
+  W1 ROS result and bounded sustainable-rate characterization.
 
-The first M3A rate diagnostic failed, so no M3 benchmark is canonical. M3B-V2 demonstrated
-isolated direct-path 20 Hz feasibility with explicit live provenance, but the candidate is not
-integrated and M3 remains stopped for review. No postprocess or ROS/DDS optimization or M4 work
-has started.
+M3 is complete. The eligible representative W1 run did not sustain 20 Hz: callback median was
+75.701 ms, loopback median was 134.250 ms, effective output was 10.825 Hz, and 159/359 measured
+inputs dropped with first-to-second-half deterioration. Bounded characterization sustained 10 Hz
+and did not sustain 15 Hz. No postprocess, ROS/DDS/executor, custom CUDA, or M4 work was started.
 
 ## M4 — v0.1
 

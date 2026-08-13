@@ -14,6 +14,8 @@ Workloads used by the existing evidence differ:
 - M2 parity v2 covers 20 frozen samples: 19 full-history samples and scene-start index 0.
 - M3 PointCloud2 round-trip correctness uses those same 20 frozen samples.
 - The failed M3A 20 Hz stress replay repeatedly uses scene-start zero-history index 0.
+- The final canonical M3 replay uses representative full-history index 42: 10 historical sweeps
+  plus the current keyframe and 354,182 points.
 
 These qualifications preserve all existing results and clarify their input weight; they do not
 change any timing, parity, engine, model, threshold, precision, or sample selection.
@@ -39,25 +41,60 @@ diagnostic and must not be treated as accepted M3 performance. See
 [`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) and the sanitized
 [`voxelization_v1_ad0d38b.json`](../benchmarks/m3/diagnostics/voxelization_v1_ad0d38b.json).
 
-## M3B-V2 exact deterministic diagnostic — not canonical performance
+## M3B-V2 exact deterministic diagnostic
 
-M3B-V2 at exact measurement commit 85b6488c92eda266f049ff142fc06bdab658d7ed used the pinned
-dynamic voxel-coordinate CUDA operation plus PyTorch tensor grouping. The candidate did not use
-deterministic=False or add custom CUDA. It matched the official deterministic voxel tensors
+M3B-V2 at exact measurement commit `85b6488c92eda266f049ff142fc06bdab658d7ed`
+used the pinned dynamic voxel-coordinate CUDA operation plus PyTorch tensor grouping. It used
+neither `deterministic=False` nor custom CUDA. It matched official deterministic voxel tensors
 bit-for-bit on all 81 mini_val samples, repeated exactly for 30 W1 and 30 W2 runs, and produced
 exact raw TensorRT outputs and final frames on the frozen 20 detector samples.
 
-In one 20-warmup/100-measurement telemetry-eligible session, W1/W2 hard-layer medians were
-238.910/261.918 ms for the official reference and 1.758/1.918 ms for the exact candidate.
-Candidate direct E2E medians were 55.416/57.854 ms with historical full provenance and
-43.168/45.971 ms with explicit live provenance. Live mode skips per-frame full voxel hashing but
-does not change detection values; full remains the default.
+In its telemetry-eligible isolated session, W1/W2 hard-layer medians changed from
+238.910/261.918 ms to 1.758/1.918 ms. Candidate direct medians were 55.416/57.854 ms with
+historical full provenance and 43.168/45.971 ms with explicit live provenance. The ~43 ms W1
+figure is direct-runtime evidence, not ROS callback or loopback latency. The diagnostic remains
+preserved in [`VOXELIZATION_V2.md`](../benchmarks/m3/VOXELIZATION_V2.md); its candidate was
+later accepted and integrated through a separate commit and fresh correctness/performance run.
 
-These values demonstrate exact direct-path feasibility, not a ROS callback or sustained ROS-rate
-pass. The candidate was not integrated, there is no canonical M3 result, and PR #4 remains draft.
-See [VOXELIZATION_V2.md](../benchmarks/m3/VOXELIZATION_V2.md) and the structured
-[diagnostic JSON](../benchmarks/m3/diagnostics/deterministic_voxelization_v2_85b6488.json).
+## M3 — canonical representative full-history ROS result
 
+The canonical M3 record is
+[`benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json`](../benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
+It was measured at exact commit `a129b3507597b25f44ab1a833562f68883ebe8ce` using
+`mini_val` index 42, 10 historical sweeps plus current keyframe, 354,182 points, the
+production exact-fast voxelizer, explicit live provenance, ROS 2 Humble,
+`rmw_fastrtps_cpp`, and the unchanged TensorRT FP16 engine on the RTX 4060 Laptop GPU.
+
+Production correctness passed first: 81/81 official-vs-exact-fast voxel outputs were bit-exact,
+and all frozen 20 raw TensorRT outputs, DetectionFrames, point round trips, and
+Detection3DArrays were exact.
+
+The eligible performance session used a 30-second sustained GPU warmup, 20 message warmups, and
+200 measured accepted/output opportunities. Callback timing starts at callback entry and ends
+after `publish()` return. Loopback timing starts at the input publisher stamp and ends at
+same-host output-sink reception.
+
+| 20 Hz boundary | Count | Mean | Median | P90 | P95 | Min | Max | Population std | >50 ms |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Callback | 200 | 77.391 | 75.701 | 85.496 | 89.197 | 63.475 | 258.069 | 14.799 | 200 |
+| Same-host loopback | 200 | 138.457 | 134.250 | 158.999 | 165.446 | 93.869 | 458.677 | 42.475 | 200 |
+
+Latency values are milliseconds. Effective offered rate was 19.509 Hz; effective detector output
+was 10.825 Hz. The measured window contained 359 offered inputs and 159 drops. Detector-to-sink
+drops and final processing backlog were zero. First/second callback-entry interval medians were
+87.243/90.463 ms and drops were 77/82, so both grew and the system was explicitly classified as
+falling behind. **Representative 20 Hz operation was not demonstrated.**
+
+Bounded characterization stopped after the authorized two rates:
+
+| Offered | Callback median | Loopback median | Effective output | Measured drops | Result |
+|---|---:|---:|---:|---:|---|
+| 10 Hz | 65.483 ms | 81.400 ms | 9.949 Hz | 0/200 | sustained |
+| 15 Hz | 60.215 ms | 121.219 ms | 13.336 Hz | 21/221 | not sustained |
+
+Ten hertz was the highest tested clean rate. M3 closes with the failed 20 Hz result; no
+postprocess, DDS, executor, or custom CUDA optimization was performed. Historical M3A failure and
+M3B-V1 `deterministic=False` rejection remain preserved.
 LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
 measurement record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).

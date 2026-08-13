@@ -1,23 +1,23 @@
-# ROS 2 Humble interface (M3A)
+# ROS 2 Humble interface (M3 complete)
 
-M3A wraps the frozen M2 TensorRT FP16 detector with a ROS 2 interface. It consumes a
-**model-ready multi-sweep** point cloud and publishes canonical `vision_msgs/Detection3DArray`
-messages. It is not a raw physical-LiDAR adapter. The implementation passed the 20-sample
-transport-fidelity gate, but its first 20 Hz rate diagnostic failed the preregistered M3A target.
+M3 wraps the frozen M2 TensorRT FP16 detector with a ROS 2 Humble interface. It consumes a
+**model-ready multi-sweep** `sensor_msgs/PointCloud2` and publishes canonical
+`vision_msgs/Detection3DArray` messages. It is not a raw physical-LiDAR adapter.
 
-M3B-V1 rejected the nondeterministic fast voxelizer. M3B-V2 subsequently demonstrated an exact,
-repeatable PyTorch/MMCV candidate and isolated direct-path W1/W2 medians below 50 ms with explicit
-live provenance. The candidate remains outside the production runtime and has not been retested
-through the ROS callback/rate gate, so M3 remains non-canonical and stopped for review.
+The final production policy is explicit:
+
+- deployed ROS path: `voxelization_mode: exact_fast`, `provenance_mode: live`;
+- historical M2/evidence default: `voxelization_mode: official`, `provenance_mode: full`; and
+- no fallback from `exact_fast` to `deterministic=False` or another semantics-changing path.
+
+If exact-fast initialization fails, startup fails loudly. Optional `official` mode remains available
+for debugging and historical-reference use.
 
 ## Frozen environment and artifacts
 
-M3A targets Ubuntu 22.04 Jammy, ROS 2 Humble, Python 3.10, CUDA 11.8, TensorRT 8.6.1, and the
-existing M2 virtual environment. It does not upgrade the system Python, NVIDIA driver, CUDA,
-TensorRT, MMDeploy, or MMDetection3D.
-
-The runtime retains the M2 assets outside the repository and fails during startup if the engine is
-missing or its checksum differs:
+M3 targets Ubuntu 22.04 under WSL2, ROS 2 Humble, Python 3.10, CUDA runtime 11.8,
+TensorRT 8.6.1, MMDeploy 1.3.1, and the existing M2 environment. The final measurement used
+`rmw_fastrtps_cpp` on the NVIDIA GeForce RTX 4060 Laptop GPU.
 
 | Artifact | Frozen SHA256 |
 |---|---|
@@ -25,8 +25,9 @@ missing or its checksum differs:
 | ONNX | `61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16` |
 | TensorRT FP16 engine | `a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b` |
 
-Install the official Humble packages and build the isolated ROS workspace while keeping build
-outputs on WSL ext4:
+No checkpoint, ONNX, or engine was changed, re-exported, or rebuilt in M3.
+
+Build the isolated ROS workspace on WSL ext4:
 
 ```bash
 export LASERPERCEPTION_M1_CACHE="$HOME/.cache/laserperception"
@@ -39,163 +40,185 @@ source "$HOME/.venvs/laserperception-m2/bin/activate"
 source "$HOME/.cache/laserperception/m3/colcon/install/setup.bash"
 ```
 
-The script uses the official ROS apt-source package and apt packages; it does not install an
-unofficial `rclpy` wheel. The core `laserperception` wheel remains ROS-free and CPU-testable.
+The setup uses official ROS packages; it does not add ROS to the lightweight core wheel.
 
-## Exact input contract
+## Production voxelization and provenance
 
-The default input is `/laserperception/points_model_ready` with type
-`sensor_msgs/msg/PointCloud2`. Every message must be non-empty and contain these named fields:
+`exact_fast` reproduces the pinned MMCV deterministic hard-voxelization outputs exactly while
+using the pinned dynamic coordinate CUDA operation plus PyTorch tensor grouping. It is a supported
+LaserPerception deployment optimization preserving upstream semantics; it is not described as an
+upstream MMDetection3D implementation. It adds no custom CUDA, C++, or TensorRT plugin.
 
-| Field | Type | Meaning |
-|---|---|---|
-| `x` | `float32` | forward coordinate in the current LiDAR frame |
-| `y` | `float32` | left coordinate in the current LiDAR frame |
-| `z` | `float32` | up coordinate in the current LiDAR frame |
-| `time_lag` | `float32` | current-sweep timestamp minus source-sweep timestamp |
+The historical `full` provenance mode retains per-frame voxel SHA256 metadata. The ROS `live`
+mode records lightweight semantic provenance without hashing complete voxel tensors. The policy
+does not change voxel values, TensorRT outputs, postprocessing, or detections.
 
-Field order is arbitrary and extra fields are ignored. Organized and unorganized layouts are
-accepted when `point_step`, `row_step`, field offsets, and data length are valid. Required values
-must be finite. A missing `time_lag` is rejected with a throttled error; it is never treated as
-intensity.
+## Input contract
 
-The points must already combine the current sweep and up to ten prior sweeps using the pinned
-MMDetection3D semantics. Historical XYZ values must already be transformed into
-`msg.header.frame_id` for the current sweep; current points use `time_lag = 0`. The M3A detector
-performs no TF lookup, ego-motion reconstruction, history buffering, or sweep aggregation.
+The default input topic is `/laserperception/points_model_ready`. Every non-empty message must
+contain finite `float32` fields:
 
-The adapter constructs only the minimum official MMDetection3D tensor/data-sample batch. The
-existing official data preprocessor still owns voxelization, and M3 does not change the range,
-voxel size, maximum points, maximum voxels, engine profile, network, classes, or postprocessing.
+| Field | Meaning |
+|---|---|
+| `x` | forward coordinate in the current LiDAR frame |
+| `y` | left coordinate in the current LiDAR frame |
+| `z` | up coordinate in the current LiDAR frame |
+| `time_lag` | current-sweep timestamp minus source-sweep timestamp |
+
+Field order is arbitrary and extra fields are ignored. Missing `time_lag` is rejected; it is never
+treated as intensity. Historical XYZ values must already be transformed into the current LiDAR
+frame, current points use `time_lag = 0`, and the input must already combine the current keyframe
+with up to ten historical sweeps under the pinned MMDetection3D semantics. M3 performs no TF
+lookup, history buffering, motion compensation, or sweep aggregation.
+
+M3 does not change point-cloud range, voxel size, maximum points, maximum voxels, engine profile,
+network, class names, thresholds, or postprocessing.
 
 ## Output contract
 
-The default machine output is `/laserperception/detections` with type
-`vision_msgs/msg/Detection3DArray`. For every accepted input:
+The default output topic is `/laserperception/detections`. For every accepted input:
 
-- the array header and every contained `Detection3D.header` copy the exact input stamp and
-  `frame_id`;
-- `bbox.center.position` copies the LaserPerception geometric center directly, with **no**
-  `height / 2` Z shift;
-- `(length, width, height)` maps to `bbox.size.(x, y, z)`;
+- the array and each detection preserve the exact source stamp and frame;
+- geometric center is copied directly, with no height/2 Z shift;
+- length/width/height map to `bbox.size.x/y/z`;
 - x-forward/y-left/z-up yaw maps to `(0, 0, sin(yaw/2), cos(yaw/2))`;
-- the sole hypothesis retains the upstream class name and detector score and uses the same box
-  pose;
-- `Detection3D.id` is empty because M3 does not track objects; and
-- detector velocity is not transported because `Detection3DArray` has no canonical velocity
-  field. No unrelated field is overloaded.
+- class names and scores remain the upstream detector values;
+- IDs remain empty because M3 does not add tracking; and
+- velocity is not overloaded into an unrelated message field.
 
-Optional `/laserperception/markers` output uses `visualization_msgs/MarkerArray`. Markers are
-cleared and recreated on every frame, share the input header, and do not imply persistent object
-identity.
+Optional `/laserperception/markers` output recreates visualization markers per frame and does not
+imply persistent object identity.
 
-## QoS
+## QoS, replay, and visualization
 
-The checked-in defaults are explicit and bounded:
+Checked-in QoS remains bounded:
 
 - input: volatile, keep-last depth 1, best effort;
 - detections: volatile, keep-last depth 5, reliable; and
 - markers: the same bounded output profile.
 
-Depth and reliability parameters are configurable in
-`ros2/laserperception_ros/config/m3_ros2.yaml`. No queue is unbounded.
-
-## Replay and visualization
-
-The replay node calls the existing verified nuScenes preparation path, extracts the exact `Nx4`
-model-ready array, and serializes it to PointCloud2. It never independently reconstructs sweeps.
+The deployment YAML explicitly selects exact-fast/live and replays representative index 42 by
+default. The replay node uses the existing nuScenes preparation path and serializes its exact
+model-ready `Nx4` array; it does not independently rebuild sweep history.
 
 ```bash
-# Detector, repeating mini_val index 0 replay, and RViz2
 ros2 launch laserperception_ros m3_demo.launch.py
-
-# One-shot example without the launch file
-ros2 run laserperception_ros laserperception_replay --ros-args \
-  -p one_shot:=true -p loop:=false -p start_index:=0
 ```
 
-`start_index`, `sample_count`, `one_shot`, `loop`, and `publish_rate_hz` support one sample or a
-sequence. The default 20 Hz mode is a synthetic throughput stress cadence, **not** native nuScenes
-annotated-keyframe timing.
+A configured replay rate is a synthetic throughput stress cadence, not native nuScenes annotated
+keyframe timing. The supplied RViz2 configuration displays model-ready points and markers in
+`nuscenes_lidar_top`. Foxglove can subscribe to the same topics.
 
-The supplied RViz2 config displays `/laserperception/points_model_ready` and
-`/laserperception/markers` with `nuscenes_lidar_top` as the replay fixed frame. Change the fixed
-frame to the actual input `frame_id` for another model-ready source. No map/odom transform is
-fabricated. Foxglove can subscribe to the same three topics. Capture screenshots or recordings
-locally; do not commit bags or large video files.
+## Final production correctness gates
 
-## Correctness and latency gates
+Correctness was rerun through the actual production integration at exact measurement commit
+`a129b3507597b25f44ab1a833562f68883ebe8ce`:
 
-Run the frozen 20-sample transport gate after sourcing the environment:
+| Gate | Result |
+|---|---:|
+| Official vs production exact-fast `voxels`/`num_points`/`coors` | **81/81 bit-exact** |
+| Frozen raw TensorRT outputs | **20/20 exact** |
+| Frozen final DetectionFrames | **20/20 exact** |
+| PointCloud2 point values/hashes and Detection3DArray semantics | **20/20 exact** |
+| Low-rate W1 PointCloud2 → exact-fast runtime → Detection3DArray smoke | **1/1 pass** |
 
-```bash
-python scripts/ros2/validate_m3_roundtrip.py
-```
+The external correctness record SHA256 is
+`000ba4bd15bc4349a0df29a2252819e00326c406e5b1dc0e787c0c060359d388`.
+A difference would have stopped performance measurement.
 
-For each parity-v2 sample it compares exact point hashes, official voxel hashes, TensorRT raw
-output hashes/statistics, and final detections between the original dataset path and the real M3
-PointCloud2 round trip. A mismatch stops benchmarking. The frozen suite contains 19 samples with
-10 historical sweeps plus the current keyframe and one scene-start sample, index 0, with zero
-historical sweeps.
+## Final representative ROS performance
 
-The M3 benchmark records two distinct boundaries:
+The canonical record is
+[`benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json`](../benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
+It measures W1, `mini_val` index 42: 10 historical sweeps plus the current keyframe,
+354,182 points, exact-fast voxelization, live provenance, and the unchanged FP16 engine.
 
-1. **Callback processing:** callback entry through PointCloud2 validation/conversion, official
-   voxelization, TensorRT, shared postprocessing, Detection3DArray construction, and return from
-   `publisher.publish()`.
-2. **Same-host ROS loopback:** replay publication stamp through same-host input transport,
-   scheduling, detector processing, output transport, and sink reception. It is not
-   sensor-to-actuator latency.
+The eligible session used AC power, the existing host Ultimate Performance plan, a 30-second
+sustained GPU warmup, 20 message warmups, and 200 measured accepted/output opportunities.
+The immutable PointCloud2 replay payload was built once before timing; only its source timestamp
+was refreshed immediately before each publish.
 
-The protocol repeats mini_val index 0—a scene-start keyframe with zero accumulated historical
-sweeps—performs 20 warmups and 200 measured messages at a synthetic 20 Hz, and reports full
-distribution, deadline, count, effective-rate, and queue evidence. At exact
-implementation commit `d54da837602de2924825d3045cb4a17b72c5b7b0`, replay held 19.945 Hz but
-callback median/P95 were 238.255/274.637 ms and same-host loopback median/P95 were
-303.283/352.550 ms. All 200 observations in both boundaries exceeded 50 ms. The detector produced
-221 outputs from 1,096 published inputs (875 bounded-QoS input drops), for 3.990 Hz effective output;
-there was no rejected message, detector-to-sink loss, or final processing backlog.
+Timing boundaries:
 
-The M3A gate therefore failed. See `benchmarks/m3/README.md` and its diagnostic-only JSON. No
-optimization, postprocess change, profiling claim, or bottleneck assumption is part of M3A.
+1. **Callback processing:** PointCloud2 callback entry through publish-return after validation,
+   conversion, exact-fast voxelization, TensorRT, unchanged MMDeploy postprocessing,
+   DetectionFrame/Detection3DArray construction, and publication.
+2. **Same-host loopback:** source publisher ROS timestamp through Detection3DArray sink reception.
+   This is not sensor-to-actuator latency and excludes one-time replay-payload construction.
 
-## M3B-V1 direct voxelization diagnosis
+### Offered 20 Hz — not sustained
 
-The separately authorized diagnostic used the same model-ready inputs outside the ROS callback to
-isolate the official hard deterministic voxelizer. For the full-history W1 and W2 samples, its
-median direct voxelization-layer cost was 270.937 and 291.729 ms. An in-memory
-`deterministic=False` candidate measured 4.782 and 5.040 ms, but projected no-provenance-hash
-detector-path medians still measured 98.910 and 106.112 ms, so neither demonstrated the 50 ms
-target.
+| Boundary | Count | Mean | Median | P90 | P95 | Min | Max | Population std | >50 ms |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Callback processing | 200 | 77.391 ms | 75.701 ms | 85.496 ms | 89.197 ms | 63.475 ms | 258.069 ms | 14.799 ms | 200 (100%) |
+| Same-host loopback | 200 | 138.457 ms | 134.250 ms | 158.999 ms | 165.446 ms | 93.869 ms | 458.677 ms | 42.475 ms | 200 (100%) |
 
-The candidate was not repeatable enough for adoption. Its 30 W2 runs against the deterministic
-reference produced a 0.989834 box-axis-yaw pass fraction (19 failures among 1,869 matched
-high-confidence detections), below the existing 0.99 diagnostic yardstick. No production default,
-postprocess, ROS, or DDS path changed. See
-[`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) for full timing,
-saturation, fidelity, repeatability, and telemetry evidence.
+| Rate/count | Measured |
+|---|---:|
+| Requested offered rate | 20.000 Hz |
+| Effective offered rate | 19.509 Hz |
+| Replay published total | 398 |
+| Detector received/accepted/published total | 221 / 221 / 221 |
+| Sink received total | 221 |
+| Measured offered inputs | 359 |
+| Measured input drops | 159 |
+| Detector-to-sink drops | 0 |
+| Final processing backlog | 0 |
+| Effective detector output rate | 10.825 Hz |
 
-## M3B-V2 exact deterministic candidate
+Backlog behavior was measured, not inferred from the latency median:
 
-The V2 candidate reproduces the official deterministic hard-voxel selection, ordering, and
-zero-padding semantics using the pinned dynamic coordinate operation and PyTorch tensor grouping.
-It passed all 81 exact voxel samples, 30 W1 and 30 W2 repeatability runs, and the frozen 20 detector
-samples exactly.
+| Half | Callback entry interval median | Mean | P95 | Input drops |
+|---|---:|---:|---:|---:|
+| First | 87.243 ms | 90.605 ms | 100.266 ms | 77 |
+| Second | 90.463 ms | 94.027 ms | 106.794 ms | 82 |
 
-The separately committed `provenance_mode` option has two policies. `full` is the historical default
-and retains per-frame voxel SHA256 metadata. `live` must be requested explicitly and records
-lightweight semantic metadata without hashing full voxel tensors. Detection values remain exact.
-The standard ROS YAML still defaults to full.
+Entry intervals and drop counts both grew between halves. The run therefore fell behind and did
+not demonstrate sustained 20 Hz. The telemetry session was eligible: both halves were P0, memory
+clock was 8001 MHz, median SM clocks were 2595/2640 MHz, temperatures were 65.0/65.5 °C, and power
+draw medians were 37.69/39.145 W. WSL did not expose a power-limit value. These observations do not
+establish clock causality.
 
-In the eligible isolated direct-path session, candidate W1/W2 medians were 55.416/57.854 ms under
-full and 43.168/45.971 ms under live. The live values demonstrate direct-path 20 Hz feasibility,
-not ROS callback or transport performance. No production voxelizer default, postprocess, ROS, or
-DDS behavior was changed. Full evidence is in
-[benchmarks/m3/VOXELIZATION_V2.md](../benchmarks/m3/VOXELIZATION_V2.md).
+### Bounded sustainable-rate characterization
 
-## Live-sensor limitation
+Only the authorized two follow-ups were run:
 
-M3A must not be described as a drop-in single-sweep sensor driver interface. A future raw-sensor
-adapter would need timestamped transforms, scan history, motion compensation into the current
-LiDAR frame, and exact `time_lag` construction. That adapter, tracking, C++, custom CUDA, INT8,
-training, Jetson, camera fusion, and M4 are outside this milestone.
+| Offered rate | Effective output | Measured drops | Half deterioration | Result |
+|---|---:|---:|---|---|
+| 10 Hz | 9.949 Hz | 0/200 | none | **sustained** |
+| 15 Hz | 13.336 Hz | 21/221 | no growth, but loss remained | **not sustained** |
+
+At 10 Hz, callback and loopback medians were 65.483 and 81.400 ms. At 15 Hz they were 60.215 and
+121.219 ms. No 5 Hz run or further search was performed. The highest tested clean rate was 10 Hz.
+
+M3 is complete despite the honest 20 Hz failure; the milestone completion criterion required exact
+integration, preserved ROS semantics, representative measurement, and accurate disclosure—not a
+forced sensor-rate pass.
+
+## Preserved chronology
+
+- **M3A:** scene-start index 0 20 Hz stress failed at 238.255 ms callback median, 303.283 ms
+  loopback median, 3.990 Hz output, and 875 bounded input drops.
+- **M3B-V1:** `deterministic=False` was fast but rejected because saturated retained-point subsets
+  and observable repeatability/fidelity changed.
+- **M3B-V2:** the exact tensor candidate passed 81/81 voxel, W1/W2 repeatability, frozen raw output,
+  and final-frame gates. In that direct diagnostic, W1 live median fell from 333.137 to 43.168 ms.
+- **Final M3:** exact-fast/live was integrated fail-closed and measured through ROS on W1; 20 Hz
+  failed, 10 Hz sustained, and 15 Hz failed.
+
+Historical diagnostics remain under [`benchmarks/m3/`](../benchmarks/m3/); the final result does
+not overwrite them.
+
+## Deferred post-v0.1 work
+
+The following are documented backlog only:
+
+- unchanged MMDeploy postprocessing optimization (about 21 ms in the V2 component ledger);
+- ROS/DDS/executor investigation if later required;
+- further exact-fast tuning;
+- custom CUDA only if future evidence justifies it;
+- INT8; and
+- other detector architectures.
+
+No postprocess, DDS, executor, custom CUDA, tracking, raw-sensor adapter, INT8, training, Jetson,
+camera-fusion, or M4 work was implemented in this cycle.

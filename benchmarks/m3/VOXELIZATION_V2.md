@@ -1,6 +1,6 @@
 # M3B-V2 exact deterministic voxelization diagnostic
 
-Status: **diagnostic measurement complete; candidate not integrated into production.**
+Status: **diagnostic measurement complete; candidate subsequently accepted and integrated through a separate production commit.**
 
 The measurement was made at exact implementation commit
 85b6488c92eda266f049ff142fc06bdab658d7ed. The structured result is
@@ -13,8 +13,9 @@ to a placeholder. The protocol was frozen before measurement in
 [configs/detection/m3b_deterministic_voxelization_v2.yaml](../../configs/detection/m3b_deterministic_voxelization_v2.yaml),
 SHA256 9d0babfc7ae71ea6ce77cfb110ee02de07ea3d54a9b3e14c7fdfb7789309a8d6.
 
-This is diagnostic evidence, not canonical M3 performance. PR #4 remains draft, and the exact-fast
-candidate remains outside the production preprocessing path.
+This file remains diagnostic evidence rather than canonical M3 performance. The candidate was
+subsequently accepted, integrated into the M3 ROS production path, and revalidated at commit
+`a129b3507597b25f44ab1a833562f68883ebe8ce`; the V2 timing values remain unchanged and diagnostic.
 
 ## Scope and immutable assets
 
@@ -95,9 +96,10 @@ to excuse an input difference.
 - evidence, parity, native/rewrite diagnostics, and existing callers continue to use full unless
   they explicitly request otherwise.
 
-ROS configuration defaults to `full`; an operator must explicitly request `live`. Detection values
-were exact between full and live in every W0/W1/W2 reference and candidate check. The option
-does not change the model, network inputs, TensorRT outputs, postprocess, or detections.
+Core/evidence behavior continues to default to `full`. The final deployed ROS YAML explicitly
+requests `live`, while detection values remained exact between full and live in every W0/W1/W2
+reference and candidate check. The option does not change the model, network inputs, TensorRT
+outputs, postprocess, or detections.
 
 ## Measurement-session eligibility
 
@@ -175,14 +177,18 @@ After exact-fast voxelization, unchanged MMDeploy postprocessing is the largest 
 component. It was measured, not optimized. Full provenance adds approximately 12.4–13.6 ms; live
 provenance reduces that stage to about 0.06 ms.
 
-## Decision
+## Decision and subsequent integration
 
-V2 satisfies its exactness, repeatability, detector-fidelity, and meaningful full-history
-acceleration conditions. It is therefore a credible candidate for a separately reviewed production
-integration step. It is **not adopted by this result**: the repository production path remains the
-official deterministic voxelizer, PR #4 remains draft, and no canonical M3 performance record
-exists. A reviewer must decide whether to authorize integration and a fresh ROS callback/rate gate.
+V2 satisfied its exactness, repeatability, detector-fidelity, and meaningful full-history
+acceleration conditions and was accepted for the separately authorized final M3 integration.
+The V2 diagnostic itself did not become canonical performance: its candidate was integrated later,
+revalidated through the actual production path on all 81 voxel samples and frozen 20 detector/ROS
+samples, and then measured through ROS at exact commit
+`a129b3507597b25f44ab1a833562f68883ebe8ce`.
 
-M3B-V1 deterministic=False remains rejected. V2 added no custom CUDA, changed no model or
-artifacts, rebuilt no engine, exported no ONNX, optimized no postprocess or ROS/DDS path, and did
-not begin M4.
+The final ROS result is reported separately in
+[`results/rtx4060_ros2_humble_exact_tensorrt_fp16.json`](results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
+It did not sustain 20 Hz; bounded characterization sustained 10 Hz and did not sustain 15 Hz.
+M3B-V1 `deterministic=False` remains rejected. V2 and final integration added no custom CUDA,
+changed no model or artifacts, rebuilt no engine, exported no ONNX, optimized no postprocess or
+ROS/DDS path, and did not begin M4.

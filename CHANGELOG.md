@@ -8,13 +8,17 @@ releases begin.
 
 ### Changed
 
-- Completed M3B-V2 at exact measurement commit
-  85b6488c92eda266f049ff142fc06bdab658d7ed: 81/81 voxel samples, both 30-run
-  repeatability suites, and all 20 detector samples were exact. Full-history candidate layer
-  medians were 1.758/1.918 ms on W1/W2; direct E2E was 55.416/57.854 ms with full provenance and
-  43.168/45.971 ms with explicit live provenance. The result is diagnostic, the candidate was not
-  integrated, no canonical M3 result exists, and PR #4 remains draft.
+- Completed M3 at exact measurement commit
+  a129b3507597b25f44ab1a833562f68883ebe8ce. Production exact-fast/live preserved 81/81
+  official voxel outputs and all frozen 20 raw TensorRT outputs, final DetectionFrames, and ROS
+  round trips exactly. The representative full-history W1 ROS test did not sustain 20 Hz:
+  callback/loopback medians were 75.701/134.250 ms, effective output was 10.825 Hz, and 159/359
+  measured inputs dropped with first-to-second-half deterioration. Bounded characterization
+  sustained 10 Hz and did not sustain 15 Hz. This honest failure is the canonical M3 result.
 
+- Accepted M3B-V2 and integrated it through a separate production path without relabeling its
+  diagnostic timings. The direct W1 live median remains 43.168 ms direct-runtime evidence rather
+  than ROS callback evidence; historical M2 official/full behavior remains unchanged.
 - Added an explicit voxel-provenance policy for TensorRT output metadata: **full** remains the
   historical default with exact tensor hashes, while opt-in ROS **live** mode records only
   lightweight semantic metadata and deliberately omits the hashing cost.
@@ -68,10 +72,12 @@ releases begin.
 
 ### Added
 
-- Added the diagnostic-only M3B-V2 exact deterministic GPU-tensor voxelizer prototype, with
-  fail-closed 81-sample/repeatability/detector gates and a telemetry-backed same-session
-  performance/component-ledger protocol. The candidate remains outside production runtime.
-
+- Promoted the validated M3B-V2 voxelizer to the supported `exact_fast` LaserPerception
+  deployment policy, with fail-closed initialization and explicit ROS exact-fast/live configuration.
+  The historical/default M2 evidence policy remains official/full.
+- Added a sanitized canonical M3 result with the full callback/loopback distributions, offered and
+  effective rates, drops, first/second-half backlog behavior, eligible GPU telemetry, and the
+  strictly bounded 10/15 Hz characterization.
 - Isolated ROS 2 Humble Python package with one-time TensorRT initialization, bounded QoS,
   Detection3DArray conversion, nuScenes replay, per-frame visualization markers, launch/config,
   official setup, and ROS-native tests without adding ROS to the core wheel.

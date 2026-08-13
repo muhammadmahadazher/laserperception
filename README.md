@@ -8,7 +8,7 @@
 [![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](#project-status)
 
 LaserPerception is an open-source 3D LiDAR perception toolkit focused on reproducible real-time
-object detection and deployment. The active work is an evidence-gated ROS 2 Humble interface around
+object detection and deployment. M3 now provides an evidence-gated ROS 2 Humble interface around
 the exact verified M2 PointPillars TensorRT FP16 runtime without changing model semantics.
 
 M1 has verified real FP32 inference, framework-independent detections, an original pedestrian BEV
@@ -23,23 +23,29 @@ direct 1.2991× end-to-end median speedup for TensorRT FP16. PR #3 merged as
 
 ## Project status
 
-### Review required: M3B-V2 — exact candidate measured, not integrated
+### M3 complete — final review
 
-M3A adds a ROS 2 Humble Python package for model-ready multi-sweep PointCloud2 input, the unchanged
-M2 TensorRT FP16 runtime, canonical Detection3DArray output, nuScenes replay, and RViz/Foxglove
-markers. The exact 20-sample PointCloud2 round-trip fidelity gate passes, but the first 20 Hz ROS
-diagnostic failed its callback-median and sustained-rate gates, so no M3 result is canonical.
+M3 production now uses the supported LaserPerception `exact_fast` voxelization policy with explicit
+`live` provenance; historical M2 evidence remains on the default `official` voxelizer with `full`
+provenance. Startup fails closed if `exact_fast` cannot initialize—there is no fallback to a
+semantics-changing voxelizer.
 
-M3B-V1 identified deterministic hard voxelization as the full-history bottleneck; its
-deterministic=False candidate was rejected after W2 repeatability/fidelity failed. M3B-V2 then
-measured a PyTorch/MMCV exact-semantics candidate at commit
-85b6488c92eda266f049ff142fc06bdab658d7ed: all 81 voxel samples, both 30-run repeatability suites,
-and all 20 detector samples were exact. Candidate W1/W2 direct E2E medians were 55.416/57.854 ms
-with historical full provenance and 43.168/45.971 ms with explicit live provenance. The candidate
-is promising but remains experimental pending reviewer authorization and a new ROS rate gate. No
-postprocess or ROS/DDS optimization, raw single-sweep adapter, tracking, model change, or M4 work
-has started. See [docs/ROS2.md](docs/ROS2.md) and
-[benchmarks/m3/VOXELIZATION_V2.md](benchmarks/m3/VOXELIZATION_V2.md).
+Official deterministic hard voxelization became the dominant full-history bottleneck. The easy
+upstream `deterministic=False` path was rejected because saturated voxels retained different point
+subsets and observable detector repeatability changed. LaserPerception instead implemented an exact
+deterministic tensor path using pinned MMCV dynamic coordinates plus PyTorch grouping. It reproduced
+all 81/81 validation samples bit-for-bit, and the frozen 20 detector cases retained exact raw
+TensorRT outputs and final detections. In the accepted V2 diagnostic, representative W1 direct-live
+median latency fell from 333.137 ms to 43.168 ms; that ~43 ms figure is **direct runtime evidence**,
+not ROS callback or transport latency.
+
+The final representative W1 ROS session is reported separately. At 20 Hz, callback median was
+75.701 ms, same-host loopback median was 134.250 ms, effective output was 10.825 Hz, and 159/359
+measured inputs were dropped; first-to-second-half entry medians and drops both grew, so 20 Hz was
+not sustained. Bounded characterization sustained 10 Hz cleanly and did not sustain 15 Hz. M3 is
+complete with this honest result; PR #4 remains open for final review. No postprocess, DDS,
+executor, or custom CUDA optimization was added. See [docs/ROS2.md](docs/ROS2.md) and the
+[canonical M3 record](benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
 
 ### Existing experimental infrastructure
 
@@ -159,12 +165,16 @@ The parked SemanticKITTI-to-DALES mIoU, per-class IoU, VRAM, and wall-clock fiel
 `Pending measurement`. See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for exact boundaries,
 complete statistics, memory definitions, parity disclosures, and acceptance criteria.
 
-M3A has no canonical result. Its scene-start, zero-history synthetic 20 Hz diagnostic retained
-19.945 Hz replay but measured 238.255 ms callback median, 303.283 ms same-host loopback median,
-3.990 Hz output, and 875 bounded-QoS input drops. M3B-V2 subsequently demonstrated exact
-full-history direct-path medians below 50 ms only with explicit live provenance, but the candidate
-is not integrated and no new ROS callback/rate result exists. See
-[benchmarks/m3/README.md](benchmarks/m3/README.md).
+The canonical M3 measured record is
+benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json, measured at exact commit
+`a129b3507597b25f44ab1a833562f68883ebe8ce` on representative full-history `mini_val` index 42
+(354,182 points). The eligible 20 Hz test did not sustain its offered rate: callback median/P95
+were 75.701/89.197 ms, loopback median/P95 were 134.250/165.446 ms, effective output was 10.825 Hz,
+and 159/359 measured inputs dropped. Bounded follow-up sustained 10 Hz with zero drops and did not
+sustain 15 Hz (21/221 measured drops). This failure is canonical evidence and still closes M3.
+
+Historical M3A scene-start failure, M3B-V1 `deterministic=False` rejection, and M3B-V2 exact
+diagnostic evidence remain preserved. See [benchmarks/m3/README.md](benchmarks/m3/README.md).
 
 ## Roadmap
 
@@ -172,9 +182,9 @@ is not integrated and no new ROS callback/rate result exists. See
 - **M1:** pretrained PointPillars, nuScenes v1.0-mini, BEV predictions, RTX 4060 FP32 measurements.
 - **M2:** parity v2, native/rewrite fidelity, and the repaired canonical benchmark passed; PR #3
   is merged.
-- **M3:** model-ready ROS 2 Humble interface and 20-sample fidelity pass; M3A rate gate failed,
-  M3B-V1 deterministic=False remains rejected, and M3B-V2 produced an exact, repeatable, promising
-  diagnostic candidate that is not yet integrated. No canonical M3 result exists.
+- **M3:** complete: model-ready ROS 2 Humble interface, production `exact_fast`/`live` deployment,
+  exact 81-sample and frozen-20 correctness gates, and canonical representative W1 measurement.
+  The final 20 Hz test did not sustain; 10 Hz was the highest tested clean bounded rate.
 - **M4:** evidence-backed v0.1 release.
 - **M5:** Jetson measurements only if physical hardware is available.
 
