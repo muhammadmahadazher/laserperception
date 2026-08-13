@@ -8,6 +8,37 @@ releases begin.
 
 ### Changed
 
+- Completed M3 at exact measurement commit
+  a129b3507597b25f44ab1a833562f68883ebe8ce. Production exact-fast/live preserved 81/81
+  official voxel outputs and all frozen 20 raw TensorRT outputs, final DetectionFrames, and ROS
+  round trips exactly. The representative full-history W1 ROS test did not sustain 20 Hz:
+  callback/loopback medians were 75.701/134.250 ms, effective output was 10.825 Hz, and 159/359
+  measured inputs dropped with first-to-second-half deterioration. Bounded characterization
+  sustained 10 Hz and did not sustain 15 Hz. This honest failure is the canonical M3 result.
+
+- Accepted M3B-V2 and integrated it through a separate production path without relabeling its
+  diagnostic timings. The direct W1 live median remains 43.168 ms direct-runtime evidence rather
+  than ROS callback evidence; historical M2 official/full behavior remains unchanged.
+- Added an explicit voxel-provenance policy for TensorRT output metadata: **full** remains the
+  historical default with exact tensor hashes, while opt-in ROS **live** mode records only
+  lightweight semantic metadata and deliberately omits the hashing cost.
+
+- Qualified the frozen detection evidence by actual sweep history: M1 and canonical M2 performance
+  repeatedly use scene-start `mini_val` index 0 with zero historical sweeps; M2 parity v2 and M3
+  round-trip correctness use 19 full-history samples plus that scene-start sample; and the failed
+  M3A synthetic 20 Hz replay also uses scene-start index 0. The 81-sample validation split contains
+  79 full 10-history-plus-current inputs and two scene starts, so the multi-sweep dataset pipeline
+  is intact.
+- Advanced to M3 only after PR #3 merged and preserved every frozen M2 artifact. Exact-commit
+  20-sample PointCloud2 fidelity passed, but the M3A 20 Hz diagnostic measured 238.255 ms callback
+  median, 303.283 ms loopback median, 3.990 Hz output, and 875 bounded-QoS input drops.
+- Diagnosed official hard voxelization in authorized diagnostic-only M3B-V1. The in-memory
+  nondeterministic candidate greatly reduced direct voxelization time but did not demonstrate 20 Hz
+  end to end and failed W2 repeatability against the existing detector yardstick, so it was not
+  adopted. No model, engine, ONNX, postprocess, ROS/DDS production path, or M4 work changed.
+- Added a strict model-ready multi-sweep PointCloud2 interface that rejects missing `time_lag`,
+  performs no TF/history reconstruction, and preserves source headers and detector box semantics.
+
 - Preserved failed M2 parity protocol v1 as historical evidence and preregistered a separate parity
   v2 protocol with unchanged samples, artifacts, thresholds, and numerical tolerances plus
   per-detection 99% acceptance and explicit direction diagnostics. Stage 1 passed every gate on the
@@ -40,6 +71,18 @@ releases begin.
   infrastructure while keeping the core package and standard CI lightweight and CPU-testable.
 
 ### Added
+
+- Promoted the validated M3B-V2 voxelizer to the supported `exact_fast` LaserPerception
+  deployment policy, with fail-closed initialization and explicit ROS exact-fast/live configuration.
+  The historical/default M2 evidence policy remains official/full.
+- Added a sanitized canonical M3 result with the full callback/loopback distributions, offered and
+  effective rates, drops, first/second-half backlog behavior, eligible GPU telemetry, and the
+  strictly bounded 10/15 Hz characterization.
+- Isolated ROS 2 Humble Python package with one-time TensorRT initialization, bounded QoS,
+  Detection3DArray conversion, nuScenes replay, per-frame visualization markers, launch/config,
+  official setup, and ROS-native tests without adding ROS to the core wheel.
+- ROS-independent PointCloud2 layout and detection-message contracts with CPU regression tests, plus
+  all-20-sample exact transport-fidelity and two-boundary ROS latency tooling.
 
 - Frozen M2 MMDeploy/TensorRT deployment boundary, official upstream pins, fixed 20-sample parity
   set, immutable acceptance tolerances, shape-profile policy, and same-session benchmark protocol.

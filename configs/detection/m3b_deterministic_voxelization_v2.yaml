@@ -1,0 +1,227 @@
+schema_version: 1
+milestone: M3B-V2
+status: protocol_frozen_before_measurement
+purpose: diagnostic_only_exact_deterministic_fast_voxelization_prototype
+
+reference_source:
+  mmcv_version: 2.1.0
+  python_wrapper:
+    logical_name: mmcv/ops/voxelize.py
+    sha256: 745fe000b838cd37bddcd079e73bea854179f6e4057625553c420ff0c2480b58
+  pytorch_dispatch:
+    logical_name: mmcv/ops/csrc/pytorch/voxelization.cpp
+    sha256: ae79f221aea337bac0499422a7ddde594a247598c9bab339bc78edb01f3cea3c
+  cuda_launcher:
+    logical_name: mmcv/ops/csrc/pytorch/cuda/voxelization_cuda.cu
+    sha256: 9a089b79490c1a53648601d992bdacea4f1272af7c127dc0c2ac854ef3f79d2d
+  cuda_kernels:
+    logical_name: mmcv/ops/csrc/common/cuda/voxelization_cuda_kernel.cuh
+    sha256: a161dfcc06303b916cd919b0eb85b3aa3bae33c16730e87c46a0e6db1fd5ab49
+  verified_semantics:
+    coordinate_convention: z_y_x
+    invalid_points_rejected: true
+    voxel_order: first_occurrence_in_original_point_order
+    point_order_within_voxel: original_input_order
+    max_num_points_selection: first_points_in_original_order
+    max_voxels_selection: first_new_voxels_in_original_order
+    unused_slots: zero_filled
+
+voxelization:
+  type: hard
+  voxel_size: [0.25, 0.25, 8.0]
+  point_cloud_range: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+  max_num_points: 64
+  max_voxels_training: 30000
+  max_voxels_test: 40000
+  reference_deterministic: true
+
+candidate:
+  status: experimental_not_production
+  coordinate_operation: pinned_mmcv_dynamic_voxel_coordinate_cuda
+  implementation: pytorch_tensor_operations
+  coordinate_key_order: z_y_x
+  grouping_order: composite_voxel_key_then_original_point_index
+  stable_sort_required: false
+  voxel_order: ascending_first_original_point_index
+  point_order_within_voxel: ascending_original_point_index
+  custom_cuda: false
+  custom_cpp: false
+  tensorrt_plugin: false
+  deterministic_false_fallback_allowed: false
+
+dataset:
+  version: v1.0-mini
+  split: mini_val
+  expected_sample_count: 81
+  exact_fidelity_indices:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+    - 44
+    - 45
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+    - 51
+    - 52
+    - 53
+    - 54
+    - 55
+    - 56
+    - 57
+    - 58
+    - 59
+    - 60
+    - 61
+    - 62
+    - 63
+    - 64
+    - 65
+    - 66
+    - 67
+    - 68
+    - 69
+    - 70
+    - 71
+    - 72
+    - 73
+    - 74
+    - 75
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+  detector_fidelity_indices: [0, 4, 8, 12, 16, 21, 25, 29, 33, 37, 42, 46, 50, 54, 58, 63, 67, 71, 75, 80]
+  repeatability_indices: [42, 49]
+  timing_workloads:
+    W0: {sample_index: 0, history: scene_start_zero_historical_sweeps}
+    W1: {sample_index: 42, history: ten_historical_sweeps_plus_current_keyframe}
+    W2: {sample_index: 49, history: ten_historical_sweeps_plus_current_keyframe}
+
+exact_voxel_gate:
+  required_exact_samples: 81
+  compare: [voxel_count, shapes, dtypes, values, voxel_order, point_order, zero_padding]
+  tensors: [voxels, coors, num_points]
+  hash: sha256_contiguous_cpu_bytes
+  stop_on_first_mismatch: true
+
+repeatability:
+  runs_per_sample: 30
+  exact_candidate_input_hashes_required: true
+  raw_tensorrt_output_repeatability_recorded_separately: true
+
+detector_fidelity:
+  exact_raw_outputs_preferred: true
+  exact_final_detections_preferred: true
+  reuse_m3b_v1_yardstick_without_changes: true
+  exported_detection_threshold: 0.25
+  high_confidence_threshold: 0.30
+  matching_minimum_bev_iou: 0.50
+  minimum_bidirectional_high_confidence_coverage: 0.99
+  minimum_per_metric_pass_fraction: 0.99
+  maximum_xy_center_displacement_m: 0.25
+  maximum_absolute_z_center_difference_m: 0.25
+  maximum_relative_error_per_lwh_dimension: 0.05
+  maximum_axis_yaw_difference_degrees_modulo_pi: 5.0
+  maximum_absolute_score_difference: 0.05
+  minimum_heading_direction_agreement: 0.99
+  aggregate_maximum_exported_count_relative_difference: 0.005
+
+performance:
+  status: frozen_before_full_measurement
+  warmups: 20
+  measurements: 100
+  sustained_gpu_warmup_seconds: 30
+  timing: synchronized_time_perf_counter_wall_clock
+  telemetry_interval_seconds: 0.5
+  telemetry_during_measured_blocks: true
+  require_ac_power_when_host_state_is_available: true
+  clock_locking_required: false
+  clock_capability_and_setting_recorded: true
+  reject_obvious_reference_candidate_gpu_state_mismatch: true
+  gpu_state_rejection:
+    rule: disjoint_performance_states_corroborated_by_disjoint_observed_clock_ranges
+    universal_mhz_threshold: null
+  hard_voxel_layer_inputs: same_pre_collated_cuda_points
+  complete_preprocessing_boundary:
+    start: prepared_model_ready_sample_before_collation
+    end: voxelized_sample_with_padded_batch_coordinates
+  direct_e2e_boundary:
+    start: model_ready_point_cloud
+    end: detection_frame_with_selected_provenance_metadata
+  direct_e2e_paths:
+    reference: official_deterministic_voxelizer_then_frozen_tensorrt
+    candidate: exact_fast_candidate_voxelizer_then_frozen_tensorrt
+  provenance_modes:
+    full: historical_exact_voxel_hash_metadata
+    live: lightweight_semantic_metadata_without_per_frame_full_voxel_hashes
+  candidate_component_ledger_workloads: [W1, W2]
+  candidate_component_ledger:
+    - model_ready_preparation
+    - cpu_to_cuda_collation
+    - candidate_voxelization
+    - tensorrt_raw
+    - official_postprocess
+    - detection_frame_semantic_conversion
+    - provenance
+    - unattributed_residual
+    - total_e2e
+  direct_e2e_classification_ms:
+    direct_20_hz_feasibility_demonstrated: [0, 50]
+    close_subsequent_measured_bottleneck_optimization_may_be_justified: [50, 75]
+    meaningful_acceleration_20_hz_not_demonstrated: [75, 100]
+    insufficient_for_current_20_hz_goal: [100, null]
+scope:
+  production_candidate_adoption_allowed: false
+  deterministic_false_allowed: false
+  custom_cuda_allowed: false
+  postprocess_optimization_allowed: false
+  ros_dds_optimization_allowed: false
+  model_change_allowed: false
+  engine_rebuild_allowed: false
+  onnx_export_allowed: false
+  m4_allowed: false

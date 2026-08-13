@@ -1,5 +1,100 @@
 # Benchmarks
 
+## Detection workload sweep-history qualification
+
+The pinned nuScenes test pipeline requests 10 historical sweeps in addition to the current
+keyframe. The actual `mini_val` split has 81 samples: indices 0 and 40 are scene starts with zero
+available history, while the other 79 contain all 10 requested historical sweeps plus the current
+keyframe. The dataset and configured multi-sweep pipeline are therefore not broken.
+
+Workloads used by the existing evidence differ:
+
+- M1 performance repeatedly measures scene-start index 0, with zero historical sweeps.
+- M2 canonical performance repeatedly measures the same scene-start zero-history index 0.
+- M2 parity v2 covers 20 frozen samples: 19 full-history samples and scene-start index 0.
+- M3 PointCloud2 round-trip correctness uses those same 20 frozen samples.
+- The failed M3A 20 Hz stress replay repeatedly uses scene-start zero-history index 0.
+- The final canonical M3 replay uses representative full-history index 42: 10 historical sweeps
+  plus the current keyframe and 354,182 points.
+
+These qualifications preserve all existing results and clarify their input weight; they do not
+change any timing, parity, engine, model, threshold, precision, or sample selection.
+
+## M3B-V1 voxelization diagnostic — not canonical performance
+
+The authorized M3B-V1 diagnostic at exact implementation commit
+`ad0d38b6e926f3a03b471c192d3e815cd07d34d1` decomposed official preprocessing, compared the
+official deterministic hard voxelizer with an in-memory `deterministic=False` candidate, and
+measured W0/W1/W2 with 20 warmups and 100 synchronized observations. It did not change the official
+configuration, model, ONNX, engine, postprocess, or ROS/DDS runtime.
+
+The candidate made the direct W1/W2 voxelization layer much faster, but projected no-hash
+end-to-end medians were still 98.910/106.112 ms and did not demonstrate 20 Hz. Across the 20 frozen
+samples, coordinate sets, voxel counts, and non-saturated point multisets matched, while 12,136 of
+16,070 saturated voxels (75.52%) retained a different capped point subset. The single-pass detector
+comparison passed the existing diagnostic yardstick, but the required 30-run W2 comparison against
+the deterministic reference did not: axis-yaw pass fraction was 0.989834 (19 failures in 1,869
+matched high-confidence detections), below the frozen 0.99 fraction.
+
+The candidate is therefore not recommended for production integration. These values are
+diagnostic and must not be treated as accepted M3 performance. See
+[`benchmarks/m3/VOXELIZATION_V1.md`](../benchmarks/m3/VOXELIZATION_V1.md) and the sanitized
+[`voxelization_v1_ad0d38b.json`](../benchmarks/m3/diagnostics/voxelization_v1_ad0d38b.json).
+
+## M3B-V2 exact deterministic diagnostic
+
+M3B-V2 at exact measurement commit `85b6488c92eda266f049ff142fc06bdab658d7ed`
+used the pinned dynamic voxel-coordinate CUDA operation plus PyTorch tensor grouping. It used
+neither `deterministic=False` nor custom CUDA. It matched official deterministic voxel tensors
+bit-for-bit on all 81 mini_val samples, repeated exactly for 30 W1 and 30 W2 runs, and produced
+exact raw TensorRT outputs and final frames on the frozen 20 detector samples.
+
+In its telemetry-eligible isolated session, W1/W2 hard-layer medians changed from
+238.910/261.918 ms to 1.758/1.918 ms. Candidate direct medians were 55.416/57.854 ms with
+historical full provenance and 43.168/45.971 ms with explicit live provenance. The ~43 ms W1
+figure is direct-runtime evidence, not ROS callback or loopback latency. The diagnostic remains
+preserved in [`VOXELIZATION_V2.md`](../benchmarks/m3/VOXELIZATION_V2.md); its candidate was
+later accepted and integrated through a separate commit and fresh correctness/performance run.
+
+## M3 — canonical representative full-history ROS result
+
+The canonical M3 record is
+[`benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json`](../benchmarks/m3/results/rtx4060_ros2_humble_exact_tensorrt_fp16.json).
+It was measured at exact commit `a129b3507597b25f44ab1a833562f68883ebe8ce` using
+`mini_val` index 42, 10 historical sweeps plus current keyframe, 354,182 points, the
+production exact-fast voxelizer, explicit live provenance, ROS 2 Humble,
+`rmw_fastrtps_cpp`, and the unchanged TensorRT FP16 engine on the RTX 4060 Laptop GPU.
+
+Production correctness passed first: 81/81 official-vs-exact-fast voxel outputs were bit-exact,
+and all frozen 20 raw TensorRT outputs, DetectionFrames, point round trips, and
+Detection3DArrays were exact.
+
+The eligible performance session used a 30-second sustained GPU warmup, 20 message warmups, and
+200 measured accepted/output opportunities. Callback timing starts at callback entry and ends
+after `publish()` return. Loopback timing starts at the input publisher stamp and ends at
+same-host output-sink reception.
+
+| 20 Hz boundary | Count | Mean | Median | P90 | P95 | Min | Max | Population std | >50 ms |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Callback | 200 | 77.391 | 75.701 | 85.496 | 89.197 | 63.475 | 258.069 | 14.799 | 200 |
+| Same-host loopback | 200 | 138.457 | 134.250 | 158.999 | 165.446 | 93.869 | 458.677 | 42.475 | 200 |
+
+Latency values are milliseconds. Effective offered rate was 19.509 Hz; effective detector output
+was 10.825 Hz. The measured window contained 359 offered inputs and 159 drops. Detector-to-sink
+drops and final processing backlog were zero. First/second callback-entry interval medians were
+87.243/90.463 ms and drops were 77/82, so both grew and the system was explicitly classified as
+falling behind. **Representative 20 Hz operation was not demonstrated.**
+
+Bounded characterization stopped after the authorized two rates:
+
+| Offered | Callback median | Loopback median | Effective output | Measured drops | Result |
+|---|---:|---:|---:|---:|---|
+| 10 Hz | 65.483 ms | 81.400 ms | 9.949 Hz | 0/200 | sustained |
+| 15 Hz | 60.215 ms | 121.219 ms | 13.336 Hz | 21/221 | not sustained |
+
+Ten hertz was the highest tested clean rate. M3 closes with the failed 20 Hz result; no
+postprocess, DDS, executor, or custom CUDA optimization was performed. Historical M3A failure and
+M3B-V1 `deterministic=False` rejection remain preserved.
 LaserPerception M1 has a real, sanitized FP32 result from the stated RTX 4060 Laptop GPU. The
 measurement record is
 [`benchmarks/m1/results/rtx4060_laptop_fp32.json`](../benchmarks/m1/results/rtx4060_laptop_fp32.json).
@@ -51,9 +146,10 @@ At the final measurement commit, native and rewritten PyTorch were reconfirmed b
 | TensorRT FP16 | 45.655 ms | 45.637 ms | 48.210 ms | 48.711 ms | 41.354 ms | 50.457 ms | 2.045 ms | 21.912 |
 
 **Headline: TensorRT FP16 measured a direct 1.299134× end-to-end median speedup over native
-PyTorch FP32.** Both paths repeatedly used `mini_val` index 0 and identical multi-sweep preparation,
-official voxelization, shared MMDeploy postprocessing, and DetectionFrame conversion. Only the
-network runtime differed. Timing used synchronized `time.perf_counter` wall time.
+PyTorch FP32.** Both paths repeatedly used `mini_val` index 0, a scene-start keyframe with zero
+accumulated historical sweeps, and otherwise identical configured preparation, official
+voxelization, shared MMDeploy postprocessing, and DetectionFrame conversion. Only the network
+runtime differed. Timing used synchronized `time.perf_counter` wall time.
 
 ### 3. Network-only comparison — secondary
 
@@ -117,8 +213,9 @@ The measured PointPillars asset is
 by LaserPerception. The run used `mini_val` index 0, sample token
 `3e8750f331d7499e9b5123e9eb70f2e2`, explicit FP32, batch size one, 10 warm-up iterations, and 50
 measurements per boundary. Warm-ups run before measurements, and every iteration repeats
-`mini_val` index 0. The end-to-end result is therefore a warm-cache, repeated-single-sample latency
-microbenchmark—not cold-storage I/O latency or whole-dataset sequential throughput.
+`mini_val` index 0. This is a scene-start keyframe with zero accumulated historical sweeps. The
+end-to-end result is therefore a warm-cache, repeated-single-sample latency microbenchmark—not
+cold-storage I/O latency or whole-dataset sequential throughput.
 
 | Boundary | Mean | Median | P90 | P95 | Min | Max | Population std. dev. | FPS from median |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|

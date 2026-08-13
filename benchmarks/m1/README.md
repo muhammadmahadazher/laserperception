@@ -8,6 +8,11 @@ NVIDIA GeForce RTX 4060 Laptop GPU at commit
 `f435f03b0e8cfdaf1b1af5b17d5c4d1e105adf86`, using official nuScenes v1.0-mini validation index 0,
 explicit FP32, batch size one, 10 warm-up iterations, and 50 measurements per boundary.
 
+Index 0 is the first sample of its scene: it contains the current keyframe and zero historical
+sweeps (33,587 points). The measured values are therefore scene-start/zero-history performance,
+not representative ten-history-sweep steady-state performance. The configured upstream pipeline
+still supports up to ten historical sweeps plus the current keyframe.
+
 Summary: model median 52.896 ms (18.905 FPS), model P95 60.729 ms; end-to-end median 55.097 ms
 (18.150 FPS), end-to-end P95 62.568 ms; peak PyTorch CUDA memory 0.381 GiB allocated and 0.400 GiB
 reserved. `docs/BENCHMARKS.md` contains the full concise table; the JSON is authoritative.

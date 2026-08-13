@@ -39,6 +39,7 @@ outputs/
 artifacts/
 /benchmarks/m1/raw/
 /benchmarks/m2/raw/
+/benchmarks/m3/raw/
 *.pt
 *.pth
 *.ckpt

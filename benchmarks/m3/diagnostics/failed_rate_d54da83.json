@@ -1,0 +1,96 @@
+{
+  "callback_processing_latency": {
+    "above_50_ms_count": 200,
+    "above_50_ms_fraction": 1.0,
+    "count": 200,
+    "fps_from_median_latency": 4.197175048941841,
+    "max_ms": 344.950665,
+    "mean_ms": 239.02648298,
+    "median_ms": 238.2554905,
+    "min_ms": 191.421411,
+    "p90_ms": 267.8404446,
+    "p95_ms": 274.6373462,
+    "population_std_ms": 22.305997308238386
+  },
+  "engine_sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+  "environment": {
+    "driver": "610.88",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.10",
+    "rmw_implementation": "rmw_fastrtps_cpp",
+    "ros_distro": "humble",
+    "tensorrt": "8.6.1",
+    "ubuntu": "22.04"
+  },
+  "gate": {
+    "callback_median_at_or_below_50_ms": false,
+    "effective_output_at_least_95_percent_of_requested_rate": false,
+    "effective_replay_at_least_95_percent_of_requested_rate": true,
+    "no_processing_induced_loss_or_final_backlog": false,
+    "pass": false
+  },
+  "generated_at_utc": "2026-08-11T14:33:31.386030+00:00",
+  "input_contract": {
+    "fields": [
+      "x",
+      "y",
+      "z",
+      "time_lag"
+    ],
+    "semantics": "model_ready_multi_sweep_current_lidar_frame",
+    "topic": "/laserperception/points_model_ready"
+  },
+  "limitations": [
+    "callback processing ends immediately after Detection3DArray publish returns",
+    "same-host loopback is not sensor-to-actuator latency",
+    "20 Hz replay is synthetic stress cadence, not native nuScenes keyframe timing",
+    "input is already model-ready multi-sweep data; no TF or sweep history is included"
+  ],
+  "measurement_commit": "d54da837602de2924825d3045cb4a17b72c5b7b0",
+  "message_counts": {
+    "detections_published": 221,
+    "detector_accepted": 221,
+    "detector_received": 221,
+    "detector_rejected": 0,
+    "replay_published": 1096,
+    "sink_received": 221
+  },
+  "milestone": "M3A",
+  "protocol": {
+    "executor": "three_thread_same_process_separate_ros_nodes",
+    "input_qos": "keep_last_depth_1_best_effort_volatile",
+    "markers_enabled": false,
+    "measured_messages": 200,
+    "output_qos": "keep_last_depth_5_reliable_volatile",
+    "replay_mode": "synthetic_20_hz_performance_stress_not_native_keyframe_cadence",
+    "replay_rate_hz": 20.0,
+    "sample": "nuScenes v1.0-mini mini_val index 0 repeated",
+    "warmup_messages": 20
+  },
+  "same_host_ros_loopback_latency": {
+    "above_50_ms_count": 200,
+    "above_50_ms_fraction": 1.0,
+    "count": 200,
+    "fps_from_median_latency": 3.2972471721893264,
+    "max_ms": 468.692563,
+    "mean_ms": 312.519205305,
+    "median_ms": 303.283299,
+    "min_ms": 266.043503,
+    "p90_ms": 348.8649176,
+    "p95_ms": 352.54952115,
+    "population_std_ms": 30.698962474801384
+  },
+  "schema_version": "1.0",
+  "status": "fail_review_required",
+  "sustained_rate": {
+    "accumulating_backlog_observed": false,
+    "effective_output_hz": 3.989641039145255,
+    "effective_replay_publish_hz": 19.944871972743496,
+    "final_processing_backlog_messages": 0,
+    "input_messages_not_received": 875,
+    "output_sensor_rate_fraction": 0.19948205195726273,
+    "output_transport_loss_messages": 0,
+    "processing_induced_loss": true,
+    "rejected_messages": 0
+  }
+}

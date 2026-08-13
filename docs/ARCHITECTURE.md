@@ -42,6 +42,29 @@ M1 preserves that upstream representation and does not route it through the exis
 `PointCloud` or its normalization transforms. Dataset roots, prepared metadata, checkpoints, caches,
 and artifacts stay outside the repository.
 
+## M3 deployment boundary
+
+M3 introduces an explicit voxelization policy without changing historical evidence:
+
+- `official` remains the M1/M2 and core/evidence default;
+- `exact_fast` is the fail-closed M3 ROS deployment choice; and
+- `full` provenance remains the evidence default while deployed ROS explicitly selects `live`.
+
+`ExactDeterministicVoxelizer` is a LaserPerception deployment implementation. It uses the pinned
+MMCV dynamic-coordinate CUDA operation plus PyTorch grouping to reproduce the pinned deterministic
+hard-voxel outputs exactly. It does not duplicate the model, voxel geometry, NMS, or postprocessing,
+and it adds no custom CUDA/C++ kernel.
+
+```mermaid
+flowchart LR
+    R["Model-ready PointCloud2"] --> P["Explicit policy"]
+    P -->|"Historical/evidence"| O["Official deterministic voxelization + full provenance"]
+    P -->|"M3 ROS"| X["Exact-fast voxelization + live provenance"]
+    O --> T["Frozen TensorRT FP16 network"]
+    X --> T
+    T --> U["Unchanged MMDeploy postprocess"]
+    U --> V["DetectionFrame / Detection3DArray"]
+```
 ## Parked segmentation architecture
 
 ```mermaid

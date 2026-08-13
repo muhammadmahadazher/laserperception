@@ -1,0 +1,1528 @@
+{
+  "schema_version": "1.0",
+  "milestone": "M3",
+  "canonical": true,
+  "status": "complete_representative_20_hz_not_sustained",
+  "measurement_commit": "a129b3507597b25f44ab1a833562f68883ebe8ce",
+  "generated_at_utc": "2026-08-13T11:12:48.842535+05:00",
+  "conclusion": {
+    "m3_complete": true,
+    "representative_20_hz_operation_demonstrated": false,
+    "highest_tested_sustainable_rate_hz": 10.0,
+    "summary": "The exact production path preserved all correctness gates. W1 did not sustain 20 Hz; bounded characterization sustained 10 Hz and did not sustain 15 Hz."
+  },
+  "environment": {
+    "backend_versions": {
+      "mmcv": "2.1.0",
+      "mmdet": "3.2.0",
+      "mmdet3d": "1.4.0",
+      "mmengine": "0.10.7",
+      "torch": "2.1.0+cu118"
+    },
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "host_ac_power_confirmed_external": true,
+    "host_performance_mode_confirmed_external": "ultimate_performance_27869068",
+    "python": "3.10",
+    "rmw_implementation": "rmw_fastrtps_cpp",
+    "ros_distro": "humble",
+    "ubuntu": "22.04",
+    "deployment_versions": {
+      "cuda_runtime": "11.8",
+      "tensorrt": "8.6.1",
+      "mmdeploy": "1.3.1"
+    }
+  },
+  "artifacts": {
+    "checkpoint": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "engine": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+    "onnx": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16"
+  },
+  "production_policy": {
+    "fallback_allowed": false,
+    "provenance_mode": "live",
+    "voxelization_mode": "exact_fast"
+  },
+  "correctness": {
+    "source_external_record": {
+      "logical_name": "production_correctness_a129b35.json",
+      "sha256": "000ba4bd15bc4349a0df29a2252819e00326c406e5b1dc0e787c0c060359d388"
+    },
+    "status": "pass",
+    "implementation_commit": "a129b3507597b25f44ab1a833562f68883ebe8ce",
+    "voxelization_mode": "exact_fast",
+    "provenance_mode": "live",
+    "official_vs_exact_fast_voxel_gate": {
+      "required_sample_count": 81,
+      "completed_sample_count": 81,
+      "passed": true,
+      "all_samples_exact": true,
+      "tensors": [
+        "voxels",
+        "num_points",
+        "coors"
+      ]
+    },
+    "frozen_detector_and_ros_gate": {
+      "sample_count": 20,
+      "passed": true,
+      "point_contract": [
+        "x",
+        "y",
+        "z",
+        "time_lag"
+      ],
+      "all_voxel_hashes_exact": true,
+      "all_raw_tensorrt_outputs_exact": true,
+      "all_detection_frames_exact": true,
+      "all_detection3darrays_exact": true,
+      "all_point_values_exact": true,
+      "all_pointcloud2_roundtrip_hashes_exact": true
+    },
+    "low_rate_w1_ros_smoke": {
+      "source_external_record": {
+        "logical_name": "ros_w1_smoke_a129b35.json",
+        "sha256": "a0eb5516144529e0bafc398e361dd0d94ad90d8e802e7c34a3bc3ef74077121c"
+      },
+      "status": "pass",
+      "point_count": 354182,
+      "published_input": 1,
+      "accepted_callbacks": 1,
+      "published_detections": 1,
+      "sink_received": 1,
+      "rejected": 0
+    }
+  },
+  "workload": {
+    "dataset": "nuScenes v1.0-mini",
+    "history": "10 historical sweeps plus current keyframe",
+    "point_count": 354182,
+    "sample_index": 42,
+    "split": "mini_val"
+  },
+  "protocol": {
+    "primary": {
+      "callback_boundary": "PointCloud2 callback entry through Detection3DArray publish return",
+      "executor": "three_thread_same_process_separate_ros_nodes",
+      "input_qos": "keep_last_depth_1_best_effort_volatile",
+      "loopback_boundary": "input publisher ROS stamp through Detection3DArray sink reception",
+      "markers_enabled": false,
+      "measured_accepted_output_opportunities": 200,
+      "output_qos": "keep_last_depth_5_reliable_volatile",
+      "replay_payload_construction": "PointCloud2 payload built once before timing; only its source timestamp is refreshed immediately before each publish",
+      "replay_rate_hz": 20.0,
+      "warmup_messages": 20
+    },
+    "sustained_gpu_warmup": {
+      "actual_seconds": 30.02717880899999,
+      "inference_count": 487,
+      "passed": true,
+      "requested_seconds": 30.0
+    },
+    "bounded_characterization": "After 20 Hz failed, test 10 Hz first; because it sustained, test 15 Hz; stop after two characterization rates."
+  },
+  "representative_20_hz": {
+    "source_external_record": {
+      "logical_name": "ros_w1_20hz_a129b35.json",
+      "sha256": "1bc77d7cbbdc6151b2a9c17815528d7bbedd10cee49c458f60336778f23b3046"
+    },
+    "status": "representative_20_hz_not_sustained",
+    "callback_processing_latency": {
+      "above_50_ms_count": 200,
+      "above_50_ms_fraction": 1.0,
+      "count": 200,
+      "fps_from_median_latency": 13.209926202747269,
+      "max_ms": 258.069033,
+      "mean_ms": 77.39055536,
+      "median_ms": 75.70065,
+      "min_ms": 63.474549,
+      "p90_ms": 85.49619489999999,
+      "p95_ms": 89.19739829999999,
+      "population_std_ms": 14.798914185937994
+    },
+    "same_host_ros_loopback_latency": {
+      "above_50_ms_count": 200,
+      "above_50_ms_fraction": 1.0,
+      "count": 200,
+      "fps_from_median_latency": 7.448767572168772,
+      "max_ms": 458.676939,
+      "mean_ms": 138.456964135,
+      "median_ms": 134.2503965,
+      "min_ms": 93.868873,
+      "p90_ms": 158.999255,
+      "p95_ms": 165.4456926,
+      "population_std_ms": 42.474853760347
+    },
+    "callback_entry_and_drop_halves": {
+      "callback_entry_interval_median_grew": true,
+      "falling_behind_between_halves": true,
+      "first_half": {
+        "callback_entry_intervals": {
+          "count": 99,
+          "fps_from_median_latency": 11.46224554101455,
+          "max_ms": 401.561259,
+          "mean_ms": 90.60459965656565,
+          "median_ms": 87.24294,
+          "min_ms": 73.126189,
+          "p90_ms": 98.1191092,
+          "p95_ms": 100.2661572,
+          "population_std_ms": 32.26084203447082
+        },
+        "input_drops": 77
+      },
+      "input_drops_grew": true,
+      "second_half": {
+        "callback_entry_intervals": {
+          "count": 100,
+          "fps_from_median_latency": 11.054295838094095,
+          "max_ms": 281.634154,
+          "mean_ms": 94.02680146,
+          "median_ms": 90.462569,
+          "min_ms": 70.642355,
+          "p90_ms": 101.85462810000001,
+          "p95_ms": 106.79429195,
+          "population_std_ms": 22.666841485613258
+        },
+        "input_drops": 82
+      }
+    },
+    "message_counts": {
+      "detections_published_total": 221,
+      "detector_accepted_total": 221,
+      "detector_received_total": 221,
+      "detector_rejected_total": 0,
+      "measured_offered_messages": 359,
+      "replay_published_total": 398,
+      "sink_received_total": 221
+    },
+    "sustained_rate": {
+      "detector_to_sink_drops": 0,
+      "effective_detector_output_hz": 10.825441119694597,
+      "effective_offered_hz": 19.509346262950938,
+      "falling_behind_between_halves": true,
+      "final_processing_backlog_messages": 0,
+      "first_half_input_drops": 77,
+      "measured_input_drops": 159,
+      "output_offered_rate_fraction": 0.5412720559847298,
+      "requested_offered_hz": 20.0,
+      "second_half_input_drops": 82,
+      "sustainable_at_offered_rate": false,
+      "total_input_messages_not_received": 177
+    },
+    "gate": {
+      "callback_median_at_or_below_50_ms": false,
+      "effective_offered_at_least_95_percent": true,
+      "effective_output_at_least_95_percent": false,
+      "no_first_to_second_half_deterioration": false,
+      "no_loss_or_final_backlog": false,
+      "session_eligible": true,
+      "twenty_hz_operation_demonstrated": false
+    },
+    "measurement_session": {
+      "eligibility": {
+        "assessment_limited_by_unavailable_telemetry": false,
+        "eligible": true,
+        "pairs": [
+          {
+            "assessable": true,
+            "candidate": {
+              "available": true,
+              "available_sample_count": 16,
+              "driver_versions": [
+                "610.88"
+              ],
+              "gpu_names": [
+                "NVIDIA GeForce RTX 4060 Laptop GPU"
+              ],
+              "numeric": {
+                "clocks.mem": {
+                  "count": 16,
+                  "maximum": 8001.0,
+                  "mean": 8001.0,
+                  "median": 8001.0,
+                  "minimum": 8001.0
+                },
+                "clocks.sm": {
+                  "count": 16,
+                  "maximum": 2640.0,
+                  "mean": 2579.0625,
+                  "median": 2640.0,
+                  "minimum": 2325.0
+                },
+                "power.draw": {
+                  "count": 16,
+                  "maximum": 42.34,
+                  "mean": 38.096875,
+                  "median": 39.144999999999996,
+                  "minimum": 32.22
+                },
+                "power.limit": {
+                  "count": 0,
+                  "maximum": null,
+                  "mean": null,
+                  "median": null,
+                  "minimum": null
+                },
+                "temperature.gpu": {
+                  "count": 16,
+                  "maximum": 68.0,
+                  "mean": 65.875,
+                  "median": 65.5,
+                  "minimum": 65.0
+                },
+                "utilization.gpu": {
+                  "count": 16,
+                  "maximum": 41.0,
+                  "mean": 37.125,
+                  "median": 36.0,
+                  "minimum": 33.0
+                },
+                "utilization.memory": {
+                  "count": 16,
+                  "maximum": 24.0,
+                  "mean": 20.75,
+                  "median": 21.0,
+                  "minimum": 17.0
+                }
+              },
+              "pstate_counts": {
+                "P0": 16
+              },
+              "sample_count": 16,
+              "unavailable_sample_count": 0
+            },
+            "candidate_block": "ros_measured_second_half",
+            "clock_range_overlap": {
+              "clocks.mem": true,
+              "clocks.sm": true
+            },
+            "obvious_material_state_mismatch": false,
+            "pair": "ros_measured_first_vs_second_half",
+            "performance_state_overlap": true,
+            "reasons": [],
+            "reference": {
+              "available": true,
+              "available_sample_count": 17,
+              "driver_versions": [
+                "610.88"
+              ],
+              "gpu_names": [
+                "NVIDIA GeForce RTX 4060 Laptop GPU"
+              ],
+              "numeric": {
+                "clocks.mem": {
+                  "count": 17,
+                  "maximum": 8001.0,
+                  "mean": 8001.0,
+                  "median": 8001.0,
+                  "minimum": 8001.0
+                },
+                "clocks.sm": {
+                  "count": 17,
+                  "maximum": 2640.0,
+                  "mean": 2587.0588235294117,
+                  "median": 2595.0,
+                  "minimum": 2475.0
+                },
+                "power.draw": {
+                  "count": 17,
+                  "maximum": 45.21,
+                  "mean": 36.904117647058825,
+                  "median": 37.69,
+                  "minimum": 26.8
+                },
+                "power.limit": {
+                  "count": 0,
+                  "maximum": null,
+                  "mean": null,
+                  "median": null,
+                  "minimum": null
+                },
+                "temperature.gpu": {
+                  "count": 17,
+                  "maximum": 67.0,
+                  "mean": 65.52941176470588,
+                  "median": 65.0,
+                  "minimum": 64.0
+                },
+                "utilization.gpu": {
+                  "count": 17,
+                  "maximum": 41.0,
+                  "mean": 34.35294117647059,
+                  "median": 35.0,
+                  "minimum": 20.0
+                },
+                "utilization.memory": {
+                  "count": 17,
+                  "maximum": 25.0,
+                  "mean": 19.0,
+                  "median": 18.0,
+                  "minimum": 11.0
+                }
+              },
+              "pstate_counts": {
+                "P0": 17
+              },
+              "sample_count": 17,
+              "unavailable_sample_count": 0
+            },
+            "reference_block": "ros_measured_first_half"
+          }
+        ],
+        "policy": "reject only disjoint performance states corroborated by disjoint clock ranges; no universal MHz threshold",
+        "rejection_reasons": [],
+        "telemetry_available": true
+      },
+      "telemetry_summary": {
+        "available": true,
+        "available_sample_count": 97,
+        "driver_versions": [
+          "610.88"
+        ],
+        "gpu_names": [
+          "NVIDIA GeForce RTX 4060 Laptop GPU"
+        ],
+        "numeric": {
+          "clocks.mem": {
+            "count": 97,
+            "maximum": 8001.0,
+            "mean": 8001.0,
+            "median": 8001.0,
+            "minimum": 8001.0
+          },
+          "clocks.sm": {
+            "count": 97,
+            "maximum": 2655.0,
+            "mean": 2533.762886597938,
+            "median": 2625.0,
+            "minimum": 1125.0
+          },
+          "power.draw": {
+            "count": 97,
+            "maximum": 86.95,
+            "mean": 39.829278350515466,
+            "median": 40.1,
+            "minimum": 14.6
+          },
+          "power.limit": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "median": null,
+            "minimum": null
+          },
+          "temperature.gpu": {
+            "count": 97,
+            "maximum": 69.0,
+            "mean": 65.84536082474227,
+            "median": 66.0,
+            "minimum": 60.0
+          },
+          "utilization.gpu": {
+            "count": 97,
+            "maximum": 97.0,
+            "mean": 44.608247422680414,
+            "median": 49.0,
+            "minimum": 10.0
+          },
+          "utilization.memory": {
+            "count": 97,
+            "maximum": 36.0,
+            "mean": 23.463917525773194,
+            "median": 24.0,
+            "minimum": 3.0
+          }
+        },
+        "pstate_counts": {
+          "P0": 97
+        },
+        "sample_count": 97,
+        "unavailable_sample_count": 0
+      },
+      "measured_first_half": {
+        "available": true,
+        "available_sample_count": 17,
+        "driver_versions": [
+          "610.88"
+        ],
+        "gpu_names": [
+          "NVIDIA GeForce RTX 4060 Laptop GPU"
+        ],
+        "numeric": {
+          "clocks.mem": {
+            "count": 17,
+            "maximum": 8001.0,
+            "mean": 8001.0,
+            "median": 8001.0,
+            "minimum": 8001.0
+          },
+          "clocks.sm": {
+            "count": 17,
+            "maximum": 2640.0,
+            "mean": 2587.0588235294117,
+            "median": 2595.0,
+            "minimum": 2475.0
+          },
+          "power.draw": {
+            "count": 17,
+            "maximum": 45.21,
+            "mean": 36.904117647058825,
+            "median": 37.69,
+            "minimum": 26.8
+          },
+          "power.limit": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "median": null,
+            "minimum": null
+          },
+          "temperature.gpu": {
+            "count": 17,
+            "maximum": 67.0,
+            "mean": 65.52941176470588,
+            "median": 65.0,
+            "minimum": 64.0
+          },
+          "utilization.gpu": {
+            "count": 17,
+            "maximum": 41.0,
+            "mean": 34.35294117647059,
+            "median": 35.0,
+            "minimum": 20.0
+          },
+          "utilization.memory": {
+            "count": 17,
+            "maximum": 25.0,
+            "mean": 19.0,
+            "median": 18.0,
+            "minimum": 11.0
+          }
+        },
+        "pstate_counts": {
+          "P0": 17
+        },
+        "sample_count": 17,
+        "unavailable_sample_count": 0
+      },
+      "measured_second_half": {
+        "available": true,
+        "available_sample_count": 16,
+        "driver_versions": [
+          "610.88"
+        ],
+        "gpu_names": [
+          "NVIDIA GeForce RTX 4060 Laptop GPU"
+        ],
+        "numeric": {
+          "clocks.mem": {
+            "count": 16,
+            "maximum": 8001.0,
+            "mean": 8001.0,
+            "median": 8001.0,
+            "minimum": 8001.0
+          },
+          "clocks.sm": {
+            "count": 16,
+            "maximum": 2640.0,
+            "mean": 2579.0625,
+            "median": 2640.0,
+            "minimum": 2325.0
+          },
+          "power.draw": {
+            "count": 16,
+            "maximum": 42.34,
+            "mean": 38.096875,
+            "median": 39.144999999999996,
+            "minimum": 32.22
+          },
+          "power.limit": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "median": null,
+            "minimum": null
+          },
+          "temperature.gpu": {
+            "count": 16,
+            "maximum": 68.0,
+            "mean": 65.875,
+            "median": 65.5,
+            "minimum": 65.0
+          },
+          "utilization.gpu": {
+            "count": 16,
+            "maximum": 41.0,
+            "mean": 37.125,
+            "median": 36.0,
+            "minimum": 33.0
+          },
+          "utilization.memory": {
+            "count": 16,
+            "maximum": 24.0,
+            "mean": 20.75,
+            "median": 21.0,
+            "minimum": 17.0
+          }
+        },
+        "pstate_counts": {
+          "P0": 16
+        },
+        "sample_count": 16,
+        "unavailable_sample_count": 0
+      },
+      "clock_capability": {
+        "query_available": true,
+        "query_returncode": 0,
+        "supported_clocks_reported": true,
+        "application_clocks_query_returncode": 0,
+        "application_clocks_setting": "[Requested functionality has been deprecated], [Requested functionality has been deprecated]",
+        "clock_locking_attempted": false,
+        "clock_locking_not_attempted_reason": "visibility of supported clocks does not establish a safe WSL2 laptop lock",
+        "clock_setting_changed": false
+      }
+    }
+  },
+  "bounded_sustainable_rate_characterization": {
+    "tested_rate_count": 2,
+    "highest_tested_sustainable_rate_hz": 10.0,
+    "ten_hz": {
+      "source_external_record": {
+        "logical_name": "ros_w1_10hz_a129b35.json",
+        "sha256": "39e260bc67405346b2e252ad8b15d8e8e93c861c4884cbf78b19d64095e3c30d"
+      },
+      "status": "bounded_characterization_rate_sustained",
+      "callback_processing_latency": {
+        "above_50_ms_count": 200,
+        "above_50_ms_fraction": 1.0,
+        "count": 200,
+        "fps_from_median_latency": 15.271187115198533,
+        "max_ms": 238.666433,
+        "mean_ms": 68.248668205,
+        "median_ms": 65.48279400000001,
+        "min_ms": 57.335215,
+        "p90_ms": 73.1884095,
+        "p95_ms": 78.41202764999997,
+        "population_std_ms": 15.215619472579558
+      },
+      "same_host_ros_loopback_latency": {
+        "above_50_ms_count": 200,
+        "above_50_ms_fraction": 1.0,
+        "count": 200,
+        "fps_from_median_latency": 12.285028886402673,
+        "max_ms": 260.877771,
+        "mean_ms": 85.301621185,
+        "median_ms": 81.39989,
+        "min_ms": 73.006414,
+        "p90_ms": 92.8994083,
+        "p95_ms": 103.40257609999993,
+        "population_std_ms": 17.082788572295982
+      },
+      "callback_entry_and_drop_halves": {
+        "callback_entry_interval_median_grew": false,
+        "falling_behind_between_halves": false,
+        "first_half": {
+          "callback_entry_intervals": {
+            "count": 99,
+            "fps_from_median_latency": 10.000172202965334,
+            "max_ms": 254.6411,
+            "mean_ms": 101.01451262626261,
+            "median_ms": 99.998278,
+            "min_ms": 81.23483,
+            "p90_ms": 101.3896874,
+            "p95_ms": 105.55166849999999,
+            "population_std_ms": 16.123135766742966
+          },
+          "input_drops": 0
+        },
+        "input_drops_grew": false,
+        "second_half": {
+          "callback_entry_intervals": {
+            "count": 100,
+            "fps_from_median_latency": 10.001694787181687,
+            "max_ms": 178.882532,
+            "mean_ms": 100.00121019,
+            "median_ms": 99.98305500000001,
+            "min_ms": 73.979631,
+            "p90_ms": 100.4230118,
+            "p95_ms": 100.68190025,
+            "population_std_ms": 8.914700000836428
+          },
+          "input_drops": 0
+        }
+      },
+      "message_counts": {
+        "detections_published_total": 220,
+        "detector_accepted_total": 220,
+        "detector_received_total": 220,
+        "detector_rejected_total": 0,
+        "measured_offered_messages": 200,
+        "replay_published_total": 220,
+        "sink_received_total": 220
+      },
+      "sustained_rate": {
+        "detector_to_sink_drops": 0,
+        "effective_detector_output_hz": 9.94900012498999,
+        "effective_offered_hz": 9.949902980486018,
+        "falling_behind_between_halves": false,
+        "final_processing_backlog_messages": 0,
+        "first_half_input_drops": 0,
+        "measured_input_drops": 0,
+        "output_offered_rate_fraction": 0.994900012498999,
+        "requested_offered_hz": 10.0,
+        "second_half_input_drops": 0,
+        "sustainable_at_offered_rate": true,
+        "total_input_messages_not_received": 0
+      },
+      "gate": {
+        "callback_median_at_or_below_50_ms": false,
+        "effective_offered_at_least_95_percent": true,
+        "effective_output_at_least_95_percent": true,
+        "no_first_to_second_half_deterioration": true,
+        "no_loss_or_final_backlog": true,
+        "session_eligible": true,
+        "twenty_hz_operation_demonstrated": false
+      },
+      "measurement_session": {
+        "eligibility": {
+          "assessment_limited_by_unavailable_telemetry": false,
+          "eligible": true,
+          "pairs": [
+            {
+              "assessable": true,
+              "candidate": {
+                "available": true,
+                "available_sample_count": 17,
+                "driver_versions": [
+                  "610.88"
+                ],
+                "gpu_names": [
+                  "NVIDIA GeForce RTX 4060 Laptop GPU"
+                ],
+                "numeric": {
+                  "clocks.mem": {
+                    "count": 17,
+                    "maximum": 8001.0,
+                    "mean": 8001.0,
+                    "median": 8001.0,
+                    "minimum": 8001.0
+                  },
+                  "clocks.sm": {
+                    "count": 17,
+                    "maximum": 1710.0,
+                    "mean": 1620.8823529411766,
+                    "median": 1605.0,
+                    "minimum": 1545.0
+                  },
+                  "power.draw": {
+                    "count": 17,
+                    "maximum": 24.85,
+                    "mean": 23.574117647058824,
+                    "median": 24.0,
+                    "minimum": 19.43
+                  },
+                  "power.limit": {
+                    "count": 0,
+                    "maximum": null,
+                    "mean": null,
+                    "median": null,
+                    "minimum": null
+                  },
+                  "temperature.gpu": {
+                    "count": 17,
+                    "maximum": 63.0,
+                    "mean": 62.76470588235294,
+                    "median": 63.0,
+                    "minimum": 62.0
+                  },
+                  "utilization.gpu": {
+                    "count": 17,
+                    "maximum": 40.0,
+                    "mean": 38.11764705882353,
+                    "median": 38.0,
+                    "minimum": 34.0
+                  },
+                  "utilization.memory": {
+                    "count": 17,
+                    "maximum": 19.0,
+                    "mean": 18.11764705882353,
+                    "median": 18.0,
+                    "minimum": 16.0
+                  }
+                },
+                "pstate_counts": {
+                  "P0": 17
+                },
+                "sample_count": 17,
+                "unavailable_sample_count": 0
+              },
+              "candidate_block": "ros_measured_second_half",
+              "clock_range_overlap": {
+                "clocks.mem": true,
+                "clocks.sm": true
+              },
+              "obvious_material_state_mismatch": false,
+              "pair": "ros_measured_first_vs_second_half",
+              "performance_state_overlap": true,
+              "reasons": [],
+              "reference": {
+                "available": true,
+                "available_sample_count": 18,
+                "driver_versions": [
+                  "610.88"
+                ],
+                "gpu_names": [
+                  "NVIDIA GeForce RTX 4060 Laptop GPU"
+                ],
+                "numeric": {
+                  "clocks.mem": {
+                    "count": 18,
+                    "maximum": 8001.0,
+                    "mean": 8001.0,
+                    "median": 8001.0,
+                    "minimum": 8001.0
+                  },
+                  "clocks.sm": {
+                    "count": 18,
+                    "maximum": 1965.0,
+                    "mean": 1667.5,
+                    "median": 1605.0,
+                    "minimum": 1560.0
+                  },
+                  "power.draw": {
+                    "count": 18,
+                    "maximum": 32.24,
+                    "mean": 23.653888888888886,
+                    "median": 23.645,
+                    "minimum": 15.51
+                  },
+                  "power.limit": {
+                    "count": 0,
+                    "maximum": null,
+                    "mean": null,
+                    "median": null,
+                    "minimum": null
+                  },
+                  "temperature.gpu": {
+                    "count": 18,
+                    "maximum": 65.0,
+                    "mean": 63.611111111111114,
+                    "median": 64.0,
+                    "minimum": 62.0
+                  },
+                  "utilization.gpu": {
+                    "count": 18,
+                    "maximum": 39.0,
+                    "mean": 36.888888888888886,
+                    "median": 37.0,
+                    "minimum": 32.0
+                  },
+                  "utilization.memory": {
+                    "count": 18,
+                    "maximum": 18.0,
+                    "mean": 18.0,
+                    "median": 18.0,
+                    "minimum": 18.0
+                  }
+                },
+                "pstate_counts": {
+                  "P0": 18
+                },
+                "sample_count": 18,
+                "unavailable_sample_count": 0
+              },
+              "reference_block": "ros_measured_first_half"
+            }
+          ],
+          "policy": "reject only disjoint performance states corroborated by disjoint clock ranges; no universal MHz threshold",
+          "rejection_reasons": [],
+          "telemetry_available": true
+        },
+        "telemetry_summary": {
+          "available": true,
+          "available_sample_count": 102,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 102,
+              "maximum": 8001.0,
+              "mean": 7961.78431372549,
+              "median": 8001.0,
+              "minimum": 7001.0
+            },
+            "clocks.sm": {
+              "count": 102,
+              "maximum": 2640.0,
+              "mean": 2157.5,
+              "median": 2505.0,
+              "minimum": 1095.0
+            },
+            "power.draw": {
+              "count": 102,
+              "maximum": 64.99,
+              "mean": 36.5143137254902,
+              "median": 39.545,
+              "minimum": 14.96
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 102,
+              "maximum": 68.0,
+              "mean": 64.80392156862744,
+              "median": 65.0,
+              "minimum": 60.0
+            },
+            "utilization.gpu": {
+              "count": 102,
+              "maximum": 69.0,
+              "mean": 44.127450980392155,
+              "median": 46.5,
+              "minimum": 18.0
+            },
+            "utilization.memory": {
+              "count": 102,
+              "maximum": 39.0,
+              "mean": 25.058823529411764,
+              "median": 27.5,
+              "minimum": 8.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 97,
+            "P3": 2,
+            "P4": 3
+          },
+          "sample_count": 102,
+          "unavailable_sample_count": 0
+        },
+        "measured_first_half": {
+          "available": true,
+          "available_sample_count": 18,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 18,
+              "maximum": 8001.0,
+              "mean": 8001.0,
+              "median": 8001.0,
+              "minimum": 8001.0
+            },
+            "clocks.sm": {
+              "count": 18,
+              "maximum": 1965.0,
+              "mean": 1667.5,
+              "median": 1605.0,
+              "minimum": 1560.0
+            },
+            "power.draw": {
+              "count": 18,
+              "maximum": 32.24,
+              "mean": 23.653888888888886,
+              "median": 23.645,
+              "minimum": 15.51
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 18,
+              "maximum": 65.0,
+              "mean": 63.611111111111114,
+              "median": 64.0,
+              "minimum": 62.0
+            },
+            "utilization.gpu": {
+              "count": 18,
+              "maximum": 39.0,
+              "mean": 36.888888888888886,
+              "median": 37.0,
+              "minimum": 32.0
+            },
+            "utilization.memory": {
+              "count": 18,
+              "maximum": 18.0,
+              "mean": 18.0,
+              "median": 18.0,
+              "minimum": 18.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 18
+          },
+          "sample_count": 18,
+          "unavailable_sample_count": 0
+        },
+        "measured_second_half": {
+          "available": true,
+          "available_sample_count": 17,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 17,
+              "maximum": 8001.0,
+              "mean": 8001.0,
+              "median": 8001.0,
+              "minimum": 8001.0
+            },
+            "clocks.sm": {
+              "count": 17,
+              "maximum": 1710.0,
+              "mean": 1620.8823529411766,
+              "median": 1605.0,
+              "minimum": 1545.0
+            },
+            "power.draw": {
+              "count": 17,
+              "maximum": 24.85,
+              "mean": 23.574117647058824,
+              "median": 24.0,
+              "minimum": 19.43
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 17,
+              "maximum": 63.0,
+              "mean": 62.76470588235294,
+              "median": 63.0,
+              "minimum": 62.0
+            },
+            "utilization.gpu": {
+              "count": 17,
+              "maximum": 40.0,
+              "mean": 38.11764705882353,
+              "median": 38.0,
+              "minimum": 34.0
+            },
+            "utilization.memory": {
+              "count": 17,
+              "maximum": 19.0,
+              "mean": 18.11764705882353,
+              "median": 18.0,
+              "minimum": 16.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 17
+          },
+          "sample_count": 17,
+          "unavailable_sample_count": 0
+        },
+        "clock_capability": {
+          "query_available": true,
+          "query_returncode": 0,
+          "supported_clocks_reported": true,
+          "application_clocks_query_returncode": 0,
+          "application_clocks_setting": "[Requested functionality has been deprecated], [Requested functionality has been deprecated]",
+          "clock_locking_attempted": false,
+          "clock_locking_not_attempted_reason": "visibility of supported clocks does not establish a safe WSL2 laptop lock",
+          "clock_setting_changed": false
+        }
+      }
+    },
+    "fifteen_hz": {
+      "source_external_record": {
+        "logical_name": "ros_w1_15hz_a129b35.json",
+        "sha256": "92d59b01d0888c713080dfa461ed9548c423196e693fb28b1b55eb30ff0a6c52"
+      },
+      "status": "bounded_characterization_rate_not_sustained",
+      "callback_processing_latency": {
+        "above_50_ms_count": 200,
+        "above_50_ms_fraction": 1.0,
+        "count": 200,
+        "fps_from_median_latency": 16.60726428145221,
+        "max_ms": 168.623622,
+        "mean_ms": 62.10186014,
+        "median_ms": 60.2146135,
+        "min_ms": 52.817265,
+        "p90_ms": 66.9171435,
+        "p95_ms": 69.13833039999999,
+        "population_std_ms": 10.972441099555747
+      },
+      "same_host_ros_loopback_latency": {
+        "above_50_ms_count": 200,
+        "above_50_ms_fraction": 1.0,
+        "count": 200,
+        "fps_from_median_latency": 8.249515744145114,
+        "max_ms": 227.950316,
+        "mean_ms": 122.01551982,
+        "median_ms": 121.2192365,
+        "min_ms": 77.8836,
+        "p90_ms": 147.25879179999998,
+        "p95_ms": 153.2012423,
+        "population_std_ms": 24.373828337974764
+      },
+      "callback_entry_and_drop_halves": {
+        "callback_entry_interval_median_grew": false,
+        "falling_behind_between_halves": false,
+        "first_half": {
+          "callback_entry_intervals": {
+            "count": 99,
+            "fps_from_median_latency": 13.523382110234254,
+            "max_ms": 176.805854,
+            "mean_ms": 74.95711905050504,
+            "median_ms": 73.945999,
+            "min_ms": 62.998821,
+            "p90_ms": 79.63738260000001,
+            "p95_ms": 82.7604494,
+            "population_std_ms": 11.365377242533516
+          },
+          "input_drops": 11
+        },
+        "input_drops_grew": false,
+        "second_half": {
+          "callback_entry_intervals": {
+            "count": 100,
+            "fps_from_median_latency": 13.870861681300044,
+            "max_ms": 171.043791,
+            "mean_ms": 75.05452563,
+            "median_ms": 72.0935745,
+            "min_ms": 61.615306,
+            "p90_ms": 81.1728816,
+            "p95_ms": 87.81461839999999,
+            "population_std_ms": 14.780067761417078
+          },
+          "input_drops": 10
+        }
+      },
+      "message_counts": {
+        "detections_published_total": 221,
+        "detector_accepted_total": 221,
+        "detector_received_total": 221,
+        "detector_rejected_total": 0,
+        "measured_offered_messages": 221,
+        "replay_published_total": 246,
+        "sink_received_total": 221
+      },
+      "sustained_rate": {
+        "detector_to_sink_drops": 0,
+        "effective_detector_output_hz": 13.335739610063618,
+        "effective_offered_hz": 14.864895712536622,
+        "falling_behind_between_halves": false,
+        "final_processing_backlog_messages": 0,
+        "first_half_input_drops": 11,
+        "measured_input_drops": 21,
+        "output_offered_rate_fraction": 0.8890493073375745,
+        "requested_offered_hz": 15.0,
+        "second_half_input_drops": 10,
+        "sustainable_at_offered_rate": false,
+        "total_input_messages_not_received": 25
+      },
+      "gate": {
+        "callback_median_at_or_below_50_ms": false,
+        "effective_offered_at_least_95_percent": true,
+        "effective_output_at_least_95_percent": false,
+        "no_first_to_second_half_deterioration": true,
+        "no_loss_or_final_backlog": false,
+        "session_eligible": true,
+        "twenty_hz_operation_demonstrated": false
+      },
+      "measurement_session": {
+        "eligibility": {
+          "assessment_limited_by_unavailable_telemetry": false,
+          "eligible": true,
+          "pairs": [
+            {
+              "assessable": true,
+              "candidate": {
+                "available": true,
+                "available_sample_count": 13,
+                "driver_versions": [
+                  "610.88"
+                ],
+                "gpu_names": [
+                  "NVIDIA GeForce RTX 4060 Laptop GPU"
+                ],
+                "numeric": {
+                  "clocks.mem": {
+                    "count": 13,
+                    "maximum": 8001.0,
+                    "mean": 8001.0,
+                    "median": 8001.0,
+                    "minimum": 8001.0
+                  },
+                  "clocks.sm": {
+                    "count": 13,
+                    "maximum": 2625.0,
+                    "mean": 2496.923076923077,
+                    "median": 2475.0,
+                    "minimum": 2415.0
+                  },
+                  "power.draw": {
+                    "count": 13,
+                    "maximum": 53.85,
+                    "mean": 40.175384615384615,
+                    "median": 39.49,
+                    "minimum": 28.88
+                  },
+                  "power.limit": {
+                    "count": 0,
+                    "maximum": null,
+                    "mean": null,
+                    "median": null,
+                    "minimum": null
+                  },
+                  "temperature.gpu": {
+                    "count": 13,
+                    "maximum": 68.0,
+                    "mean": 66.38461538461539,
+                    "median": 66.0,
+                    "minimum": 65.0
+                  },
+                  "utilization.gpu": {
+                    "count": 13,
+                    "maximum": 39.0,
+                    "mean": 35.07692307692308,
+                    "median": 34.0,
+                    "minimum": 32.0
+                  },
+                  "utilization.memory": {
+                    "count": 13,
+                    "maximum": 25.0,
+                    "mean": 21.53846153846154,
+                    "median": 21.0,
+                    "minimum": 19.0
+                  }
+                },
+                "pstate_counts": {
+                  "P0": 13
+                },
+                "sample_count": 13,
+                "unavailable_sample_count": 0
+              },
+              "candidate_block": "ros_measured_second_half",
+              "clock_range_overlap": {
+                "clocks.mem": true,
+                "clocks.sm": true
+              },
+              "obvious_material_state_mismatch": false,
+              "pair": "ros_measured_first_vs_second_half",
+              "performance_state_overlap": true,
+              "reasons": [],
+              "reference": {
+                "available": true,
+                "available_sample_count": 14,
+                "driver_versions": [
+                  "610.88"
+                ],
+                "gpu_names": [
+                  "NVIDIA GeForce RTX 4060 Laptop GPU"
+                ],
+                "numeric": {
+                  "clocks.mem": {
+                    "count": 14,
+                    "maximum": 8001.0,
+                    "mean": 8001.0,
+                    "median": 8001.0,
+                    "minimum": 8001.0
+                  },
+                  "clocks.sm": {
+                    "count": 14,
+                    "maximum": 2640.0,
+                    "mean": 2454.6428571428573,
+                    "median": 2430.0,
+                    "minimum": 2355.0
+                  },
+                  "power.draw": {
+                    "count": 14,
+                    "maximum": 46.41,
+                    "mean": 38.229285714285716,
+                    "median": 38.985,
+                    "minimum": 25.02
+                  },
+                  "power.limit": {
+                    "count": 0,
+                    "maximum": null,
+                    "mean": null,
+                    "median": null,
+                    "minimum": null
+                  },
+                  "temperature.gpu": {
+                    "count": 14,
+                    "maximum": 68.0,
+                    "mean": 66.64285714285714,
+                    "median": 67.0,
+                    "minimum": 66.0
+                  },
+                  "utilization.gpu": {
+                    "count": 14,
+                    "maximum": 40.0,
+                    "mean": 36.785714285714285,
+                    "median": 37.5,
+                    "minimum": 32.0
+                  },
+                  "utilization.memory": {
+                    "count": 14,
+                    "maximum": 25.0,
+                    "mean": 22.571428571428573,
+                    "median": 23.5,
+                    "minimum": 18.0
+                  }
+                },
+                "pstate_counts": {
+                  "P0": 14
+                },
+                "sample_count": 14,
+                "unavailable_sample_count": 0
+              },
+              "reference_block": "ros_measured_first_half"
+            }
+          ],
+          "policy": "reject only disjoint performance states corroborated by disjoint clock ranges; no universal MHz threshold",
+          "rejection_reasons": [],
+          "telemetry_available": true
+        },
+        "telemetry_summary": {
+          "available": true,
+          "available_sample_count": 92,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 92,
+              "maximum": 8001.0,
+              "mean": 7957.521739130435,
+              "median": 8001.0,
+              "minimum": 6001.0
+            },
+            "clocks.sm": {
+              "count": 92,
+              "maximum": 2640.0,
+              "mean": 2502.717391304348,
+              "median": 2565.0,
+              "minimum": 930.0
+            },
+            "power.draw": {
+              "count": 92,
+              "maximum": 79.11,
+              "mean": 44.94315217391305,
+              "median": 47.935,
+              "minimum": 12.01
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 92,
+              "maximum": 69.0,
+              "mean": 67.33695652173913,
+              "median": 68.0,
+              "minimum": 65.0
+            },
+            "utilization.gpu": {
+              "count": 92,
+              "maximum": 78.0,
+              "mean": 46.21739130434783,
+              "median": 52.0,
+              "minimum": 6.0
+            },
+            "utilization.memory": {
+              "count": 92,
+              "maximum": 45.0,
+              "mean": 28.434782608695652,
+              "median": 32.0,
+              "minimum": 4.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 89,
+            "P4": 3
+          },
+          "sample_count": 92,
+          "unavailable_sample_count": 0
+        },
+        "measured_first_half": {
+          "available": true,
+          "available_sample_count": 14,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 14,
+              "maximum": 8001.0,
+              "mean": 8001.0,
+              "median": 8001.0,
+              "minimum": 8001.0
+            },
+            "clocks.sm": {
+              "count": 14,
+              "maximum": 2640.0,
+              "mean": 2454.6428571428573,
+              "median": 2430.0,
+              "minimum": 2355.0
+            },
+            "power.draw": {
+              "count": 14,
+              "maximum": 46.41,
+              "mean": 38.229285714285716,
+              "median": 38.985,
+              "minimum": 25.02
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 14,
+              "maximum": 68.0,
+              "mean": 66.64285714285714,
+              "median": 67.0,
+              "minimum": 66.0
+            },
+            "utilization.gpu": {
+              "count": 14,
+              "maximum": 40.0,
+              "mean": 36.785714285714285,
+              "median": 37.5,
+              "minimum": 32.0
+            },
+            "utilization.memory": {
+              "count": 14,
+              "maximum": 25.0,
+              "mean": 22.571428571428573,
+              "median": 23.5,
+              "minimum": 18.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 14
+          },
+          "sample_count": 14,
+          "unavailable_sample_count": 0
+        },
+        "measured_second_half": {
+          "available": true,
+          "available_sample_count": 13,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 13,
+              "maximum": 8001.0,
+              "mean": 8001.0,
+              "median": 8001.0,
+              "minimum": 8001.0
+            },
+            "clocks.sm": {
+              "count": 13,
+              "maximum": 2625.0,
+              "mean": 2496.923076923077,
+              "median": 2475.0,
+              "minimum": 2415.0
+            },
+            "power.draw": {
+              "count": 13,
+              "maximum": 53.85,
+              "mean": 40.175384615384615,
+              "median": 39.49,
+              "minimum": 28.88
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 13,
+              "maximum": 68.0,
+              "mean": 66.38461538461539,
+              "median": 66.0,
+              "minimum": 65.0
+            },
+            "utilization.gpu": {
+              "count": 13,
+              "maximum": 39.0,
+              "mean": 35.07692307692308,
+              "median": 34.0,
+              "minimum": 32.0
+            },
+            "utilization.memory": {
+              "count": 13,
+              "maximum": 25.0,
+              "mean": 21.53846153846154,
+              "median": 21.0,
+              "minimum": 19.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 13
+          },
+          "sample_count": 13,
+          "unavailable_sample_count": 0
+        },
+        "clock_capability": {
+          "query_available": true,
+          "query_returncode": 0,
+          "supported_clocks_reported": true,
+          "application_clocks_query_returncode": 0,
+          "application_clocks_setting": "[Requested functionality has been deprecated], [Requested functionality has been deprecated]",
+          "clock_locking_attempted": false,
+          "clock_locking_not_attempted_reason": "visibility of supported clocks does not establish a safe WSL2 laptop lock",
+          "clock_setting_changed": false
+        }
+      }
+    }
+  },
+  "historical_diagnostics_preserved": [
+    "M3A scene-start 20 Hz FAIL",
+    "M3B-V1 deterministic=False rejection",
+    "M3B-V2 exact deterministic diagnostic PASS"
+  ],
+  "limitations": [
+    "The source is model-ready multi-sweep PointCloud2; no TF lookup or sweep accumulation is timed.",
+    "Same-host loopback is not sensor-to-actuator latency.",
+    "The immutable replay PointCloud2 payload is built once before timing; only its timestamp is refreshed before publish.",
+    "Telemetry establishes session eligibility but does not prove clock causality.",
+    "No postprocessing, DDS, executor, or custom CUDA optimization was performed."
+  ]
+}

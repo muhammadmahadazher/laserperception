@@ -39,12 +39,35 @@ Gate 0, the 81-sample profile, ONNX checking, FP16 engine build, and parity v2 r
 benchmark at e2f9b6b remains rejected because rewritten eager PyTorch was used as the performance
 baseline. At repaired measurement commit 3f240d6, exact-commit parity and native-vs-rewritten
 fidelity passed, then the direct benchmark measured a 1.2991× end-to-end median speedup and a
-secondary 3.1326× network-only speedup with no review flags. PR #3 remains draft for final M2
-review, and M3 has not started.
+secondary 3.1326× network-only speedup with no review flags. PR #3 merged at b1d42a0, satisfying
+the prerequisite for M3.
 
 ## M3 — ROS 2
 
-Add ROS 2 integration around a verified detector runtime. This work begins only after M2 review.
+- [x] Prove ROS 2 Humble and the frozen M2 detector coexist in Python 3.10 on Ubuntu 22.04.
+- [x] Implement the strict model-ready `x/y/z/time_lag` PointCloud2 contract and official in-memory
+  MMDetection3D preprocessing adapter.
+- [x] Preserve headers and exact geometric-center/LWH/yaw/class/score semantics in
+  Detection3DArray, with empty tracking IDs.
+- [x] Pass exact 20-sample PointCloud2 transport fidelity through voxels, TensorRT raw outputs, and
+  final detections.
+- [x] Add bounded QoS, nuScenes replay, RViz/Foxglove markers, setup, launch, CPU tests, and ROS-native
+  tests.
+- [x] Record the preregistered M3A callback/rate failure without treating it as canonical
+  representative full-history performance.
+- [x] Diagnose the deterministic full-history voxelization bottleneck and reject the
+  nondeterministic V1 candidate after its repeatability/fidelity failure.
+- [x] Demonstrate the exact deterministic V2 candidate across all 81 voxel samples, both 30-run
+  repeatability suites, and the frozen 20 detector samples.
+- [x] Integrate exact-fast/live fail-closed into the deployed ROS path while preserving
+  official/full historical M2 behavior.
+- [x] Reconfirm 81/81 and frozen-20 exactness through production, then publish the representative
+  W1 ROS result and bounded sustainable-rate characterization.
+
+M3 is complete. The eligible representative W1 run did not sustain 20 Hz: callback median was
+75.701 ms, loopback median was 134.250 ms, effective output was 10.825 Hz, and 159/359 measured
+inputs dropped with first-to-second-half deterioration. Bounded characterization sustained 10 Hz
+and did not sustain 15 Hz. No postprocess, ROS/DDS/executor, custom CUDA, or M4 work was started.
 
 ## M4 — v0.1
 
