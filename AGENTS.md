@@ -6,10 +6,11 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Active project and current milestone
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit. The
-current milestone is **M4.5a — offline raw-sweep multi-sweep reconstruction**. M0 through M4 are
-complete and v0.1.0 remains released. M4.5a is limited to pinned-upstream discovery,
-ROS-independent raw-sweep contracts, offline temporal reconstruction, parity evidence, tests, and
-documentation. It must not expand detector or performance scope.
+current milestone is **M4.5b — live raw PointCloud2 and time-aware TF multi-sweep ingestion**. M0
+through M4 are complete, v0.1.0 remains released, and M4.5a is complete. M4.5b is limited to the
+ROS boundary around the accepted M4.5a reconstruction core: raw-sweep decoding, time-aware TF,
+bounded live history, exact parity evidence, tests, and documentation. It must not expand detector
+or performance scope.
 
 The accepted v0.1 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, and a
@@ -37,14 +38,14 @@ deleted.
 - M3: ROS 2 Humble interface, exact deterministic deployment voxelization, correctness evidence,
   and representative full-history ROS measurement — complete.
 - M4: evidence-backed v0.1.0 release — complete.
-- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — active.
-- M4.5b: raw `PointCloud2`, tf2, and live history integration — planned, not started.
+- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — complete.
+- M4.5b: raw `PointCloud2`, tf2, and live history integration — active.
 - M5: physical Jetson measurements only if target hardware is actually available.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
-without hardware, or unrelated features unless the owner explicitly changes scope. During M4.5a,
-do not add ROS nodes, tf2, live buffering, physical-sensor adapters, postprocessing/DDS/executor/
-voxelization optimization, or changes to any measured runtime path.
+without hardware, or unrelated features unless the owner explicitly changes scope. During M4.5b,
+do not add localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization optimization,
+or changes to any measured detector runtime path.
 
 ## Detection and deployment architecture
 

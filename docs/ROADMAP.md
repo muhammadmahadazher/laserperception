@@ -26,15 +26,16 @@ optimization.
 
 ## M4.5 — raw-sweep integration
 
-M4.5a is complete on its review branch. It provides only this offline boundary:
+M4.5a is complete and merged. It provides this accepted offline boundary:
 
 ```text
 raw sweep + known pose/calibration metadata -> model-ready temporal cloud
 ```
 
-M4.5b is planned but not started. It requires a separate review for raw `PointCloud2`, tf2
-time-travel transforms, live history buffering, ROS replay, and detector chaining. Offline M4.5a
-does not provide physical-sensor ingestion.
+M4.5b is active on a separate review branch. It adds raw `PointCloud2`, tf2 time-travel transforms,
+live history buffering, ROS replay, and detector chaining while preserving the M4.5a reconstruction
+core and exact oracle. It consumes an existing localization/TF source and does not add localization
+or vendor-specific sensor drivers.
 
 ## M5 — conditional physical Jetson measurement
 
