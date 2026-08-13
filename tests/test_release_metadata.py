@@ -25,7 +25,10 @@ def test_v0_1_release_metadata_is_consistent() -> None:
     assert "No software release" + " exists yet" not in citation
 
     assert '__version__ = "0.1.0"' in _text("src/laserperception/__init__.py")
-    assert "## [Unreleased]\n\n## [0.1.0] - 2026-08-13" in _text("CHANGELOG.md")
+    changelog = _text("CHANGELOG.md")
+    assert "## [Unreleased]" in changelog
+    assert "M4.5a is offline reconstruction only" in changelog
+    assert "## [0.1.0] - 2026-08-13" in changelog
 
 
 def test_release_story_keeps_performance_and_parity_roles_distinct() -> None:

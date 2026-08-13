@@ -16,9 +16,29 @@ flowchart TD
     E --> G["RViz / Foxglove markers"]
 ```
 
-The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. It is
-model-ready: v0.1 does not reconstruct history, perform TF lookup, or accept a raw single-sweep
-physical-LiDAR topic.
+The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. The
+v0.1 ROS path remains model-ready: it does not reconstruct history, perform TF lookup, or accept a
+raw single-sweep physical-LiDAR topic.
+
+## Post-v0.1 offline reconstruction boundary
+
+M4.5a adds a lightweight offline path before the existing model-ready contract:
+
+```mermaid
+flowchart LR
+    C["Current raw sweep"] --> B["MultiSweepBuilder"]
+    H["Ordered historical raw sweeps"] --> B
+    P["Known calibration and ego poses"] --> B
+    B --> M["ModelReadyPointCloud: float32 XYZT"]
+```
+
+The NumPy-only builder exactly reproduced the pinned official multi-sweep output on 81/81 mini-val
+samples. It is independent of MMDetection3D at runtime; MMDetection3D is used only by the manual
+parity oracle. Details and evidence are in [`docs/MULTISWEEP.md`](MULTISWEEP.md).
+
+This does **not** change the ROS deployment diagram above. Raw `PointCloud2`, time-travel TF lookup,
+live history buffering, and detector chaining remain a separately reviewed planned M4.5b. M4.5a
+does not claim physical-sensor plug-and-play ingestion.
 
 The TensorRT network produces `cls_score`, `bbox_pred`, and `dir_cls_pred`. The existing MMDeploy
 postprocess remains unchanged and is shared by evidence paths. LaserPerception converts final
@@ -66,9 +86,9 @@ reported separately.
 ## Dependency boundary
 
 The wheel packages `src/laserperception` only. Core types, I/O, datasets, transforms, ontology,
-audit, detection contracts, and geometry remain CPU-testable. PyTorch, CUDA, MMDetection3D,
-MMDeploy, ONNX, TensorRT, and ROS 2 are installed in isolated external environments and are imported
-only by optional paths.
+audit, detection contracts, geometry, and offline multi-sweep reconstruction remain CPU-testable.
+PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, TensorRT, and ROS 2 remain isolated optional
+dependencies and are imported only by optional paths.
 
 Standard GitHub CI does not install GPU or ROS dependencies. Manual integration gates validate the
 pinned WSL2 environment, external artifact hashes, CUDA device execution, clean colcon build,

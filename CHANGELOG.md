@@ -5,6 +5,20 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### Added
+
+- A ROS-independent offline `MultiSweepBuilder` that reconstructs the pinned float32 XYZT
+  PointPillars input from raw nuScenes LIDAR_TOP sweeps, integer-microsecond timestamps, sensor
+  calibration, and ego poses without a production MMDetection3D dependency.
+- Sanitized M4.5a evidence: 81/81 mini-val matrices were byte-identical to the pinned official test
+  pipeline (2 scene starts, 79 full-history samples), and the frozen 20-sample suite retained exact
+  voxel tensors, raw TensorRT outputs, and final `DetectionFrame` values.
+
+### Scope
+
+- M4.5a is offline reconstruction only. Raw ROS `PointCloud2`, tf2 lookup, live history buffering,
+  and physical-sensor detector chaining remain planned M4.5b work and are not implemented.
+
 ## [0.1.0] - 2026-08-13
 
 ### Added

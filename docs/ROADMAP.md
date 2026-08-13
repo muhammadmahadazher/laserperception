@@ -15,23 +15,26 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
 - [x] **M3 — ROS 2:** model-ready multi-sweep `PointCloud2`, exact output conversion, bounded QoS,
   replay/visualization, the rejected nondeterministic voxelizer, accepted exact-fast replacement,
   production correctness gates, and representative full-history ROS evidence.
+- [x] **M4 — v0.1.0 release:** release metadata, stranger-first documentation, packaging audits,
+  final validation, merged release commit, `v0.1.0` tag, and GitHub release.
+- [x] **M4.5a — offline multi-sweep reconstruction:** independent raw-sweep/pose reconstruction,
+  81/81 exact official-pipeline parity, and exact frozen 20-sample detector verification.
 
 M3 closed honestly: representative W1 (10 historical sweeps plus current, 354,182 points) sustained
 10 Hz cleanly; 15 Hz and 20 Hz were not sustained. This result does not authorize additional M3
 optimization.
 
-## M4 — v0.1.0 release
+## M4.5 — raw-sweep integration
 
-The release-candidate work prepares the accepted implementation without changing measured runtime
-behavior:
+M4.5a is complete on its review branch. It provides only this offline boundary:
 
-- [x] align version, citation, governance, package metadata, and release history;
-- [x] provide stranger-first release documentation and an external-asset-aware demo path;
-- [x] preserve and clearly separate M1, M2, M3B-V2, and M3 evidence;
-- [ ] merge the reviewed release PR into `main`, then create tag `v0.1.0` from that merged commit.
+```text
+raw sweep + known pose/calibration metadata -> model-ready temporal cloud
+```
 
-The tag, GitHub release, and any package publication happen only after final release review. They are
-not created from the release branch.
+M4.5b is planned but not started. It requires a separate review for raw `PointCloud2`, tf2
+time-travel transforms, live history buffering, ROS replay, and detector chaining. Offline M4.5a
+does not provide physical-sensor ingestion.
 
 ## M5 — conditional physical Jetson measurement
 
