@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
-from laserperception.detection.m2_backend import M2Backend, validate_provenance_mode
+from laserperception.detection.m2_backend import (
+    M2Backend,
+    validate_provenance_mode,
+    validate_voxelization_mode,
+)
 from laserperception.detection.types import DetectionFrame
 
 
@@ -87,3 +92,21 @@ def test_live_provenance_omits_tensor_hashing_and_keeps_semantic_output() -> Non
 def test_invalid_provenance_mode_fails_closed(value: str) -> None:
     with pytest.raises(ValueError, match="must be full or live"):
         validate_provenance_mode(value)
+
+
+@pytest.mark.parametrize("value", ["", "fast", "deterministic_false", "EXACT_FAST"])
+def test_invalid_voxelization_mode_fails_closed(value: str) -> None:
+    with pytest.raises(ValueError):
+        validate_voxelization_mode(value)
+
+
+def test_m2_backend_preserves_official_voxelization_default(tmp_path: Path) -> None:
+    backend = M2Backend(
+        tmp_path / "model.py",
+        tmp_path / "checkpoint.pth",
+        tmp_path / "deploy.py",
+        checkpoint_sha256="0" * 64,
+    )
+
+    assert backend.voxelization_mode == "official"
+    assert validate_voxelization_mode("exact_fast") == "exact_fast"

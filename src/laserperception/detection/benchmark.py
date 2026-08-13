@@ -30,6 +30,35 @@ def latency_statistics_ms(values: Sequence[float]) -> dict[str, float | int]:
     }
 
 
+def half_run_backlog_summary(
+    entry_intervals_ms: Sequence[float],
+    *,
+    first_half_drops: int,
+    second_half_drops: int,
+) -> dict[str, object]:
+    """Expose first/second-half interval and drop growth without hiding overload."""
+
+    if len(entry_intervals_ms) < 2:
+        raise ValueError("at least two callback entry intervals are required")
+    if first_half_drops < 0 or second_half_drops < 0:
+        raise ValueError("half-run drop counts must be non-negative")
+    midpoint = len(entry_intervals_ms) // 2
+    first = latency_statistics_ms(entry_intervals_ms[:midpoint])
+    second = latency_statistics_ms(entry_intervals_ms[midpoint:])
+    interval_growth = second["median_ms"] > first["median_ms"]
+    drop_growth = second_half_drops > first_half_drops
+    return {
+        "first_half": {"callback_entry_intervals": first, "input_drops": first_half_drops},
+        "second_half": {
+            "callback_entry_intervals": second,
+            "input_drops": second_half_drops,
+        },
+        "callback_entry_interval_median_grew": interval_growth,
+        "input_drops_grew": drop_growth,
+        "falling_behind_between_halves": interval_growth or drop_growth,
+    }
+
+
 def bytes_to_gib(value: int) -> float:
     """Convert a non-negative byte count to binary GiB."""
 

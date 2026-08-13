@@ -1,4 +1,4 @@
-"""Validate all 20 frozen M2 samples through the exact M3 PointCloud2 round trip."""
+"""Run final production exact-fast voxel, detector, and ROS correctness gates."""
 
 from __future__ import annotations
 
@@ -14,15 +14,19 @@ from typing import Any
 import numpy as np
 import yaml
 from builtin_interfaces.msg import Time
-from laserperception_ros.conversion import model_ready_to_pointcloud2, pointcloud2_to_model_ready
+from laserperception_ros.conversion import (
+    detection_frame_to_message,
+    model_ready_to_pointcloud2,
+    pointcloud2_to_model_ready,
+)
+from laserperception_ros.runtime import M3DetectorRuntime
 from std_msgs.msg import Header
 
-from laserperception.detection.m1_assets import resolve_m1_asset_paths
-from laserperception.detection.m2_assets import resolve_m2_asset_paths
-from laserperception.detection.m2_backend import M2Backend
 from laserperception.detection.mmdet3d_backend import sha256_file
 from laserperception.detection.runtime_metadata import repository_git_sha
 
+EXPECTED_CHECKPOINT_SHA256 = "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0"
+EXPECTED_ONNX_SHA256 = "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16"
 EXPECTED_ENGINE_SHA256 = "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b"
 
 
@@ -63,23 +67,80 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if not args.data_root:
         raise SystemExit("set LASERPERCEPTION_NUSCENES_ROOT or pass --data-root")
-    m1 = _manifest("m1_pointpillars_nuscenes.yaml")
-    m2 = _manifest("m2_pointpillars_tensorrt.yaml")
     parity = _manifest("m2_parity_v2.yaml")
-    a1 = resolve_m1_asset_paths(m1)
-    a2 = resolve_m2_asset_paths(m2)
-    engine = a2.engine_directory / "pointpillars_fp16.engine"
-    engine_sha = sha256_file(engine)
-    if engine_sha != EXPECTED_ENGINE_SHA256:
-        raise SystemExit("frozen TensorRT engine SHA256 mismatch; M3 fidelity refused")
-    backend = M2Backend(
-        a1.mmdet3d_root / str(m1["model"]["upstream_config"]),
-        a1.checkpoint_path,
-        a2.mmdeploy_root / str(m2["deployment"]["official_deployment_config"]),
-        checkpoint_sha256=str(m1["model"]["checkpoint"]["sha256"]),
-    )
-    backend.initialize()
-    backend._backend_model(engine)
+    runtime = M3DetectorRuntime(voxelization_mode="exact_fast", provenance_mode="live")
+    backend = runtime.backend
+    engine = runtime.assets.engine_path
+    artifact_hashes = {
+        "checkpoint": sha256_file(runtime.assets.checkpoint_path),
+        "onnx": sha256_file(runtime.assets.onnx_path),
+        "engine": sha256_file(engine),
+    }
+    expected_hashes = {
+        "checkpoint": EXPECTED_CHECKPOINT_SHA256,
+        "onnx": EXPECTED_ONNX_SHA256,
+        "engine": EXPECTED_ENGINE_SHA256,
+    }
+    if artifact_hashes != expected_hashes:
+        raise SystemExit(f"frozen artifact SHA256 mismatch: {artifact_hashes}; M3 fidelity refused")
+
+    output = args.output or engine.parent.parent / "m3" / "production_correctness.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    split_size = backend.dataset_size(args.data_root, "mini_val")
+    if split_size != 81:
+        raise SystemExit(f"production exact gate requires 81 mini_val samples, found {split_size}")
+    voxel_records: list[dict[str, object]] = []
+    all_voxels_exact = True
+    for index in range(split_size):
+        prepared = backend.prepare_sample(args.data_root, split="mini_val", index=index)
+        official = backend.voxelize_official(prepared)
+        exact_fast = backend.voxelize(prepared)
+        tensors: dict[str, object] = {}
+        sample_exact = True
+        for name in ("voxels", "num_points", "coors"):
+            official_array = getattr(official, name).detach().cpu().contiguous().numpy()
+            exact_array = getattr(exact_fast, name).detach().cpu().contiguous().numpy()
+            tensor_exact = bool(np.array_equal(official_array, exact_array))
+            sample_exact = sample_exact and tensor_exact
+            tensors[name] = {
+                "exact": tensor_exact,
+                "shape": list(official_array.shape),
+                "dtype": str(official_array.dtype),
+                "official_sha256": hashlib.sha256(official_array.tobytes(order="C")).hexdigest(),
+                "exact_fast_sha256": hashlib.sha256(exact_array.tobytes(order="C")).hexdigest(),
+            }
+        all_voxels_exact = all_voxels_exact and sample_exact
+        voxel_records.append(
+            {
+                "sample_index": index,
+                "sample_id": prepared.sample_id,
+                "point_count": int(prepared.points_xyzt.shape[0]),
+                "voxel_count": official.voxel_count,
+                "exact": sample_exact,
+                "tensors": tensors,
+            }
+        )
+        print(f"production voxel index {index:02d}: exact={sample_exact}", flush=True)
+
+    if not all_voxels_exact:
+        failed = {
+            "schema_version": "1.0",
+            "milestone": "M3",
+            "status": "fail_stop_before_detector_and_benchmark",
+            "implementation_commit": repository_git_sha(_root()),
+            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+            "artifacts": artifact_hashes,
+            "production_voxelization_mode": runtime.voxelization_mode,
+            "provenance_mode": runtime.provenance_mode,
+            "voxel_gate": {
+                "required_sample_count": 81,
+                "passed": False,
+                "samples": voxel_records,
+            },
+        }
+        output.write_text(json.dumps(failed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        raise SystemExit("production exact-fast voxel gate failed; benchmark refused")
+
     records: list[dict[str, object]] = []
     all_passed = True
     indices = [int(value) for value in parity["dataset"]["sample_indices"]]
@@ -98,15 +159,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             sample_id=original_prepared.sample_id,
             coordinate_frame="nuscenes_lidar_top",
         )
-        original_voxels = backend.voxelize(original_prepared)
+        original_voxels = backend.voxelize_official(original_prepared)
         adapter_voxels = backend.voxelize(adapter_prepared)
         original_raw = backend.run_tensorrt_raw(original_voxels, engine)
         adapter_raw = backend.run_tensorrt_raw(adapter_voxels, engine)
         original_frame = backend.postprocess_raw(
             original_raw, original_voxels, backend_name="tensorrt", precision="fp16"
         )
-        adapter_frame = backend.postprocess_raw(
-            adapter_raw, adapter_voxels, backend_name="tensorrt", precision="fp16"
+        adapter_frame = runtime.infer(
+            transported,
+            sample_id=original_prepared.sample_id,
+            coordinate_frame="nuscenes_lidar_top",
         )
         point_equal = bool(np.array_equal(source.points_xyzt, transported.points_xyzt))
         voxel_hashes_equal = original_voxels.hashes() == adapter_voxels.hashes()
@@ -116,7 +179,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         detections_equal = [item.to_dict() for item in original_frame.detections] == [
             item.to_dict() for item in adapter_frame.detections
         ]
-        sample_passed = point_equal and voxel_hashes_equal and raw_equal and detections_equal
+        reference_message = detection_frame_to_message(original_frame, message.header)
+        adapter_message = detection_frame_to_message(adapter_frame, message.header)
+        ros_message_equal = reference_message == adapter_message
+        sample_passed = (
+            point_equal
+            and voxel_hashes_equal
+            and raw_equal
+            and detections_equal
+            and ros_message_equal
+        )
         all_passed = all_passed and sample_passed
         records.append(
             {
@@ -139,28 +211,48 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "original_detection_count": len(original_frame.detections),
                 "adapter_detection_count": len(adapter_frame.detections),
                 "final_detections_exact": detections_equal,
+                "ros_detection3darray_exact": ros_message_equal,
                 "status": "pass" if sample_passed else "fail",
             }
         )
     result = {
         "schema_version": "1.0",
-        "milestone": "M3A",
-        "gate": "ros_pointcloud2_roundtrip_fidelity",
+        "milestone": "M3",
+        "gate": "production_exact_fast_and_ros_correctness",
         "status": "pass" if all_passed else "fail",
         "implementation_commit": repository_git_sha(_root()),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "sample_count": len(records),
-        "engine_sha256": engine_sha,
-        "point_contract": ["x", "y", "z", "time_lag"],
-        "samples": records,
+        "artifacts": artifact_hashes,
+        "production_voxelization_mode": runtime.voxelization_mode,
+        "provenance_mode": runtime.provenance_mode,
+        "voxel_gate": {
+            "required_sample_count": 81,
+            "completed_sample_count": len(voxel_records),
+            "passed": all_voxels_exact,
+            "samples": voxel_records,
+        },
+        "detector_and_ros_gate": {
+            "sample_count": len(records),
+            "passed": all_passed,
+            "point_contract": ["x", "y", "z", "time_lag"],
+            "samples": records,
+        },
     }
-    output = args.output or a2.artifact_directory / "m3" / "roundtrip_fidelity.json"
-    output.parent.mkdir(parents=True, exist_ok=True)
+
     output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({key: value for key, value in result.items() if key != "samples"}, indent=2))
+    summary = {
+        "status": result["status"],
+        "implementation_commit": result["implementation_commit"],
+        "artifacts": result["artifacts"],
+        "production_voxelization_mode": result["production_voxelization_mode"],
+        "provenance_mode": result["provenance_mode"],
+        "voxel_samples": len(voxel_records),
+        "detector_and_ros_samples": len(records),
+    }
+    print(json.dumps(summary, indent=2, sort_keys=True))
     print(f"external result: {output}")
     if not all_passed:
-        raise SystemExit("M3 round-trip fidelity failed; stop without benchmarking")
+        raise SystemExit("M3 production correctness failed; stop without benchmarking")
     return 0
 
 

@@ -34,6 +34,7 @@ class LaserPerceptionDetectorNode(Node):
         self.declare_parameter("output_qos_depth", 5)
         self.declare_parameter("output_reliability", "reliable")
         self.declare_parameter("engine_path", "")
+        self.declare_parameter("voxelization_mode", "official")
         self.declare_parameter("provenance_mode", "full")
 
         input_qos = _qos(
@@ -58,9 +59,12 @@ class LaserPerceptionDetectorNode(Node):
 
         self._runtime = runtime or M3DetectorRuntime(
             engine_override=str(self.get_parameter("engine_path").value),
+            voxelization_mode=str(self.get_parameter("voxelization_mode").value),
             provenance_mode=str(self.get_parameter("provenance_mode").value),
         )
         self.callback_latencies_ms: list[float] = []
+        self.callback_entry_perf_ns: list[int] = []
+        self.accepted_source_stamp_ns: list[int] = []
         self.received_count = 0
         self.accepted_count = 0
         self.published_count = 0
@@ -76,10 +80,15 @@ class LaserPerceptionDetectorNode(Node):
 
     def _on_points(self, message: PointCloud2) -> None:
         started_ns = time.perf_counter_ns()
+        self.callback_entry_perf_ns.append(started_ns)
         self.received_count += 1
         try:
             points = pointcloud2_to_model_ready(message)
             self.accepted_count += 1
+            source_stamp_ns = int(message.header.stamp.sec) * 1_000_000_000 + int(
+                message.header.stamp.nanosec
+            )
+            self.accepted_source_stamp_ns.append(source_stamp_ns)
             sample_id = f"{message.header.stamp.sec}.{message.header.stamp.nanosec:09d}"
             frame = self._runtime.infer(
                 points,

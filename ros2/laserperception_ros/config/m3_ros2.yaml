@@ -9,13 +9,14 @@ laserperception_detector:
     output_qos_depth: 5
     output_reliability: reliable
     engine_path: ""
-    provenance_mode: full
+    voxelization_mode: exact_fast
+    provenance_mode: live
 
 laserperception_replay:
   ros__parameters:
     output_topic: /laserperception/points_model_ready
     split: mini_val
-    start_index: 0
+    start_index: 42
     sample_count: 1
     one_shot: false
     loop: true

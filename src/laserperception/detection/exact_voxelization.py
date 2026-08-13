@@ -1,4 +1,4 @@
-"""Experimental exact-semantics hard voxelization using lazy CUDA dependencies."""
+"""Supported exact-semantics hard voxelization using lazy CUDA dependencies."""
 
 from __future__ import annotations
 
@@ -7,10 +7,12 @@ from typing import Any
 
 
 class ExactDeterministicVoxelizer:
-    """Reproduce pinned MMCV deterministic hard-voxel selection with tensor ops.
+    """Preserve pinned MMCV deterministic hard-voxel outputs with tensor grouping.
 
-    The class is diagnostic-only. Importing this module remains CPU-safe; PyTorch and
-    MMCV are loaded lazily when an instance is constructed.
+    exact_fast is a LaserPerception deployment optimization. It uses the pinned
+    MMCV dynamic coordinate CUDA operation plus PyTorch tensor grouping; it is not
+    an upstream MMDetection3D implementation. Importing this module remains CPU-safe
+    because PyTorch and MMCV are loaded lazily when an instance is constructed.
     """
 
     def __init__(self, official_layer: Any) -> None:

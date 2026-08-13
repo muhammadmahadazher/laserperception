@@ -30,3 +30,12 @@ def test_m3b_v2_protocol_freezes_exact_gates_and_scope() -> None:
         "    logical_name: mmcv/ops/csrc/pytorch/cuda/voxelization_cuda.cu\n"
         "    sha256: 9a089b79490c1a53648601d992bdacea4f1272af7c127dc0c2ac854ef3f79d2d" in protocol
     )
+
+
+def test_m3_ros_config_explicitly_selects_exact_fast_live() -> None:
+    root = Path(__file__).parents[1]
+    config = (root / "ros2/laserperception_ros/config/m3_ros2.yaml").read_text(encoding="utf-8")
+
+    assert "voxelization_mode: exact_fast" in config
+    assert "provenance_mode: live" in config
+    assert "start_index: 42" in config

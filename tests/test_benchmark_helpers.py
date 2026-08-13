@@ -2,7 +2,11 @@ import math
 
 import pytest
 
-from laserperception.detection.benchmark import bytes_to_gib, latency_statistics_ms
+from laserperception.detection.benchmark import (
+    bytes_to_gib,
+    half_run_backlog_summary,
+    latency_statistics_ms,
+)
 
 
 def test_latency_statistics_are_deterministic() -> None:
@@ -23,6 +27,25 @@ def test_latency_statistics_are_deterministic() -> None:
 def test_latency_statistics_reject_invalid_values(values: list[float]) -> None:
     with pytest.raises(ValueError):
         latency_statistics_ms(values)
+
+
+def test_half_run_backlog_summary_exposes_interval_and_drop_growth() -> None:
+    result = half_run_backlog_summary(
+        [40.0, 45.0, 55.0, 60.0], first_half_drops=1, second_half_drops=3
+    )
+
+    assert result["first_half"]["input_drops"] == 1
+    assert result["second_half"]["input_drops"] == 3
+    assert result["callback_entry_interval_median_grew"] is True
+    assert result["input_drops_grew"] is True
+    assert result["falling_behind_between_halves"] is True
+
+
+def test_half_run_backlog_summary_rejects_invalid_inputs() -> None:
+    with pytest.raises(ValueError):
+        half_run_backlog_summary([1.0], first_half_drops=0, second_half_drops=0)
+    with pytest.raises(ValueError):
+        half_run_backlog_summary([1.0, 2.0], first_half_drops=-1, second_half_drops=0)
 
 
 def test_bytes_to_gib_validates_and_converts() -> None:

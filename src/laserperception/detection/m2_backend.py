@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from laserperception.detection.exact_voxelization import ExactDeterministicVoxelizer
 from laserperception.detection.m2_diagnostics import (
     RAW_OUTPUT_NAMES,
     assert_cuda0_model,
@@ -29,6 +30,7 @@ EXPECTED_RAW_OUTPUT_SHAPES = {
     "dir_cls_pred": (1, 28, 200, 200),
 }
 ProvenanceMode = Literal["full", "live"]
+VoxelizationMode = Literal["official", "exact_fast"]
 
 
 def validate_provenance_mode(value: str) -> ProvenanceMode:
@@ -37,6 +39,14 @@ def validate_provenance_mode(value: str) -> ProvenanceMode:
     if value not in {"full", "live"}:
         raise ValueError("provenance_mode must be full or live")
     return cast(ProvenanceMode, value)
+
+
+def validate_voxelization_mode(value: str) -> VoxelizationMode:
+    """Validate the official-reference or exact deployment voxelization policy."""
+
+    if value not in {"official", "exact_fast"}:
+        raise ValueError("voxelization_mode must be official or exact_fast")
+    return cast(VoxelizationMode, value)
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,6 +104,7 @@ class M2Backend(Mmdet3dBackend):
         *,
         checkpoint_sha256: str,
         device: str = "cuda:0",
+        voxelization_mode: str = "official",
     ) -> None:
         super().__init__(
             config_path,
@@ -102,9 +113,11 @@ class M2Backend(Mmdet3dBackend):
             device=device,
         )
         self.deploy_config_path = Path(deploy_config_path).expanduser()
+        self.voxelization_mode: VoxelizationMode = validate_voxelization_mode(voxelization_mode)
         self._deploy_config: Any = None
         self._task_processor: Any = None
         self._backend_models: dict[Path, Any] = {}
+        self._exact_voxelizer: ExactDeterministicVoxelizer | None = None
 
     def initialize(self) -> None:
         """Load the pinned M1 model plus the pinned MMDeploy rewrite registry."""
@@ -131,6 +144,17 @@ class M2Backend(Mmdet3dBackend):
         self._task_processor = build_task_processor(
             self._model.cfg, self._deploy_config, self.device
         )
+        if self.voxelization_mode == "exact_fast":
+            try:
+                official_layer = self._model.data_preprocessor.voxel_layer
+                if bool(official_layer.deterministic) is not True:
+                    raise RuntimeError("the pinned official voxel layer is not deterministic")
+                self._exact_voxelizer = ExactDeterministicVoxelizer(official_layer).eval()
+            except Exception as error:
+                raise DetectionEnvironmentError(
+                    "exact_fast voxelization initialization failed; startup is refused "
+                    "and no fallback voxelizer will be selected"
+                ) from error
 
     @property
     def deploy_config(self) -> Any:
@@ -160,7 +184,16 @@ class M2Backend(Mmdet3dBackend):
         return value
 
     def voxelize(self, sample: PreparedMmdet3dSample) -> VoxelizedM2Sample:
-        """Apply the official MMDetection3D data preprocessor exactly once."""
+        """Apply the configured fail-closed voxelization policy exactly once."""
+
+        if self.voxelization_mode == "official":
+            return self.voxelize_official(sample)
+        if self.voxelization_mode == "exact_fast":
+            return self._voxelize_exact_fast(sample)
+        raise AssertionError(f"unsupported voxelization mode: {self.voxelization_mode}")
+
+    def voxelize_official(self, sample: PreparedMmdet3dSample) -> VoxelizedM2Sample:
+        """Apply official MMDetection3D preprocessing for reference and M2 evidence."""
 
         self.initialize()
         assert self._runtime is not None
@@ -194,6 +227,56 @@ class M2Backend(Mmdet3dBackend):
             coors=coors.contiguous(),
             data_samples=data_samples,
         )
+
+    def _voxelize_exact_fast(self, sample: PreparedMmdet3dSample) -> VoxelizedM2Sample:
+        """Run the validated LaserPerception exact deterministic deployment path."""
+
+        self.initialize()
+        if self._exact_voxelizer is None:
+            raise RuntimeError(
+                "exact_fast voxelization was requested but did not initialize; no fallback allowed"
+            )
+        assert self._runtime is not None
+        preprocessor = self._model.data_preprocessor
+        with (
+            self._runtime.torch.inference_mode(),
+            self._runtime.torch.autocast(device_type="cuda", enabled=False),
+        ):
+            collated = preprocessor.collate_data(sample.batch)
+            try:
+                points = list(collated["inputs"]["points"])
+                data_samples = tuple(collated["data_samples"])
+            except (KeyError, TypeError) as error:
+                raise RuntimeError(
+                    "MMDetection3D collate_data returned malformed point data"
+                ) from error
+            if len(points) != 1 or len(data_samples) != 1:
+                raise RuntimeError("exact_fast requires batch size one")
+            voxels, coors, num_points = self._exact_voxelizer(points[0])
+            centers = (coors[:, [2, 1, 0]] + 0.5) * voxels.new_tensor(
+                self._exact_voxelizer.voxel_size
+            ) + voxels.new_tensor(self._exact_voxelizer.point_cloud_range[0:3])
+            padded_coors = self._runtime.torch.nn.functional.pad(
+                coors, (1, 0), mode="constant", value=0
+            )
+            result = VoxelizedM2Sample(
+                prepared=sample,
+                voxels=self._runtime.torch.cat([voxels], dim=0).contiguous(),
+                num_points=self._runtime.torch.cat([num_points], dim=0).contiguous(),
+                coors=self._runtime.torch.cat([padded_coors], dim=0).contiguous(),
+                data_samples=data_samples,
+            )
+            self._runtime.torch.cat([centers], dim=0).contiguous()
+        if tuple(result.voxels.shape[1:]) != (64, 4):
+            raise RuntimeError(
+                f"exact_fast requires voxel shape (N, 64, 4), found {tuple(result.voxels.shape)}"
+            )
+        if tuple(result.num_points.shape) != (result.voxel_count,):
+            raise RuntimeError("exact_fast num_points shape does not match voxel count")
+        if tuple(result.coors.shape) != (result.voxel_count, 4):
+            raise RuntimeError("exact_fast coors shape does not match voxel count")
+        self.assert_shared_cuda_inputs(result)
+        return result
 
     def run_rewritten_pytorch_raw(self, sample: VoxelizedM2Sample) -> dict[str, list[Any]]:
         """Run the MMDeploy-rewritten PointPillars network in PyTorch FP32."""

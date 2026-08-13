@@ -23,7 +23,7 @@ setup(
     zip_safe=False,
     maintainer="Mahad Azher",
     maintainer_email="muhammadmahadazher@users.noreply.github.com",
-    description="ROS 2 Humble interface for LaserPerception M3A.",
+    description="ROS 2 Humble interface for the LaserPerception M3 deployment path.",
     license="Apache-2.0",
     entry_points={
         "console_scripts": [

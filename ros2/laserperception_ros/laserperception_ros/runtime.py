@@ -13,7 +13,9 @@ from laserperception.detection.m2_assets import resolve_m2_asset_paths
 from laserperception.detection.m2_backend import (
     M2Backend,
     ProvenanceMode,
+    VoxelizationMode,
     validate_provenance_mode,
+    validate_voxelization_mode,
 )
 from laserperception.detection.mmdet3d_backend import sha256_file
 from laserperception.detection.ros2_contract import ModelReadyPointCloud
@@ -66,8 +68,8 @@ def resolve_m3_assets(*, engine_override: str = "") -> M3Assets:
     )
 
 
-def create_backend(assets: M3Assets) -> M2Backend:
-    """Create the shared official backend without modifying model semantics."""
+def create_backend(assets: M3Assets, *, voxelization_mode: str = "official") -> M2Backend:
+    """Create the shared backend under an explicit fail-closed voxelization policy."""
 
     checkpoint_sha = str(assets.m1_manifest["model"]["checkpoint"]["sha256"])
     if checkpoint_sha != EXPECTED_CHECKPOINT_SHA256:
@@ -81,13 +83,21 @@ def create_backend(assets: M3Assets) -> M2Backend:
         assets.checkpoint_path,
         assets.deploy_config_path,
         checkpoint_sha256=checkpoint_sha,
+        voxelization_mode=voxelization_mode,
     )
 
 
 class M3DetectorRuntime:
     """Initialized-once in-memory PointCloud2-to-DetectionFrame runtime."""
 
-    def __init__(self, *, engine_override: str = "", provenance_mode: str = "full") -> None:
+    def __init__(
+        self,
+        *,
+        engine_override: str = "",
+        voxelization_mode: str = "official",
+        provenance_mode: str = "full",
+    ) -> None:
+        self.voxelization_mode: VoxelizationMode = validate_voxelization_mode(voxelization_mode)
         self.provenance_mode: ProvenanceMode = validate_provenance_mode(provenance_mode)
         self.assets = resolve_m3_assets(engine_override=engine_override)
         if not self.assets.engine_path.is_file():
@@ -98,7 +108,7 @@ class M3DetectorRuntime:
                 f"TensorRT engine SHA256 mismatch: expected {EXPECTED_ENGINE_SHA256}, "
                 f"found {actual_engine_sha}"
             )
-        self.backend = create_backend(self.assets)
+        self.backend = create_backend(self.assets, voxelization_mode=self.voxelization_mode)
         self.backend.initialize()
         # Build and retain the official wrapper/engine/context before the first callback.
         self.backend._backend_model(self.assets.engine_path)
@@ -111,7 +121,7 @@ class M3DetectorRuntime:
         sample_id: str,
         coordinate_frame: str,
     ) -> DetectionFrame:
-        """Run official voxelization, frozen TensorRT FP16, and shared postprocessing."""
+        """Run configured deterministic voxelization, frozen TensorRT, and postprocessing."""
 
         prepared = self.backend.prepare_model_ready_points(
             points,
