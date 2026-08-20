@@ -1,8 +1,9 @@
 # Roadmap
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
-M4.6 is active for v0.2.0 release engineering only. No technical or performance milestone is
-active, and M5 remains conditional and inactive.
+M0 through M4.6 are complete, v0.2.0 is released, and no technical or performance milestone is
+active. M5 remains conditional and inactive; any next technical work requires explicit owner
+authorization.
 
 ## Completed foundations
 
@@ -25,6 +26,8 @@ active, and M5 remains conditional and inactive.
   bounded live history, preserved transform-repair chronology, exact model-ready reconstruction,
   and 20/20 exact unchanged detector-chain evidence.
 - [x] **M4.5 overall:** offline known-pose reconstruction and live ROS/tf2 ingestion both complete.
+- [x] **M4.6 — v0.2.0 release:** release metadata, documentation, packaging and validation,
+  merged release commit, annotated `v0.2.0` tag, and public GitHub release.
 
 M3 closed honestly: representative W1 (10 historical sweeps plus current, 354,182 points) sustained
 10 Hz cleanly; 15 Hz and 20 Hz were not sustained. M4.5b ran correctness and integration gates only
@@ -44,12 +47,13 @@ compatible raw PointCloud2 + time-aware TF + bounded live history
 M4.5b consumes an existing valid localization/TF source. It does not add localization, odometry,
 calibration automation, per-point deskew, a vendor sensor driver, or a new detector path.
 
-## Active M4.6 — v0.2.0 release engineering
+## Completed M4.6 — v0.2.0 release engineering
 
-M4.6 packages and documents the accepted M4.5 raw-ingestion capability as v0.2.0. It may update
-release metadata, documentation, packaging checks, and release validation only. It does not reopen
-runtime implementation, correctness protocols, or performance measurement. After separate review,
-merge, tag, and release, M4.6 may be marked complete; no later milestone activates automatically.
+M4.6 packaged and documented the accepted M4.5 raw-ingestion capability as v0.2.0. The release PR
+was merged, the annotated `v0.2.0` tag was created, and the public GitHub release was published.
+M4.6 did not reopen runtime implementation, correctness protocols, or performance measurement. No
+later milestone activates automatically; any next technical work requires explicit owner
+authorization.
 
 ## M5 — conditional physical Jetson measurement
 
