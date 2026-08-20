@@ -24,10 +24,12 @@ were not sustained. This failure is part of the release evidence, not hidden.
 [Read the v0.1.0 release notes](docs/releases/v0.1.0.md) ·
 [Inspect the benchmark evidence](docs/BENCHMARKS.md)
 
-**Post-v0.1 offline reconstruction:** M4.5a can now reproduce the model-ready XYZT cloud from raw
-nuScenes sweeps plus known calibration/ego poses. It matched the pinned official pipeline exactly
-on 81/81 mini-val samples and preserved all frozen 20-sample detector outputs. This is an offline
-library, not live physical-sensor ingestion. [Read the multi-sweep contract and evidence](docs/MULTISWEEP.md).
+**Post-v0.1 raw ingestion:** M4.5 is complete. M4.5a reconstructs model-ready XYZT clouds from raw
+sweeps plus known poses, and M4.5b adds compatible raw ROS 2 `PointCloud2`, time-aware tf2, bounded
+live history, and the unchanged detector. The raw ROS path matched the accepted model-ready input,
+voxel tensors, TensorRT tensors, detections, and ROS message semantics exactly on the frozen
+20-sample suite. [Read the raw ROS contract](docs/RAW_LIDAR_ROS2.md) or the
+[multi-sweep evidence](docs/MULTISWEEP.md).
 
 ## What v0.1.0 does—and what was measured
 
@@ -57,7 +59,9 @@ Jetson, or another environment.
 
 ```mermaid
 flowchart TD
-    A["Model-ready multi-sweep PointCloud2"] --> B["exact_fast deterministic voxelization"]
+    R["Post-v0.1: raw single-sweep PointCloud2"] --> T["Time-aware tf2 + bounded live history"]
+    T --> A["Model-ready multi-sweep PointCloud2"]
+    A --> B["exact_fast deterministic voxelization"]
     B --> C["Frozen TensorRT FP16 PointPillars network"]
     C --> D["Unchanged MMDeploy postprocess"]
     D --> E["Framework-independent DetectionFrame"]
@@ -65,9 +69,11 @@ flowchart TD
     E --> G["RViz / Foxglove markers"]
 ```
 
-The ROS input already contains `x`, `y`, `z`, and `time_lag`. The post-v0.1 M4.5a library can build
-that matrix offline from raw sweeps and known poses, but the ROS path still does not build live
-history from a raw physical-LiDAR topic. PointCloud2/TF/history integration remains planned M4.5b.
+The v0.1 path begins at model-ready `x`, `y`, `z`, and `time_lag`. Post-v0.1 M4.5b optionally begins
+one boundary earlier: compatible raw single-sweep messages require float32 XYZ and a valid
+time-indexed TF tree. The builder uses the current acquisition time as the target time and preserves
+historical acquisition stamps; a repeated frame name at different times is not assumed to be an
+identity transform. Additional vendor fields are accepted but ignored by the frozen detector path.
 
 Two explicit policies preserve historical evidence and deployed semantics:
 
@@ -181,9 +187,11 @@ M1-style reproduction that differed from the archived M1 result, and decreasing 
 15/20 Hz offered-rate overload. Causes were not isolated. See the separate
 [Known issues section](docs/releases/v0.1.0.md#known-issues).
 
-v0.1.0 does not include training, tracking, camera fusion, a second detector, INT8, a raw LiDAR
-history builder, or Jetson measurements. It is research/demo software, not a safety-certified
-perception system.
+v0.1.0 itself remains the released model-ready interface. Post-v0.1 M4.5 adds raw-sweep history
+ingestion for compatible PointCloud2 plus valid TF; it does not prove arbitrary sensor calibration,
+localization, odometry, intra-scan deskew, physical-LiDAR accuracy, or plug-and-play support for any
+LiDAR. Training, tracking, camera fusion, a second detector, INT8, and Jetson measurements remain
+absent. LaserPerception is research/demo software, not a safety-certified perception system.
 
 ## Repository map
 

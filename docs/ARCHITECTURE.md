@@ -4,7 +4,7 @@ LaserPerception v0.1.0 keeps a lightweight CPU package separate from an optional
 deployment stack. The deployed detector is an official pretrained MMDetection3D PointPillars model;
 LaserPerception did not train or reimplement it.
 
-## v0.1 deployment path
+## v0.1 model-ready deployment path
 
 ```mermaid
 flowchart TD
@@ -20,30 +20,39 @@ The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the sour
 v0.1 ROS path remains model-ready: it does not reconstruct history, perform TF lookup, or accept a
 raw single-sweep physical-LiDAR topic.
 
-## Post-v0.1 offline reconstruction boundary
+## Post-v0.1 M4.5 raw ingestion
 
-M4.5a adds a lightweight offline path before the existing model-ready contract:
+M4.5 adds two reviewed boundaries before the unchanged model-ready detector:
 
 ```mermaid
 flowchart LR
-    C["Current raw sweep"] --> B["MultiSweepBuilder"]
-    H["Ordered historical raw sweeps"] --> B
-    P["Known calibration and ego poses"] --> B
-    B --> M["ModelReadyPointCloud: float32 XYZT"]
+    C["Current raw sweep"] --> A["M4.5a offline builder"]
+    H["Ordered historical sweeps"] --> A
+    P["Known poses"] --> A
+    R["Raw single-sweep PointCloud2"] --> L["M4.5b live history"]
+    T["Time-indexed tf2 through fixed frame"] --> L
+    A --> M["Model-ready float32 XYZT"]
+    L --> M
+    M --> D["Existing exact_fast + TensorRT detector"]
+    D --> O["Detection3DArray"]
 ```
 
-The NumPy-only builder exactly reproduced the pinned official multi-sweep output on 81/81 mini-val
-samples. It is independent of MMDetection3D at runtime; MMDetection3D is used only by the manual
-parity oracle. Details and evidence are in [`docs/MULTISWEEP.md`](MULTISWEEP.md).
+M4.5a is the NumPy-only reconstruction core. M4.5b decodes compatible float32 XYZ PointCloud2,
+keeps up to ten earlier acquisitions, obtains source-time-to-current-time transforms with
+`tf2_ros.Buffer.lookup_transform_full`, and delegates exact accumulation semantics to the same
+`MultiSweepBuilder`. The current acquisition frame is the target when `target_frame` is empty.
+A dedicated `TransformListener(..., spin_thread=True)` services TF while the node uses a bounded
+lookup timeout, so waiting in the point callback does not starve TF reception.
 
-This does **not** change the ROS deployment diagram above. Raw `PointCloud2`, time-travel TF lookup,
-live history buffering, and detector chaining remain a separately reviewed planned M4.5b. M4.5a
-does not claim physical-sensor plug-and-play ingestion.
+The live path exactly matched the accepted M4.5a model-ready input and the complete frozen detector
+chain on 20/20 samples. It accepts compatible streams only; it does not provide calibration,
+localization, odometry, per-point deskew, or a vendor driver. Contracts and evidence are in
+[`docs/MULTISWEEP.md`](MULTISWEEP.md) and [`docs/RAW_LIDAR_ROS2.md`](RAW_LIDAR_ROS2.md).
 
-The TensorRT network produces `cls_score`, `bbox_pred`, and `dir_cls_pred`. The existing MMDeploy
-postprocess remains unchanged and is shared by evidence paths. LaserPerception converts final
-predictions into a framework-independent `DetectionFrame`, then the ROS package converts that
-contract to `Detection3DArray` and visualization markers.
+The TensorRT network still produces `cls_score`, `bbox_pred`, and `dir_cls_pred`. The existing
+MMDeploy postprocess remains unchanged. LaserPerception converts final predictions into a
+framework-independent `DetectionFrame`, then the ROS package converts that contract to
+`Detection3DArray` and visualization markers.
 
 ## Voxelization and provenance policy
 

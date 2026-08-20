@@ -5,11 +5,10 @@ modifying the repository. User instructions take precedence when they explicitly
 
 ## Active project and current milestone
 
-LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit. The
-current milestone is **M4.5a — offline raw-sweep multi-sweep reconstruction**. M0 through M4 are
-complete and v0.1.0 remains released. M4.5a is limited to pinned-upstream discovery,
-ROS-independent raw-sweep contracts, offline temporal reconstruction, parity evidence, tests, and
-documentation. It must not expand detector or performance scope.
+LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
+M0 through M4 are complete, v0.1.0 is released, M4.5a and M4.5b are complete, and **M4.5 is complete
+overall**. No technical milestone is currently active. Post-M4.5 work requires an explicit owner
+decision; M5 remains conditional on physical target Jetson hardware.
 
 The accepted v0.1 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, and a
@@ -37,14 +36,17 @@ deleted.
 - M3: ROS 2 Humble interface, exact deterministic deployment voxelization, correctness evidence,
   and representative full-history ROS measurement — complete.
 - M4: evidence-backed v0.1.0 release — complete.
-- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — active.
-- M4.5b: raw `PointCloud2`, tf2, and live history integration — planned, not started.
-- M5: physical Jetson measurements only if target hardware is actually available.
+- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — complete.
+- M4.5b: raw `PointCloud2`, time-aware tf2, bounded live history, transform-repair chronology, and
+  exact frozen detector-chain evidence — complete.
+- M4.5: offline and live raw-sweep integration — complete overall.
+- M5: conditional physical Jetson measurements only if target hardware is actually available and
+  the owner explicitly activates the milestone.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
-without hardware, or unrelated features unless the owner explicitly changes scope. During M4.5a,
-do not add ROS nodes, tf2, live buffering, physical-sensor adapters, postprocessing/DDS/executor/
-voxelization optimization, or changes to any measured runtime path.
+without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
+optimization, or unrelated features unless the owner explicitly changes scope. M4.5 completion does
+not authorize another feature or performance campaign.
 
 ## Detection and deployment architecture
 
@@ -63,6 +65,14 @@ voxelization optimization, or changes to any measured runtime path.
   MMDetection3D is its manual parity oracle only, not a runtime dependency. Preserve exact sweep
   and source-row order, timestamp arithmetic, transform cast/write-back points, and strict range
   semantics recorded in `docs/m45/UPSTREAM_MULTISWEEP_CONTRACT.md`.
+- The M4.5b ROS boundary accepts compatible raw PointCloud2 with scalar float32 XYZ, removes
+  non-finite rows without reordering, retains bounded acquisition history, and requires time-aware
+  `lookup_transform_full` through a fixed frame. Same frame names at different timestamps are not
+  identity. Preserve the accepted ROS column-vector to builder storage mapping
+  `rotation = R.T`, `translation = -R.T @ t`; do not reintroduce the rejected `-t` adapter.
+- M4.5b authoritative evidence is actual raw nuScenes data through PointCloud2/tf2/builder and the
+  unchanged detector, not the synthetic transform fixture alone. Preserve the original W1 failure,
+  transform ledger, repair exactness evidence, and final 20-sample canonical record.
 - The historical/core evidence voxelization default is `official` with `full` provenance.
 - The ROS deployment policy is explicitly `exact_fast` with `live` provenance. `exact_fast` is a
   LaserPerception implementation proven bit-exact against the pinned official deterministic hard

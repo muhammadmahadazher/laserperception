@@ -1,25 +1,28 @@
-# Offline multi-sweep reconstruction
+# Multi-sweep reconstruction (M4.5 complete)
 
-LaserPerception M4.5a adds a ROS-independent library that reconstructs the pinned PointPillars
-model input from raw individual nuScenes LIDAR_TOP acquisitions and known calibration/ego-pose
-metadata:
+LaserPerception provides two post-v0.1 boundaries that produce the unchanged PointPillars
+model-ready `float32 N x 4` XYZT contract:
 
 ```text
-current raw sweep + historical raw sweeps + timestamps + poses
-                              |
-                              v
-                 MultiSweepBuilder (NumPy)
-                              |
-                              v
-            ModelReadyPointCloud: float32 N x 4 XYZT
+M4.5a offline: raw sweeps + integer timestamps + known poses
+M4.5b live ROS: raw PointCloud2 + acquisition stamps + time-indexed tf2
+                                  |
+                                  v
+                       MultiSweepBuilder (NumPy)
+                                  |
+                                  v
+                   ModelReadyPointCloud: float32 XYZT
+                                  |
+                                  v
+                          unchanged detector
 ```
 
-This is an **offline reconstruction boundary**. It does not accept ROS `PointCloud2`, query TF,
-buffer live sensor history, or chain into the ROS detector node. Those capabilities remain planned
-for a separately reviewed M4.5b. A physical LiDAR cannot be plugged into this library without a
-caller that supplies correctly ordered raw sweeps and exact acquisition-time poses.
+M4.5a is the accepted ROS-independent reconstruction core. M4.5b is a narrow ROS boundary around
+that core: it decodes raw XYZ, retains bounded chronological history, resolves historical-to-current
+transforms, serializes model-ready PointCloud2, and feeds the existing detector. Neither path
+changes the model, voxel geometry, TensorRT engine, thresholds, classes, or exact-fast voxelizer.
 
-## Contracts
+## Shared M4.5a reconstruction core
 
 The production implementation is
 [`src/laserperception/detection/multisweep.py`](../src/laserperception/detection/multisweep.py).
@@ -32,89 +35,136 @@ MMCV, the nuScenes devkit, ROS, PyTorch, or TensorRT.
 - `SweepTransform` reproduces the pinned converter's row-vector operation sequence and float32
   transform-storage cast while retaining source and current-target IDs.
 - `HistoricalSweep` binds a raw acquisition to its exact transform.
-- `MultiSweepBuilderConfig` records only pinned reference behavior: ten historical sweeps,
-  `remove_close=False`, radius `1.0`, and `pad_empty_sweeps=False`.
-- `MultiSweepBuilder` selects the caller-provided history in nearest-to-farthest order, applies
-  exact pinned arithmetic, concatenates current first, keeps XYZT, applies strict spatial bounds,
-  and returns the existing `ModelReadyPointCloud`.
+- `MultiSweepBuilderConfig` records ten historical sweeps, `remove_close=False`, radius `1.0`, and
+  `pad_empty_sweeps=False`.
+- `MultiSweepBuilder` selects history nearest-to-farthest, applies pinned arithmetic, concatenates
+  current first, keeps XYZT, applies strict spatial bounds, and preserves source-row order.
 
-The builder fails closed on malformed shapes/dtypes, non-finite values, invalid homogeneous
+The builder fails closed on malformed shapes or dtypes, non-finite values, invalid homogeneous
 matrices, and transform source/target mismatches. Point order is never geometrically sorted.
 
-## Pinned semantics
+## Pinned accumulation semantics
 
 The source-level discovery record is
-[`docs/m45/UPSTREAM_MULTISWEEP_CONTRACT.md`](m45/UPSTREAM_MULTISWEEP_CONTRACT.md). In summary:
+[`docs/m45/UPSTREAM_MULTISWEEP_CONTRACT.md`](m45/UPSTREAM_MULTISWEEP_CONTRACT.md).
 
 | Property | Frozen behavior |
 |---|---|
 | Raw load | five native float32 values per point |
 | History | up to ten acquisitions plus the current keyframe |
-| Test selection | first N prepared sweeps, nearest-to-farthest |
-| Scene start | current keyframe only; no padding |
-| `remove_close` | disabled; dormant rule is strict `abs(x) < 1 && abs(y) < 1` before history transform |
-| Transform | float32 points multiplied by float64 reload of a float32-quantized matrix; float32 write-back after rotation and again after translation |
+| Selection | previous acquisitions nearest-to-farthest |
+| Scene start | current keyframe only; no fabricated padding |
+| `remove_close` | disabled; dormant rule is strict `abs(x) < 1 && abs(y) < 1` before transform |
+| Transform | float32 points use float64 reload of a float32-quantized matrix; float32 write-back after rotation and translation |
 | Lag | `(current_us / 1e6) - (historical_us / 1e6)`, assigned to float32; current is zero |
-| Concatenation | current, then history nearest-to-farthest; source row order retained |
+| Concatenation | current, then history nearest-to-farthest; source-row order retained |
 | Spatial filter | strict `-50 < x,y < 50`, `-5 < z < 3` |
 | Output | contiguous float32 `x, y, z, time_lag` |
 
-The builder deliberately matches operations rather than replacing them with an algebraically
-equivalent SE(3) expression; the intermediate rounding points are part of the evidence contract.
-The pinned upstream pipeline does not deskew individual points.
+The implementation matches the pinned operation sequence instead of substituting a merely
+algebraically equivalent SE(3) expression. Intermediate rounding points are part of the evidence
+contract. The pinned pipeline does not deskew individual points.
 
-## Exact parity evidence
+## Live ROS history boundary
 
-The manual validator is
-[`scripts/detection/validate_m45a_multisweep.py`](../scripts/detection/validate_m45a_multisweep.py).
-For the candidate side it independently follows raw nuScenes sample-data history, reads raw files,
-constructs poses from calibration/ego tables, and invokes `MultiSweepBuilder`. Only the reference
-side invokes the pinned official PointPillars test pipeline. Production code never calls
-`LoadPointsFromMultiSweeps`.
+The `laserperception_multisweep_builder` executable subscribes to
+`/laserperception/points_raw` and publishes `/laserperception/points_model_ready`. Its complete
+contract is in [`docs/RAW_LIDAR_ROS2.md`](RAW_LIDAR_ROS2.md).
 
-At implementation commit `cc0f20b16412d98939c9544002d02029b35a5971`:
+- Required input fields are scalar float32 `x`, `y`, and `z`; other fields are ignored.
+- The acquisition time is the PointCloud2 header stamp. Historical source stamps are retained and
+  the current stamp is the target time. There is no per-point firing-time deskew.
+- Non-finite XYZ rows are removed deterministically without reordering retained rows; a cloud with
+  no valid rows is rejected.
+- History starts current-only and grows to current plus ten prior acquisitions. It is selected
+  nearest-to-farthest with no padding.
+- Equal or regressing timestamps reset history. An optional positive configured gap also resets it;
+  the packaged configuration leaves gap reset disabled (`0.0`).
+- Every selected historical acquisition requires a valid bounded cross-time TF. A missing transform
+  rejects the current output; the node does not skip a sweep or substitute latest TF.
 
-- **81/81** mini-val samples had identical shape, row order, float32 bytes, and SHA256;
-- the reverified distribution was **2/2** current-only scene starts and **79/79** samples with ten
-  historical sweeps;
-- the frozen 20-sample detector check produced exact `voxels`, `num_points`, and `coors` tensors,
-  exact raw TensorRT outputs, and exact final `DetectionFrame` values;
-- Tier B was not used.
+## Transform convention and regression evidence
 
-The sanitized per-sample evidence is
-[`benchmarks/m45a/results/nuscenes_mini_multisweep_parity.json`](../benchmarks/m45a/results/nuscenes_mini_multisweep_parity.json).
-It contains tokens, counts, shapes, hashes, artifact identities, and exact booleans—not dataset
-points or private filesystem paths. nuScenes data and frozen model/deployment artifacts remain
-external.
+For a conventional ROS column-vector transform,
 
-## Manual reproduction
+```text
+p_target = R @ p_source + t
+```
 
-Use the already documented pinned detection environment and external assets. From the repository
-root in that environment:
+The pinned builder applies `p_source_row @ A - b`. The adapter must therefore store:
+
+```text
+rotation_storage = R.T
+translation_storage = -R.T @ t
+```
+
+The first M4.5b adapter incorrectly stored `-t`, which is wrong whenever `R != I`. A fail-first
+synthetic rotation-plus-translation fixture demonstrated that the regression test detects this
+specific implementation bug; pure translation alone could not expose it.
+
+That synthetic fixture is a **regression guard**, not proof of agreement with MMDetection3D. The
+authoritative correctness evidence uses actual raw nuScenes sweeps and poses through ROS
+PointCloud2, tf2 time travel, the repaired adapter, `MultiSweepBuilder`, and model-ready
+PointCloud2, then compares the result byte-for-byte with the accepted M4.5a oracle.
+
+| Authoritative raw ROS sample | History | Exact result |
+|---|---:|---|
+| Scene start index 0 | current only | 33,587 points, exact |
+| W1 index 42 | current + 10 | 354,182 points, SHA256 `5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a` |
+| Low-rotation index 21 | current + 10 | exact |
+| Median-rotation index 39 | current + 10 | exact |
+| High-rotation index 58 | current + 10 | exact |
+
+The chronology is intentionally preserved under `benchmarks/m45b`: the original W1 failure, TF
+transform ledger, fail-first repair evidence, and final passing record remain separate artifacts.
+
+## Exact correctness evidence
+
+M4.5a commit `cc0f20b16412d98939c9544002d02029b35a5971` passed 81/81 mini-val
+model-ready matrices and the frozen 20 detector samples. The M4.5b final measurement commit
+`9e0f4dfacbfc997945825d86a85a3609594a059e` then ran the same frozen detector set through the
+actual raw ROS integration path:
+
+- **20/20** model-ready inputs: exact shape, point count, float32 bytes, and SHA256;
+- **20/20** `voxels`, `num_points`, and `coors`: exact;
+- **20/20** raw TensorRT `cls_score`, `bbox_pred`, and `dir_cls_pred`: exact;
+- **20/20** full `DetectionFrame` values: exact; and
+- **20/20** `Detection3DArray` semantic/geometric content: exact, with the raw acquisition header
+  preserved. The older model-ready replay's wall-clock header is documented separately and is not
+  treated as a semantic detector difference.
+
+The canonical sanitized record is
+[`benchmarks/m45b/results/raw_ros_multisweep_correctness.json`](../benchmarks/m45b/results/raw_ros_multisweep_correctness.json),
+SHA256 `09ec61bee8b005b7f006a3cb56186cdb08e4da7f8d822174a34e3185267f7224`.
+It contains tokens, counts, shapes, hashes, first-difference fields, frozen artifact identities, and
+scope guards—not dataset points or private filesystem paths.
+
+## Reproduction boundaries
+
+The offline M4.5a validator is:
 
 ```bash
 export LASERPERCEPTION_NUSCENES_ROOT=/external/path/to/nuscenes
 python scripts/detection/validate_m45a_multisweep.py
 ```
 
-The command refuses a dirty implementation tree, verifies checkpoint/ONNX/engine hashes, requires
-exactly 81 mini-val samples, stops on the first Tier A mismatch, and runs the frozen detector check
-only after Tier A succeeds. It is a manual integration gate; ordinary CPU CI does not require
-nuScenes, MMDetection3D, CUDA, TensorRT, or ROS.
+M4.5b ROS-native tests and validation require the documented pinned ROS/GPU environment, external
+nuScenes mini data, and frozen model/deployment assets. Start with:
 
-## Scope boundary
-
-M4.5a provides:
-
-```text
-raw sweep + known pose/calibration metadata -> model-ready temporal cloud
+```bash
+python scripts/ros2/validate_m45b_raw_ros.py --help
+python scripts/ros2/validate_m45b_detector_chain.py --help
 ```
 
-M4.5b remains planned:
+Both evidence paths fail closed. Ordinary CPU CI does not require nuScenes, MMDetection3D, CUDA,
+TensorRT, or ROS.
 
-```text
-raw PointCloud2 + time-travel TF + live history buffering -> detector-ready stream
-```
+## Scope and limitations
 
-No ROS node, tf2 integration, live buffer, detector runtime, voxelizer, model, engine, threshold,
-or benchmark timing path changed in M4.5a.
+M4.5 proves reconstruction and ingestion correctness for the pinned nuScenes inputs and for
+compatible ROS 2 PointCloud2 streams containing float32 XYZ when a valid time-aware TF tree is
+supplied. It does **not** prove detection accuracy on arbitrary physical sensors or provide
+calibration automation, localization, odometry, intra-scan deskew, tracking, camera fusion, INT8,
+Jetson deployment, physical-LiDAR accuracy, or safety certification. Vendor-specific extra fields
+are ignored by the frozen detector path. LaserPerception does not claim that it “works with any
+LiDAR.”
