@@ -5,6 +5,18 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### Added
+
+- A CPU-only KITTI Raw dataset contract, exact Raw-devkit pose oracle, frozen KITTI-to-model basis,
+  and deterministic 24-frame offline multi-sweep reconstruction hashes for future ROS validation.
+
+### Scientific chronology
+
+- The original M6a odometry-equality gate remains FAIL. R1 diagnosed the cause as distinct official
+  data/timing products. Prospective Protocol R2 then passed 271/271 exact adapter comparisons and a
+  separate 108/108 canonical-drive transfer check without relaxing the original gate. No KITTI
+  detector, TensorRT, ROS, training, tuning, or performance work occurred.
+
 ## [0.2.0] - 2026-08-20
 
 ### Added

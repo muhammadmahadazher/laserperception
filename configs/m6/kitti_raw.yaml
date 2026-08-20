@@ -1,0 +1,96 @@
+schema_version: 1
+status: preregistered
+dataset: KITTI Raw
+scope: M6a offline ingestion and reconstruction only
+
+source:
+  official_page: https://www.cvlibs.net/datasets/kitti/raw_data.php
+  object_store: https://s3.eu-central-1.amazonaws.com/avg-kitti
+  license: CC BY-NC-SA 3.0
+  redistributed: false
+
+timestamp:
+  selected_file: velodyne_points/timestamps.txt
+  parse: exact_integer_nanoseconds
+  timezone_interpretation: deterministic_utc_epoch_representation_only
+  raw_sweep_microseconds: floor_nanoseconds_div_1000
+
+point_record:
+  dtype: little-endian float32
+  columns: [x_forward_m, y_left_m, z_up_m, reflectance]
+  bytes_per_record: 16
+  preserve_order: true
+  reject_nonfinite: true
+  deskew: false
+
+model_frame:
+  axes: [x_right, y_forward, z_up]
+  model_from_kitti_rotation:
+    - [0.0, -1.0, 0.0]
+    - [1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  translation_m: [0.0, 0.0, 0.0]
+
+drives:
+  canonical_reconstruction:
+    date: "2011_09_26"
+    drive: "2011_09_26_drive_0001"
+    category: City
+    raw_frame_count: 108
+    tracklets: true
+    sync_archive_bytes: 458643963
+    sync_archive_sha256: 7827a821ddc0a973bdf66de3a005a8825bd37c304aa9750f3c018f80d5b18458
+    tracklets_archive_bytes: 280497
+    tracklets_archive_sha256: fe1a9a054f0cf24459d6637b54800b6d0c1d632fa0c6a42a1b1ae81efe4168f7
+  tier_a_pose_oracle:
+    date: "2011_09_30"
+    drive: "2011_09_30_drive_0016"
+    category: Road
+    raw_frame_count: 279
+    mapped_frame_count: 271
+    odometry_sequence: "04"
+    odometry_frame_range: [0, 270]
+    tracklets: false
+    sync_archive_bytes: 1134226963
+    sync_archive_sha256: 22faf3a360b488bb54fd35f2a1333f73697a7d8f00d8cd02c960efda3d22847c
+  future_m6b_candidates:
+    - drive: "2011_09_26_drive_0017"
+      category: City
+      raw_frame_count: 114
+      tracklets: true
+      sync_archive_bytes: 469598656
+      tracklets_archive_bytes: 42419
+    - drive: "2011_09_26_drive_0019"
+      category: City
+      raw_frame_count: 481
+      tracklets: true
+      sync_archive_bytes: 2097547106
+      tracklets_archive_bytes: 628409
+
+archives:
+  calibration_2011_09_26_sha256: e0108cfd000cf802c14ed94fba38601185c792e5640abba015a34b7a85b812e0
+  calibration_2011_09_30_sha256: 2ed01563b616baec14f25659671bd9a77810bd87752d709d184fe304ff7258e3
+  odometry_poses_sha256: a969190799bb3fc4a15f5f0675b1ee6b7067292599b3269bdafc1e5ba883b9e1
+  odometry_devkit_sha256: c4703456de60cdeaaec672381fbe169155ba4c2fcded102335b42cb07ff76758
+  raw_devkit_sha256: 5fe511ba02b9588c4b18ad154e6d31d716e16b6ad115d1ac00d13d6d5bbcb6bc
+
+pose_oracle:
+  production_source: official_raw_oxts_equations
+  independent_oracle: official_odometry_poses_sequence_04
+  alignment: calibration_conjugation_only
+  fitted_alignment_permitted: false
+  tolerances:
+    rotation_matrix_max_abs: 1.0e-9
+    relative_rotation_angle_rad: 1.0e-8
+    translation_norm_m: 1.0e-5
+    closure_rotation_matrix_max_abs: 1.0e-10
+    closure_translation_norm_m: 1.0e-9
+
+reconstruction:
+  historical_sweeps: 10
+  order: current_then_history_nearest_to_farthest
+  builder: existing_MultiSweepBuilder_unchanged
+  structural_indices: [0, 1, 2, 5, 10]
+  systematic_full_history_count: 16
+  motion_stratified_count: 3
+  selected_indices: [0, 1, 2, 5, 10, 11, 14, 17, 23, 30, 36, 43, 49, 55, 62, 65, 68, 75, 81, 87, 94, 100, 106, 107]
