@@ -1,0 +1,673 @@
+{
+  "adapter_formulas": {
+    "calculation_and_storage": "float64 calculation then one float32 SweepTransform cast",
+    "corrected": "translation_storage = -R.T @ t",
+    "old": "translation_storage = -t",
+    "rotation_storage": "R.T"
+  },
+  "additional_full_history_selection": {
+    "eligible_after_excluding_w1_count": 78,
+    "full_history_pool_count": 79,
+    "metric": "maximum historical-to-current lidar rotation angle in degrees",
+    "procedure": "Among the 79 accepted M4.5a samples with ten historical sweeps, exclude W1 index 42, compute each sample's maximum historical-to-current lidar rotation angle, then select the minimum, median, and maximum ranked candidates."
+  },
+  "additional_full_history_sentinels": [
+    {
+      "acquisition_count": 11,
+      "acquisition_tokens_chronological": [
+        "386a9b509ee146a190d387ce5b0113e7",
+        "00d2f978c9064ebcb7f0dae5e586f27c",
+        "50aab542de404af9be30889e2602b925",
+        "9671f40e9fbb48c1a991d33560f7c9fe",
+        "cb2bf59067614d9f82507da7dc70f110",
+        "2e7dcd4b31be4835b3a0cc7aaef70d7f",
+        "39539d9dd3494cfea3ff43d41a5991ef",
+        "435758f449b940399bacf062af69ca13",
+        "475c6f9a06bc490b98dc6652b30fbcfe",
+        "0c1cc2b4cf8c4f3c8b3ed8d78184a5a9",
+        "f6bf5986ca8a49c082c0e4d892de767c"
+      ],
+      "counters": {
+        "current_history_depth": 10,
+        "history_resets": 0,
+        "invalid_points_filtered": 0,
+        "model_ready_frames_published": 11,
+        "raw_frames_received": 11,
+        "rejected_frames": 0,
+        "tf_failures": 0,
+        "valid_raw_frames": 11
+      },
+      "dtype": "float32",
+      "exact": true,
+      "expected_sha256": "fd2d34ef023e0dd6ccf35856597be4589677f089ef4a85cf6ac964d8940f5203",
+      "final_history_depth": 10,
+      "final_point_count": 364175,
+      "max_historical_to_current_rotation_degrees": 0.11428606752900633,
+      "nonfinite_filtered_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_sha256": "fd2d34ef023e0dd6ccf35856597be4589677f089ef4a85cf6ac964d8940f5203",
+      "per_input_raw_point_counts": [
+        34720,
+        34720,
+        34688,
+        34720,
+        34688,
+        34720,
+        34720,
+        34720,
+        34752,
+        34720,
+        34752
+      ],
+      "sample_index": 21,
+      "sample_token": "d0ecf474e0e64950aa265cd44b9c9d75",
+      "selection_reason": "minimum maximum historical-to-current rotation among eligible full-history samples",
+      "shape": [
+        364175,
+        4
+      ]
+    },
+    {
+      "acquisition_count": 11,
+      "acquisition_tokens_chronological": [
+        "c98b06812964464093b23c3734532d06",
+        "37224890a1c24eb489f8966b4ac537b1",
+        "a9846b25cebf4b73bebdc576c3ffdbe9",
+        "ee47b1c0765148ecaabb56a45ff031a5",
+        "ebac396dd8ae419a80bb94ba7de78533",
+        "e485f59a3407435e81b1d1afb142e40e",
+        "e800deeabdce4387bb066522db59379b",
+        "d61d1fca2212415ea8922dac96604ef2",
+        "a0e3a10a0c064d159e860d0565fdc4ca",
+        "25051e2ff7364df89b2e1852c059d1be",
+        "12f431b160be4858a51cced6955c37bd"
+      ],
+      "counters": {
+        "current_history_depth": 10,
+        "history_resets": 0,
+        "invalid_points_filtered": 0,
+        "model_ready_frames_published": 11,
+        "raw_frames_received": 11,
+        "rejected_frames": 0,
+        "tf_failures": 0,
+        "valid_raw_frames": 11
+      },
+      "dtype": "float32",
+      "exact": true,
+      "expected_sha256": "69d47b50ecf480764aefcb0b21ea13240d07239b8c08a55edae0b7e7588cdfb0",
+      "final_history_depth": 10,
+      "final_point_count": 366595,
+      "max_historical_to_current_rotation_degrees": 0.8125235145892298,
+      "nonfinite_filtered_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_sha256": "69d47b50ecf480764aefcb0b21ea13240d07239b8c08a55edae0b7e7588cdfb0",
+      "per_input_raw_point_counts": [
+        34752,
+        34720,
+        34752,
+        34720,
+        34720,
+        34720,
+        34720,
+        34720,
+        34688,
+        34720,
+        34720
+      ],
+      "sample_index": 39,
+      "sample_token": "281b92269fd648d4b52d06ac06ca6d65",
+      "selection_reason": "median maximum historical-to-current rotation among eligible full-history samples",
+      "shape": [
+        366595,
+        4
+      ]
+    },
+    {
+      "acquisition_count": 11,
+      "acquisition_tokens_chronological": [
+        "3d5a6fe339f3490297e4b9d1f3949618",
+        "ee497692cd8a463d99e6ea1b21dfa97e",
+        "f540ff8eeeb241739333f0a18bf82198",
+        "3061646c6a074649ba56ae2ca9c4a4f1",
+        "b1d8e720979a4cb9a94b7446b2679f60",
+        "e18d2e9da5c246348ef53654916dcf43",
+        "1641a4b3eb894a26af3ffc2bdc6ded6d",
+        "2e7580286b394c679ea2093f45006ac3",
+        "730028a996d6415db515b834946d0aec",
+        "da8b7581a81b4dec94a17db3e9642769",
+        "306e66375cf94c7881864ba03782d2d2"
+      ],
+      "counters": {
+        "current_history_depth": 10,
+        "history_resets": 0,
+        "invalid_points_filtered": 0,
+        "model_ready_frames_published": 11,
+        "raw_frames_received": 11,
+        "rejected_frames": 0,
+        "tf_failures": 0,
+        "valid_raw_frames": 11
+      },
+      "dtype": "float32",
+      "exact": true,
+      "expected_sha256": "9e78b54a2cc0cf07e468cac9d837a031b55f8c892bb4cacd1ddcf06361c80d3e",
+      "final_history_depth": 10,
+      "final_point_count": 349245,
+      "max_historical_to_current_rotation_degrees": 14.764159634767788,
+      "nonfinite_filtered_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_sha256": "9e78b54a2cc0cf07e468cac9d837a031b55f8c892bb4cacd1ddcf06361c80d3e",
+      "per_input_raw_point_counts": [
+        34720,
+        34720,
+        34720,
+        34752,
+        34752,
+        34720,
+        34720,
+        34720,
+        34720,
+        34688,
+        34688
+      ],
+      "sample_index": 58,
+      "sample_token": "8092909473464f80b9f791a4d31ddcb8",
+      "selection_reason": "maximum maximum historical-to-current rotation among eligible full-history samples",
+      "shape": [
+        349245,
+        4
+      ]
+    }
+  ],
+  "base_main": "9c0fecbb45ebb1d0c65e61a99f13b72558327527",
+  "chronology": {
+    "previous_failure_diagnostic": {
+      "logical_path": "benchmarks/m45b/diagnostics/w1_raw_ros_hash_failure.json",
+      "sha256": "d912eaa94cdb38ee1c8b6c6f4fc59831c31f37d33152b23d1d2a9f334a2fc8d6"
+    },
+    "repaired_w1_exact": true,
+    "transform_ledger": {
+      "logical_path": "benchmarks/m45b/diagnostics/w1_tf_transform_ledger.json",
+      "sha256": "0363fd23ff426aca7a9d88518203062a8e7440b0155a49879f639b3c96c18f2d"
+    }
+  },
+  "diagnostic_commit": "cb4621602a199fc17ed51c1759015012b74d9848",
+  "environment": {
+    "dataset": "nuScenes v1.0-mini mini_val",
+    "rmw_implementation": "rmw_fastrtps_cpp",
+    "ros_distro": "humble",
+    "tf2_ros_version": "0.25.22 (installed Debian package)"
+  },
+  "failure_wip_commit": "931978d9faaf192e8d2e71409eb467d90a138a8f",
+  "repair_commit": "7539f4c14e6ef275c456b487794e9d08113f7801",
+  "rotation_bearing_unit_regression": {
+    "correct_translation_storage": [
+      0.16746824526945137,
+      2.790063509461097,
+      -0.75
+    ],
+    "exact": true,
+    "expected_storage_float32": [
+      [
+        0.8660253882408142,
+        0.5,
+        0.0,
+        0.16746824979782104
+      ],
+      [
+        -0.5,
+        0.8660253882408142,
+        0.0,
+        2.7900636196136475
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.75
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "formula_separation_l2_m": 1.4468424468020509,
+    "observed_storage_float32": [
+      [
+        0.8660253882408142,
+        0.5,
+        0.0,
+        0.16746824979782104
+      ],
+      [
+        -0.5,
+        0.8660253882408142,
+        0.0,
+        2.7900636196136475
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.75
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "old_behavior_materially_distinct": true,
+    "old_incorrect_translation_storage": [
+      -1.25,
+      2.5,
+      -0.75
+    ],
+    "rotation_source_to_target": [
+      [
+        0.8660254037844387,
+        -0.49999999999999994,
+        0.0
+      ],
+      [
+        0.49999999999999994,
+        0.8660254037844387,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "translation_xyz": [
+      1.25,
+      -2.5,
+      0.75
+    ],
+    "yaw_degrees": 30.0
+  },
+  "same_frame_different_time_pure_translation": {
+    "ego_motion_x_m": 1.0,
+    "exact": true,
+    "expected_translation_x_m": -1.0,
+    "fixed_frame": "map",
+    "formula_discrimination": false,
+    "limitation": "Identity rotation makes -t equal -R.T@t; this regression proves cross-time lookup only.",
+    "observed_source_to_target_translation_x_m": -1.0,
+    "source_frame": "lidar",
+    "source_time_sec": 1,
+    "target_frame": "lidar",
+    "target_time_sec": 2
+  },
+  "same_frame_different_time_rotation_translation": {
+    "checks": {
+      "adapter_storage_matches_pinned_formula": true,
+      "cross_time_nonidentity": true,
+      "old_translation_materially_distinct": true,
+      "returned_rotation_matches_known_poses": true,
+      "returned_translation_matches_known_poses": true,
+      "transformed_point_exact": true
+    },
+    "correct_translation_storage": [
+      1.9113320736856376,
+      2.2015471160301243,
+      -0.75
+    ],
+    "exact": true,
+    "expected_storage_float32": [
+      [
+        0.8660253882408142,
+        -0.5,
+        0.0,
+        1.911332130432129
+      ],
+      [
+        0.5,
+        0.8660253882408142,
+        0.0,
+        2.201547145843506
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.75
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "fixed_frame": "map",
+    "observed_storage_float32": [
+      [
+        0.8660253882408142,
+        -0.5,
+        -0.0,
+        1.911332130432129
+      ],
+      [
+        0.5,
+        0.8660253882408142,
+        0.0,
+        2.201547145843506
+      ],
+      [
+        0.0,
+        -0.0,
+        1.0,
+        -0.75
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "old_incorrect_translation_storage": [
+      2.756035688894815,
+      0.9509296932676361,
+      -0.75
+    ],
+    "returned_quaternion_xyzw": [
+      0.0,
+      0.0,
+      -0.25881904510252074,
+      0.9659258262890683
+    ],
+    "returned_source_to_target_rotation": [
+      [
+        0.8660254037844387,
+        0.49999999999999994,
+        0.0
+      ],
+      [
+        -0.49999999999999994,
+        0.8660254037844387,
+        -0.0
+      ],
+      [
+        -0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "returned_source_to_target_translation": [
+      -2.7560356888948156,
+      -0.9509296932676362,
+      0.75
+    ],
+    "source": {
+      "frame": "lidar",
+      "map_translation_xyz": [
+        0.5,
+        -1.0,
+        0.25
+      ],
+      "map_yaw_degrees": 10.0,
+      "time_sec": 1
+    },
+    "target": {
+      "frame": "lidar",
+      "map_translation_xyz": [
+        2.0,
+        1.5,
+        -0.5
+      ],
+      "map_yaw_degrees": 40.0,
+      "time_sec": 2
+    },
+    "test_point_expected_xyz": [
+      -0.04530668258666992,
+      -0.9694963693618774,
+      1.0
+    ],
+    "test_point_observed_xyz": [
+      -0.04530668258666992,
+      -0.9694963693618774,
+      1.0
+    ],
+    "test_point_source_xyz": [
+      1.0,
+      2.0,
+      0.25
+    ]
+  },
+  "scene_start": {
+    "acquisition_count": 1,
+    "acquisition_tokens_chronological": [
+      "fdddd75ee1d94f14a09991988dab8b3e"
+    ],
+    "counters": {
+      "current_history_depth": 0,
+      "history_resets": 0,
+      "invalid_points_filtered": 0,
+      "model_ready_frames_published": 1,
+      "raw_frames_received": 1,
+      "rejected_frames": 0,
+      "tf_failures": 0,
+      "valid_raw_frames": 1
+    },
+    "dtype": "float32",
+    "exact": true,
+    "expected_sha256": "4da6843d2f4fcca676705ecd440047e0d0371efa53ee8d4bed305c72d8e1def4",
+    "final_history_depth": 0,
+    "final_point_count": 33587,
+    "nonfinite_filtered_counts": [
+      0
+    ],
+    "observed_sha256": "4da6843d2f4fcca676705ecd440047e0d0371efa53ee8d4bed305c72d8e1def4",
+    "per_input_raw_point_counts": [
+      34752
+    ],
+    "sample_index": 0,
+    "sample_token": "3e8750f331d7499e9b5123e9eb70f2e2",
+    "shape": [
+      33587,
+      4
+    ]
+  },
+  "schema_version": 1,
+  "scope_guards": {
+    "detector_chain_run": false,
+    "detector_changed": false,
+    "exact_fast_changed": false,
+    "exact_gate_changed": false,
+    "history_ordering_changed": false,
+    "model_changed": false,
+    "multisweep_builder_changed": false,
+    "onnx_changed": false,
+    "performance_campaign_run": false,
+    "range_filtering_changed": false,
+    "replay_tf_publication_changed": false,
+    "tensorrt_engine_changed": false,
+    "tf2_lookup_changed": false,
+    "timestamp_handling_changed": false,
+    "tolerance_or_tier_b_added": false
+  },
+  "status": "passed",
+  "w1": {
+    "acquisition_count": 11,
+    "acquisition_tokens_chronological": [
+      "9ab5069c183c492b82b0ab30133080c1",
+      "50fea3e15c1045aab63c47733c062b13",
+      "1933cd5908024738bf2d9d1fa75f471d",
+      "dfcda1c420184056aa5c37c6d081f449",
+      "82cd1ee6271c4cbf9497fbf0194702f4",
+      "a3e2b99c4aff443cb96100f097a3e1d0",
+      "0c80906f5e7f4e7ca81cd0af0191204f",
+      "bac10e2743da4991aee17c29a55a1467",
+      "0abf2f4ff0844d2095eeb581aeffbbb1",
+      "8b6d9970938a4457b5a2effb877de6f7",
+      "4258ba3b8b8142f48c3249d310a8c3d2"
+    ],
+    "counters": {
+      "current_history_depth": 10,
+      "history_resets": 0,
+      "invalid_points_filtered": 0,
+      "model_ready_frames_published": 11,
+      "raw_frames_received": 11,
+      "rejected_frames": 0,
+      "tf_failures": 0,
+      "valid_raw_frames": 11
+    },
+    "dtype": "float32",
+    "exact": true,
+    "expected_sha256": "5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a",
+    "final_history_depth": 10,
+    "final_point_count": 354182,
+    "nonfinite_filtered_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "observed_sha256": "5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a",
+    "per_input_raw_point_counts": [
+      34720,
+      34688,
+      34720,
+      34752,
+      34720,
+      34720,
+      34752,
+      34720,
+      34752,
+      34720,
+      34752
+    ],
+    "retained_row_membership": {
+      "exact": true,
+      "history_depth": 10,
+      "live_only_count": 0,
+      "per_history": [
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.497223000",
+          "exact": true,
+          "history_index": 0,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.447494000",
+          "exact": true,
+          "history_index": 1,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.397154000",
+          "exact": true,
+          "history_index": 2,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.347391000",
+          "exact": true,
+          "history_index": 3,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.297096000",
+          "exact": true,
+          "history_index": 4,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.247302000",
+          "exact": true,
+          "history_index": 5,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.197513000",
+          "exact": true,
+          "history_index": 6,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.147205000",
+          "exact": true,
+          "history_index": 7,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+          "exact": true,
+          "history_index": 8,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        },
+        {
+          "acquisition_identity": "nuscenes_lidar_top@1538984234.047134000",
+          "exact": true,
+          "history_index": 9,
+          "live_only_count": 0,
+          "reference_only_count": 0
+        }
+      ],
+      "previous_failure_live_only_count": 7,
+      "previous_failure_net_count": 2,
+      "previous_failure_reference_only_count": 5,
+      "reference_only_count": 0
+    },
+    "sample_index": 42,
+    "sample_token": "07fad91090c746ccaa1b2bdb55329e20",
+    "shape": [
+      354182,
+      4
+    ]
+  }
+}
