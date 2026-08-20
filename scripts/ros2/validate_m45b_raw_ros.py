@@ -65,13 +65,13 @@ class _CaptureNode(Node):
         self.clouds.append(CapturedCloud(stamp_ns, message))
 
 
-def _run_case(
+def _capture_case(
     index: int,
     data_root: Path,
     *,
     timeout_sec: float,
     expected: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], CapturedCloud]:
     expected = EXPECTED[index] if expected is None else expected
     suffix = f"s{index}"
     raw_topic = f"/laserperception/m45b_validation/{suffix}/raw"
@@ -122,7 +122,7 @@ def _run_case(
         exact = observed_count == int(expected["point_count"]) and observed_hash == str(
             expected["sha256"]
         )
-        return {
+        record = {
             "sample_index": index,
             "sample_token": expected["sample_token"],
             "acquisition_count": len(replay._acquisitions),
@@ -149,6 +149,7 @@ def _run_case(
                 "current_history_depth": builder.current_history_depth,
             },
         }
+        return record, final
     finally:
         executor.shutdown(timeout_sec=2.0)
         for node in (capture, replay):
@@ -157,6 +158,22 @@ def _run_case(
         executor.remove_node(builder)
         builder.destroy_node()
         rclpy.shutdown()
+
+
+def _run_case(
+    index: int,
+    data_root: Path,
+    *,
+    timeout_sec: float,
+    expected: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    record, _ = _capture_case(
+        index,
+        data_root,
+        timeout_sec=timeout_sec,
+        expected=expected,
+    )
+    return record
 
 
 def _same_frame_time_travel() -> dict[str, Any]:
