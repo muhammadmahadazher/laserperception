@@ -3,12 +3,12 @@
 This file is the source of truth for AI coding agents working on LaserPerception. Read it before
 modifying the repository. User instructions take precedence when they explicitly change scope.
 
-## Active project and current milestone
+## Project and milestone state
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
-M0 through M4.5 are complete, v0.1.0 is released, and **M4.6 — v0.2.0 release engineering** is the
-active release-only milestone. M4.6 may package and document the already accepted raw-ingestion
-capability but may not expand technical or performance scope. M5 remains conditional and inactive.
+M0 through M4 are complete, M4.5a and M4.5b are complete, M4.5 is complete overall, M4.6 is
+complete, and v0.2.0 is released. No technical milestone is currently active. M5 remains
+conditional and inactive; any next technical work requires explicit owner authorization.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -40,15 +40,14 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 - M4.5b: raw `PointCloud2`, time-aware tf2, bounded live history, transform-repair chronology, and
   exact frozen detector-chain evidence — complete.
 - M4.5: offline and live raw-sweep integration — complete overall.
-- M4.6: v0.2.0 release engineering for the accepted M4.5 capability — active, release-only.
+- M4.6: v0.2.0 release engineering for the accepted M4.5 capability — complete.
 - M5: conditional physical Jetson measurements only if target hardware is actually available and
   the owner explicitly activates the milestone; currently inactive.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. M4.6 is release
-engineering only: do not change raw ingestion, TF, reconstruction, detector, or measured runtime
-semantics, and do not run another performance campaign.
+optimization, or unrelated features unless the owner explicitly changes scope. No technical
+milestone is currently active, and any next technical work requires explicit owner authorization.
 
 ## Detection and deployment architecture
 
