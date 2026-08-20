@@ -1,6 +1,7 @@
 # Roadmap
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
+No technical milestone is currently active; the next post-M4.5 phase requires an owner decision.
 
 ## Completed foundations
 
@@ -12,39 +13,45 @@ Progress is evidence-gated. Dates and capabilities are not promised before prere
 - [x] **M2 — TensorRT FP16:** pinned MMDeploy export/build path, preserved parity-v1 failure,
   parity-v2 pass, native/rewrite fidelity, rejected first benchmark, and repaired canonical
   native-PyTorch-versus-TensorRT measurement.
-- [x] **M3 — ROS 2:** model-ready multi-sweep `PointCloud2`, exact output conversion, bounded QoS,
-  replay/visualization, the rejected nondeterministic voxelizer, accepted exact-fast replacement,
-  production correctness gates, and representative full-history ROS evidence.
+- [x] **M3 — ROS 2:** model-ready multi-sweep PointCloud2, exact output conversion, bounded QoS,
+  replay/visualization, rejected nondeterministic voxelization, accepted exact-fast replacement,
+  production correctness, and representative full-history ROS evidence.
 - [x] **M4 — v0.1.0 release:** release metadata, stranger-first documentation, packaging audits,
   final validation, merged release commit, `v0.1.0` tag, and GitHub release.
 - [x] **M4.5a — offline multi-sweep reconstruction:** independent raw-sweep/pose reconstruction,
   81/81 exact official-pipeline parity, and exact frozen 20-sample detector verification.
+- [x] **M4.5b — live raw ROS ingestion:** compatible raw XYZ PointCloud2 decoding, time-aware tf2,
+  bounded live history, preserved transform-repair chronology, exact model-ready reconstruction,
+  and 20/20 exact unchanged detector-chain evidence.
+- [x] **M4.5 overall:** offline known-pose reconstruction and live ROS/tf2 ingestion both complete.
 
 M3 closed honestly: representative W1 (10 historical sweeps plus current, 354,182 points) sustained
-10 Hz cleanly; 15 Hz and 20 Hz were not sustained. This result does not authorize additional M3
-optimization.
+10 Hz cleanly; 15 Hz and 20 Hz were not sustained. M4.5b ran correctness and integration gates only
+and did not reopen performance work.
 
-## M4.5 — raw-sweep integration
-
-M4.5a is complete and merged. It provides this accepted offline boundary:
+## Completed M4.5 boundary
 
 ```text
+M4.5a:
 raw sweep + known pose/calibration metadata -> model-ready temporal cloud
+
+M4.5b:
+compatible raw PointCloud2 + time-aware TF + bounded live history
+    -> same model-ready temporal cloud -> unchanged detector
 ```
 
-M4.5b is active on a separate review branch. It adds raw `PointCloud2`, tf2 time-travel transforms,
-live history buffering, ROS replay, and detector chaining while preserving the M4.5a reconstruction
-core and exact oracle. It consumes an existing localization/TF source and does not add localization
-or vendor-specific sensor drivers.
+M4.5b consumes an existing valid localization/TF source. It does not add localization, odometry,
+calibration automation, per-point deskew, a vendor sensor driver, or a new detector path.
 
 ## M5 — conditional physical Jetson measurement
 
-Measure and tune for Jetson only if target hardware is physically available. No Jetson figure will
-be estimated, simulated, or inferred from the RTX 4060 Laptop result.
+M5 remains conditional and inactive. Measure or tune for Jetson only if target hardware is
+physically available and the owner explicitly authorizes the milestone. No Jetson figure will be
+estimated, simulated, or inferred from the RTX 4060 Laptop result.
 
 ## Post-v0.1 backlog — not started
 
-These are separate future proposals, not v0.1 commitments:
+These are separate future proposals, not current work or commitments:
 
 - MMDeploy postprocessing profiling and optimization;
 - ROS/DDS/executor profiling and tuning;

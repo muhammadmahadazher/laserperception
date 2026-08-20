@@ -47,17 +47,21 @@ M3 installs ROS 2 Humble packages from the official ROS apt distribution. LaserP
 does not vendor these external components:
 
 - [rclpy](https://github.com/ros2/rclpy), the ROS 2 Python client library, Apache-2.0;
-- [ROS 2 common interfaces](https://github.com/ros2/common_interfaces), including `sensor_msgs`,
-  `std_msgs`, and `visualization_msgs`, under their recorded Apache-2.0 package licenses;
+- [ROS 2 common interfaces](https://github.com/ros2/common_interfaces), including `geometry_msgs`,
+  `sensor_msgs`, `std_msgs`, and `visualization_msgs`, under their recorded Apache-2.0 package
+  licenses; the installed Humble `sensor_msgs_py` package declares BSD;
+- [tf2_ros / geometry2](https://github.com/ros2/geometry2), whose installed Humble `tf2_ros`
+  package declares BSD;
 - [vision_msgs](https://github.com/ros-perception/vision_msgs), Apache-2.0;
 - [rmw_fastrtps](https://github.com/ros2/rmw_fastrtps) and
   [eProsima Fast DDS](https://github.com/eProsima/Fast-DDS), Apache-2.0; and
 - [RViz](https://github.com/ros2/rviz), BSD-3-Clause-Clear.
 
 These components and their transitive dependencies remain under their own upstream terms. ROS 2,
-its message definitions, Fast DDS, and RViz are installed externally and are not relicensed by
-LaserPerception. The recorded M3 system used `rmw_fastrtps_cpp`; the repository does not redistribute
-that middleware.
+tf2, its message definitions, Fast DDS, and RViz are installed externally and are not relicensed by
+LaserPerception. The recorded M3/M4.5b system used `rmw_fastrtps_cpp`; the repository does not
+redistribute that middleware. M4.5b adds no non-ROS Python distribution dependency.
+
 ## Upstream pretrained PointPillars checkpoint
 
 M1 uses the official MMDetection3D nuScenes PointPillars checkpoint

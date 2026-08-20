@@ -27,8 +27,9 @@ def test_v0_1_release_metadata_is_consistent() -> None:
     assert '__version__ = "0.1.0"' in _text("src/laserperception/__init__.py")
     changelog = _text("CHANGELOG.md")
     assert "## [Unreleased]" in changelog
-    assert "M4.5a is offline reconstruction only" in changelog
-    assert "## [0.1.0] - 2026-08-13" in changelog
+    unreleased, release = changelog.split("## [0.1.0] - 2026-08-13", maxsplit=1)
+    assert "M4.5 is post-v0.1 development" in unreleased
+    assert "v0.1.0 requires model-ready multi-sweep" in release
 
 
 def test_release_story_keeps_performance_and_parity_roles_distinct() -> None:

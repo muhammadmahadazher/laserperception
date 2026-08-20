@@ -1,8 +1,10 @@
-# ROS 2 Humble interface (M3 complete)
+# ROS 2 Humble interface (M3 and M4.5 complete)
 
-M3 wraps the frozen M2 TensorRT FP16 detector with a ROS 2 Humble interface. It consumes a
-**model-ready multi-sweep** `sensor_msgs/PointCloud2` and publishes canonical
-`vision_msgs/Detection3DArray` messages. It is not a raw physical-LiDAR adapter.
+M3 wraps the frozen M2 TensorRT FP16 detector with a ROS 2 Humble interface. Its released v0.1
+boundary consumes **model-ready multi-sweep** `sensor_msgs/PointCloud2` and publishes canonical
+`vision_msgs/Detection3DArray` messages. Post-v0.1 M4.5b adds a separate compatible raw XYZ
+PointCloud2 plus time-aware tf2 builder before that unchanged detector. It is not a localization,
+calibration, or vendor-driver system.
 
 The final production policy is explicit:
 
@@ -74,6 +76,32 @@ lookup, history buffering, motion compensation, or sweep aggregation.
 M3 does not change point-cloud range, voxel size, maximum points, maximum voxels, engine profile,
 network, class names, thresholds, or postprocessing.
 
+## Post-v0.1 raw ingestion boundary (M4.5b)
+
+The optional `laserperception_multisweep_builder` begins at
+`/laserperception/points_raw`, produces the same `/laserperception/points_model_ready` contract,
+and leaves the detector path above unchanged. Raw messages require scalar float32 `x`, `y`, and
+`z`; extra fields are allowed but ignored. Non-finite XYZ rows are removed deterministically while
+retained-row order stays fixed, and an all-invalid cloud is rejected.
+
+The header stamp is the acquisition time. Historical source stamps are retained, the current stamp
+is the target time, and no per-point firing-time deskew is performed. History starts current-only,
+grows to current plus at most ten prior acquisitions, and is selected nearest-to-farthest without
+padding. Equal or regressing timestamps reset history. The packaged large-gap threshold is disabled;
+a positive configured threshold would also reset history.
+
+Cross-time transforms use
+`tf2_ros.Buffer.lookup_transform_full(target_frame, current_stamp, source_frame,
+historical_stamp, fixed_frame, timeout=...)`. A same-named LiDAR frame at different times is not
+assumed to be identity. `Buffer` uses a 10-second cache and
+`TransformListener(buffer, None, spin_thread=True)` owns a dedicated listener thread, so the
+bounded 0.2-second production lookup wait does not starve TF reception. Missing TF for any selected
+history rejects the current output; no sweep is silently skipped and latest TF is never substituted.
+
+See [`RAW_LIDAR_ROS2.md`](RAW_LIDAR_ROS2.md) for the complete topic, TF, history, replay, and
+failure contract. The transform storage convention and authoritative-vs-regression evidence are in
+[`MULTISWEEP.md`](MULTISWEEP.md).
+
 ## Output contract
 
 The default output topic is `/laserperception/detections`. For every accepted input:
@@ -125,6 +153,29 @@ Correctness was rerun through the actual production integration at exact measure
 The external correctness record SHA256 is
 `000ba4bd15bc4349a0df29a2252819e00326c406e5b1dc0e787c0c060359d388`.
 A difference would have stopped performance measurement.
+
+## Post-v0.1 M4.5b correctness gates
+
+At clean measurement commit `9e0f4dfacbfc997945825d86a85a3609594a059e`, actual raw
+nuScenes acquisitions traversed PointCloud2, time-aware tf2, the repaired transform adapter,
+`MultiSweepBuilder`, model-ready PointCloud2, and the unchanged detector. The frozen suite passed:
+
+| Gate | Result |
+|---|---:|
+| Raw ROS model-ready shape/count/float32 bytes/SHA256 | **20/20 exact** |
+| `voxels` / `num_points` / `coors` | **20/20 exact** |
+| TensorRT `cls_score` / `bbox_pred` / `dir_cls_pred` | **20/20 exact** |
+| Full `DetectionFrame` content | **20/20 exact** |
+| `Detection3DArray` semantic/geometric content | **20/20 exact** |
+| Existing model-ready M3 low-rate smoke | **PASS** |
+
+The raw path preserves the acquisition header. The older model-ready replay uses a wall-clock
+publication stamp, so header exactness against that older replay is reported separately rather
+than weakening detector semantics. Canonical evidence is
+[`benchmarks/m45b/results/raw_ros_multisweep_correctness.json`](../benchmarks/m45b/results/raw_ros_multisweep_correctness.json),
+SHA256 `09ec61bee8b005b7f006a3cb56186cdb08e4da7f8d822174a34e3185267f7224`.
+The original failed W1 record, transform ledger, fail-first regression, and repaired exactness
+record remain preserved.
 
 ## Final representative ROS performance
 
@@ -220,5 +271,6 @@ The following are documented backlog only:
 - INT8; and
 - other detector architectures.
 
-No postprocess, DDS, executor, custom CUDA, tracking, raw-sensor adapter, INT8, training, Jetson,
-camera-fusion, or M4 work was implemented in this cycle.
+M4.5b later added the bounded raw PointCloud2/tf2 ingestion boundary documented above, but ran no
+performance campaign and changed no measured detector path. Postprocess, DDS/executor optimization,
+custom CUDA, tracking, INT8, training, Jetson, and camera fusion remain unimplemented.
