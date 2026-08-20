@@ -65,8 +65,14 @@ class _CaptureNode(Node):
         self.clouds.append(CapturedCloud(stamp_ns, message))
 
 
-def _run_case(index: int, data_root: Path, *, timeout_sec: float) -> dict[str, Any]:
-    expected = EXPECTED[index]
+def _run_case(
+    index: int,
+    data_root: Path,
+    *,
+    timeout_sec: float,
+    expected: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    expected = EXPECTED[index] if expected is None else expected
     suffix = f"s{index}"
     raw_topic = f"/laserperception/m45b_validation/{suffix}/raw"
     model_ready_topic = f"/laserperception/m45b_validation/{suffix}/model_ready"
@@ -119,6 +125,7 @@ def _run_case(index: int, data_root: Path, *, timeout_sec: float) -> dict[str, A
         return {
             "sample_index": index,
             "sample_token": expected["sample_token"],
+            "acquisition_count": len(replay._acquisitions),
             "acquisition_tokens_chronological": [
                 item.sample_data_token for item in replay._acquisitions
             ],

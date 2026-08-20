@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt
+from math import cos, radians, sin, sqrt
 
 import numpy as np
 import pytest
@@ -22,6 +22,15 @@ def _live(index: int, stamp_ns: int | None = None):
     stamp = TimeStamp(sec=0, nanosec=timestamp)
     points = np.array([[float(index + 1), 0.0, 0.0]], dtype=np.float32)
     return live_raw_sweep_from_xyz(points, frame_id="lidar", stamp=stamp)
+
+
+def _yaw_rotation(angle_radians: float) -> np.ndarray:
+    cosine = cos(angle_radians)
+    sine = sin(angle_radians)
+    return np.array(
+        [[cosine, -sine, 0.0], [sine, cosine, 0.0], [0.0, 0.0, 1.0]],
+        dtype=np.float64,
+    )
 
 
 def test_ros_stamp_integer_adaptation_preserves_microseconds_and_identity() -> None:
@@ -142,6 +151,42 @@ def test_ros_transform_adapter_identity_and_signed_translations() -> None:
     assert negative.lidar2sensor[:3, 3].tolist() == [1.25, -2.5, 0.75]
 
 
+def test_ros_transform_adapter_rotation_only_preserves_pinned_storage() -> None:
+    yaw = radians(35.0)
+    rotation = _yaw_rotation(yaw)
+    transform = sweep_transform_from_ros(
+        translation_xyz=(0.0, 0.0, 0.0),
+        quaternion_xyzw=(0.0, 0.0, sin(yaw / 2.0), cos(yaw / 2.0)),
+        source_id="history",
+        target_id="current",
+    )
+
+    expected = np.eye(4, dtype=np.float64)
+    expected[:3, :3] = rotation.T
+    assert np.array_equal(transform.lidar2sensor, expected.astype(np.float32))
+
+
+def test_ros_transform_adapter_rotation_translation_uses_pinned_inverse_convention() -> None:
+    yaw = radians(30.0)
+    rotation = _yaw_rotation(yaw)
+    translation = np.array([1.25, -2.5, 0.75], dtype=np.float64)
+    correct_translation = -rotation.T @ translation
+    old_incorrect_translation = -translation
+    assert np.linalg.norm(correct_translation - old_incorrect_translation) > 0.5
+
+    transform = sweep_transform_from_ros(
+        translation_xyz=translation,
+        quaternion_xyzw=(0.0, 0.0, sin(yaw / 2.0), cos(yaw / 2.0)),
+        source_id="history",
+        target_id="current",
+    )
+    expected = np.eye(4, dtype=np.float64)
+    expected[:3, :3] = rotation.T
+    expected[:3, 3] = correct_translation
+    assert np.array_equal(transform.lidar2sensor, expected.astype(np.float32))
+    assert not np.allclose(transform.lidar2sensor[:3, 3], old_incorrect_translation)
+
+
 def test_ros_transform_adapter_rotation_and_translation_drive_builder_correctly() -> None:
     current = _live(2, 2_000_000)
     history = live_raw_sweep_from_xyz(
@@ -149,8 +194,9 @@ def test_ros_transform_adapter_rotation_and_translation_drive_builder_correctly(
         frame_id="lidar",
         stamp=TimeStamp(sec=0, nanosec=1_000_000),
     )
+    translation = np.array([2.0, 3.0, 0.0], dtype=np.float64)
     transform = sweep_transform_from_ros(
-        translation_xyz=(2.0, 3.0, 0.0),
+        translation_xyz=translation,
         quaternion_xyzw=(0.0, 0.0, sqrt(0.5), sqrt(0.5)),
         source_id=history.sweep.source_id,
         target_id=current.sweep.source_id,
@@ -160,7 +206,14 @@ def test_ros_transform_adapter_rotation_and_translation_drive_builder_correctly(
         current.sweep,
         [HistoricalSweep(history.sweep, transform)],
     )
-    assert output.points_xyzt[1, :3] == pytest.approx([2.0, 4.0, 0.0], abs=1e-6)
+    rotation = _yaw_rotation(radians(90.0))
+    expected_storage = np.eye(4, dtype=np.float32)
+    expected_storage[:3, :3] = rotation.T.astype(np.float32)
+    expected_storage[:3, 3] = (-rotation.T @ translation).astype(np.float32)
+    source_point = history.sweep.points[0, :3].copy()
+    expected_point = source_point @ expected_storage[:3, :3]
+    expected_point -= expected_storage[:3, 3]
+    assert output.points_xyzt[1, :3] == pytest.approx(expected_point, abs=1e-6)
 
 
 def test_ros_transform_adapter_rejects_malformed_quaternion() -> None:

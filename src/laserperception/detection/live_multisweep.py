@@ -173,7 +173,7 @@ def sweep_transform_from_ros(
 
     ROS uses column vectors: ``p_target = R @ p_source + t``. The accepted
     builder applies ``p_source_row @ A - b``. Therefore this adapter stores
-    ``A = R.T`` and ``b = -t`` before the single required float32 cast.
+    ``A = R.T`` and ``b = -R.T @ t`` before the single required float32 cast.
     """
 
     translation = _finite_float64_vector(translation_xyz, 3, "translation_xyz")
@@ -195,7 +195,7 @@ def sweep_transform_from_ros(
     )
     matrix = np.eye(4, dtype=np.float64)
     matrix[:3, :3] = rotation.T
-    matrix[:3, 3] = -translation
+    matrix[:3, 3] = -rotation.T @ translation
     return SweepTransform(matrix.astype(np.float32), source_id=source_id, target_id=target_id)
 
 
