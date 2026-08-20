@@ -1,0 +1,81 @@
+schema_version: 1
+status: preregistered_after_r1_diagnosis
+dataset: KITTI Raw
+scope: M6a Protocol R2 offline ingestion and reconstruction only
+
+chronology:
+  protocol_v1_commit: 4d6bc3704f5404fbb761cc758c60f7958e17b872
+  measurement_v1_commit: ec9e341056807d5549353c8ef362fd109b25f2f2
+  original_tier_a_status: fail
+  original_failure_sha256: 894960c34b96aac02db2a8a10f13c66e39e3ac99b3ef34ee76c0ef3e88eabaf3
+  r1_diagnosis_head: a4fb2625db5f95b4eb81e0a70051037285c0be61
+  r1_diagnosis_sha256: 44509f4c28fafbdd848c2627c99cde4615bd8e6011520c2a371b1ee3ce6853d8
+  root_cause: DATA-PRODUCT / TIMING
+  protocol_r2_commit: 17924559ca852d23e661e0451bf1a22fc3af9bf6
+
+external_archive_addition:
+  odometry_calibration_sha256: fa45d2bbff828776e6df689b161415fb7cd719345454b6d3567c2ff81fa4d075
+
+pose_roles:
+  raw_correctness:
+    reference: official KITTI Raw devkit OXTS conversion semantics
+    production: LaserPerception KITTI Raw pose adapter
+    comparison_boundary: direct float64 4x4 matrices before serialization
+    exact_all_16_scalars: true
+    matrix_max_abs: 0.0
+    rotation_matrix_max_abs: 0.0
+    translation_norm_m: 0.0
+    on_nonzero: stop_and_report_without_adopting_tolerance
+    drives:
+      - id: 2011_09_30_drive_0016
+        frame_count: 271
+        role: adapter_pose_oracle
+      - id: 2011_09_26_drive_0001
+        frame_count: 108
+        role: canonical_reconstruction_transfer_check
+  odometry_external_context:
+    sequence: "04"
+    equality_oracle: false
+    report_absolute: true
+    relative_deltas: [1, 2, 5, 10]
+    report_timing_and_calibration: true
+    interpolation_promoted_to_production: false
+  frame_zero_ideal_identity:
+    historical_r1_limit: 1.0e-12
+    historical_status: fail
+    r2_status: known_non_blocking_diagnostic_without_new_limit
+
+timestamp:
+  selected_file: velodyne_points/timestamps.txt
+  source_nanoseconds: exact_integer
+  raw_sweep_microseconds: floor_nanoseconds_div_1000
+  record_sub_microsecond_remainder: true
+
+model_frame:
+  axes: [x_right, y_forward, z_up]
+  model_from_kitti_rotation:
+    - [0.0, -1.0, 0.0]
+    - [1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  translation_m: [0.0, 0.0, 0.0]
+
+reconstruction:
+  canonical_drive: 2011_09_26_drive_0001
+  drive_frame_count: 108
+  builder: existing_MultiSweepBuilder_unchanged
+  historical_sweeps: 10
+  order: current_then_history_nearest_to_farthest
+  selected_indices: [0, 1, 2, 5, 10, 11, 14, 17, 23, 30, 36, 43, 49, 55, 62, 65, 68, 75, 81, 87, 94, 100, 106, 107]
+  determinism_repetitions_per_selected_frame: 10
+  range_m: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+  voxel_size_m: [0.25, 0.25, 8.0]
+  max_voxels: 40000
+
+scope_exclusions:
+  detector_inference: false
+  tensorrt_kitti_run: false
+  ros_kitti_run: false
+  threshold_tuning: false
+  training: false
+  performance_campaign: false
+  m6b_started: false
