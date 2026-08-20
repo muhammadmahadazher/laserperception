@@ -1,9 +1,9 @@
 # Roadmap
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
-M0 through M4.6 are complete, v0.2.0 is released, and no technical or performance milestone is
-active. M5 remains conditional and inactive; any next technical work requires explicit owner
-authorization.
+M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is
+authorized, with M6a active and M6b planned but not started. M5 remains conditional and inactive.
+No other technical milestone is active.
 
 ## Completed foundations
 
@@ -54,6 +54,16 @@ was merged, the annotated `v0.2.0` tag was created, and the public GitHub releas
 M4.6 did not reopen runtime implementation, correctness protocols, or performance measurement. No
 later milestone activates automatically; any next technical work requires explicit owner
 authorization.
+
+## Active M6 — Cross-Domain Validation: KITTI Raw
+
+- **M6a — active:** authoritative KITTI Raw discovery, dataset contract, pose/calibration oracle,
+  model-frame alignment, and ROS-independent offline multi-sweep reconstruction.
+- **M6b — planned, not started:** raw ROS replay, time-aware tf2 integration, frozen detector
+  execution, ground-truth/domain-shift characterization, and visualization.
+
+M6a addresses engineering interoperability only. It must not initialize or run the detector on
+KITTI, inspect predictions, implement ROS replay, or begin M6b evaluation.
 
 ## M5 — conditional physical Jetson measurement
 

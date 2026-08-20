@@ -6,9 +6,10 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Project and milestone state
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
-M0 through M4 are complete, M4.5a and M4.5b are complete, M4.5 is complete overall, M4.6 is
-complete, and v0.2.0 is released. No technical milestone is currently active. M5 remains
-conditional and inactive; any next technical work requires explicit owner authorization.
+M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
+is authorized, with M6a dataset-contract, pose-oracle, model-frame, and offline-reconstruction work
+active. M6b is planned and not started. M5 remains conditional and inactive. No other technical
+milestone is active.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -43,11 +44,17 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 - M4.6: v0.2.0 release engineering for the accepted M4.5 capability — complete.
 - M5: conditional physical Jetson measurements only if target hardware is actually available and
   the owner explicitly activates the milestone; currently inactive.
+- M6: cross-domain validation using official KITTI Raw data — authorized.
+- M6a: KITTI Raw discovery, dataset contract, pose/calibration verification, model-frame alignment,
+  and ROS-independent reconstruction oracle — active.
+- M6b: raw ROS replay, tf2, frozen detector execution, domain-shift characterization, and
+  visualization — planned and not started.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. No technical
-milestone is currently active, and any next technical work requires explicit owner authorization.
+optimization, or unrelated features unless the owner explicitly changes scope. M6a is the only
+active technical milestone. It must not initialize or run the detector on KITTI, change the frozen
+runtime, implement ROS replay, or begin any M6b work.
 
 ## Detection and deployment architecture
 
