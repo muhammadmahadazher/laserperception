@@ -2,8 +2,9 @@
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
 M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is
-authorized, with M6a active and M6b planned but not started. M5 remains conditional and inactive.
-No other technical milestone is active.
+authorized. The M6a candidate is blocked/not ready after its preregistered Tier-A pose-oracle gate
+failed. M6b is planned but not started, and M5 remains conditional and inactive. No technical
+milestone is currently active; continuation requires explicit owner authorization.
 
 ## Completed foundations
 
@@ -55,14 +56,21 @@ M4.6 did not reopen runtime implementation, correctness protocols, or performanc
 later milestone activates automatically; any next technical work requires explicit owner
 authorization.
 
-## Active M6 — Cross-Domain Validation: KITTI Raw
+## M6 — blocked at the M6a pose oracle
 
-- **M6a — active:** authoritative KITTI Raw discovery, dataset contract, pose/calibration oracle,
-  model-frame alignment, and ROS-independent offline multi-sweep reconstruction.
+- **M6a — blocked/not ready:** authoritative KITTI Raw discovery, dataset contract,
+  pose/calibration oracle, model-frame alignment, and an offline reconstruction candidate were
+  implemented, but the preregistered Tier-A pose-oracle gate failed.
 - **M6b — planned, not started:** raw ROS replay, time-aware tf2 integration, frozen detector
   execution, ground-truth/domain-shift characterization, and visualization.
 
-M6a addresses engineering interoperability only. It must not initialize or run the detector on
+At measurement commit `ec9e341056807d5549353c8ef362fd109b25f2f2`, 271 mapped frames differed
+from the official odometry oracle by as much as 0.0884767 m translation and 0.000416629 rad
+rotation, above the frozen numerical-only tolerances. No tolerance was changed and canonical
+reconstruction evidence was not generated. The sanitized failure is retained under
+`benchmarks/m6a/diagnostics/`.
+
+M6a remains limited to engineering interoperability. It did not initialize or run the detector on
 KITTI, inspect predictions, implement ROS replay, or begin M6b evaluation.
 
 ## M5 — conditional physical Jetson measurement

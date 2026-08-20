@@ -82,8 +82,29 @@ threshold change and do not assert which spatial region would be retained.
 
 ## Evidence discipline
 
-Implementation and CPU tests are committed cleanly. Evidence is then generated from that exact
-commit and stored, sanitized, in
+Implementation and CPU tests are committed cleanly. Only after every hard gate passes may evidence
+be generated from that exact commit and stored, sanitized, in
 `benchmarks/m6a/results/kitti_raw_offline_reconstruction.json`. Dataset bytes, private paths,
 credentials, and raw labels are excluded. Any accidental KITTI detector run contaminates the
 preregistration boundary and stops M6a.
+
+## Exact-commit Tier-A result: FAIL
+
+The clean candidate implementation was committed as
+`ec9e341056807d5549353c8ef362fd109b25f2f2` before the comparison. The production OXTS route
+and official odometry sequence 04 were compared for all 271 mapped frames without fitted
+alignment.
+
+| Metric | Frozen tolerance | Observed maximum | Frame | Result |
+|---|---:|---:|---:|---|
+| Rotation-matrix element absolute difference | `1e-9` | `0.00029970412004469253` | 108 | FAIL |
+| Relative rotation angle | `1e-8 rad` | `0.0004166289537925316 rad` | 147 | FAIL |
+| Translation-vector norm difference | `1e-5 m` | `0.08847669331706698 m` | 220 | FAIL |
+| Relative-transform closure, rotation | `1e-10` | `3.3306690738754696e-16` | n/a | PASS |
+| Relative-transform closure, translation | `1e-9 m` | `4.441027828493136e-16 m` | n/a | PASS |
+
+The numerical closure checks passed, but all three independent pose-difference tolerances failed.
+No tolerance was changed. The causal mechanism was not established. Per the preregistered stop
+rule, no canonical reconstruction evidence or input-shift diagnostics were generated, no detector
+or ROS path was run, and M6b was not started. The sanitized non-canonical record is
+`benchmarks/m6a/diagnostics/pose_oracle_failure_ec9e341.json`.

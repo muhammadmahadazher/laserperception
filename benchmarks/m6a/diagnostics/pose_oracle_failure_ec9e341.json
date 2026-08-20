@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "failed_gate",
+  "canonical": false,
+  "gate": "tier_a_pose_oracle",
+  "base_main_commit": "0218d610bac064c1f9cc9b8f0db8a7ca371b2fb5",
+  "measurement_commit": "ec9e341056807d5549353c8ef362fd109b25f2f2",
+  "measured_at_utc": "2026-08-20T14:45:49.894382+00:00",
+  "inputs": {
+    "raw_drive": "2011_09_30_drive_0016_sync",
+    "raw_oxts_frames": 279,
+    "mapped_frames": 271,
+    "official_odometry_sequence": "04",
+    "official_odometry_frame_range": [0, 270],
+    "raw_sync_archive_sha256": "22faf3a360b488bb54fd35f2a1333f73697a7d8f00d8cd02c960efda3d22847c",
+    "date_calibration_archive_sha256": "2ed01563b616baec14f25659671bd9a77810bd87752d709d184fe304ff7258e3",
+    "odometry_poses_archive_sha256": "a969190799bb3fc4a15f5f0675b1ee6b7067292599b3269bdafc1e5ba883b9e1"
+  },
+  "comparison": {
+    "rotation_matrix_max_abs": {
+      "value": 0.00029970412004469253,
+      "frame": 108,
+      "tolerance": 1e-9,
+      "pass": false
+    },
+    "relative_rotation_angle_rad": {
+      "value": 0.0004166289537925316,
+      "frame": 147,
+      "tolerance": 1e-8,
+      "pass": false
+    },
+    "translation_norm_m": {
+      "value": 0.08847669331706698,
+      "frame": 220,
+      "tolerance": 1e-5,
+      "pass": false
+    },
+    "closure_rotation_matrix_max_abs": {
+      "value": 3.3306690738754696e-16,
+      "tolerance": 1e-10,
+      "pass": true
+    },
+    "closure_translation_norm_m": {
+      "value": 4.441027828493136e-16,
+      "tolerance": 1e-9,
+      "pass": true
+    },
+    "overall_pass": false
+  },
+  "promotion": {
+    "tolerances_changed": false,
+    "canonical_reconstruction_evidence_generated": false,
+    "detector_initialized_or_run": false,
+    "ros_run": false,
+    "m6b_started": false,
+    "pr_opened": false,
+    "reason": "The independent Tier-A pose comparison exceeded all three preregistered pose-difference tolerances."
+  }
+}

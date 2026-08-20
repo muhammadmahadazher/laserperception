@@ -7,9 +7,10 @@ modifying the repository. User instructions take precedence when they explicitly
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
 M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
-is authorized, with M6a dataset-contract, pose-oracle, model-frame, and offline-reconstruction work
-active. M6b is planned and not started. M5 remains conditional and inactive. No other technical
-milestone is active.
+is authorized. The M6a candidate reached its preregistered Tier-A pose-oracle gate and is
+blocked/not ready because that gate failed. M6b is planned and not started. M5 remains conditional
+and inactive. No technical milestone is currently active; continuation requires explicit owner
+authorization.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -46,15 +47,17 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
   the owner explicitly activates the milestone; currently inactive.
 - M6: cross-domain validation using official KITTI Raw data — authorized.
 - M6a: KITTI Raw discovery, dataset contract, pose/calibration verification, model-frame alignment,
-  and ROS-independent reconstruction oracle — active.
+  and ROS-independent reconstruction oracle — blocked/not ready after the preregistered
+  Tier-A pose-oracle failure.
 - M6b: raw ROS replay, tf2, frozen detector execution, domain-shift characterization, and
   visualization — planned and not started.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. M6a is the only
-active technical milestone. It must not initialize or run the detector on KITTI, change the frozen
-runtime, implement ROS replay, or begin any M6b work.
+optimization, or unrelated features unless the owner explicitly changes scope. No technical
+milestone is active. Any M6a repair or revised oracle protocol requires explicit owner authorization. M6a must not
+initialize or run the detector on KITTI, change the frozen runtime, implement ROS replay, or begin
+any M6b work.
 
 ## Detection and deployment architecture
 
