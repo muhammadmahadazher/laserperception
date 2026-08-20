@@ -1,7 +1,7 @@
 # KITTI Raw source and dataset contract
 
-Status: M6a Protocol R2 offline-oracle candidate. This contract was frozen before any KITTI
-detector initialization or prediction. M6a validates ingestion and reconstruction only.
+Status: M6a complete under Protocol R2. This contract was frozen before any KITTI detector
+initialization or prediction. M6a validates ingestion and reconstruction only.
 
 ## Authoritative sources
 
