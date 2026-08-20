@@ -1,10 +1,11 @@
 # Architecture
 
-LaserPerception v0.1.0 keeps a lightweight CPU package separate from an optional, pinned GPU/ROS
+LaserPerception v0.2.0 keeps a lightweight CPU package separate from an optional, pinned GPU/ROS
 deployment stack. The deployed detector is an official pretrained MMDetection3D PointPillars model;
-LaserPerception did not train or reimplement it.
+LaserPerception did not train or reimplement it. v0.2 supports both the original model-ready input
+and the accepted raw XYZ plus time-aware TF reconstruction boundary.
 
-## v0.1 model-ready deployment path
+## Supported model-ready path (v0.1-compatible)
 
 ```mermaid
 flowchart TD
@@ -16,13 +17,12 @@ flowchart TD
     E --> G["RViz / Foxglove markers"]
 ```
 
-The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. The
-v0.1 ROS path remains model-ready: it does not reconstruct history, perform TF lookup, or accept a
-raw single-sweep physical-LiDAR topic.
+The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. This
+direct path remains model-ready: it does not reconstruct history or perform TF lookup.
 
-## Post-v0.1 M4.5 raw ingestion
+## Raw ingestion path (new in v0.2)
 
-M4.5 adds two reviewed boundaries before the unchanged model-ready detector:
+v0.2 includes the two accepted M4.5 boundaries before the unchanged model-ready detector:
 
 ```mermaid
 flowchart LR
@@ -122,4 +122,4 @@ flowchart LR
 
 This earlier infrastructure remains tested and supported. Readers preserve point-level data and do
 not silently normalize, crop, voxelize, or augment. Its semantic-segmentation model, training, and
-accuracy results remain `Pending measurement` and outside the v0.1 detector line.
+accuracy results remain `Pending measurement` and outside the current detection release line.

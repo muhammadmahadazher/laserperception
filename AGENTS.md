@@ -6,15 +6,15 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Active project and current milestone
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
-M0 through M4 are complete, v0.1.0 is released, M4.5a and M4.5b are complete, and **M4.5 is complete
-overall**. No technical milestone is currently active. Post-M4.5 work requires an explicit owner
-decision; M5 remains conditional on physical target Jetson hardware.
+M0 through M4.5 are complete, v0.1.0 is released, and **M4.6 — v0.2.0 release engineering** is the
+active release-only milestone. M4.6 may package and document the already accepted raw-ingestion
+capability but may not expand technical or performance scope. M5 remains conditional and inactive.
 
-The accepted v0.1 path uses an official pretrained MMDetection3D PointPillars checkpoint on
-nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, and a
-ROS 2 Humble interface. The earlier SemanticKITTI-to-DALES adapters, ontology, configuration, and
-audit pipeline remain tested, supported, parked experimental infrastructure and must not be
-deleted.
+The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
+nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
+ROS 2 Humble interface, and compatible raw XYZ PointCloud2 plus time-aware TF multi-sweep
+reconstruction. The earlier SemanticKITTI-to-DALES adapters, ontology, configuration, and audit
+pipeline remain tested, supported, parked experimental infrastructure and must not be deleted.
 
 ## Branch ownership and collaboration
 
@@ -40,13 +40,15 @@ deleted.
 - M4.5b: raw `PointCloud2`, time-aware tf2, bounded live history, transform-repair chronology, and
   exact frozen detector-chain evidence — complete.
 - M4.5: offline and live raw-sweep integration — complete overall.
+- M4.6: v0.2.0 release engineering for the accepted M4.5 capability — active, release-only.
 - M5: conditional physical Jetson measurements only if target hardware is actually available and
-  the owner explicitly activates the milestone.
+  the owner explicitly activates the milestone; currently inactive.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. M4.5 completion does
-not authorize another feature or performance campaign.
+optimization, or unrelated features unless the owner explicitly changes scope. M4.6 is release
+engineering only: do not change raw ingestion, TF, reconstruction, detector, or measured runtime
+semantics, and do not run another performance campaign.
 
 ## Detection and deployment architecture
 

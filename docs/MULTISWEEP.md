@@ -1,7 +1,7 @@
-# Multi-sweep reconstruction (M4.5 complete)
+# Multi-sweep reconstruction (v0.2.0)
 
-LaserPerception provides two post-v0.1 boundaries that produce the unchanged PointPillars
-model-ready `float32 N x 4` XYZT contract:
+LaserPerception v0.2.0 supports two accepted reconstruction boundaries that produce the unchanged
+PointPillars model-ready `float32 N x 4` XYZT contract:
 
 ```text
 M4.5a offline: raw sweeps + integer timestamps + known poses

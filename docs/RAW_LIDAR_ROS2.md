@@ -1,7 +1,7 @@
-# Raw LiDAR PointCloud2 ingestion (M4.5b)
+# Raw LiDAR PointCloud2 ingestion (v0.2.0)
 
-M4.5b is the post-v0.1 ROS boundary that turns compatible raw single-sweep PointCloud2 messages
-plus time-aware TF into the existing model-ready PointCloud2 contract:
+v0.2.0 releases the accepted M4.5b ROS boundary that turns compatible raw single-sweep PointCloud2
+messages plus time-aware TF into the existing model-ready PointCloud2 contract:
 
 ```text
 /laserperception/points_raw

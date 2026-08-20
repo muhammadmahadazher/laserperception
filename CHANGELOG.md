@@ -5,39 +5,43 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-20
+
 ### Added
 
-- A ROS-independent M4.5a `MultiSweepBuilder` that reconstructs the pinned float32 XYZT PointPillars
-  input from raw nuScenes sweeps, integer-microsecond timestamps, calibration, and ego poses without
-  a production MMDetection3D dependency.
-- M4.5b compatible raw float32 XYZ PointCloud2 decoding, bounded live history, time-aware
-  `tf2_ros.Buffer.lookup_transform_full` transforms through a fixed frame, model-ready PointCloud2
-  publication, nuScenes raw replay, launch/config installation, and ROS-native regressions.
-- Sanitized exactness evidence: M4.5a matched 81/81 mini-val matrices and all frozen detector
-  outputs; the M4.5b raw ROS path matched 20/20 model-ready inputs, voxel tensors, raw TensorRT
-  outputs, DetectionFrames, and Detection3DArray semantics.
+- Raw ROS 2 LiDAR ingestion for compatible scalar float32 XYZ `PointCloud2`, time-aware tf2 lookup
+  through a fixed frame, bounded current-plus-ten-sweep history, and publication into the existing
+  model-ready detector boundary.
+- The ROS-independent M4.5a `MultiSweepBuilder`, nuScenes raw replay, launch/config installation,
+  fail-closed input and TF handling, ROS-native regressions, and sanitized exactness evidence.
 
 ### Changed
 
-- Corrected the ROS-to-`SweepTransform` inverse-translation storage from `-t` to `-R.T @ t` while
-  preserving the accepted M4.5a accumulation core and every frozen detector/runtime artifact.
-- Marked M4.5a, M4.5b, and M4.5 overall complete. No subsequent technical milestone is active;
-  post-M4.5 work requires an owner decision.
+- Corrected the ROS-to-`SweepTransform` inverse-translation adapter from `-t` to `-R.T @ t` while
+  preserving the accepted accumulation core and every frozen detector/runtime artifact.
+- Updated current Python, ROS, citation, quickstart, release-note, and repository metadata for the
+  v0.2.0 release.
 
 ### Scientific chronology
 
-- The first full-history W1 ROS exactness run failed and remains preserved.
-- A transform ledger localized the discrepancy to the ROS/tf2 adapter boundary.
-- A fail-first rotation-plus-translation regression exposed the inverse-translation error; the
-  minimal repair restored exact scene-start, W1, and rotation-stratified sentinel results.
-- Final validation kept that failure history visible and passed the unchanged frozen 20-sample
-  detector chain exactly. The older model-ready M3 smoke also remained valid.
+- M4.5a matched 81/81 mini-val model-ready matrices byte-for-byte against the pinned official
+  preparation path: two current-only scene starts and 79 ten-history samples. Its frozen 20-sample
+  detector outputs also remained exact.
+- The first M4.5b full-history W1 raw ROS run failed at 354,184 points versus 354,182 expected. The
+  failed record remains preserved.
+- A transform ledger localized the discrepancy to the ROS/tf2 adapter. A fail-first
+  rotation-plus-translation regression exposed the incorrect `-t` storage rule.
+- The minimal `-R.T @ t` repair restored exact scene-start, W1, and rotation-stratified sentinel
+  reconstruction. Final validation passed 20/20 model-ready inputs, voxel tensors, raw TensorRT
+  outputs, DetectionFrames, and Detection3DArray semantic/geometric content exactly. The older
+  model-ready M3 smoke also passed.
 
 ### Scope
 
-- M4.5 is post-v0.1 development; the v0.1.0 release notes and version remain unchanged.
-- No checkpoint, model, ONNX, engine, exact-fast, threshold, class mapping, voxel geometry, or
-  historical M1/M2/M3/M4.5a evidence changed. No performance campaign was run.
+- M4.5/M4.5b was correctness and integration work, not a new performance campaign. Historical
+  model-ready M3 10/15/20 Hz evidence is not a raw-ingestion throughput claim.
+- No checkpoint, model, ONNX, engine, exact-fast implementation, threshold, class mapping, voxel
+  geometry, or historical M1/M2/M3/M4.5 evidence changed.
 
 ## [0.1.0] - 2026-08-13
 

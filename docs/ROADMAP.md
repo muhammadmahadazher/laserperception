@@ -1,7 +1,8 @@
 # Roadmap
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
-No technical milestone is currently active; the next post-M4.5 phase requires an owner decision.
+M4.6 is active for v0.2.0 release engineering only. No technical or performance milestone is
+active, and M5 remains conditional and inactive.
 
 ## Completed foundations
 
@@ -43,13 +44,20 @@ compatible raw PointCloud2 + time-aware TF + bounded live history
 M4.5b consumes an existing valid localization/TF source. It does not add localization, odometry,
 calibration automation, per-point deskew, a vendor sensor driver, or a new detector path.
 
+## Active M4.6 — v0.2.0 release engineering
+
+M4.6 packages and documents the accepted M4.5 raw-ingestion capability as v0.2.0. It may update
+release metadata, documentation, packaging checks, and release validation only. It does not reopen
+runtime implementation, correctness protocols, or performance measurement. After separate review,
+merge, tag, and release, M4.6 may be marked complete; no later milestone activates automatically.
+
 ## M5 — conditional physical Jetson measurement
 
 M5 remains conditional and inactive. Measure or tune for Jetson only if target hardware is
 physically available and the owner explicitly authorizes the milestone. No Jetson figure will be
 estimated, simulated, or inferred from the RTX 4060 Laptop result.
 
-## Post-v0.1 backlog — not started
+## Post-v0.2 backlog — not started
 
 These are separate future proposals, not current work or commitments:
 
@@ -65,4 +73,5 @@ These are separate future proposals, not current work or commitments:
 
 The earlier Experiment 001 foundation—`PointCloud`, I/O, SemanticKITTI and DALES adapters, explicit
 normalization, ontology mappings, and dataset audits—remains tested and supported. Its model,
-training, and accuracy evaluation remain `Pending measurement` and outside the v0.1 detection line.
+training, and accuracy evaluation remain `Pending measurement` and outside the current detection
+release line.

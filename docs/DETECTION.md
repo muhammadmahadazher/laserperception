@@ -184,6 +184,6 @@ checkpoint loading, visualization, and image saving are outside both boundaries.
 
 This path is a single upstream model on one small demo dataset, with batch size one and no accuracy
 evaluation by LaserPerception. It is not evidence of generalization, production readiness, or safe
-operation. LaserPerception v0.1 is for research, benchmarking and demo use. It is NOT
+operation. LaserPerception v0.2 is for research, benchmarking and demo use. It is NOT
 safety-certified and must not be treated as a certified perception system for operation around
 humans.

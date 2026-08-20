@@ -1,43 +1,47 @@
 # LaserPerception
 
-> Reproducible 3D LiDAR detection, TensorRT deployment, and ROS 2 integration.
+> Reproducible 3D LiDAR detection with raw ROS 2 ingestion, time-aware multi-sweep
+> reconstruction, TensorRT FP16, and exact deterministic voxelization.
 
 [![CI](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-4c1.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-4c1.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-LaserPerception v0.1.0 is an open-source research toolkit that runs one frozen, official pretrained
+LaserPerception v0.2.0 is an open-source research toolkit that runs one frozen, official pretrained
 PointPillars detector on nuScenes, deploys its network through TensorRT FP16, preserves deterministic
-voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble.
-LaserPerception did **not** train PointPillars or introduce a new detector architecture.
+voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble. It can
+accept either model-ready temporal input or compatible raw single-sweep XYZ `PointCloud2` plus a
+valid time-aware TF tree. LaserPerception did **not** train PointPillars or introduce a new detector
+architecture.
 
 ![Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.](docs/assets/v0_1_ros_demo.png)
 
 *Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.*
 
-**Measured release status:** on representative full-history W1 (10 historical sweeps plus current,
-354,182 points), 10 Hz was the highest tested clean sustained ROS rate. Fifteen hertz and 20 Hz
-were not sustained. This failure is part of the release evidence, not hidden.
+**Historical model-ready performance:** on representative full-history W1 (10 historical sweeps
+plus current, 354,182 points), 10 Hz was the highest tested clean sustained ROS rate. Fifteen hertz
+and 20 Hz were not sustained. M4.5 raw ingestion was correctness/integration work and has no new
+throughput claim.
 
-[Run the detection/ROS quickstart](docs/QUICKSTART_V0_1.md) ·
-[Read the v0.1.0 release notes](docs/releases/v0.1.0.md) ·
+[Run the v0.2 detection/ROS quickstart](docs/QUICKSTART_V0_2.md) ·
+[Read the v0.2.0 release notes](docs/releases/v0.2.0.md) ·
 [Inspect the benchmark evidence](docs/BENCHMARKS.md)
 
-**Post-v0.1 raw ingestion:** M4.5 is complete. M4.5a reconstructs model-ready XYZT clouds from raw
-sweeps plus known poses, and M4.5b adds compatible raw ROS 2 `PointCloud2`, time-aware tf2, bounded
-live history, and the unchanged detector. The raw ROS path matched the accepted model-ready input,
-voxel tensors, TensorRT tensors, detections, and ROS message semantics exactly on the frozen
-20-sample suite. [Read the raw ROS contract](docs/RAW_LIDAR_ROS2.md) or the
-[multi-sweep evidence](docs/MULTISWEEP.md).
+**New raw ingestion path:** compatible scalar float32 XYZ `PointCloud2` plus time-aware tf2 feeds a
+bounded current-plus-ten-sweep builder and then the unchanged model-ready detector. The frozen raw
+ROS suite matched accepted model-ready inputs, voxel tensors, TensorRT tensors, detections, and ROS
+message semantics exactly on 20/20 samples. [Read the raw ROS contract](docs/RAW_LIDAR_ROS2.md) or
+the [multi-sweep evidence](docs/MULTISWEEP.md).
 
-## What v0.1.0 does—and what was measured
+## What v0.2.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |
 |---|---|---|
 | TensorRT deployment | Frozen pretrained PointPillars, pinned MMDeploy export, TensorRT 8.6.1 FP16 | Parity-v2 gates passed; repaired scene-start M2 median was 59.289 ms native PyTorch vs 45.637 ms TensorRT end to end (1.2991×) |
 | Deterministic voxelization | `exact_fast` preserves pinned official deterministic retained-point semantics | 81/81 validation samples bit-exact; frozen raw/final detector outputs exact; W1 hard layer 238.910 → 1.758 ms (≈136×, hard layer only) |
-| ROS 2 integration | Model-ready multi-sweep `PointCloud2` → `Detection3DArray` plus RViz/Foxglove markers | W1 sustained 10 Hz cleanly; 15 Hz and 20 Hz were not sustained |
+| ROS 2 integration | Model-ready multi-sweep `PointCloud2` → `Detection3DArray` plus RViz/Foxglove markers | Historical model-ready W1 sustained 10 Hz cleanly; 15 Hz and 20 Hz were not sustained |
+| Raw multi-sweep ingestion | Compatible float32 XYZ `PointCloud2` + time-aware TF → bounded history → same model-ready detector | M4.5a 81/81 inputs exact; M4.5b complete raw ROS detector chain exact on 20/20 frozen samples; no new rate campaign |
 
 The accepted M3B-V2 direct W1 live diagnostic changed from about 333 ms to 43.168 ms. The ~43 ms
 figure is **direct runtime evidence, not ROS callback or loopback latency**. The ≈136× ratio applies
@@ -59,7 +63,7 @@ Jetson, or another environment.
 
 ```mermaid
 flowchart TD
-    R["Post-v0.1: raw single-sweep PointCloud2"] --> T["Time-aware tf2 + bounded live history"]
+    R["v0.2: raw single-sweep PointCloud2"] --> T["Time-aware tf2 + bounded live history"]
     T --> A["Model-ready multi-sweep PointCloud2"]
     A --> B["exact_fast deterministic voxelization"]
     B --> C["Frozen TensorRT FP16 PointPillars network"]
@@ -69,11 +73,11 @@ flowchart TD
     E --> G["RViz / Foxglove markers"]
 ```
 
-The v0.1 path begins at model-ready `x`, `y`, `z`, and `time_lag`. Post-v0.1 M4.5b optionally begins
-one boundary earlier: compatible raw single-sweep messages require float32 XYZ and a valid
-time-indexed TF tree. The builder uses the current acquisition time as the target time and preserves
-historical acquisition stamps; a repeated frame name at different times is not assumed to be an
-identity transform. Additional vendor fields are accepted but ignored by the frozen detector path.
+v0.2 supports both boundaries. The v0.1-compatible path begins at model-ready `x`, `y`, `z`, and
+`time_lag`. The new path begins one boundary earlier: compatible raw single-sweep messages require
+scalar float32 XYZ and a valid time-indexed TF tree. The builder uses the current acquisition time as
+the target time and preserves historical acquisition stamps; a repeated frame name at different
+times is not assumed to be an identity transform. Extra fields are ignored by the frozen detector.
 
 Two explicit policies preserve historical evidence and deployed semantics:
 
@@ -116,17 +120,22 @@ The validated deployment stack is Ubuntu 22.04 under WSL2, Python 3.10, CUDA 11.
 and ROS 2 Humble. nuScenes, the official checkpoint, ONNX, and TensorRT engine are external and are
 not committed or included in the wheel.
 
-After completing the [v0.1.0 quickstart](docs/QUICKSTART_V0_1.md), launch the real W1 replay and
-actual predicted boxes with:
+Follow the [v0.2.0 quickstart](docs/QUICKSTART_V0_2.md). The existing model-ready W1 replay and
+actual predicted boxes remain available through the compatibility wrapper:
 
 ```bash
 bash scripts/run_v0_1_demo.sh
 ```
 
-The wrapper verifies cache roots, frozen hashes, prepared nuScenes mini data, the installed
-`exact_fast` / `live` config, pinned versions, and a CUDA operation before delegating to the existing
-M3 launch. Missing prerequisites fail with actionable instructions; no licensed dataset is silently
-downloaded and no engine is rebuilt.
+The v0.2 raw XYZ plus time-aware TF replay uses the accepted M4.5b launch:
+
+```bash
+ros2 launch laserperception_ros m45b_raw_multisweep.launch.py
+```
+
+The wrapper and launch use the existing detector path. Missing prerequisites fail closed; no
+licensed dataset is silently downloaded and no engine is rebuilt. The raw replay is a nuScenes
+reproducibility example, not a physical-sensor validation or a new performance measurement.
 
 ## Three evidence-backed engineering stories
 
@@ -185,13 +194,14 @@ and accepted M3B-V2 diagnostics remain visible in the scientific chronology.
 Observed issues include material GPU session-to-session timing variability, an uncontrolled later
 M1-style reproduction that differed from the archived M1 result, and decreasing useful output under
 15/20 Hz offered-rate overload. Causes were not isolated. See the separate
-[Known issues section](docs/releases/v0.1.0.md#known-issues).
+[historical v0.1 known issues](docs/releases/v0.1.0.md#known-issues).
 
-v0.1.0 itself remains the released model-ready interface. Post-v0.1 M4.5 adds raw-sweep history
-ingestion for compatible PointCloud2 plus valid TF; it does not prove arbitrary sensor calibration,
-localization, odometry, intra-scan deskew, physical-LiDAR accuracy, or plug-and-play support for any
-LiDAR. Training, tracking, camera fusion, a second detector, INT8, and Jetson measurements remain
-absent. LaserPerception is research/demo software, not a safety-certified perception system.
+v0.2.0 supports the model-ready interface and compatible raw PointCloud2 plus valid time-aware TF.
+It does not prove arbitrary sensor calibration, localization, odometry, intra-scan deskew,
+physical-LiDAR accuracy, or plug-and-play support for any LiDAR. Training, tracking, camera fusion,
+a second detector, INT8, and Jetson measurements remain absent. LaserPerception is research/demo
+software, not a safety-certified perception system. See the
+[v0.2.0 limitations](docs/releases/v0.2.0.md#limitations).
 
 ## Repository map
 
@@ -208,8 +218,8 @@ tests/                  Synthetic CPU regression suite
 ## Parked experimental infrastructure
 
 The earlier SemanticKITTI-to-DALES `PointCloud`, I/O, transforms, ontology, adapters, and audit
-pipeline remain tested and supported, but they are not the v0.1 product line. No segmentation model
-or training result exists; those fields remain `Pending measurement`.
+pipeline remain tested and supported, but they are not the current detection release line. No
+segmentation model or training result exists; those fields remain `Pending measurement`.
 
 ## Safety, citation, and licensing
 
@@ -218,7 +228,7 @@ certified component for operation around people or vehicles.
 
 Original LaserPerception code is [Apache-2.0](LICENSE). That license does not relicense nuScenes,
 external weights, TensorRT engines, ROS/OpenMMLab/NVIDIA components, datasets, or papers. See
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.1.0 and, where
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.2.0 and, where
 reproducibility matters, the exact commit; no DOI is claimed. Citation metadata is in
 [CITATION.cff](CITATION.cff).
 
