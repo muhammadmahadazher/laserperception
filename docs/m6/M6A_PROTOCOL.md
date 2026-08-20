@@ -48,8 +48,10 @@ information:
    ranked by `translation_norm_m + relative_rotation_angle_rad`; if an index is already selected,
    take the next closest ranked unused candidate, breaking ties by lower frame index.
 
-The exact resulting list is committed before the clean measurement commit. At least ten frames
-must have all ten historical sweeps.
+The exact resulting list is
+`[0, 1, 2, 5, 10, 11, 14, 17, 23, 30, 36, 43, 49, 55, 62, 65, 68, 75, 81, 87, 94, 100, 106, 107]`.
+It was frozen before the clean measurement commit. At least ten frames must have all ten historical
+sweeps.
 
 History is current first, then up to ten preceding acquisitions nearest-to-farthest. No padding or
 synthetic sweep is permitted. `MultiSweepBuilder` remains unchanged.

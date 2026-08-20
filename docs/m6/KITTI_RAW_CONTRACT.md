@@ -27,7 +27,7 @@ Selection used official metadata and did not use detector results.
 | Role | Raw drive | Category | Frames | Tracklets | Reason |
 |---|---|---:|---:|---:|---|
 | Canonical reconstruction | `2011_09_26_drive_0001` | City | 108 | yes | Small sequential urban drive with OXTS, calibration, timestamps, more than ten history frames, and future-M6b labels |
-| Tier-A pose oracle | `2011_09_30_drive_0016` | Road | 271 | no | Authoritatively maps one-to-one to odometry training sequence 04 with public poses |
+| Tier-A pose oracle | `2011_09_30_drive_0016` | Road | 279 raw / 271 mapped | no | Frames 0-270 map one-to-one to odometry training sequence 04 with public poses |
 | Future M6b candidate | `2011_09_26_drive_0017` | City | 114 | yes | Compact independent tracklet drive |
 | Future M6b candidate | `2011_09_26_drive_0019` | City | 481 | yes | Longer independent tracklet drive |
 
