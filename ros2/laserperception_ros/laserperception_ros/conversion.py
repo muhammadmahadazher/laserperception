@@ -11,9 +11,11 @@ from laserperception.detection.ros2_contract import (
     ModelReadyPointCloud,
     PointCloud2Layout,
     PointFieldLayout,
+    RawPointCloudXYZ,
     SourceHeader,
     TimeStamp,
     decode_model_ready_pointcloud,
+    decode_raw_xyz_pointcloud,
     detection_frame_to_records,
     model_ready_pointcloud_layout,
 )
@@ -23,7 +25,19 @@ from laserperception.detection.types import DetectionFrame
 def pointcloud2_to_model_ready(message: PointCloud2) -> ModelReadyPointCloud:
     """Run the exact M3 subscriber conversion without assuming field order."""
 
-    layout = PointCloud2Layout(
+    return decode_model_ready_pointcloud(pointcloud2_layout(message))
+
+
+def pointcloud2_to_raw_xyz(message: PointCloud2) -> RawPointCloudXYZ:
+    """Decode and filter an ordinary single-sweep float32 XYZ message."""
+
+    return decode_raw_xyz_pointcloud(pointcloud2_layout(message))
+
+
+def pointcloud2_layout(message: PointCloud2) -> PointCloud2Layout:
+    """Copy the byte-layout portion of a ROS PointCloud2 message."""
+
+    return PointCloud2Layout(
         height=int(message.height),
         width=int(message.width),
         fields=tuple(
@@ -40,7 +54,6 @@ def pointcloud2_to_model_ready(message: PointCloud2) -> ModelReadyPointCloud:
         row_step=int(message.row_step),
         data=bytes(message.data),
     )
-    return decode_model_ready_pointcloud(layout)
 
 
 def model_ready_to_pointcloud2(

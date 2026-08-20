@@ -11,6 +11,7 @@ import numpy as np
 
 POINT_FIELD_FLOAT32 = 7
 MODEL_READY_FIELD_NAMES = ("x", "y", "z", "time_lag")
+RAW_XYZ_FIELD_NAMES = ("x", "y", "z")
 _POINT_FIELD_SIZES = {1: 1, 2: 1, 3: 2, 4: 2, 5: 4, 6: 4, 7: 4, 8: 8}
 
 
@@ -64,6 +65,33 @@ class SourceHeader:
         if not isinstance(self.frame_id, str) or not self.frame_id.strip():
             raise ValueError("frame_id must be a non-empty string")
         object.__setattr__(self, "frame_id", self.frame_id.strip())
+
+
+@dataclass(frozen=True, slots=True)
+class RawPointCloudXYZ:
+    """Decoded finite raw XYZ rows plus deterministic filtering counts."""
+
+    points_xyz: np.ndarray
+    source_point_count: int
+    invalid_point_count: int
+
+    def __post_init__(self) -> None:
+        points = np.asarray(self.points_xyz)
+        if points.dtype != np.dtype(np.float32):
+            raise TypeError("raw XYZ points must have dtype float32")
+        if points.ndim != 2 or points.shape[1] != 3:
+            raise ValueError("raw XYZ points must have shape (N, 3)")
+        if not np.isfinite(points).all():
+            raise ValueError("retained raw XYZ points must contain only finite values")
+        for name, value in (
+            ("source_point_count", self.source_point_count),
+            ("invalid_point_count", self.invalid_point_count),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"{name} must be a non-negative integer")
+        if self.source_point_count != len(points) + self.invalid_point_count:
+            raise ValueError("raw XYZ point counts are inconsistent")
+        object.__setattr__(self, "points_xyz", np.ascontiguousarray(points).copy())
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,6 +201,51 @@ def decode_model_ready_pointcloud(layout: PointCloud2Layout) -> ModelReadyPointC
             )
         )
     return ModelReadyPointCloud(np.ascontiguousarray(np.concatenate(rows, axis=0)))
+
+
+def decode_raw_xyz_pointcloud(layout: PointCloud2Layout) -> RawPointCloudXYZ:
+    """Decode finite float32 XYZ rows while preserving PointCloud2 row order."""
+
+    _validate_layout(layout)
+    by_name = {field.name: field for field in layout.fields}
+    missing = [name for name in RAW_XYZ_FIELD_NAMES if name not in by_name]
+    if missing:
+        raise ValueError(f"PointCloud2 is missing required field(s): {', '.join(missing)}")
+    required = [by_name[name] for name in RAW_XYZ_FIELD_NAMES]
+    for field in required:
+        if field.datatype != POINT_FIELD_FLOAT32 or field.count != 1:
+            raise ValueError(f"PointCloud2 field {field.name} must be one float32 value")
+
+    endian = ">" if layout.is_bigendian else "<"
+    dtype = np.dtype(
+        {
+            "names": list(RAW_XYZ_FIELD_NAMES),
+            "formats": [f"{endian}f4"] * 3,
+            "offsets": [field.offset for field in required],
+            "itemsize": layout.point_step,
+        }
+    )
+    rows: list[np.ndarray] = []
+    for row_index in range(layout.height):
+        structured: np.ndarray = np.ndarray(
+            shape=(layout.width,),
+            dtype=dtype,
+            buffer=layout.data,
+            offset=row_index * layout.row_step,
+        )
+        rows.append(
+            np.column_stack(tuple(structured[name] for name in RAW_XYZ_FIELD_NAMES)).astype(
+                np.float32, copy=False
+            )
+        )
+    points = np.ascontiguousarray(np.concatenate(rows, axis=0))
+    finite = np.isfinite(points).all(axis=1)
+    retained = np.ascontiguousarray(points[finite])
+    return RawPointCloudXYZ(
+        retained,
+        source_point_count=len(points),
+        invalid_point_count=int(np.count_nonzero(~finite)),
+    )
 
 
 def model_ready_pointcloud_layout(
