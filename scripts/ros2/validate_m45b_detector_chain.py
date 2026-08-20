@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import subprocess
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
@@ -29,7 +30,6 @@ from laserperception_ros.runtime import (
 from validate_m45b_raw_ros import _capture_case, _tf2_version
 
 from laserperception.detection.mmdet3d_backend import sha256_file
-from laserperception.detection.runtime_metadata import repository_git_sha
 from laserperception.detection.types import DetectionFrame
 
 BASE_MAIN_SHA = "9c0fecbb45ebb1d0c65e61a99f13b72558327527"
@@ -71,11 +71,31 @@ def _git_output(*args: str) -> str:
     return process.stdout.strip()
 
 
-def _require_clean_measurement_tree() -> tuple[str, str]:
+def _require_clean_measurement_tree(
+    *,
+    explicit_commit: str | None,
+    explicit_branch: str | None,
+) -> tuple[str, str, str]:
+    if (explicit_commit is None) != (explicit_branch is None):
+        raise RuntimeError("explicit measurement commit and branch must be supplied together")
+    if explicit_commit is not None and explicit_branch is not None:
+        if re.fullmatch(r"[0-9a-f]{40}", explicit_commit) is None:
+            raise RuntimeError("explicit measurement commit must be a lowercase full SHA")
+        if explicit_branch != "feat/m45b-ros-multisweep":
+            raise RuntimeError(f"unexpected explicit measurement branch: {explicit_branch}")
+        return (
+            explicit_commit,
+            explicit_branch,
+            "Windows Git clean-tree check immediately before WSL invocation",
+        )
     status = _git_output("status", "--porcelain", "--untracked-files=all")
     if status:
         raise RuntimeError("final detector-chain measurement requires a clean working tree")
-    return repository_git_sha(_root()), _git_output("branch", "--show-current")
+    return (
+        _git_output("rev-parse", "HEAD"),
+        _git_output("branch", "--show-current"),
+        "native Git clean-tree check inside measurement process",
+    )
 
 
 def _first_array_difference(expected: np.ndarray, observed: np.ndarray) -> dict[str, object]:
@@ -435,6 +455,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", default=os.environ.get("LASERPERCEPTION_NUSCENES_ROOT"))
     parser.add_argument("--legacy-smoke-result", type=Path, required=True)
+    parser.add_argument("--measurement-commit")
+    parser.add_argument("--measurement-branch")
     parser.add_argument("--timeout-sec", type=float, default=25.0)
     parser.add_argument("--output", type=Path)
     return parser
@@ -450,7 +472,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.timeout_sec <= 0.0:
         raise SystemExit("timeout must be positive")
 
-    measurement_commit, branch = _require_clean_measurement_tree()
+    measurement_commit, branch, clean_tree_verification = _require_clean_measurement_tree(
+        explicit_commit=args.measurement_commit,
+        explicit_branch=args.measurement_branch,
+    )
     if branch != "feat/m45b-ros-multisweep":
         raise SystemExit(f"unexpected measurement branch: {branch}")
     repair, chronology_hashes = _repair_evidence()
@@ -498,6 +523,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "base_main_sha": BASE_MAIN_SHA,
             "measurement_commit": measurement_commit,
             "branch": branch,
+            "clean_tree_verification": clean_tree_verification,
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
             "ros_distro": os.environ.get("ROS_DISTRO", "unknown"),
             "rmw_implementation": rclpy.utilities.get_rmw_implementation_identifier(),
