@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "laserperception"
-version = "0.1.0"
-description = "Reproducible 3D LiDAR detection, TensorRT deployment, and ROS 2 integration."
+version = "0.2.0"
+description = "Reproducible 3D LiDAR detection, raw ROS 2 ingestion, and TensorRT deployment."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"

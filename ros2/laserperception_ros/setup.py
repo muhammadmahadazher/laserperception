@@ -4,7 +4,7 @@ PACKAGE_NAME = "laserperception_ros"
 
 setup(
     name=PACKAGE_NAME,
-    version="0.1.0",
+    version="0.2.0",
     packages=find_packages(exclude=("test",)),
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{PACKAGE_NAME}"]),
@@ -29,7 +29,9 @@ setup(
     zip_safe=False,
     maintainer="Mahad Azher",
     maintainer_email="muhammadmahadazher@users.noreply.github.com",
-    description="ROS 2 Humble interface for the LaserPerception v0.1 deployment path.",
+    description=(
+        "ROS 2 Humble interface for LaserPerception detection and raw multi-sweep ingestion."
+    ),
     license="Apache-2.0",
     entry_points={
         "console_scripts": [

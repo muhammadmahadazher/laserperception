@@ -1,11 +1,11 @@
 cff-version: 1.2.0
 message: >-
-  If you use LaserPerception, cite LaserPerception v0.1.0 and, where reproducibility matters, the
+  If you use LaserPerception, cite LaserPerception v0.2.0 and, where reproducibility matters, the
   exact commit used.
 type: software
 title: LaserPerception
-version: 0.1.0
-date-released: 2026-08-13
+version: 0.2.0
+date-released: 2026-08-20
 authors:
   - given-names: Mahad
     family-names: Azher
@@ -16,7 +16,7 @@ license: Apache-2.0
 abstract: >-
   An open-source 3D LiDAR object-detection and deployment-engineering toolkit built around a
   pretrained PointPillars detector on nuScenes, TensorRT FP16 deployment, exact deterministic
-  deployment voxelization, and a ROS 2 interface.
+  deployment voxelization, ROS 2, and time-aware raw PointCloud2 multi-sweep ingestion.
 keywords:
   - LiDAR
   - point cloud

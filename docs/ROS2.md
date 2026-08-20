@@ -1,10 +1,10 @@
-# ROS 2 Humble interface (M3 and M4.5 complete)
+# ROS 2 Humble interface (v0.2.0)
 
-M3 wraps the frozen M2 TensorRT FP16 detector with a ROS 2 Humble interface. Its released v0.1
-boundary consumes **model-ready multi-sweep** `sensor_msgs/PointCloud2` and publishes canonical
-`vision_msgs/Detection3DArray` messages. Post-v0.1 M4.5b adds a separate compatible raw XYZ
-PointCloud2 plus time-aware tf2 builder before that unchanged detector. It is not a localization,
-calibration, or vendor-driver system.
+v0.2.0 supports two ROS 2 Humble inputs around the same frozen M2 TensorRT FP16 detector. The
+v0.1-compatible boundary consumes **model-ready multi-sweep** `sensor_msgs/PointCloud2`. The new
+v0.2 boundary accepts compatible raw XYZ PointCloud2 plus time-aware tf2, reconstructs bounded
+history, and feeds that unchanged detector. Both publish canonical `vision_msgs/Detection3DArray`
+messages. The raw boundary is not a localization, calibration, or vendor-driver system.
 
 The final production policy is explicit:
 
@@ -70,13 +70,14 @@ contain finite `float32` fields:
 Field order is arbitrary and extra fields are ignored. Missing `time_lag` is rejected; it is never
 treated as intensity. Historical XYZ values must already be transformed into the current LiDAR
 frame, current points use `time_lag = 0`, and the input must already combine the current keyframe
-with up to ten historical sweeps under the pinned MMDetection3D semantics. M3 performs no TF
-lookup, history buffering, motion compensation, or sweep aggregation.
+with up to ten historical sweeps under the pinned MMDetection3D semantics. The direct model-ready
+path performs no TF lookup, history buffering, motion compensation, or sweep aggregation; the
+separate v0.2 builder owns those boundary responsibilities.
 
 M3 does not change point-cloud range, voxel size, maximum points, maximum voxels, engine profile,
 network, class names, thresholds, or postprocessing.
 
-## Post-v0.1 raw ingestion boundary (M4.5b)
+## Raw ingestion boundary (new in v0.2)
 
 The optional `laserperception_multisweep_builder` begins at
 `/laserperception/points_raw`, produces the same `/laserperception/points_model_ready` contract,
@@ -154,7 +155,7 @@ The external correctness record SHA256 is
 `000ba4bd15bc4349a0df29a2252819e00326c406e5b1dc0e787c0c060359d388`.
 A difference would have stopped performance measurement.
 
-## Post-v0.1 M4.5b correctness gates
+## v0.2 raw-ingestion correctness gates
 
 At clean measurement commit `9e0f4dfacbfc997945825d86a85a3609594a059e`, actual raw
 nuScenes acquisitions traversed PointCloud2, time-aware tf2, the repaired transform adapter,
@@ -260,7 +261,7 @@ forced sensor-rate pass.
 Historical diagnostics remain under [`benchmarks/m3/`](../benchmarks/m3/); the final result does
 not overwrite them.
 
-## Deferred post-v0.1 work
+## Deferred work after v0.2
 
 The following are documented backlog only:
 
@@ -271,6 +272,6 @@ The following are documented backlog only:
 - INT8; and
 - other detector architectures.
 
-M4.5b later added the bounded raw PointCloud2/tf2 ingestion boundary documented above, but ran no
-performance campaign and changed no measured detector path. Postprocess, DDS/executor optimization,
-custom CUDA, tracking, INT8, training, Jetson, and camera fusion remain unimplemented.
+The v0.2 raw PointCloud2/tf2 ingestion boundary ran no performance campaign and changed no measured
+detector path. Postprocess, DDS/executor optimization, custom CUDA, tracking, INT8, training,
+Jetson, and camera fusion remain unimplemented.
