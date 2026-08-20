@@ -1,0 +1,1309 @@
+{
+  "M_adapter": {
+    "current_precast_float64_semantics": {
+      "dtype": "float64",
+      "sha256": "60de06bcc9c645e5c9fd837a91f05cdce44a5011dc135f7b039bd48c1f6af6be",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443269973777,
+          0.017609818802392055,
+          0.0011027478899289984,
+          0.017196676790945276
+        ],
+        [
+          -0.017609208552460856,
+          0.9998447886627563,
+          -0.0005606764529552745,
+          0.20440802712755612
+        ],
+        [
+          -0.0011124501416976697,
+          0.0005411706531937972,
+          0.9999992347942108,
+          0.0068094074758846546
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "current_stored_float32_matrix": {
+      "dtype": "float32",
+      "sha256": "efc57955e82427aec7a958ccc23bf4dde850ca2270ca5e2a27f186c1d14c3e97",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443126678467,
+          0.017609817907214165,
+          0.0011027478612959385,
+          0.01719667762517929
+        ],
+        [
+          -0.017609208822250366,
+          0.9998447895050049,
+          -0.000560676446184516,
+          0.20440801978111267
+        ],
+        [
+          -0.001112450147047639,
+          0.0005411706515587866,
+          0.9999992251396179,
+          0.006809407379478216
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "M_from_published_edges": {
+    "float64_matrix": {
+      "dtype": "float64",
+      "sha256": "97244b278907f519b58703f395e7102dff194b71090c2f3189533cab3ad1404f",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443269973787,
+          -0.01760920855246105,
+          -0.0011124501416976684,
+          -0.017196676790604215
+        ],
+        [
+          0.017609818802392273,
+          0.9998447886627571,
+          0.0005411706531938086,
+          -0.20440802712641926
+        ],
+        [
+          0.00110274788992901,
+          -0.0005606764529552874,
+          0.9999992347942118,
+          -0.006809407475856233
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "pinned_reference_storage_float32": {
+      "dtype": "float32",
+      "sha256": "86a3acc8c1af97bb4b83d87d4a42749e5991253ed7ca58be845c2b45eb5aaee1",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443126678467,
+          0.017609817907214165,
+          0.0011027478612959385,
+          0.02080109715461731
+        ],
+        [
+          -0.017609208822250366,
+          0.9998447895050049,
+          -0.000560676446184516,
+          0.20406965911388397
+        ],
+        [
+          -0.001112450147047639,
+          0.0005411706515587866,
+          0.9999992251396179,
+          0.006900891661643982
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "pinned_reference_storage_float64": {
+      "dtype": "float64",
+      "sha256": "dc71547052e5a6d6f1f9403f2369e4f89bf8e747a53c337bf8af8477226b853c",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443269973787,
+          0.017609818802392273,
+          0.00110274788992901,
+          0.02080109711146951
+        ],
+        [
+          -0.01760920855246105,
+          0.9998447886627571,
+          -0.0005606764529552874,
+          0.20406966294074047
+        ],
+        [
+          -0.0011124501416976684,
+          0.0005411706531938086,
+          0.9999992347942118,
+          0.006900891445283844
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "representation": "conventional column-vector source-to-target transform"
+  },
+  "M_ref": {
+    "float64_intermediate_rotation": [
+      [
+        0.9998443269973788,
+        0.017609818802392253,
+        0.00110274788992901
+      ],
+      [
+        -0.017609208552461064,
+        0.9998447886627572,
+        -0.0005606764529552909
+      ],
+      [
+        -0.001112450141697665,
+        0.0005411706531938121,
+        0.9999992347942117
+      ]
+    ],
+    "float64_intermediate_translation": [
+      -0.017196676790717902,
+      -0.20440802712641926,
+      -0.006809407475856233
+    ],
+    "float64_sensor2lidar_rotation": [
+      [
+        0.9998443269973788,
+        -0.017609208552461064,
+        -0.001112450141697665
+      ],
+      [
+        0.017609818802392253,
+        0.9998447886627572,
+        0.0005411706531938121
+      ],
+      [
+        0.00110274788992901,
+        -0.0005606764529552909,
+        0.9999992347942117
+      ]
+    ],
+    "representation": "pinned M4.5a row-vector SweepTransform storage",
+    "stored_float32_matrix": {
+      "dtype": "float32",
+      "sha256": "86a3acc8c1af97bb4b83d87d4a42749e5991253ed7ca58be845c2b45eb5aaee1",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443126678467,
+          0.017609817907214165,
+          0.0011027478612959385,
+          0.02080109715461731
+        ],
+        [
+          -0.017609208822250366,
+          0.9998447895050049,
+          -0.000560676446184516,
+          0.20406965911388397
+        ],
+        [
+          -0.001112450147047639,
+          0.0005411706515587866,
+          0.9999992251396179,
+          0.006900891661643982
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "M_tf2": {
+    "conventional_float64_matrix": {
+      "dtype": "float64",
+      "sha256": "7aab27f97551b4091d71cf0bb2b09b27adacdfa2ed3991deb56197c4c3e8bf48",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443269973777,
+          -0.017609208552460856,
+          -0.0011124501416976697,
+          -0.017196676790945276
+        ],
+        [
+          0.017609818802392055,
+          0.9998447886627563,
+          0.0005411706531937972,
+          -0.20440802712755612
+        ],
+        [
+          0.0011027478899289984,
+          -0.0005606764529552745,
+          0.9999992347942108,
+          -0.0068094074758846546
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "pinned_reference_storage_float64": {
+      "dtype": "float64",
+      "sha256": "318f8c4fbd70b93e0fcc68e9095393e98202145337355392eee39109b57bd4c2",
+      "shape": [
+        4,
+        4
+      ],
+      "values": [
+        [
+          0.9998443269973777,
+          0.017609818802392055,
+          0.0011027478899289984,
+          0.020801097111830508
+        ],
+        [
+          -0.017609208552460856,
+          0.9998447886627563,
+          -0.0005606764529552745,
+          0.20406966294187098
+        ],
+        [
+          -0.0011124501416976697,
+          0.0005411706531937972,
+          0.9999992347942108,
+          0.006900891445312492
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "returned_transform_stamped": {
+      "quaternion_repr": "(-0.00027547250810655154, -0.0005538210830880335, 0.008805099858566028, 0.9999610430479711)",
+      "quaternion_xyzw": [
+        -0.00027547250810655154,
+        -0.0005538210830880335,
+        0.008805099858566028,
+        0.9999610430479711
+      ],
+      "translation_xyz": [
+        -0.017196676790945276,
+        -0.20440802712755612,
+        -0.0068094074758846546
+      ]
+    }
+  },
+  "composition_precision_ledger": {
+    "M4.5a": {
+      "actual_numpy_inverse_calls_in_from_poses": 7,
+      "actual_quaternion_normalizations_for_W1_records": 0,
+      "conceptual_edges": 4,
+      "conceptual_inversions": 2,
+      "conceptual_rigid_compositions": 3,
+      "matrix_to_quaternion_conversions": 0,
+      "pyquaternion_normalization_checks": 4,
+      "quaternion_to_matrix_conversions_before_from_poses": 4,
+      "rigid_chain": "historical lidar -> historical ego -> global -> current ego -> current lidar"
+    },
+    "adapter": {
+      "explicit_quaternion_normalizations": 0,
+      "float64_to_float32_storage_casts": 1,
+      "matrix_to_quaternion_conversions": 0,
+      "quaternion_norm_checks": 1,
+      "quaternion_to_matrix_conversions": 1,
+      "rotation_formula_2_over_norm_squared_scaling": 1
+    },
+    "outside_tf2_reconstruction": {
+      "actual_quaternion_normalizations_for_W1_records": 0,
+      "matrix_compositions": 3,
+      "matrix_inversions": 1,
+      "matrix_to_quaternion_conversions": 0,
+      "pyquaternion_normalization_checks": 4,
+      "quaternion_to_matrix_conversions": 4
+    },
+    "replay_publisher": {
+      "inversions": 0,
+      "matrix_compositions": 0,
+      "matrix_to_quaternion_conversions": 0,
+      "published_edge_records_for_query": 4,
+      "quaternion_normalizations": 0,
+      "quaternion_to_matrix_conversions": 0
+    },
+    "tf2_query": {
+      "conceptual_edge_inversions": 2,
+      "conceptual_rigid_compositions": 3,
+      "diagnostic_actual_quaternion_normalizations": 0,
+      "diagnostic_pyquaternion_normalization_checks": 1,
+      "diagnostic_return_quaternion_to_matrix_conversions": 1,
+      "equivalent_composite_inversions": 1,
+      "internal_quaternion_matrix_conversions": "not exposed by the public tf2 API",
+      "internal_quaternion_normalizations": "not exposed by the public tf2 API",
+      "interpolation": false,
+      "path": "historical lidar@source_time -> historical ego@source_time -> map -> current ego@target_time -> current lidar@target_time",
+      "queried_edge_samples": 4,
+      "source_time_exact_sample": true,
+      "target_time_exact_sample": true
+    }
+  },
+  "controlled_point_test": {
+    "adapter_minus_reference_delta_spread_xyz": [
+      3.345310688018799e-06,
+      2.682209014892578e-06,
+      6.845220923423767e-08
+    ],
+    "basis": "all compared rotations are float32-byte-exact and the selected-point delta does not grow with range",
+    "classification": "nearly constant translation offset",
+    "points": [
+      {
+        "M_adapter_builder_xyz": [
+          -3.1245484352111816,
+          -0.5066702961921692,
+          -1.85814368724823
+        ],
+        "M_from_published_edges_conventional_xyz": [
+          -3.1245486085571454,
+          -0.5066703143467095,
+          -1.858143769029503
+        ],
+        "M_ref_builder_xyz": [
+          -3.128152847290039,
+          -0.5063319206237793,
+          -1.858235239982605
+        ],
+        "M_tf2_conventional_xyz": [
+          -3.1245486085574834,
+          -0.5066703143478455,
+          -1.8581437690295295
+        ],
+        "adapter_minus_reference_xyz": [
+          0.003604412078857422,
+          -0.0003383755683898926,
+          9.1552734375e-05
+        ],
+        "raw_xyz": [
+          -3.1142325401306152,
+          -0.24645936489105225,
+          -1.8480397462844849
+        ],
+        "selection": "first_source_point",
+        "source_row_index": 0
+      },
+      {
+        "M_adapter_builder_xyz": [
+          -0.017205173149704933,
+          -0.20439626276493073,
+          -0.00680916802957654
+        ],
+        "M_from_published_edges_conventional_xyz": [
+          -0.01720517216284404,
+          -0.20439627086104595,
+          -0.006809168059926171
+        ],
+        "M_ref_builder_xyz": [
+          -0.020809592679142952,
+          -0.20405790209770203,
+          -0.006900652311742306
+        ],
+        "M_tf2_conventional_xyz": [
+          -0.017205172163185102,
+          -0.20439627086218282,
+          -0.0068091680599545925
+        ],
+        "adapter_minus_reference_xyz": [
+          0.003604419529438019,
+          -0.00033836066722869873,
+          9.148428216576576e-05
+        ],
+        "raw_xyz": [
+          -8.286760021292139e-06,
+          1.1903903214260936e-05,
+          2.552285707224655e-07
+        ],
+        "selection": "origin_like_minimum_norm",
+        "source_row_index": 34709
+      },
+      {
+        "M_adapter_builder_xyz": [
+          7.456544399261475,
+          -2.4410243034362793,
+          0.9135154485702515
+        ],
+        "M_from_published_edges_conventional_xyz": [
+          7.456544316277406,
+          -2.441024497716817,
+          0.9135154747208625
+        ],
+        "M_ref_builder_xyz": [
+          7.452939987182617,
+          -2.440685987472534,
+          0.9134239554405212
+        ],
+        "M_tf2_conventional_xyz": [
+          7.456544316277058,
+          -2.4410244977179536,
+          0.913515474720833
+        ],
+        "adapter_minus_reference_xyz": [
+          0.003604412078857422,
+          -0.0003383159637451172,
+          9.149312973022461e-05
+        ],
+        "raw_xyz": [
+          7.434206008911133,
+          -2.368391990661621,
+          0.9107996225357056
+        ],
+        "selection": "ordinary_median_norm",
+        "source_row_index": 19036
+      },
+      {
+        "M_adapter_builder_xyz": [
+          64.97727966308594,
+          -76.48159790039062,
+          4.815738201141357
+        ],
+        "M_from_published_edges_conventional_xyz": [
+          64.97727693795166,
+          -76.48160149226747,
+          4.815737859575252
+        ],
+        "M_ref_builder_xyz": [
+          64.97367858886719,
+          -76.48126220703125,
+          4.815646648406982
+        ],
+        "M_tf2_conventional_xyz": [
+          64.97727693795123,
+          -76.48160149226857,
+          4.8157378595752185
+        ],
+        "adapter_minus_reference_xyz": [
+          0.00360107421875,
+          -0.000335693359375,
+          9.1552734375e-05
+        ],
+        "raw_xyz": [
+          63.646446228027344,
+          -77.41255950927734,
+          4.708961486816406
+        ],
+        "selection": "distant_maximum_norm",
+        "source_row_index": 22265
+      }
+    ]
+  },
+  "extra_point_analysis": {
+    "classification": "A. consequence of the same transform discrepancy",
+    "net_retained_count_difference": 2,
+    "provenance_interpretation": "The output-count delta is a net difference, not two uniquely attributable source rows: seven rows enter the strict range and five rows leave it.",
+    "retained_only_by_m45b": [
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.197513000",
+        "history_index": 6,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 50.35570949316025,
+          "x_below_50": 49.64429050683975,
+          "y_above_minus_50": 80.8343505859375,
+          "y_below_50": 19.1656494140625,
+          "z_above_minus_5": 7.999706745147705,
+          "z_below_3": 0.0002932548522949219
+        },
+        "m45b_xyz": [
+          0.3557094931602478,
+          30.8343505859375,
+          2.999706745147705
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 50.18068914115429,
+          "x_below_50": 49.81931085884571,
+          "y_above_minus_50": 80.85017776489258,
+          "y_below_50": 19.149822235107422,
+          "z_above_minus_5": 8.000695705413818,
+          "z_below_3": -0.0006957054138183594
+        },
+        "reference_failed_boundaries": [
+          "z_below_3"
+        ],
+        "reference_xyz": [
+          0.18068914115428925,
+          30.850177764892578,
+          3.0006957054138184
+        ],
+        "source_row_index": 9499
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.147205000",
+        "history_index": 7,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 31.438011169433594,
+          "x_below_50": 68.5619888305664,
+          "y_above_minus_50": 53.90254831314087,
+          "y_below_50": 46.09745168685913,
+          "z_above_minus_5": 7.999268531799316,
+          "z_below_3": 0.0007314682006835938
+        },
+        "m45b_xyz": [
+          -18.561988830566406,
+          3.902548313140869,
+          2.9992685317993164
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 31.209131240844727,
+          "x_below_50": 68.79086875915527,
+          "y_above_minus_50": 53.92271327972412,
+          "y_below_50": 46.07728672027588,
+          "z_above_minus_5": 8.000467300415039,
+          "z_below_3": -0.0004673004150390625
+        },
+        "reference_failed_boundaries": [
+          "z_below_3"
+        ],
+        "reference_xyz": [
+          -18.790868759155273,
+          3.922713279724121,
+          3.000467300415039
+        ],
+        "source_row_index": 2526
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.147205000",
+        "history_index": 7,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 34.194687843322754,
+          "x_below_50": 65.80531215667725,
+          "y_above_minus_50": 53.97242259979248,
+          "y_below_50": 46.02757740020752,
+          "z_above_minus_5": 7.999192237854004,
+          "z_below_3": 0.0008077621459960938
+        },
+        "m45b_xyz": [
+          -15.805312156677246,
+          3.9724225997924805,
+          2.999192237854004
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 33.9658088684082,
+          "x_below_50": 66.0341911315918,
+          "y_above_minus_50": 53.99258756637573,
+          "y_below_50": 46.00741243362427,
+          "z_above_minus_5": 8.000391006469727,
+          "z_below_3": -0.0003910064697265625
+        },
+        "reference_failed_boundaries": [
+          "z_below_3"
+        ],
+        "reference_xyz": [
+          -16.034191131591797,
+          3.9925875663757324,
+          3.0003910064697266
+        ],
+        "source_row_index": 2815
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 31.1630916595459,
+          "x_below_50": 68.8369083404541,
+          "y_above_minus_50": 52.807748317718506,
+          "y_below_50": 47.192251682281494,
+          "z_above_minus_5": 7.999066352844238,
+          "z_below_3": 0.0009336471557617188
+        },
+        "m45b_xyz": [
+          -18.8369083404541,
+          2.807748317718506,
+          2.9990663528442383
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 30.870342254638672,
+          "x_below_50": 69.12965774536133,
+          "y_above_minus_50": 52.833290100097656,
+          "y_below_50": 47.166709899902344,
+          "z_above_minus_5": 8.000077724456787,
+          "z_below_3": -7.772445678710938e-05
+        },
+        "reference_failed_boundaries": [
+          "z_below_3"
+        ],
+        "reference_xyz": [
+          -19.129657745361328,
+          2.8332901000976562,
+          3.000077724456787
+        ],
+        "source_row_index": 2334
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 31.188720703125,
+          "x_below_50": 68.811279296875,
+          "y_above_minus_50": 52.913753032684326,
+          "y_below_50": 47.086246967315674,
+          "z_above_minus_5": 7.999598741531372,
+          "z_below_3": 0.0004012584686279297
+        },
+        "m45b_xyz": [
+          -18.811279296875,
+          2.913753032684326,
+          2.999598741531372
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 30.895971298217773,
+          "x_below_50": 69.10402870178223,
+          "y_above_minus_50": 52.93929481506348,
+          "y_below_50": 47.06070518493652,
+          "z_above_minus_5": 8.000610113143921,
+          "z_below_3": -0.0006101131439208984
+        },
+        "reference_failed_boundaries": [
+          "z_below_3"
+        ],
+        "reference_xyz": [
+          -19.104028701782227,
+          2.9392948150634766,
+          3.000610113143921
+        ],
+        "source_row_index": 2366
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 49.64317891001701,
+          "x_below_50": 50.35682108998299,
+          "y_above_minus_50": 99.99633407592773,
+          "y_below_50": 0.003665924072265625,
+          "z_above_minus_5": 4.9526543244719505,
+          "z_below_3": 3.0473456755280495
+        },
+        "m45b_xyz": [
+          -0.35682108998298645,
+          49.996334075927734,
+          -0.04734567552804947
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 49.350429356098175,
+          "x_below_50": 50.649570643901825,
+          "y_above_minus_50": 100.0218734741211,
+          "y_below_50": -0.02187347412109375,
+          "z_above_minus_5": 4.953665561974049,
+          "z_below_3": 3.0463344380259514
+        },
+        "reference_failed_boundaries": [
+          "y_below_50"
+        ],
+        "reference_xyz": [
+          -0.649570643901825,
+          50.021873474121094,
+          -0.046334438025951385
+        ],
+        "source_row_index": 9559
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 49.65270730853081,
+          "x_below_50": 50.34729269146919,
+          "y_above_minus_50": 99.99010467529297,
+          "y_below_50": 0.00989532470703125,
+          "z_above_minus_5": 6.160224199295044,
+          "z_below_3": 1.839775800704956
+        },
+        "m45b_xyz": [
+          -0.3472926914691925,
+          49.99010467529297,
+          1.160224199295044
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 49.35995775461197,
+          "x_below_50": 50.64004224538803,
+          "y_above_minus_50": 100.01564407348633,
+          "y_below_50": -0.015644073486328125,
+          "z_above_minus_5": 6.161235332489014,
+          "z_below_3": 1.8387646675109863
+        },
+        "reference_failed_boundaries": [
+          "y_below_50"
+        ],
+        "reference_xyz": [
+          -0.640042245388031,
+          50.01564407348633,
+          1.1612353324890137
+        ],
+        "source_row_index": 9560
+      }
+    ],
+    "retained_only_by_m45b_count": 7,
+    "retained_only_by_reference": [
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.397154000",
+        "history_index": 2,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 56.66001224517822,
+          "x_below_50": 43.33998775482178,
+          "y_above_minus_50": 81.1734733581543,
+          "y_below_50": 18.826526641845703,
+          "z_above_minus_5": 8.000312566757202,
+          "z_below_3": -0.00031256675720214844
+        },
+        "m45b_failed_boundaries": [
+          "z_below_3"
+        ],
+        "m45b_xyz": [
+          6.660012245178223,
+          31.173473358154297,
+          3.000312566757202
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 56.628029346466064,
+          "x_below_50": 43.371970653533936,
+          "y_above_minus_50": 81.17632484436035,
+          "y_below_50": 18.82367515563965,
+          "z_above_minus_5": 7.999560117721558,
+          "z_below_3": 0.0004398822784423828
+        },
+        "reference_xyz": [
+          6.6280293464660645,
+          31.17632484436035,
+          2.9995601177215576
+        ],
+        "source_row_index": 10171
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.347391000",
+        "history_index": 3,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 49.70600813627243,
+          "x_below_50": 50.29399186372757,
+          "y_above_minus_50": 33.16440963745117,
+          "y_below_50": 66.83559036254883,
+          "z_above_minus_5": 8.000075101852417,
+          "z_below_3": -7.510185241699219e-05
+        },
+        "m45b_failed_boundaries": [
+          "z_below_3"
+        ],
+        "m45b_xyz": [
+          -0.2939918637275696,
+          -16.835590362548828,
+          3.000075101852417
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 49.649824023246765,
+          "x_below_50": 50.350175976753235,
+          "y_above_minus_50": 33.16944885253906,
+          "y_below_50": 66.83055114746094,
+          "z_above_minus_5": 7.999223470687866,
+          "z_below_3": 0.0007765293121337891
+        },
+        "reference_xyz": [
+          -0.35017597675323486,
+          -16.830551147460938,
+          2.999223470687866
+        ],
+        "source_row_index": 26527
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.297096000",
+        "history_index": 4,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 81.27967071533203,
+          "x_below_50": 18.72032928466797,
+          "y_above_minus_50": 74.71610450744629,
+          "y_below_50": 25.28389549255371,
+          "z_above_minus_5": 8.000017404556274,
+          "z_below_3": -1.7404556274414062e-05
+        },
+        "m45b_failed_boundaries": [
+          "z_below_3"
+        ],
+        "m45b_xyz": [
+          31.27967071533203,
+          24.71610450744629,
+          3.0000174045562744
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 81.1910457611084,
+          "x_below_50": 18.8089542388916,
+          "y_above_minus_50": 74.72423553466797,
+          "y_below_50": 25.27576446533203,
+          "z_above_minus_5": 7.999637842178345,
+          "z_below_3": 0.00036215782165527344
+        },
+        "reference_xyz": [
+          31.1910457611084,
+          24.72423553466797,
+          2.9996378421783447
+        ],
+        "source_row_index": 14074
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 100.16156768798828,
+          "x_below_50": -0.16156768798828125,
+          "y_above_minus_50": 34.75148105621338,
+          "y_below_50": 65.24851894378662,
+          "z_above_minus_5": 6.504770755767822,
+          "z_below_3": 1.4952292442321777
+        },
+        "m45b_failed_boundaries": [
+          "x_below_50"
+        ],
+        "m45b_xyz": [
+          50.16156768798828,
+          -15.248518943786621,
+          1.5047707557678223
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 99.86882019042969,
+          "x_below_50": 0.1311798095703125,
+          "y_above_minus_50": 34.77702331542969,
+          "y_below_50": 65.22297668457031,
+          "z_above_minus_5": 6.505781888961792,
+          "z_below_3": 1.494218111038208
+        },
+        "reference_xyz": [
+          49.86882019042969,
+          -15.222976684570312,
+          1.505781888961792
+        ],
+        "source_row_index": 19672
+      },
+      {
+        "acquisition_identity": "nuscenes_lidar_top@1538984234.097442000",
+        "history_index": 8,
+        "m45b_boundary_distances": {
+          "x_above_minus_50": 100.13461303710938,
+          "x_below_50": -0.134613037109375,
+          "y_above_minus_50": 34.74648094177246,
+          "y_below_50": 65.25351905822754,
+          "z_above_minus_5": 7.7194178104400635,
+          "z_below_3": 0.2805821895599365
+        },
+        "m45b_failed_boundaries": [
+          "x_below_50"
+        ],
+        "m45b_xyz": [
+          50.134613037109375,
+          -15.253519058227539,
+          2.7194178104400635
+        ],
+        "reference_boundary_distances": {
+          "x_above_minus_50": 99.84186553955078,
+          "x_below_50": 0.15813446044921875,
+          "y_above_minus_50": 34.77202224731445,
+          "y_below_50": 65.22797775268555,
+          "z_above_minus_5": 7.720429182052612,
+          "z_below_3": 0.2795708179473877
+        },
+        "reference_xyz": [
+          49.84186553955078,
+          -15.227977752685547,
+          2.7204291820526123
+        ],
+        "source_row_index": 19673
+      }
+    ],
+    "retained_only_by_reference_count": 5
+  },
+  "failed_gate": {
+    "acceptance_changed": false,
+    "m45b_point_count": 354184,
+    "m45b_sha256": "50205b0992cc23e8cfde265430a51ae65fbf49cadce7b4f9e3b9f7bc0547f467",
+    "reference_point_count": 354182,
+    "reference_sha256": "5c1f5590ce7925d9312fe9ef755d0d849f579ff3d7ae842af75d41a0252cb29a"
+  },
+  "first_divergence": {
+    "first_element": {
+      "absolute_difference": 0.003604420320885232,
+      "column": 3,
+      "left": 0.020801097111830508,
+      "right": 0.017196676790945276,
+      "row": 0
+    },
+    "rotation_float32_bytes_exact": true,
+    "stage": "TransformStamped-to-SweepTransform adapter translation-column encoding",
+    "statement": "The first material divergence is introduced at the current TransformStamped-to-SweepTransform adapter, which stores -t instead of the pinned upstream -R^T@t translation column."
+  },
+  "frames": {
+    "fixed": "nuscenes_map",
+    "source": "nuscenes_lidar_top",
+    "target": "nuscenes_lidar_top",
+    "tree": "nuscenes_map -> nuscenes_ego -> nuscenes_lidar_top"
+  },
+  "historical_acquisition_identity": "nuscenes_lidar_top@1538984234.497223000",
+  "historical_index": 0,
+  "implementation_wip_commit": "931978d9faaf192e8d2e71409eb467d90a138a8f",
+  "matrix_comparisons": {
+    "M_adapter_precast_vs_M_adapter_float32": {
+      "exact_first_differing_element": {
+        "absolute_difference": 1.4329531006218588e-08,
+        "column": 0,
+        "left": 0.9998443269973777,
+        "right": 0.9998443126678467,
+        "row": 0
+      },
+      "first_material_differing_element": {
+        "absolute_difference": 1.4329531006218588e-08,
+        "column": 0,
+        "left": 0.9998443269973777,
+        "right": 0.9998443126678467,
+        "row": 0
+      },
+      "max_absolute_rotation_element_difference": 1.4329531006218588e-08,
+      "max_absolute_translation_difference": 7.346443453570828e-09,
+      "rotation_float32_bytes_exact": true,
+      "rotation_float64_exact": false,
+      "translation_float32_bytes_exact": true,
+      "translation_float64_exact": false
+    },
+    "M_from_published_edges_vs_M_tf2_conventional_float64": {
+      "exact_first_differing_element": {
+        "absolute_difference": 9.992007221626409e-16,
+        "column": 0,
+        "left": 0.9998443269973787,
+        "right": 0.9998443269973777,
+        "row": 0
+      },
+      "first_material_differing_element": null,
+      "max_absolute_rotation_element_difference": 9.992007221626409e-16,
+      "max_absolute_translation_difference": 1.1368683772161603e-12,
+      "rotation_float32_bytes_exact": true,
+      "rotation_float64_exact": false,
+      "translation_float32_bytes_exact": true,
+      "translation_float64_exact": false
+    },
+    "M_ref_vs_M_adapter_float32": {
+      "exact_first_differing_element": {
+        "absolute_difference": 0.003604419529438019,
+        "column": 3,
+        "left": 0.02080109715461731,
+        "right": 0.01719667762517929,
+        "row": 0
+      },
+      "first_material_differing_element": {
+        "absolute_difference": 0.003604419529438019,
+        "column": 3,
+        "left": 0.02080109715461731,
+        "right": 0.01719667762517929,
+        "row": 0
+      },
+      "max_absolute_rotation_element_difference": 0.0,
+      "max_absolute_translation_difference": 0.003604419529438019,
+      "rotation_float32_bytes_exact": true,
+      "rotation_float64_exact": true,
+      "translation_float32_bytes_exact": false,
+      "translation_float64_exact": false
+    },
+    "M_ref_vs_M_from_published_edges_reference_storage_float32": {
+      "exact_first_differing_element": null,
+      "first_material_differing_element": null,
+      "max_absolute_rotation_element_difference": 0.0,
+      "max_absolute_translation_difference": 0.0,
+      "rotation_float32_bytes_exact": true,
+      "rotation_float64_exact": true,
+      "translation_float32_bytes_exact": true,
+      "translation_float64_exact": true
+    },
+    "M_tf2_reference_semantics_vs_M_adapter_precast_float64": {
+      "exact_first_differing_element": {
+        "absolute_difference": 0.003604420320885232,
+        "column": 3,
+        "left": 0.020801097111830508,
+        "right": 0.017196676790945276,
+        "row": 0
+      },
+      "first_material_differing_element": {
+        "absolute_difference": 0.003604420320885232,
+        "column": 3,
+        "left": 0.020801097111830508,
+        "right": 0.017196676790945276,
+        "row": 0
+      },
+      "max_absolute_rotation_element_difference": 0.0,
+      "max_absolute_translation_difference": 0.003604420320885232,
+      "rotation_float32_bytes_exact": true,
+      "rotation_float64_exact": true,
+      "translation_float32_bytes_exact": false,
+      "translation_float64_exact": false
+    }
+  },
+  "raw_nuscenes_records": {
+    "current_calibrated_sensor": {
+      "camera_intrinsic": [],
+      "rotation": [
+        0.7077955119163518,
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817
+      ],
+      "sensor_token": "dc8b396651c05aedbb9cdaae573bb567",
+      "token": "00e93a09857648a8b723b48db4236602",
+      "translation": [
+        0.943713,
+        0.0,
+        1.84023
+      ]
+    },
+    "current_ego_pose": {
+      "rotation": [
+        0.6782718418961043,
+        0.006612868107668059,
+        -0.0023497046355634562,
+        -0.7347775563763375
+      ],
+      "timestamp": 1538984234547551,
+      "token": "4258ba3b8b8142f48c3249d310a8c3d2",
+      "translation": [
+        716.0570033520877,
+        1805.9828064891144,
+        0.0
+      ]
+    },
+    "historical_calibrated_sensor": {
+      "camera_intrinsic": [],
+      "rotation": [
+        0.7077955119163518,
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817
+      ],
+      "sensor_token": "dc8b396651c05aedbb9cdaae573bb567",
+      "token": "00e93a09857648a8b723b48db4236602",
+      "translation": [
+        0.943713,
+        0.0,
+        1.84023
+      ]
+    },
+    "historical_ego_pose": {
+      "rotation": [
+        0.6847270270706431,
+        0.006524442121101203,
+        -0.0020064390550348756,
+        -0.7287676613683722
+      ],
+      "timestamp": 1538984234497223,
+      "token": "8b6d9970938a4457b5a2effb877de6f7",
+      "translation": [
+        716.0722899757907,
+        1806.1874531637313,
+        0.0
+      ]
+    }
+  },
+  "recommendation": "EXACT PARITY APPEARS FIXABLE \u2014 owner review should consider correcting only the adapter translation-column encoding to the pinned -R^T@t convention. No fix was implemented in this diagnostic turn.",
+  "replay_published_edges": [
+    {
+      "child_frame": "nuscenes_ego",
+      "derived": false,
+      "inverse_before_publication": false,
+      "matrix_decomposition": false,
+      "parent_frame": "nuscenes_map",
+      "publisher_quaternion_normalization": false,
+      "quaternion_norm": 1.0000000000000004,
+      "quaternion_wxyz_raw": [
+        0.6847270270706431,
+        0.006524442121101203,
+        -0.0020064390550348756,
+        -0.7287676613683722
+      ],
+      "quaternion_xyzw": [
+        0.006524442121101203,
+        -0.0020064390550348756,
+        -0.7287676613683722,
+        0.6847270270706431
+      ],
+      "source": "direct raw nuScenes ego_pose",
+      "timestamp": {
+        "microseconds": 1538984234497223,
+        "nanosec": 497223000,
+        "nanoseconds": 1538984234497223000,
+        "sec": 1538984234
+      },
+      "translation_xyz": [
+        716.0722899757907,
+        1806.1874531637313,
+        0.0
+      ]
+    },
+    {
+      "child_frame": "nuscenes_lidar_top",
+      "derived": false,
+      "inverse_before_publication": false,
+      "matrix_decomposition": false,
+      "parent_frame": "nuscenes_ego",
+      "publisher_quaternion_normalization": false,
+      "quaternion_norm": 1.0,
+      "quaternion_wxyz_raw": [
+        0.7077955119163518,
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817
+      ],
+      "quaternion_xyzw": [
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817,
+        0.7077955119163518
+      ],
+      "source": "direct raw nuScenes calibrated_sensor",
+      "timestamp": {
+        "microseconds": 1538984234497223,
+        "nanosec": 497223000,
+        "nanoseconds": 1538984234497223000,
+        "sec": 1538984234
+      },
+      "translation_xyz": [
+        0.943713,
+        0.0,
+        1.84023
+      ]
+    },
+    {
+      "child_frame": "nuscenes_ego",
+      "derived": false,
+      "inverse_before_publication": false,
+      "matrix_decomposition": false,
+      "parent_frame": "nuscenes_map",
+      "publisher_quaternion_normalization": false,
+      "quaternion_norm": 0.9999999999999998,
+      "quaternion_wxyz_raw": [
+        0.6782718418961043,
+        0.006612868107668059,
+        -0.0023497046355634562,
+        -0.7347775563763375
+      ],
+      "quaternion_xyzw": [
+        0.006612868107668059,
+        -0.0023497046355634562,
+        -0.7347775563763375,
+        0.6782718418961043
+      ],
+      "source": "direct raw nuScenes ego_pose",
+      "timestamp": {
+        "microseconds": 1538984234547551,
+        "nanosec": 547551000,
+        "nanoseconds": 1538984234547551000,
+        "sec": 1538984234
+      },
+      "translation_xyz": [
+        716.0570033520877,
+        1805.9828064891144,
+        0.0
+      ]
+    },
+    {
+      "child_frame": "nuscenes_lidar_top",
+      "derived": false,
+      "inverse_before_publication": false,
+      "matrix_decomposition": false,
+      "parent_frame": "nuscenes_ego",
+      "publisher_quaternion_normalization": false,
+      "quaternion_norm": 1.0,
+      "quaternion_wxyz_raw": [
+        0.7077955119163518,
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817
+      ],
+      "quaternion_xyzw": [
+        -0.006492242056004365,
+        0.010646214713995808,
+        -0.7063073142877817,
+        0.7077955119163518
+      ],
+      "source": "direct raw nuScenes calibrated_sensor",
+      "timestamp": {
+        "microseconds": 1538984234547551,
+        "nanosec": 547551000,
+        "nanoseconds": 1538984234547551000,
+        "sec": 1538984234
+      },
+      "translation_xyz": [
+        0.943713,
+        0.0,
+        1.84023
+      ]
+    }
+  ],
+  "replay_source_audit": {
+    "calibration_values_identical_at_source_and_target": true,
+    "composed_matrix_decomposed_before_publication": false,
+    "dynamic_edges": [
+      "nuscenes_map->nuscenes_ego",
+      "nuscenes_ego->nuscenes_lidar_top"
+    ],
+    "ego_to_lidar": "direct raw nuScenes calibrated_sensor at each acquisition timestamp",
+    "inversion_before_publication": false,
+    "map_to_ego": "direct raw nuScenes ego_pose at each acquisition timestamp",
+    "quaternion_normalized_by_replay": false,
+    "static_edges": []
+  },
+  "sample_index": 42,
+  "sample_token": "07fad91090c746ccaa1b2bdb55329e20",
+  "schema_version": 1,
+  "status": "diagnostic_only_exact_gate_still_failed",
+  "times": {
+    "requested_times_exactly_match_published_samples": true,
+    "source": {
+      "microseconds": 1538984234497223,
+      "nanosec": 497223000,
+      "nanoseconds": 1538984234497223000,
+      "sec": 1538984234
+    },
+    "target": {
+      "microseconds": 1538984234547551,
+      "nanosec": 547551000,
+      "nanoseconds": 1538984234547551000,
+      "sec": 1538984234
+    },
+    "tf2_interpolation": false
+  }
+}
