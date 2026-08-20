@@ -369,19 +369,25 @@ def _sample_gate(
         "point_count": int(ros_record["final_point_count"]),
         "raw_ros_counters": ros_record["counters"],
         "model_ready_input": input_comparison,
+        "detector_boundary": "same model-ready runtime preparation for reference and raw ROS input",
     }
     if not bool(input_comparison["exact"]):
         sample["status"] = "failed_model_ready_input"
         sample["downstream"] = "not_run"
         return sample, False
 
-    observed_prepared = backend.prepare_model_ready_points(
+    reference_runtime_prepared = backend.prepare_model_ready_points(
+        reference_points,
+        sample_id=reference_prepared.sample_id,
+        coordinate_frame=reference_prepared.coordinate_frame,
+    )
+    observed_runtime_prepared = backend.prepare_model_ready_points(
         observed_points,
         sample_id=reference_prepared.sample_id,
-        coordinate_frame="nuscenes_lidar_top",
+        coordinate_frame=reference_prepared.coordinate_frame,
     )
-    reference_voxels = backend.voxelize_official(reference_prepared)
-    observed_voxels = backend.voxelize(observed_prepared)
+    reference_voxels = backend.voxelize(reference_runtime_prepared)
+    observed_voxels = backend.voxelize(observed_runtime_prepared)
     voxel_records: dict[str, object] = {}
     voxels_exact = True
     accepted_voxels = detector_reference["voxel_hashes"]["official"]
