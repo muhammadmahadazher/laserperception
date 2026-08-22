@@ -25,6 +25,7 @@ from laserperception.detection.m6b_engine_remediation import (
     NON_EVALUATION_DRIVE,
     load_engine_manifest,
     reject_evaluation_drive,
+    select_profile_gap_frames,
     select_repeatability_frames,
     select_third_drive_frames,
     validate_candidate_manifest,
@@ -44,7 +45,8 @@ from laserperception.evaluation.m6b_input_oracle import (
 from laserperception.evaluation.m6b_pillars import analyze_pillars
 
 RAW_NAMES = ("cls_score", "bbox_pred", "dir_cls_pred")
-HISTORY = 10
+R1_HISTORY = 10
+GAP_HISTORY = 5
 
 
 def _root() -> Path:
@@ -171,11 +173,12 @@ def _selection(args: argparse.Namespace) -> int:
     reject_evaluation_drive(args.drive_id)
     date_root = args.data_root.expanduser().resolve() / "2011_09_30"
     sequence = KittiRawSequence(date_root, date_root / f"{args.drive_id}_sync")
+    history = int(args.history)
     frames: list[dict[str, object]] = []
-    for frame_index in range(HISTORY, len(sequence)):
+    for frame_index in range(history, len(sequence)):
         reconstruction = sequence.reconstruct(
             frame_index,
-            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=HISTORY)),
+            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=history)),
         )
         points = reconstruction.point_cloud.points_xyzt
         audit = analyze_pillars(points)
@@ -190,8 +193,11 @@ def _selection(args: argparse.Namespace) -> int:
             }
         )
         if len(frames) == 1 or len(frames) % 50 == 0 or frame_index == len(sequence) - 1:
-            print(f"input-only census {len(frames)}/{len(sequence) - HISTORY}", flush=True)
-    selected = select_third_drive_frames(frames)
+            print(f"input-only census {len(frames)}/{len(sequence) - history}", flush=True)
+    profile_gap = bool(args.profile_gap)
+    selected = (
+        select_profile_gap_frames(frames) if profile_gap else select_third_drive_frames(frames)
+    )
     for record in selected:
         frame_index = int(record["frame_index"])
         frozen = freeze_sweep_transforms(sequence, frame_index)
@@ -199,28 +205,55 @@ def _selection(args: argparse.Namespace) -> int:
             sequence,
             frame_index,
             frozen,
-            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=HISTORY)),
+            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=history)),
         )
         if _array_sha256(reproduction.point_cloud.points_xyzt) != record["model_ready_sha256"]:
             raise RuntimeError("frozen third-drive transforms changed a selected model-ready input")
         record["frozen_sweep_transforms"] = list(frozen)
     record = {
         "schema_version": 1,
-        "milestone": "M6b-R1",
-        "status": "non_evaluation_input_only_selection_frozen",
+        "milestone": "M6b-R2" if profile_gap else "M6b-R1",
+        "status": (
+            "non_evaluation_H5_profile_gap_selection_frozen"
+            if profile_gap
+            else "non_evaluation_input_only_selection_frozen"
+        ),
         "measurement_commit": measurement_commit,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "network_output_produced": False,
         "evaluation_drives_used": [],
         "drive_id": args.drive_id,
-        "history": {"historical_sweeps": HISTORY, "current_plus_history": HISTORY + 1},
+        "history": {"historical_sweeps": history, "current_plus_history": history + 1},
         "eligible_frame_count": len(frames),
         "voxel_count_distribution": _distribution([int(frame["voxel_count"]) for frame in frames]),
-        "selection_policy": {
-            "nearest_rank_quantiles_percent": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100],
-            "tie_break": "lower_frame_index",
-            "dedup_fill": "greatest_unused_voxel_count_distance_then_lower_frame_index",
-        },
+        "selection_policy": (
+            {
+                "blind_interval_inclusive": [22547, 29422],
+                "target_voxel_counts": [23000, 25000, 27000, 29000],
+                "choice": "minimum_absolute_voxel_count_distance",
+                "tie_break": "lower_frame_index",
+                "minimum_distinct_frames": 3,
+            }
+            if profile_gap
+            else {
+                "nearest_rank_quantiles_percent": [
+                    0,
+                    10,
+                    20,
+                    30,
+                    40,
+                    50,
+                    60,
+                    70,
+                    80,
+                    90,
+                    95,
+                    100,
+                ],
+                "tie_break": "lower_frame_index",
+                "dedup_fill": "greatest_unused_voxel_count_distance_then_lower_frame_index",
+            }
+        ),
         "coverage": _distribution([int(frame["voxel_count"]) for frame in selected]),
         "selected_frames": selected,
         "all_input_only_frames": frames,
@@ -279,16 +312,28 @@ def _kitti_parity(args: argparse.Namespace) -> int:
     if sha256_file(parity_path) != candidate["validation"]["parity_protocol_sha256"]:
         raise RuntimeError("frozen M2 parity-v2 protocol SHA256 changed")
     selection = json.loads(args.selection.read_text(encoding="utf-8"))
-    if selection["status"] != "non_evaluation_input_only_selection_frozen":
+    status = str(selection["status"])
+    if status not in {
+        "non_evaluation_input_only_selection_frozen",
+        "non_evaluation_H5_profile_gap_selection_frozen",
+    }:
         raise RuntimeError("third-drive selection is not frozen input-only evidence")
     if selection["measurement_commit"] != measurement_commit:
         raise RuntimeError("third-drive selection was not generated at this measurement commit")
     drive_id = str(selection["drive_id"])
     reject_evaluation_drive(drive_id)
     selected = selection["selected_frames"]
-    if len(selected) != 12:
+    profile_gap = status == "non_evaluation_H5_profile_gap_selection_frozen"
+    history = GAP_HISTORY if profile_gap else R1_HISTORY
+    if profile_gap and not 3 <= len(selected) <= 4:
+        raise RuntimeError("profile-gap parity requires three or four frozen frames")
+    if not profile_gap and len(selected) != 12:
         raise RuntimeError("third-drive parity requires exactly 12 frozen frames")
-    recomputed = select_third_drive_frames(selection["all_input_only_frames"])
+    recomputed = (
+        select_profile_gap_frames(selection["all_input_only_frames"])
+        if profile_gap
+        else select_third_drive_frames(selection["all_input_only_frames"])
+    )
     expected_identity = [
         (int(record["frame_index"]), int(record["voxel_count"])) for record in recomputed
     ]
@@ -331,7 +376,7 @@ def _kitti_parity(args: argparse.Namespace) -> int:
             sequence,
             frame_index,
             record["frozen_sweep_transforms"],
-            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=HISTORY)),
+            builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=history)),
         )
         points = reproduction.point_cloud.points_xyzt
         if _array_sha256(points) != record["model_ready_sha256"]:
@@ -398,11 +443,15 @@ def _kitti_parity(args: argparse.Namespace) -> int:
     stage_1 = _stage_1(reports, parity)
     result = {
         "schema_version": 1,
-        "milestone": "M6b-R1",
+        "milestone": "M6b-R2" if profile_gap else "M6b-R1",
         "status": "pass" if stage_1["overall_pass"] else "fail",
         "measurement_commit": measurement_commit,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "gate": "non_evaluation_KITTI_rewritten_PyTorch_FP32_vs_structural_40k_TensorRT_FP16",
+        "gate": (
+            "non_evaluation_KITTI_H5_profile_gap_rewritten_PyTorch_FP32_vs_structural_40k_TensorRT_FP16"
+            if profile_gap
+            else "non_evaluation_KITTI_rewritten_PyTorch_FP32_vs_structural_40k_TensorRT_FP16"
+        ),
         "drive_id": drive_id,
         "evaluation_drives_used": [],
         "ground_truth_metrics_run": False,
@@ -448,6 +497,10 @@ def _kitti_parity(args: argparse.Namespace) -> int:
         print(json.dumps(stage_1, indent=2, sort_keys=True))
         return 2
 
+    if profile_gap:
+        print(json.dumps({"stage_1": stage_1}, indent=2))
+        return 0
+
     repeat_frames = select_repeatability_frames(selected)
     repeat_results: dict[str, object] = {}
     for role, record in repeat_frames.items():
@@ -482,6 +535,8 @@ def _kitti_parity(args: argparse.Namespace) -> int:
         "evaluation_drives_used": [],
         "samples": repeat_results,
     }
+    if args.repeatability_output is None:
+        raise RuntimeError("R1 repeatability output path is required")
     _write_json(args.repeatability_output, repeatability)
     print(json.dumps({"stage_1": stage_1, "repeatability": repeatability}, indent=2))
     return 0 if repeatability["status"] == "pass" else 3
@@ -494,21 +549,36 @@ def build_parser() -> argparse.ArgumentParser:
     select.add_argument("--data-root", type=Path, required=True)
     select.add_argument("--output", type=Path, required=True)
     select.add_argument("--drive-id", default=NON_EVALUATION_DRIVE)
+    select.set_defaults(history=R1_HISTORY, profile_gap=False)
+    gap_select = subparsers.add_parser(
+        "gap-select", help="freeze the input-only drive-0016 H5 profile-gap set"
+    )
+    gap_select.add_argument("--data-root", type=Path, required=True)
+    gap_select.add_argument("--output", type=Path, required=True)
+    gap_select.add_argument("--drive-id", default=NON_EVALUATION_DRIVE)
+    gap_select.set_defaults(history=GAP_HISTORY, profile_gap=True)
     parity = subparsers.add_parser("kitti-parity", help="run Gate 2 and repeatability")
     parity.add_argument("--data-root", type=Path, required=True)
     parity.add_argument("--selection", type=Path, required=True)
     parity.add_argument("--engine", type=Path, required=True)
     parity.add_argument("--engine-sha256", required=True)
     parity.add_argument("--output", type=Path, required=True)
-    parity.add_argument("--repeatability-output", type=Path, required=True)
+    parity.add_argument("--repeatability-output", type=Path)
+    gap_parity = subparsers.add_parser("gap-parity", help="run the R2 H5 profile-gap parity gate")
+    gap_parity.add_argument("--data-root", type=Path, required=True)
+    gap_parity.add_argument("--selection", type=Path, required=True)
+    gap_parity.add_argument("--engine", type=Path, required=True)
+    gap_parity.add_argument("--engine-sha256", required=True)
+    gap_parity.add_argument("--output", type=Path, required=True)
+    gap_parity.set_defaults(repeatability_output=None)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    if args.command == "select":
+    if args.command in {"select", "gap-select"}:
         return _selection(args)
-    if args.command == "kitti-parity":
+    if args.command in {"kitti-parity", "gap-parity"}:
         return _kitti_parity(args)
     raise AssertionError(f"unsupported command: {args.command}")
 

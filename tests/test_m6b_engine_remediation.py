@@ -13,6 +13,7 @@ from laserperception.detection.m6b_engine_remediation import (
     profile_shapes,
     reject_evaluation_drive,
     resolve_build_manifest_path,
+    select_profile_gap_frames,
     select_repeatability_frames,
     select_third_drive_frames,
     validate_candidate_manifest,
@@ -134,3 +135,33 @@ def test_selection_fails_closed_without_new_envelope_coverage() -> None:
     frames = [{"frame_index": index, "voxel_count": 20000 + index} for index in range(12)]
     with pytest.raises(ValueError, match="PROFILE-COVERAGE INSUFFICIENT"):
         select_third_drive_frames(frames)
+
+
+def test_profile_gap_selection_targets_band_and_is_deterministic() -> None:
+    frames = [
+        {"frame_index": index, "voxel_count": count}
+        for index, count in enumerate((22000, 22800, 23100, 24900, 25100, 27050, 28800, 29500))
+    ]
+
+    first = select_profile_gap_frames(frames)
+    second = select_profile_gap_frames(list(reversed(frames)))
+
+    assert first == second
+    assert [(item["frame_index"], item["voxel_count"]) for item in first] == [
+        (2, 23100),
+        (3, 24900),
+        (5, 27050),
+        (6, 28800),
+    ]
+    assert [item["selection_target_voxels"] for item in first] == [23000, 25000, 27000, 29000]
+
+
+def test_profile_gap_selection_fails_with_fewer_than_three_frames() -> None:
+    frames = [
+        {"frame_index": 1, "voxel_count": 23000},
+        {"frame_index": 2, "voxel_count": 25000},
+        {"frame_index": 3, "voxel_count": 30000},
+    ]
+
+    with pytest.raises(ValueError, match="PROFILE GAP COVERAGE INSUFFICIENT"):
+        select_profile_gap_frames(frames)

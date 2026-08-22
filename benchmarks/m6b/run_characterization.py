@@ -57,7 +57,11 @@ from laserperception.evaluation.m6b_pillars import (
     spatial_regions,
 )
 
-PROTOCOL_COMMIT = "16e2f7734061a5d0c2c2dec7b44f8b31e21591ae"
+ORIGINAL_PROTOCOL_COMMIT = "16e2f7734061a5d0c2c2dec7b44f8b31e21591ae"
+R1_PROTOCOL_COMMIT = "c3c4fd9faf41396ad5a7553757d222fc20981169"
+R1_VALIDATION_COMMIT = "d1f534d79b85f6d67c54ebc70b99d7b92cd31413"
+R1_EVIDENCE_COMMIT = "b28a273694b2d943bb2fe8797001d9ff366cd640"
+PROTOCOL_R2_PATH = "docs/m6/M6B_PROTOCOL_R2.md"
 EXPECTED_CONFIG_PATH = "configs/m6/kitti_m6b.yaml"
 EXPECTED_LEDGER_SHA256 = "2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480"
 BASE_MAIN_COMMIT = "91fecf94dc5373c77d614b042e2db58cbe5f7063"
@@ -70,6 +74,9 @@ CONDITIONS = {"H10": 10, "H5": 5}
 CLASSES = ("car", "pedestrian")
 IOU_THRESHOLDS = (0.30, 0.50, 0.70)
 OPERATING_SCORE = 0.25
+CANDIDATE_ENGINE_SHA256 = "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f"
+HISTORICAL_ENGINE_SHA256 = "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b"
+BLOCKER_EVIDENCE_SHA256 = "dfd595dcab5ce41e8846e128de85092c2c8f9d3f98b9aba99f488b03332ed2fb"
 
 
 def _root() -> Path:
@@ -172,12 +179,25 @@ def _clean_measurement_tree(root: Path) -> None:
     if status:
         raise RuntimeError("M6b measurement requires a clean committed worktree")
     ancestor = subprocess.run(
-        ["git", "merge-base", "--is-ancestor", PROTOCOL_COMMIT, "HEAD"],
+        ["git", "merge-base", "--is-ancestor", ORIGINAL_PROTOCOL_COMMIT, "HEAD"],
         cwd=root,
         check=False,
     )
     if ancestor.returncode != 0:
         raise RuntimeError("measurement commit does not descend from the frozen protocol commit")
+    protocol_path = root / PROTOCOL_R2_PATH
+    if not protocol_path.is_file():
+        raise RuntimeError("final owner-approved M6b Protocol R2 is not committed")
+    protocol_commit = subprocess.run(
+        ["git", "log", "-1", "--format=%H", "--", PROTOCOL_R2_PATH],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    head = repository_git_sha(root)
+    if protocol_commit != head:
+        raise RuntimeError("measurement HEAD must be the final Protocol R2 commit")
 
 
 def _artifact(path: Path, expected: str) -> dict[str, object]:
@@ -580,79 +600,57 @@ def _run_inference(
     return frame, execution, audit, raw
 
 
-def _repeatability(
-    backend: M2Backend,
-    engine: Path,
-    sequences: Mapping[str, KittiRawSequence],
-    ledger_by_id: Mapping[str, Mapping[str, object]],
-    sentinels: Sequence[Mapping[str, object]],
-) -> dict[str, object]:
-    results = []
-    for sentinel in sentinels:
-        frame_id = str(sentinel["frame_id"])
-        drive, raw_index = frame_id.split("/", 1)
-        raw_hashes: list[dict[str, str]] = []
-        frame_hashes: list[str] = []
-        for repetition in range(10):
-            frame, execution, _, _ = _run_inference(
-                backend,
-                engine,
-                sequences[drive],
-                int(raw_index),
-                10,
-                ledger_by_id[frame_id],
-            )
-            raw_hashes.append(execution["raw_output_hashes"])
-            frame_hashes.append(_json_sha256(frame.to_dict()))
-            print(f"repeat {frame_id} {repetition + 1}/10", flush=True)
-        raw_exact = all(value == raw_hashes[0] for value in raw_hashes)
-        frame_exact = len(set(frame_hashes)) == 1
-        results.append(
-            {
-                "role": sentinel["role"],
-                "frame_id": frame_id,
-                "repetitions": 10,
-                "raw_output_hashes": raw_hashes,
-                "detection_frame_hashes": frame_hashes,
-                "raw_outputs_exact": raw_exact,
-                "detection_frames_exact": frame_exact,
-            }
-        )
-        if not raw_exact or not frame_exact:
-            return {
-                "passed": False,
-                "sentinel_count": len(results),
-                "samples": results,
-            }
-    return {"passed": True, "sentinel_count": len(results), "samples": results}
+def _atomic_write_json(path: Path, record: Mapping[str, object]) -> None:
+    encoded = json.dumps(record, indent=2, sort_keys=True) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(encoded, encoding="utf-8")
+    temporary.replace(path)
 
 
-def _condition_run(
+def _condition_key(frame_id: str, condition: str) -> str:
+    return f"{frame_id}|{condition}"
+
+
+def _checkpoint_path(progress_root: Path, frame_id: str, condition: str) -> Path:
+    drive, frame_index = frame_id.split("/", 1)
+    return progress_root / "predictions" / drive / f"{frame_index}_{condition.lower()}.json"
+
+
+def _detection_from_dict(record: Mapping[str, object]) -> Detection3D:
+    velocity = record.get("velocity_xy")
+    return Detection3D(
+        center_xyz=tuple(float(value) for value in record["center_xyz"]),  # type: ignore[arg-type]
+        size_lwh=tuple(float(value) for value in record["size_lwh"]),  # type: ignore[arg-type]
+        yaw_rad=float(record["yaw_rad"]),
+        score=float(record["score"]),
+        class_id=int(record["class_id"]),
+        class_name=str(record["class_name"]),
+        velocity_xy=(
+            None if velocity is None else tuple(float(value) for value in velocity)  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _evaluate_frame(
+    frame: DetectionFrame,
+    execution: Mapping[str, object],
+    audit: PillarAudit,
+    frame_id: str,
     condition: str,
-    backend: M2Backend,
-    engine: Path,
-    sequences: Mapping[str, KittiRawSequence],
     poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
     camera: KittiReferenceCamera,
-    ledger_frames: Sequence[Mapping[str, object]],
     track_labelled_counts: Mapping[tuple[str, int], int],
-) -> list[dict[str, object]]:
-    history = CONDITIONS[condition]
-    results: list[dict[str, object]] = []
-    for rank, expected in enumerate(ledger_frames, start=1):
-        frame_id = str(expected["frame_id"])
-        drive, raw_index = frame_id.split("/", 1)
-        frame, execution, audit, _ = _run_inference(
-            backend,
-            engine,
-            sequences[drive],
-            int(raw_index),
-            history,
-            expected,
-        )
-        eligible = _eligible_poses(poses_by_frame.get(frame_id, ()), camera)
-        inside, outside = _prediction_fov(frame.detections, camera)
-        class_results = {
+) -> dict[str, object]:
+    eligible = _eligible_poses(poses_by_frame.get(frame_id, ()), camera)
+    inside, outside = _prediction_fov(frame.detections, camera)
+    return {
+        "frame_id": frame_id,
+        "frame_index": int(frame_id.rsplit("/", 1)[1]),
+        "condition": condition,
+        "execution": dict(execution),
+        "outside_annotation_fov_predictions_all_classes": len(outside),
+        "classes": {
             class_name: _class_evaluation(
                 frame_id,
                 class_name,
@@ -663,21 +661,370 @@ def _condition_run(
                 track_labelled_counts,
             )
             for class_name in CLASSES
+        },
+        "_detections": frame.detections,
+        "_detection_frame": frame.to_dict(),
+    }
+
+
+def _run_evaluated_condition(
+    condition: str,
+    backend: M2Backend,
+    engine: Path,
+    sequences: Mapping[str, KittiRawSequence],
+    poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
+    camera: KittiReferenceCamera,
+    expected: Mapping[str, object],
+    track_labelled_counts: Mapping[tuple[str, int], int],
+) -> dict[str, object]:
+    history = CONDITIONS[condition]
+    frame_id = str(expected["frame_id"])
+    drive, raw_index = frame_id.split("/", 1)
+    frame, execution, audit, _ = _run_inference(
+        backend,
+        engine,
+        sequences[drive],
+        int(raw_index),
+        history,
+        expected,
+    )
+    return _evaluate_frame(
+        frame,
+        execution,
+        audit,
+        frame_id,
+        condition,
+        poses_by_frame,
+        camera,
+        track_labelled_counts,
+    )
+
+
+def _progress_totals(records: Mapping[str, Mapping[str, object]]) -> dict[str, int]:
+    totals: dict[str, int] = {}
+    for condition in CONDITIONS:
+        values = [
+            str(record["status"])
+            for key, record in records.items()
+            if key.endswith(f"|{condition}")
+        ]
+        totals[f"completed_{condition}"] = values.count("COMPLETE")
+        totals[f"remaining_{condition}"] = len(values) - values.count("COMPLETE")
+    return totals
+
+
+def _initialize_progress(
+    progress_root: Path,
+    identity: Mapping[str, object],
+    ledger_frames: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    identity_path = progress_root / "progress" / "identity.json"
+    progress_path = progress_root / "progress" / "ledger.json"
+    if identity_path.exists():
+        existing = json.loads(identity_path.read_text(encoding="utf-8"))
+        if existing != dict(identity):
+            raise RuntimeError("local M6b-R2 resume identity differs from this measurement")
+    else:
+        if progress_path.exists() or (progress_root / "predictions").exists():
+            raise RuntimeError("local M6b-R2 progress exists without a validated identity")
+        _atomic_write_json(identity_path, dict(identity))
+    expected_keys = [
+        _condition_key(str(frame["frame_id"]), condition)
+        for frame in ledger_frames
+        for condition in CONDITIONS
+    ]
+    if progress_path.exists():
+        progress = json.loads(progress_path.read_text(encoding="utf-8"))
+        if progress["identity"] != dict(identity):
+            raise RuntimeError("progress ledger identity differs from this measurement")
+        if set(progress["conditions"]) != set(expected_keys):
+            raise RuntimeError("progress ledger condition set differs from the frozen corpus")
+    else:
+        progress = {
+            "schema_version": 1,
+            "identity": dict(identity),
+            "conditions": {key: {"status": "PENDING"} for key in expected_keys},
         }
-        results.append(
-            {
-                "frame_id": frame_id,
-                "frame_index": int(raw_index),
-                "condition": condition,
-                "execution": execution,
-                "outside_annotation_fov_predictions_all_classes": len(outside),
-                "classes": class_results,
-                "_detections": frame.detections,
-            }
+    progress["totals"] = _progress_totals(progress["conditions"])
+    progress["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+    _atomic_write_json(progress_path, progress)
+    return progress
+
+
+def _set_progress(
+    progress_root: Path,
+    progress: dict[str, object],
+    key: str,
+    status: str,
+    *,
+    checkpoint_sha256: str | None = None,
+) -> None:
+    conditions = progress["conditions"]
+    assert isinstance(conditions, dict)
+    record: dict[str, object] = {
+        "status": status,
+        "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    if checkpoint_sha256 is not None:
+        record["checkpoint_sha256"] = checkpoint_sha256
+    conditions[key] = record
+    progress["totals"] = _progress_totals(conditions)
+    progress["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+    _atomic_write_json(progress_root / "progress" / "ledger.json", progress)
+
+
+def _checkpoint_record(
+    result: Mapping[str, object], identity: Mapping[str, object]
+) -> dict[str, object]:
+    frame = result["_detection_frame"]
+    assert isinstance(frame, Mapping)
+    execution = result["execution"]
+    assert isinstance(execution, Mapping)
+    return {
+        "schema_version": 1,
+        "status": "COMPLETE",
+        "identity": dict(identity),
+        "frame_id": result["frame_id"],
+        "frame_index": result["frame_index"],
+        "condition": result["condition"],
+        "model_ready_sha256": execution["model_ready_sha256"],
+        "voxel_count": execution["voxel_count"],
+        "raw_output_hashes": execution["raw_output_hashes"],
+        "detection_frame_sha256": _json_sha256(frame),
+        "detection_frame": dict(frame),
+        "execution": dict(execution),
+        "outside_annotation_fov_predictions_all_classes": result[
+            "outside_annotation_fov_predictions_all_classes"
+        ],
+        "classes": result["classes"],
+        "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def _load_checkpoint(
+    path: Path,
+    identity: Mapping[str, object],
+    expected: Mapping[str, object],
+    condition: str,
+) -> dict[str, object]:
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if record.get("status") != "COMPLETE" or record.get("identity") != dict(identity):
+        raise RuntimeError(f"invalid completed checkpoint identity: {path.name}")
+    frame_id = str(expected["frame_id"])
+    if record.get("frame_id") != frame_id or record.get("condition") != condition:
+        raise RuntimeError(f"completed checkpoint targets the wrong condition: {path.name}")
+    expected_condition = expected[condition.lower()]
+    if record.get("model_ready_sha256") != expected_condition["model_ready_sha256"]:
+        raise RuntimeError(f"completed checkpoint input hash mismatch: {path.name}")
+    frame = record["detection_frame"]
+    if record.get("detection_frame_sha256") != _json_sha256(frame):
+        raise RuntimeError(f"completed checkpoint DetectionFrame hash mismatch: {path.name}")
+    detections = tuple(_detection_from_dict(value) for value in frame["detections"])
+    return {
+        "frame_id": frame_id,
+        "frame_index": int(record["frame_index"]),
+        "condition": condition,
+        "execution": record["execution"],
+        "outside_annotation_fov_predictions_all_classes": record[
+            "outside_annotation_fov_predictions_all_classes"
+        ],
+        "classes": record["classes"],
+        "_detections": detections,
+        "_detection_frame": frame,
+    }
+
+
+def _save_checkpoint(
+    progress_root: Path,
+    result: Mapping[str, object],
+    identity: Mapping[str, object],
+) -> str:
+    path = _checkpoint_path(progress_root, str(result["frame_id"]), str(result["condition"]))
+    _atomic_write_json(path, _checkpoint_record(result, identity))
+    return sha256_file(path)
+
+
+def _load_or_run_condition(
+    condition: str,
+    backend: M2Backend,
+    engine: Path,
+    sequences: Mapping[str, KittiRawSequence],
+    poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
+    camera: KittiReferenceCamera,
+    expected: Mapping[str, object],
+    track_labelled_counts: Mapping[tuple[str, int], int],
+    progress_root: Path,
+    progress: dict[str, object],
+    identity: Mapping[str, object],
+) -> tuple[dict[str, object], bool]:
+    frame_id = str(expected["frame_id"])
+    key = _condition_key(frame_id, condition)
+    path = _checkpoint_path(progress_root, frame_id, condition)
+    conditions = progress["conditions"]
+    assert isinstance(conditions, dict)
+    status = str(conditions[key]["status"])
+    if path.exists():
+        result = _load_checkpoint(path, identity, expected, condition)
+        _set_progress(progress_root, progress, key, "COMPLETE", checkpoint_sha256=sha256_file(path))
+        return result, True
+    if status == "COMPLETE":
+        raise RuntimeError(f"completed condition is missing its checkpoint: {key}")
+    if status == "FAILED":
+        raise RuntimeError(f"failed condition requires review before resume: {key}")
+    _set_progress(progress_root, progress, key, "RUNNING")
+    try:
+        result = _run_evaluated_condition(
+            condition,
+            backend,
+            engine,
+            sequences,
+            poses_by_frame,
+            camera,
+            expected,
+            track_labelled_counts,
         )
+        checkpoint_sha = _save_checkpoint(progress_root, result, identity)
+        _set_progress(progress_root, progress, key, "COMPLETE", checkpoint_sha256=checkpoint_sha)
+        return result, False
+    except Exception:
+        _set_progress(progress_root, progress, key, "FAILED")
+        raise
+
+
+def _repeatability(
+    backend: M2Backend,
+    engine: Path,
+    sequences: Mapping[str, KittiRawSequence],
+    ledger_by_id: Mapping[str, Mapping[str, object]],
+    sentinels: Sequence[Mapping[str, object]],
+    poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
+    camera: KittiReferenceCamera,
+    track_labelled_counts: Mapping[tuple[str, int], int],
+    progress_root: Path,
+    progress: dict[str, object],
+    identity: Mapping[str, object],
+) -> dict[str, object]:
+    results: list[dict[str, object]] = []
+    for sentinel in sentinels:
+        frame_id = str(sentinel["frame_id"])
+        safe_name = frame_id.replace("/", "_")
+        sentinel_path = progress_root / "progress" / "sentinels" / f"{safe_name}.json"
+        checkpoint_path = _checkpoint_path(progress_root, frame_id, "H10")
+        if sentinel_path.exists():
+            sample = json.loads(sentinel_path.read_text(encoding="utf-8"))
+            if sample.get("identity") != dict(identity) or not sample.get("passed"):
+                raise RuntimeError(f"invalid completed sentinel evidence: {frame_id}")
+            _load_checkpoint(checkpoint_path, identity, ledger_by_id[frame_id], "H10")
+            results.append(sample["sample"])
+            continue
+        drive, raw_index = frame_id.split("/", 1)
+        raw_hashes: list[dict[str, str]] = []
+        frame_hashes: list[str] = []
+        canonical: dict[str, object] | None = None
+        for repetition in range(10):
+            frame, execution, audit, _ = _run_inference(
+                backend,
+                engine,
+                sequences[drive],
+                int(raw_index),
+                10,
+                ledger_by_id[frame_id],
+            )
+            raw_hashes.append(execution["raw_output_hashes"])
+            frame_hashes.append(_json_sha256(frame.to_dict()))
+            if repetition == 0:
+                canonical = _evaluate_frame(
+                    frame,
+                    execution,
+                    audit,
+                    frame_id,
+                    "H10",
+                    poses_by_frame,
+                    camera,
+                    track_labelled_counts,
+                )
+            print(f"repeat {frame_id} {repetition + 1}/10", flush=True)
+        raw_exact = all(value == raw_hashes[0] for value in raw_hashes)
+        frame_exact = len(set(frame_hashes)) == 1
+        sample = {
+            "role": sentinel["role"],
+            "frame_id": frame_id,
+            "repetitions": 10,
+            "raw_output_hashes": raw_hashes,
+            "detection_frame_hashes": frame_hashes,
+            "raw_outputs_exact": raw_exact,
+            "detection_frames_exact": frame_exact,
+        }
+        if not raw_exact or not frame_exact or canonical is None:
+            _atomic_write_json(
+                sentinel_path,
+                {"identity": dict(identity), "passed": False, "sample": sample},
+            )
+            return {
+                "passed": False,
+                "sentinel_count": len(results) + 1,
+                "samples": [*results, sample],
+            }
+        checkpoint_sha = _save_checkpoint(progress_root, canonical, identity)
+        _set_progress(
+            progress_root,
+            progress,
+            _condition_key(frame_id, "H10"),
+            "COMPLETE",
+            checkpoint_sha256=checkpoint_sha,
+        )
+        _atomic_write_json(
+            sentinel_path,
+            {"identity": dict(identity), "passed": True, "sample": sample},
+        )
+        results.append(sample)
+    combined = {"passed": True, "sentinel_count": len(results), "samples": results}
+    _atomic_write_json(
+        progress_root / "progress" / "sentinel_repeatability.json",
+        {"identity": dict(identity), **combined},
+    )
+    return combined
+
+
+def _ordered_condition_runs(
+    backend: M2Backend,
+    engine: Path,
+    sequences: Mapping[str, KittiRawSequence],
+    poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
+    camera: KittiReferenceCamera,
+    ledger_frames: Sequence[Mapping[str, object]],
+    track_labelled_counts: Mapping[tuple[str, int], int],
+    progress_root: Path,
+    progress: dict[str, object],
+    identity: Mapping[str, object],
+) -> tuple[list[dict[str, object]], list[dict[str, object]], int]:
+    results: dict[str, list[dict[str, object]]] = {"H10": [], "H5": []}
+    resumed = 0
+    for rank, expected in enumerate(ledger_frames, start=1):
+        for condition in ("H10", "H5"):
+            result, skipped = _load_or_run_condition(
+                condition,
+                backend,
+                engine,
+                sequences,
+                poses_by_frame,
+                camera,
+                expected,
+                track_labelled_counts,
+                progress_root,
+                progress,
+                identity,
+            )
+            results[condition].append(result)
+            resumed += int(skipped)
         if rank == 1 or rank % 25 == 0 or rank == len(ledger_frames):
-            print(f"{condition} {rank}/{len(ledger_frames)} {frame_id}", flush=True)
-    return results
+            totals = progress["totals"]
+            print(
+                f"paired progress {rank}/{len(ledger_frames)} "
+                f"H10={totals['completed_H10']} H5={totals['completed_H5']}",
+                flush=True,
+            )
+    return results["H10"], results["H5"], resumed
 
 
 def _aggregate_class(frames: Sequence[Mapping[str, object]], class_name: str) -> dict[str, object]:
@@ -1253,6 +1600,12 @@ def _write_json(path: Path, record: Mapping[str, object]) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path, required=True)
+    parser.add_argument("--engine", type=Path, required=True)
+    parser.add_argument(
+        "--progress-root",
+        type=Path,
+        default=_root() / ".local/m6b-r2",
+    )
     parser.add_argument(
         "--output",
         type=Path,
@@ -1274,8 +1627,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     measurement_commit = repository_git_sha(root)
     config_path = root / EXPECTED_CONFIG_PATH
     config = _load_yaml(config_path)
-    if config["status"] != "preregistered_before_detector_inference":
-        raise RuntimeError("M6b protocol is not frozen")
+    if config["status"] != "owner_approved_protocol_R2_before_detector_inference":
+        raise RuntimeError("M6b Protocol R2 is not owner-approved and frozen")
+    protocol_commit = measurement_commit
     gt_geometry_fixture = _gt_geometry_fixture()
     installed_version = importlib.import_module("importlib.metadata").version("laserperception")
     if installed_version != PROJECT_VERSION:
@@ -1300,10 +1654,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     sequences = {
         drive: KittiRawSequence(date_root, date_root / f"{drive}_sync") for drive in drive_ids
     }
-    input_verification = _verify_input_oracles(sequences, ledger_frames)
     if args.verify_input_oracles_only:
-        print(json.dumps(input_verification, indent=2, sort_keys=True), flush=True)
-        return 0
+        raise RuntimeError("R2 reuses the accepted 856-condition input verification; no rerun")
     all_poses: dict[str, tuple[KittiTrackletPose, ...]] = {}
     poses_by_frame: dict[str, list[KittiTrackletPose]] = defaultdict(list)
     track_labelled_counts: dict[tuple[str, int], int] = defaultdict(int)
@@ -1324,17 +1676,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                 track_labelled_counts[(drive, pose.track_id)] += 1
 
     m1 = _load_yaml(root / "configs/detection/m1_pointpillars_nuscenes.yaml")
-    m2 = _load_yaml(root / "configs/detection/m2_pointpillars_tensorrt.yaml")
+    m2 = _load_yaml(root / "configs/detection/m6_pointpillars_tensorrt_40k.yaml")
     m1_assets = resolve_m1_asset_paths(m1)
     m2_assets = resolve_m2_asset_paths(m2)
     onnx = m2_assets.artifact_directory / "pointpillars.onnx"
-    engine = m2_assets.engine_directory / "pointpillars_fp16.engine"
+    engine = args.engine.expanduser().resolve()
     artifacts = {
         "checkpoint": _artifact(
             m1_assets.checkpoint_path, config["frozen_detector"]["checkpoint_sha256"]
         ),
         "onnx": _artifact(onnx, config["frozen_detector"]["onnx_sha256"]),
-        "tensorrt_engine": _artifact(engine, config["frozen_detector"]["tensorrt_engine_sha256"]),
+        "tensorrt_engine": _artifact(engine, CANDIDATE_ENGINE_SHA256),
     }
     backend = M2Backend(
         m1_assets.mmdet3d_root / str(m1["model"]["upstream_config"]),
@@ -1344,12 +1696,33 @@ def main(argv: Sequence[str] | None = None) -> int:
         voxelization_mode="exact_fast",
     )
     backend.initialize()
+    gap_path = root / str(config["profile_gap_gate"]["evidence_path"])
+    if sha256_file(gap_path) != config["profile_gap_gate"]["evidence_sha256"]:
+        raise RuntimeError("profile-gap parity evidence SHA256 changed")
+    gap = json.loads(gap_path.read_text(encoding="utf-8"))
+    if not gap.get("overall_pass") or gap.get("evaluation_drives_used"):
+        raise RuntimeError("profile-gap parity evidence is not an uncontaminated PASS")
+    identity = {
+        "protocol_R2_commit": protocol_commit,
+        "measurement_commit": measurement_commit,
+        "candidate_engine_sha256": artifacts["tensorrt_engine"]["sha256"],
+        "protocol_config_sha256": sha256_file(config_path),
+        "input_ledger_sha256": sha256_file(ledger_path),
+    }
+    progress_root = args.progress_root.expanduser().resolve()
+    progress = _initialize_progress(progress_root, identity, ledger_frames)
     repeatability = _repeatability(
         backend,
         engine,
         sequences,
         ledger_by_id,
         config["repeatability"]["sentinels"],
+        poses_by_frame,
+        camera,
+        track_labelled_counts,
+        progress_root,
+        progress,
+        identity,
     )
     if not repeatability["passed"]:
         failed_record = {
@@ -1357,14 +1730,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             "milestone": "M6b",
             "status": "FAILED_TENSORRT_REPEATABILITY",
             "measurement_commit": measurement_commit,
-            "protocol_commit": PROTOCOL_COMMIT,
+            "protocol_commit": protocol_commit,
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
             "protocol_config": {"path": EXPECTED_CONFIG_PATH, "sha256": sha256_file(config_path)},
             "pre_inference_ledger": {
                 "path": str(config["input_oracles"]["committed_ledger"]),
                 "sha256": sha256_file(ledger_path),
             },
-            "pre_inference_input_verification": input_verification,
+            "pre_inference_input_verification": {
+                "reused": True,
+                "condition_count": 856,
+                "sha256": EXPECTED_LEDGER_SHA256,
+            },
             "environment": {"gpu": _gpu_record(), "cuda_device": "cuda:0"},
             "artifacts": artifacts,
             "repeatability": repeatability,
@@ -1374,8 +1751,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("repeatability failed; full characterization was not started", flush=True)
         return 2
 
-    h10 = _condition_run(
-        "H10",
+    h10, h5, resumed_conditions = _ordered_condition_runs(
         backend,
         engine,
         sequences,
@@ -1383,16 +1759,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         camera,
         ledger_frames,
         track_labelled_counts,
-    )
-    h5 = _condition_run(
-        "H5",
-        backend,
-        engine,
-        sequences,
-        poses_by_frame,
-        camera,
-        ledger_frames,
-        track_labelled_counts,
+        progress_root,
+        progress,
+        identity,
     )
     aggregated = {"H10": _aggregate_condition(h10), "H5": _aggregate_condition(h5)}
     paired = _paired_analysis(h10, h5)
@@ -1403,12 +1772,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     for frame in (*h10, *h5):
         frame.pop("_detections")
+        frame.pop("_detection_frame")
     result: dict[str, object] = {
         "schema_version": 1,
         "milestone": "M6b",
         "status": "M6b FROZEN CROSS-DOMAIN CHARACTERIZATION COMPLETE",
         "measurement_commit": measurement_commit,
-        "protocol_commit": PROTOCOL_COMMIT,
+        "protocol_commit": protocol_commit,
+        "protocol_R2": {
+            "path": PROTOCOL_R2_PATH,
+            "commit": protocol_commit,
+            "owner_approved": True,
+            "first_evaluation_prediction_after_commit": True,
+        },
+        "scientific_chronology": {
+            "original_protocol_commit": ORIGINAL_PROTOCOL_COMMIT,
+            "original_blocked_measurement_commit": "438e755d46f5768e429c1359ee99c353b325bad7",
+            "original_blocker_evidence_sha256": BLOCKER_EVIDENCE_SHA256,
+            "evaluation_predictions_before_R2": 0,
+            "R1_protocol_commit": R1_PROTOCOL_COMMIT,
+            "R1_validation_commit": R1_VALIDATION_COMMIT,
+            "R1_evidence_commit": R1_EVIDENCE_COMMIT,
+        },
         "base_main_commit": BASE_MAIN_COMMIT,
         "project_version": PROJECT_VERSION,
         "m6a_evidence": {
@@ -1426,7 +1811,20 @@ def main(argv: Sequence[str] | None = None) -> int:
             "sha256": sha256_file(ledger_path),
             "frame_count": len(ledger_frames),
         },
-        "pre_inference_input_verification": input_verification,
+        "pre_inference_input_verification": {
+            "reused_accepted_evidence": True,
+            "rerun": False,
+            "condition_count": 856,
+            "exact_conditions": 856,
+            "ledger_sha256": EXPECTED_LEDGER_SHA256,
+        },
+        "execution_resume": {
+            "local_atomic_progress_used": True,
+            "expected_conditions": 856,
+            "completed_conditions": 856,
+            "conditions_loaded_from_valid_checkpoints": resumed_conditions,
+            "completed_condition_unnecessarily_rerun": False,
+        },
         "environment": {
             "gpu": _gpu_record(),
             "laserperception": installed_version,
@@ -1436,6 +1834,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             "cuda_device": "cuda:0",
         },
         "artifacts": artifacts,
+        "engine_profile": {
+            "minimum_voxels": 4352,
+            "optimum_voxels": 18207,
+            "maximum_voxels": 40000,
+            "historical_engine_sha256": HISTORICAL_ENGINE_SHA256,
+            "candidate_engine_device_memory_bytes": 1602800640,
+            "historical_engine_device_memory_bytes": 1212340736,
+            "device_memory_increase_bytes": 390459904,
+        },
+        "profile_gap_gate": {
+            "path": str(config["profile_gap_gate"]["evidence_path"]),
+            "sha256": config["profile_gap_gate"]["evidence_sha256"],
+            "status": gap["status"],
+            "frame_ids": gap["selection"]["frame_ids"],
+            "voxel_counts": gap["selection"]["voxel_counts"],
+        },
         "dataset": {
             "name": "KITTI Raw",
             "drives": list(drive_ids),
@@ -1490,7 +1904,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             "H10_H5_compound_ablation": True,
             "ROS_used": False,
             "model_changed": False,
-            "engine_changed": False,
+            "historical_engine_replaced": False,
+            "candidate_engine_used_prospectively": True,
+            "H10_H5_isolated_time_lag_causality_claimed": False,
         },
     }
     _write_json(args.output, result)

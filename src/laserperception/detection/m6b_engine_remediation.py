@@ -16,6 +16,9 @@ EXPECTED_PROFILE_COUNTS = {"min": 4352, "opt": 18207, "max": 40000}
 M6B_EVALUATION_DRIVES = frozenset({"2011_09_26_drive_0001", "2011_09_26_drive_0091"})
 NON_EVALUATION_DRIVE = "2011_09_30_drive_0016"
 PARITY_QUANTILES = (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100)
+PROFILE_GAP_MINIMUM = 22547
+PROFILE_GAP_MAXIMUM = 29422
+PROFILE_GAP_TARGETS = (23000, 25000, 27000, 29000)
 HISTORICAL_MANIFEST_RELATIVE = Path("configs/detection/m2_pointpillars_tensorrt.yaml")
 
 
@@ -227,3 +230,41 @@ def select_repeatability_frames(
         ),
     )
     return {"highest_shape": dict(highest), "mid_range_near_opt": dict(mid_range)}
+
+
+def select_profile_gap_frames(
+    frames: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    """Freeze up to four non-evaluation H5 frames in the R2 profile gap."""
+
+    eligible = [
+        {
+            **dict(frame),
+            "frame_index": _required_record_int(frame, "frame_index"),
+            "voxel_count": _required_record_int(frame, "voxel_count"),
+        }
+        for frame in frames
+        if PROFILE_GAP_MINIMUM <= _required_record_int(frame, "voxel_count") <= PROFILE_GAP_MAXIMUM
+    ]
+    if len({record["frame_index"] for record in eligible}) != len(eligible):
+        raise ValueError("profile-gap frame indices must be unique")
+    selected: list[dict[str, object]] = []
+    used: set[int] = set()
+    for target in PROFILE_GAP_TARGETS:
+        available = [
+            record for record in eligible if _required_record_int(record, "frame_index") not in used
+        ]
+        if not available:
+            break
+        chosen = min(
+            available,
+            key=lambda record: (
+                abs(_required_record_int(record, "voxel_count") - target),
+                _required_record_int(record, "frame_index"),
+            ),
+        )
+        selected.append({**chosen, "selection_target_voxels": target})
+        used.add(_required_record_int(chosen, "frame_index"))
+    if len(selected) < 3:
+        raise ValueError("PROFILE GAP COVERAGE INSUFFICIENT: fewer than three distinct frames")
+    return selected
