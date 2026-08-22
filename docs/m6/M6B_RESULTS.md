@@ -34,7 +34,42 @@ or detector visualization was generated. The preregistration was not contaminate
 The failure is recorded in
 [`failed_engine_shape_preflight.json`](../../benchmarks/m6b/diagnostics/failed_engine_shape_preflight.json).
 
-The authorized protocol forbids truncating the input, changing `max_voxels`, changing voxel
-geometry, rebuilding/replacing the engine, or skipping incompatible frames. Any path forward would
-require a separate owner-reviewed prospective protocol and detector-artifact decision. M6b remains
-incomplete; M6c and M5 remain inactive.
+The frozen protocol forbade truncating the input, changing `max_voxels`, changing voxel geometry,
+rebuilding/replacing the engine, or skipping incompatible frames. The owner subsequently authorized
+the separate prospective M6b-R1 remediation below. The original failure and zero-prediction status
+remain unchanged.
+
+## Prospective M6b-R1 structural remediation
+
+M6b-R1 built one distinct candidate engine from the byte-identical M2 ONNX. It retained the
+historical 4,352 minimum and 18,207 optimum while expanding only the profile maximum from 30,000 to
+the voxelizer's structural 40,000 ceiling. The original engine remains the canonical artifact for
+M2 through v0.2.0.
+
+The candidate engine passed serialized profile and binding inspection. Its SHA256 is
+`2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f`; it requires 1,602,800,640
+bytes from TensorRT's `getDeviceMemorySize`, 390,459,904 bytes more than the historical engine's
+1,212,340,736 bytes.
+
+The frozen 20-sample nuScenes parity-v2 suite passed at validation commit
+`d1f534d79b85f6d67c54ebc70b99d7b92cd31413`. All preregistered per-metric Stage 1 gates passed;
+7/752 high-confidence matches exceeded at least one continuous tolerance and remain included in the
+metric denominators. Same-session old-versus-new characterization found different raw values and
+three continuous final-detection outliers among 754 high-confidence matches, while both exported
+885 detections and the characterization satisfied the unchanged Stage 1 checks. This comparison is
+diagnostic, not an exact-equality requirement.
+
+An input-only census of all 269 eligible H10 frames from non-evaluation drive
+`2011_09_30_drive_0016` found 29,423–40,000 retained voxels; 251 exceeded 30,000 and 108 reached
+40,000. The deterministic frozen 12-frame set spans 29,423–40,000. Rewritten PyTorch FP32 versus
+candidate TensorRT FP16 then passed the unchanged parity-v2 Stage 1 gate: 42/42 exported detections,
+39/39 high-confidence matches, and no continuous-tolerance failures. Neither evaluation drive was
+used.
+
+Candidate raw outputs were bit-exact across five repeats on the 40,000-voxel frame and across five
+repeats on frame 114 at 29,423 voxels. That second frame is the closest available full-history 0016
+frame to the frozen 18,207 optimum; the census minimum is 29,423.
+
+Sanitized tracked evidence is under [`benchmarks/m6b/engine`](../../benchmarks/m6b/engine). The
+prospective protocol is still only a draft: M6b evaluation remains blocked pending explicit owner
+approval of [`M6B_PROTOCOL_R2_DRAFT.md`](M6B_PROTOCOL_R2_DRAFT.md). M6c and M5 remain inactive.

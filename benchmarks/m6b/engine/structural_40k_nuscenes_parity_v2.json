@@ -1,0 +1,6307 @@
+{
+  "artifacts": {
+    "candidate_engine_built_for_m6b_r1": true,
+    "engine": {
+      "committed": false,
+      "logical_name": "engines/m6/pointpillars_fp16_profile40k.engine",
+      "sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+      "size_bytes": 31469076
+    },
+    "engine_rebuilt_for_v2": false,
+    "layer_precision_changes": false,
+    "onnx": {
+      "committed": false,
+      "logical_name": "m2/pointpillars.onnx",
+      "sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+      "size_bytes": 60711828
+    }
+  },
+  "benchmark_run": false,
+  "commit_sha": "d1f534d79b85f6d67c54ebc70b99d7b92cd31413",
+  "confirmed_nms_survivor_swaps": [],
+  "dataset": {
+    "name": "nuScenes",
+    "observed_split_size": 81,
+    "sample_indices": [
+      0,
+      4,
+      8,
+      12,
+      16,
+      21,
+      25,
+      29,
+      33,
+      37,
+      42,
+      46,
+      50,
+      54,
+      58,
+      63,
+      67,
+      71,
+      75,
+      80
+    ],
+    "split": "mini_val",
+    "version": "v1.0-mini"
+  },
+  "diagnostic_only": false,
+  "direction_population_diagnostic": {
+    "all_anchors": {
+      "count": 11200000,
+      "direction_argmax_disagreement_count": 48276,
+      "direction_argmax_disagreement_fraction": 0.004310357142857143,
+      "winning_margins": {
+        "agreeing_anchors": {
+          "pytorch": {
+            "count": 11151724,
+            "maximum": 21.20945644378662,
+            "mean": 1.0361924582953879,
+            "median": 0.6566462814807892,
+            "p90": 2.248888075351716,
+            "p95": 3.1794360220432276,
+            "p99": 6.726719012260427
+          },
+          "tensorrt": {
+            "count": 11151724,
+            "maximum": 21.21875,
+            "mean": 1.0360794064907919,
+            "median": 0.65673828125,
+            "p90": 2.248046875,
+            "p95": 3.1787109375,
+            "p99": 6.7265625
+          }
+        },
+        "disagreeing_anchors": {
+          "pytorch": {
+            "count": 48276,
+            "maximum": 0.23807795345783234,
+            "mean": 0.010850530745953057,
+            "median": 0.006809985265135765,
+            "p90": 0.025235192850232124,
+            "p95": 0.03482553083449602,
+            "p99": 0.06021137163043022
+          },
+          "tensorrt": {
+            "count": 48276,
+            "maximum": 0.286865234375,
+            "mean": 0.010851669651303002,
+            "median": 0.006744384765625,
+            "p90": 0.02520751953125,
+            "p95": 0.03466796875,
+            "p99": 0.060703277587890625
+          }
+        }
+      }
+    },
+    "decision_relevant_anchors": {
+      "count": 20115,
+      "direction_argmax_disagreement_count": 33,
+      "direction_argmax_disagreement_fraction": 0.0016405667412378823,
+      "disagreements": [
+        {
+          "anchor_index": 20678,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.0003725090064108372,
+            0.004848501645028591
+          ],
+          "pytorch_margin": 0.004475992638617754,
+          "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+          "sample_index": 0,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.006927490234375,
+            -0.0005435943603515625
+          ],
+          "tensorrt_margin": 0.0074710845947265625
+        },
+        {
+          "anchor_index": 465249,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.06644000858068466,
+            -0.016401290893554688
+          ],
+          "pytorch_margin": 0.08284129947423935,
+          "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+          "sample_index": 0,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.0224609375,
+            0.0284423828125
+          ],
+          "tensorrt_margin": 0.0059814453125
+        },
+        {
+          "anchor_index": 486172,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.011418171226978302,
+            0.0017884112894535065
+          ],
+          "pytorch_margin": 0.013206582516431808,
+          "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+          "sample_index": 0,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.002197265625,
+            -0.0076904296875
+          ],
+          "tensorrt_margin": 0.0054931640625
+        },
+        {
+          "anchor_index": 501522,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.03679622709751129,
+            -0.01237651240080595
+          ],
+          "pytorch_margin": 0.04917273949831724,
+          "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+          "sample_index": 0,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.00933074951171875,
+            0.01532745361328125
+          ],
+          "tensorrt_margin": 0.0059967041015625
+        },
+        {
+          "anchor_index": 212940,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.010484449565410614,
+            -0.007475561462342739
+          ],
+          "pytorch_margin": 0.003008888103067875,
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.00669097900390625,
+            -0.01227569580078125
+          ],
+          "tensorrt_margin": 0.005584716796875
+        },
+        {
+          "anchor_index": 333964,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.021374065428972244,
+            0.0023199953138828278
+          ],
+          "pytorch_margin": 0.023694060742855072,
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.00823974609375,
+            -0.011322021484375
+          ],
+          "tensorrt_margin": 0.003082275390625
+        },
+        {
+          "anchor_index": 334175,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.01102536916732788,
+            0.017067451030015945
+          ],
+          "pytorch_margin": 0.006042081862688065,
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.016998291015625,
+            0.011077880859375
+          ],
+          "tensorrt_margin": 0.00592041015625
+        },
+        {
+          "anchor_index": 381677,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.0319276824593544,
+            -0.0284690223634243
+          ],
+          "pytorch_margin": 0.0034586600959300995,
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.028900146484375,
+            -0.031646728515625
+          ],
+          "tensorrt_margin": 0.00274658203125
+        },
+        {
+          "anchor_index": 232688,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.041028913110494614,
+            -0.026037540286779404
+          ],
+          "pytorch_margin": 0.01499137282371521,
+          "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+          "sample_index": 8,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.03179931640625,
+            -0.03436279296875
+          ],
+          "tensorrt_margin": 0.0025634765625
+        },
+        {
+          "anchor_index": 268270,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.009580540470778942,
+            -2.9820948839187622e-05
+          ],
+          "pytorch_margin": 0.00961036141961813,
+          "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+          "sample_index": 8,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.00455474853515625,
+            0.0049591064453125
+          ],
+          "tensorrt_margin": 0.00040435791015625
+        },
+        {
+          "anchor_index": 468720,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.011239375919103622,
+            0.00904583279043436
+          ],
+          "pytorch_margin": 0.002193543128669262,
+          "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+          "sample_index": 8,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.0043182373046875,
+            0.0243072509765625
+          ],
+          "tensorrt_margin": 0.02862548828125
+        },
+        {
+          "anchor_index": 517207,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.029952622950077057,
+            0.015159235335886478
+          ],
+          "pytorch_margin": 0.014793387614190578,
+          "sample_id": "0a0d6b8c2e884134a3b48df43d54c36a",
+          "sample_index": 16,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.020172119140625,
+            0.024322509765625
+          ],
+          "tensorrt_margin": 0.004150390625
+        },
+        {
+          "anchor_index": 306965,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.00034489668905735016,
+            0.0054976679384708405
+          ],
+          "pytorch_margin": 0.005842564627528191,
+          "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+          "sample_index": 29,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.00635528564453125,
+            -0.00115966796875
+          ],
+          "tensorrt_margin": 0.00751495361328125
+        },
+        {
+          "anchor_index": 391595,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            -0.020173029974102974,
+            -0.03464452177286148
+          ],
+          "pytorch_margin": 0.014471491798758507,
+          "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+          "sample_index": 29,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.048004150390625,
+            -0.00760650634765625
+          ],
+          "tensorrt_margin": 0.04039764404296875
+        },
+        {
+          "anchor_index": 214816,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.007251047063618898,
+            -0.014607205055654049
+          ],
+          "pytorch_margin": 0.021858252119272947,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.00765228271484375,
+            0.0013294219970703125
+          ],
+          "tensorrt_margin": 0.008981704711914062
+        },
+        {
+          "anchor_index": 217632,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.02842579409480095,
+            0.009234463796019554
+          ],
+          "pytorch_margin": 0.019191330298781395,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.0154571533203125,
+            0.022003173828125
+          ],
+          "tensorrt_margin": 0.0065460205078125
+        },
+        {
+          "anchor_index": 228818,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.03986397385597229,
+            -0.0012545674107968807
+          ],
+          "pytorch_margin": 0.04111854126676917,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.01910400390625,
+            0.019683837890625
+          ],
+          "tensorrt_margin": 0.000579833984375
+        },
+        {
+          "anchor_index": 346514,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.029998645186424255,
+            0.01852872222661972
+          ],
+          "pytorch_margin": 0.048527367413043976,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.00034332275390625,
+            -0.012237548828125
+          ],
+          "tensorrt_margin": 0.01258087158203125
+        },
+        {
+          "anchor_index": 354916,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.004137275740504265,
+            0.043633125722408295
+          ],
+          "pytorch_margin": 0.04777040146291256,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.02301025390625,
+            0.0167236328125
+          ],
+          "tensorrt_margin": 0.00628662109375
+        },
+        {
+          "anchor_index": 430571,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.003687845543026924,
+            0.008434653282165527
+          ],
+          "pytorch_margin": 0.004746807739138603,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.0147857666015625,
+            -0.00260162353515625
+          ],
+          "tensorrt_margin": 0.01738739013671875
+        },
+        {
+          "anchor_index": 444235,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.020357733592391014,
+            0.0013974960893392563
+          ],
+          "pytorch_margin": 0.02175522968173027,
+          "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+          "sample_index": 46,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            -0.00274658203125,
+            -0.0154571533203125
+          ],
+          "tensorrt_margin": 0.0127105712890625
+        },
+        {
+          "anchor_index": 313531,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.011640319600701332,
+            0.005099251866340637
+          ],
+          "pytorch_margin": 0.01673957146704197,
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.00872039794921875,
+            -0.01470947265625
+          ],
+          "tensorrt_margin": 0.02342987060546875
+        },
+        {
+          "anchor_index": 318923,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.010317551903426647,
+            -0.013493982143700123
+          ],
+          "pytorch_margin": 0.02381153404712677,
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.033782958984375,
+            0.03070068359375
+          ],
+          "tensorrt_margin": 0.064483642578125
+        },
+        {
+          "anchor_index": 321721,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.012977099046111107,
+            -0.0024333447217941284
+          ],
+          "pytorch_margin": 0.015410443767905235,
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.0185546875,
+            0.03009033203125
+          ],
+          "tensorrt_margin": 0.04864501953125
+        },
+        {
+          "anchor_index": 391791,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.00823171716183424,
+            0.013507742434740067
+          ],
+          "pytorch_margin": 0.005276025272905827,
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.02215576171875,
+            -0.0003509521484375
+          ],
+          "tensorrt_margin": 0.0225067138671875
+        },
+        {
+          "anchor_index": 284959,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.012232168577611446,
+            0.02013319730758667
+          ],
+          "pytorch_margin": 0.007901028729975224,
+          "sample_id": "609d5177362340458a3bfd4949cd1e64",
+          "sample_index": 54,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.018951416015625,
+            0.0127716064453125
+          ],
+          "tensorrt_margin": 0.0061798095703125
+        },
+        {
+          "anchor_index": 480774,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.04502227157354355,
+            -0.014329873956739902
+          ],
+          "pytorch_margin": 0.05935214553028345,
+          "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+          "sample_index": 58,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.030548095703125,
+            0.06378173828125
+          ],
+          "tensorrt_margin": 0.094329833984375
+        },
+        {
+          "anchor_index": 533568,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.02267155610024929,
+            0.005988673307001591
+          ],
+          "pytorch_margin": 0.0166828827932477,
+          "sample_id": "7bebe3c9be714f02837f8617c56df122",
+          "sample_index": 67,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.0024280548095703125,
+            0.030914306640625
+          ],
+          "tensorrt_margin": 0.03334236145019531
+        },
+        {
+          "anchor_index": 435710,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            0.006530797109007835,
+            0.01767020858824253
+          ],
+          "pytorch_margin": 0.011139411479234695,
+          "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+          "sample_index": 71,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.033355712890625,
+            -0.009429931640625
+          ],
+          "tensorrt_margin": 0.04278564453125
+        },
+        {
+          "anchor_index": 42897,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.030462173745036125,
+            0.0012389346957206726
+          ],
+          "pytorch_margin": 0.029223239049315453,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            0.0083770751953125,
+            0.02423095703125
+          ],
+          "tensorrt_margin": 0.0158538818359375
+        },
+        {
+          "anchor_index": 152587,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            0.005630274303257465,
+            -0.0001692064106464386
+          ],
+          "pytorch_margin": 0.005799480713903904,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.0034027099609375,
+            0.0086517333984375
+          ],
+          "tensorrt_margin": 0.012054443359375
+        },
+        {
+          "anchor_index": 152589,
+          "pytorch_direction_class": 0,
+          "pytorch_logits": [
+            -0.004917445592582226,
+            -0.014949311502277851
+          ],
+          "pytorch_margin": 0.010031865909695625,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_direction_class": 1,
+          "tensorrt_logits": [
+            -0.0142974853515625,
+            -0.0055999755859375
+          ],
+          "tensorrt_margin": 0.008697509765625
+        },
+        {
+          "anchor_index": 152601,
+          "pytorch_direction_class": 1,
+          "pytorch_logits": [
+            -0.0026714857667684555,
+            0.014726780354976654
+          ],
+          "pytorch_margin": 0.01739826612174511,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_direction_class": 0,
+          "tensorrt_logits": [
+            0.00803375244140625,
+            0.00421142578125
+          ],
+          "tensorrt_margin": 0.00382232666015625
+        }
+      ],
+      "winning_margins": {
+        "agreeing_anchors": {
+          "pytorch": {
+            "count": 20082,
+            "maximum": 15.754069328308105,
+            "mean": 4.029557812436043,
+            "median": 3.5516265630722046,
+            "p90": 8.301619482040406,
+            "p95": 9.497635889053345,
+            "p99": 11.42649459838864
+          },
+          "tensorrt": {
+            "count": 20082,
+            "maximum": 15.73828125,
+            "mean": 4.027679191857573,
+            "median": 3.5478515625,
+            "p90": 8.304296875000006,
+            "p95": 9.5078125,
+            "p99": 11.434335937499995
+          }
+        },
+        "disagreeing_anchors": {
+          "pytorch": {
+            "count": 33,
+            "maximum": 0.08284129947423935,
+            "mean": 0.020349601551777487,
+            "median": 0.01499137282371521,
+            "p90": 0.04837597422301769,
+            "p95": 0.05324450191110371,
+            "p99": 0.07532477021217346
+          },
+          "tensorrt": {
+            "count": 33,
+            "maximum": 0.094329833984375,
+            "mean": 0.017185962561405067,
+            "median": 0.00751495361328125,
+            "p90": 0.042308044433593754,
+            "p95": 0.054980468749999976,
+            "p99": 0.084779052734375
+          }
+        }
+      }
+    },
+    "decision_relevant_definition": "union of anchors in the official nms_pre top candidate pool in either runtime",
+    "official_nms_pre": 1000
+  },
+  "environment": {
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "mmcv": "2.1.0",
+    "mmdeploy": "1.3.1",
+    "mmdeploy_commit": "bc75c9d6c8940aa03d0e1e5b5962bd930478ba77",
+    "mmdet": "3.2.0",
+    "mmdet3d": "1.4.0",
+    "mmengine": "0.10.7",
+    "nvidia_driver": "610.88",
+    "onnx": "1.14.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "tensorrt": "8.6.1",
+    "torch": "2.1.0+cu118",
+    "torch_cuda_runtime": "11.8"
+  },
+  "failure_categories": [],
+  "generated_at_utc": "2026-08-22T13:01:50.817459+00:00",
+  "milestone": "M6b-R1",
+  "model": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "mmdet3d_commit": "fe25f7a51d36e3702f961e198894580d83c4387b"
+  },
+  "other_discrete_divergences": [],
+  "overall_pass": true,
+  "protocol": {
+    "deployment_manifest": "m6_pointpillars_tensorrt_40k.yaml",
+    "matching": {
+      "candidate_selection": "maximum_bev_iou_among_unmatched_tensorrt_detections",
+      "class_wise": true,
+      "minimum_bev_iou": 0.5,
+      "one_to_one": true,
+      "reference": "pytorch",
+      "reference_order": "descending_score_then_detection_sort_key",
+      "scipy_required": false
+    },
+    "parity_config": "configs/detection/m2_parity_v2.yaml",
+    "parity_config_sha256": "91e7cde19076c6452d9ff8e0fefc893a6d429622ed30c2da88127d29d4418df0",
+    "stage_1_acceptance": {
+      "count_guards": {
+        "aggregate_maximum_relative_difference": 0.05,
+        "per_sample_maximum_absolute_difference": "max(1,ceil(0.05*pytorch_count))"
+      },
+      "distinct_continuous_outlier_policy": {
+        "count_each_detection_match_once": true,
+        "record_failed_metrics": true,
+        "retained_in_denominator": true
+      },
+      "high_confidence_match_coverage": {
+        "pytorch_to_tensorrt_minimum": 0.99,
+        "tensorrt_to_pytorch_minimum": 0.99
+      },
+      "matched_high_confidence": {
+        "dimensions_detection_passes_only_if_all_lwh_pass": true,
+        "maximum_absolute_score_difference": 0.05,
+        "maximum_absolute_z_center_difference_m": 0.25,
+        "maximum_axis_yaw_difference_degrees_modulo_pi": 5.0,
+        "maximum_class_name_mismatches": 0,
+        "maximum_relative_error_per_lwh_dimension": 0.05,
+        "maximum_xy_center_displacement_m": 0.25,
+        "minimum_heading_direction_agreement": 0.99,
+        "minimum_per_detection_pass_fraction": 0.99
+      }
+    },
+    "threshold_edge_policy": {
+      "classification_allowed_only_when_either_score_is_in_band": true,
+      "excluded_from_high_confidence_coverage": false,
+      "record_every_disagreement": true
+    },
+    "thresholds": {
+      "exported_detection": 0.25,
+      "high_confidence_guard": 0.3,
+      "threshold_edge_band": {
+        "maximum_inclusive": 0.3,
+        "minimum_inclusive": 0.2
+      }
+    },
+    "thresholds_mutated": false
+  },
+  "protocol_version": 2,
+  "rationale": "Protocol v1 applied hard maximum continuous-error bounds to final detections after discontinuous direction argmax and NMS operations. Its evidence showed microscopic medians with rare large maxima. PointPillars uses a two-class direction head, and final yaw adds pi according to the selected direction class; a near-tied direction-logit argmax can therefore produce an approximately 180-degree heading difference while retaining an almost identical geometric box axis. Protocol v2 preserves every sample, artifact, execution path, threshold, matching rule, and numerical tolerance. It changes only the aggregate continuous acceptance rule to a per-detection 99-percent pass fraction, separates modulo-pi box-axis yaw from heading agreement, and retains every exception. This refinement does not retroactively alter or pass the authoritative v1 failure.",
+  "raw_network_comparisons": {
+    "aggregate": {
+      "bbox_pred": {
+        "absolute_difference": {
+          "count": 100800000,
+          "maximum": 0.44306832551956177,
+          "mean": 0.0018494239442447904,
+          "median": 0.0006069689989089966,
+          "p95": 0.007679462432861328,
+          "p99": 0.0184781551361084
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 20,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            126,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      },
+      "cls_score": {
+        "absolute_difference": {
+          "count": 112000000,
+          "maximum": 0.744624137878418,
+          "mean": 0.011102692461815264,
+          "median": 0.007853507995605469,
+          "p95": 0.032253265380859375,
+          "p99": 0.05698585510253906
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 20,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            140,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      },
+      "dir_cls_pred": {
+        "absolute_difference": {
+          "count": 22400000,
+          "maximum": 0.174027681350708,
+          "mean": 0.005806595629276645,
+          "median": 0.003827214241027832,
+          "p95": 0.017876625061035156,
+          "p99": 0.03057801783084879
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 20,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            28,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      }
+    },
+    "per_sample": [
+      {
+        "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+        "sample_index": 0,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.240126371383667,
+              "mean": 0.001541962506927924,
+              "median": 0.0005974769592285156,
+              "p95": 0.005950138717889783,
+              "p99": 0.01447685107588767
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.49600791931152344,
+              "mean": 0.01150035029541169,
+              "median": 0.008066177368164062,
+              "p95": 0.03426933288574219,
+              "p99": 0.05880928039550781
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.1255430430173874,
+              "mean": 0.005941977674718198,
+              "median": 0.0040075890719890594,
+              "p95": 0.017896953225135806,
+              "p99": 0.03179002225399018
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+        "sample_index": 4,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.16139495372772217,
+              "mean": 0.0016412141787841153,
+              "median": 0.0005739359185099602,
+              "p95": 0.006643533706665039,
+              "p99": 0.016741396188735935
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3089923858642578,
+              "mean": 0.010337938373450721,
+              "median": 0.007312774658203125,
+              "p95": 0.030063629150390625,
+              "p99": 0.05379486083984375
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.10820275545120239,
+              "mean": 0.005181365234900191,
+              "median": 0.003528539091348648,
+              "p95": 0.01546764671802521,
+              "p99": 0.025532196164131174
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+        "sample_index": 8,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.44306832551956177,
+              "mean": 0.0017844298602017845,
+              "median": 0.0005950927734375,
+              "p95": 0.007215502113103858,
+              "p99": 0.018095614314079245
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.6264209747314453,
+              "mean": 0.011098054294692619,
+              "median": 0.0077838897705078125,
+              "p95": 0.032512664794921875,
+              "p99": 0.05851841926574686
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.15930578112602234,
+              "mean": 0.005309741640428131,
+              "median": 0.0036022961139678955,
+              "p95": 0.015896566212177284,
+              "p99": 0.026922703981399537
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "0d0700a2284e477db876c3ee1d864668",
+        "sample_index": 12,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.22397470474243164,
+              "mean": 0.0018078229556914923,
+              "median": 0.0005891770124435425,
+              "p95": 0.00732372775673866,
+              "p99": 0.01894311252981424
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.44776153564453125,
+              "mean": 0.011355689359605313,
+              "median": 0.007671356201171875,
+              "p95": 0.03361320495605469,
+              "p99": 0.06613540649414062
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11969709396362305,
+              "mean": 0.005646485657527436,
+              "median": 0.003675609827041626,
+              "p95": 0.01733053475618363,
+              "p99": 0.029963597133755702
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "0a0d6b8c2e884134a3b48df43d54c36a",
+        "sample_index": 16,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.3858067989349365,
+              "mean": 0.0017811866862717759,
+              "median": 0.0006076768040657043,
+              "p95": 0.007326664030551905,
+              "p99": 0.01755172133445737
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3666200637817383,
+              "mean": 0.011339382063469716,
+              "median": 0.007846832275390625,
+              "p95": 0.033745765686035156,
+              "p99": 0.05989837646484375
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.16520512104034424,
+              "mean": 0.005965775713446783,
+              "median": 0.003945529460906982,
+              "p95": 0.018248087167739874,
+              "p99": 0.0308942860364914
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "d0ecf474e0e64950aa265cd44b9c9d75",
+        "sample_index": 21,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.16532862186431885,
+              "mean": 0.0016410387985322352,
+              "median": 0.0005902647972106934,
+              "p95": 0.0066874478012323366,
+              "p99": 0.01598614133894434
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.2922077178955078,
+              "mean": 0.010757979134683099,
+              "median": 0.007620334625244141,
+              "p95": 0.03150367736816406,
+              "p99": 0.05544090270996094
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.10297173261642456,
+              "mean": 0.005276875173013624,
+              "median": 0.003660440444946289,
+              "p95": 0.015730943437665703,
+              "p99": 0.025206093788146977
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+        "sample_index": 25,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.24378418922424316,
+              "mean": 0.001707552704594265,
+              "median": 0.000581677071750164,
+              "p95": 0.006906110979616641,
+              "p99": 0.017423511743545506
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.5076580047607422,
+              "mean": 0.011119935370172774,
+              "median": 0.007687568664550781,
+              "p95": 0.03257179260253906,
+              "p99": 0.061603546142578125
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.13493549823760986,
+              "mean": 0.005454872047386224,
+              "median": 0.003645608201622963,
+              "p95": 0.016683304682374,
+              "p99": 0.027493539750576022
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+        "sample_index": 29,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.3922910690307617,
+              "mean": 0.0015830205739308894,
+              "median": 0.0005417913198471069,
+              "p95": 0.006301344931125635,
+              "p99": 0.01589584410190581
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.5701828002929688,
+              "mean": 0.010453256319548403,
+              "median": 0.007344245910644531,
+              "p95": 0.03063201904296875,
+              "p99": 0.055376071929931214
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.174027681350708,
+              "mean": 0.005143513930345736,
+              "median": 0.00343361496925354,
+              "p95": 0.015549668669700631,
+              "p99": 0.026185121014714242
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "9fcdc52b791045e99c623c5fc643331f",
+        "sample_index": 33,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.17318737506866455,
+              "mean": 0.001674010819747201,
+              "median": 0.0005570799112319946,
+              "p95": 0.0069517940282821655,
+              "p99": 0.016555071398615825
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3036003112792969,
+              "mean": 0.010316731181485312,
+              "median": 0.007315635681152344,
+              "p95": 0.02963542938232422,
+              "p99": 0.055294036865234375
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.0774431824684143,
+              "mean": 0.005067273451400771,
+              "median": 0.003439396619796753,
+              "p95": 0.015432837605476382,
+              "p99": 0.025230895280838023
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "87e772078a494d42bd34cd16172808bc",
+        "sample_index": 37,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.18669897317886353,
+              "mean": 0.0016589368521093093,
+              "median": 0.0005481308326125145,
+              "p95": 0.006783008575439453,
+              "p99": 0.01715219400823116
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3724803924560547,
+              "mean": 0.011350139559400934,
+              "median": 0.007704734802246094,
+              "p95": 0.0340423583984375,
+              "p99": 0.06406021118164062
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.10770517587661743,
+              "mean": 0.005097544595894163,
+              "median": 0.0034137368202209473,
+              "p95": 0.015540848672389994,
+              "p99": 0.025700466614216582
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+        "sample_index": 42,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.12969106435775757,
+              "mean": 0.0018903143378225665,
+              "median": 0.0006641149520874023,
+              "p95": 0.007985654473304737,
+              "p99": 0.017608165889978405
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.2939624786376953,
+              "mean": 0.012134903599577291,
+              "median": 0.008469104766845703,
+              "p95": 0.0362396240234375,
+              "p99": 0.06273556232452382
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.1174750030040741,
+              "mean": 0.005960837625041313,
+              "median": 0.004093129187822342,
+              "p95": 0.017929892241954813,
+              "p99": 0.03012420699000359
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+        "sample_index": 46,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.165077805519104,
+              "mean": 0.001747272783111829,
+              "median": 0.0005988441407680511,
+              "p95": 0.007293820381164551,
+              "p99": 0.01714158058166504
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.4131612777709961,
+              "mean": 0.01080491579898766,
+              "median": 0.007838249206542969,
+              "p95": 0.03094482421875,
+              "p99": 0.052936563491821076
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.10149562358856201,
+              "mean": 0.005528391874091176,
+              "median": 0.0037474334239959717,
+              "p95": 0.0167131580412388,
+              "p99": 0.027847278863191608
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+        "sample_index": 50,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.15547317266464233,
+              "mean": 0.0017803114087971362,
+              "median": 0.000579610001295805,
+              "p95": 0.007710073888301833,
+              "p99": 0.017836692035198165
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.2738037109375,
+              "mean": 0.010460305345548052,
+              "median": 0.0076351165771484375,
+              "p95": 0.029807090759277344,
+              "p99": 0.04973888397216797
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11217260360717773,
+              "mean": 0.005537012215815152,
+              "median": 0.003738678991794586,
+              "p95": 0.016924865543842323,
+              "p99": 0.027461678683757783
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "609d5177362340458a3bfd4949cd1e64",
+        "sample_index": 54,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.1464219093322754,
+              "mean": 0.0019438175023103357,
+              "median": 0.0006394870579242706,
+              "p95": 0.008295956254005421,
+              "p99": 0.01899051725864409
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.2729454040527344,
+              "mean": 0.011300816352686711,
+              "median": 0.00797414779663086,
+              "p95": 0.03251457214355469,
+              "p99": 0.060550689697265625
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.14573222398757935,
+              "mean": 0.005847581249024785,
+              "median": 0.003907203674316406,
+              "p95": 0.01788102909922602,
+              "p99": 0.03060293853282929
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+        "sample_index": 58,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.21679210662841797,
+              "mean": 0.0024436104694106225,
+              "median": 0.0007237403187900782,
+              "p95": 0.010479302704334253,
+              "p99": 0.02500463187694535
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3901233673095703,
+              "mean": 0.01161652054390737,
+              "median": 0.008216381072998047,
+              "p95": 0.033822059631347656,
+              "p99": 0.0586395263671875
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.14999175071716309,
+              "mean": 0.006755288605409649,
+              "median": 0.0042378902435302734,
+              "p95": 0.021331727504730225,
+              "p99": 0.03864229507744313
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "8573a885a7cb41d185c05029eeb9a54e",
+        "sample_index": 63,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.22407305240631104,
+              "mean": 0.0020725644910635035,
+              "median": 0.0006504058837890625,
+              "p95": 0.008707940578460693,
+              "p99": 0.020203593298792774
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.4771585464477539,
+              "mean": 0.011679830551786083,
+              "median": 0.008382797241210938,
+              "p95": 0.03339862823486328,
+              "p99": 0.056652069091796875
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.13488534092903137,
+              "mean": 0.006915617897270672,
+              "median": 0.004339713603258133,
+              "p95": 0.022082932293415077,
+              "p99": 0.03872204065322876
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "7bebe3c9be714f02837f8617c56df122",
+        "sample_index": 67,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.21950221061706543,
+              "mean": 0.001847785776253962,
+              "median": 0.0006048530340194702,
+              "p95": 0.00782850394025445,
+              "p99": 0.017592370659112927
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3839836120605469,
+              "mean": 0.010910119328158243,
+              "median": 0.007974624633789062,
+              "p95": 0.03087615966796875,
+              "p99": 0.051067352294921875
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.09816533327102661,
+              "mean": 0.00619990575873214,
+              "median": 0.004067476838827133,
+              "p95": 0.01946686655282976,
+              "p99": 0.03231560036540032
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+        "sample_index": 71,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.26441192626953125,
+              "mean": 0.002045295410822606,
+              "median": 0.0006393641233444214,
+              "p95": 0.008564294874668116,
+              "p99": 0.020757847353816014
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.5586824417114258,
+              "mean": 0.011136901522512947,
+              "median": 0.008095741271972656,
+              "p95": 0.03176882266998282,
+              "p99": 0.05243111610412576
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.12219929695129395,
+              "mean": 0.0065667707888962465,
+              "median": 0.00416058674454689,
+              "p95": 0.021045872569084176,
+              "p99": 0.03531694978475571
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+        "sample_index": 75,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.2098531723022461,
+              "mean": 0.0020360126246160566,
+              "median": 0.0006275046616792679,
+              "p95": 0.008879546821117384,
+              "p99": 0.020315140783786767
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.46901893615722656,
+              "mean": 0.010945491865554026,
+              "median": 0.0081024169921875,
+              "p95": 0.030611038208007812,
+              "p99": 0.05023670196533203
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11615811288356781,
+              "mean": 0.006011352180969178,
+              "median": 0.003893863409757614,
+              "p95": 0.018882156908512117,
+              "p99": 0.0318388865888119
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+        "sample_index": 80,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.36570608615875244,
+              "mean": 0.0023603181438962163,
+              "median": 0.0006772875785827637,
+              "p95": 0.009575159847736353,
+              "p99": 0.02541297793388364
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.744624137878418,
+              "mean": 0.011434588375666311,
+              "median": 0.008235931396484375,
+              "p95": 0.03245735168457031,
+              "p99": 0.05522727966308594
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.15741828083992004,
+              "mean": 0.006723729271221341,
+              "median": 0.004351004958152771,
+              "p95": 0.02093949317932131,
+              "p99": 0.03646206945180893
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      }
+    ]
+  },
+  "reference_to": {
+    "protocol_v1": "configs/detection/m2_parity_v1.yaml",
+    "v1_config_sha256": "ff5926f4481d9eeebfaf49036c2edbd6f399ef9cc513f73c471ab210551c94cf",
+    "v1_external_result_sha256": "f6474c365f8fc3d8595db813d1d23258574e4d0448e73473d68bf817f297e534",
+    "v1_measurement_commit": "a9314483e0ba7a191866266080c3147f9d902956",
+    "v1_status": "failed"
+  },
+  "same_session_original_vs_candidate": {
+    "candidate_engine": {
+      "committed": false,
+      "logical_name": "engines/m6/pointpillars_fp16_profile40k.engine",
+      "sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+      "size_bytes": 31469076
+    },
+    "final_detection_comparison": {
+      "checks": {
+        "aggregate_exported_counts": true,
+        "high_confidence_axis_yaw": true,
+        "high_confidence_classes": true,
+        "high_confidence_dimensions_per_detection": true,
+        "high_confidence_heading_direction_agreement": true,
+        "high_confidence_score": true,
+        "high_confidence_xy_center": true,
+        "high_confidence_z_center": true,
+        "per_sample_exported_counts": true,
+        "pytorch_to_tensorrt_high_confidence_coverage": true,
+        "tensorrt_to_pytorch_high_confidence_coverage": true
+      },
+      "class_name_mismatches": 0,
+      "continuous_metrics": {
+        "absolute_score_difference": {
+          "accepted": true,
+          "count": 754,
+          "failure_count": 0,
+          "maximum": 0.002926945686340332,
+          "mean": 0.0005722922576833467,
+          "median": 0.00047966837882995605,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.0016378611326217651,
+          "p99": 0.0024259388446807866,
+          "pass_count": 754,
+          "pass_fraction": 1.0,
+          "tolerance": 0.05
+        },
+        "absolute_z_center_difference_m": {
+          "accepted": true,
+          "count": 754,
+          "failure_count": 0,
+          "maximum": 0.10722577571868896,
+          "mean": 0.0007734886847377139,
+          "median": 0.00026285648345947266,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.001682281494140625,
+          "p99": 0.0026190280914307022,
+          "pass_count": 754,
+          "pass_fraction": 1.0,
+          "tolerance": 0.25
+        },
+        "axis_yaw_difference_modulo_pi_degrees": {
+          "accepted": true,
+          "count": 754,
+          "failure_count": 2,
+          "maximum": 16.09869258078469,
+          "mean": 0.06197905453780871,
+          "median": 0.010491170565139585,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.11190581936148891,
+          "p99": 0.4705639704150655,
+          "pass_count": 752,
+          "pass_fraction": 0.9973474801061007,
+          "tolerance": 5.0
+        },
+        "maximum_dimension_relative_error_per_detection": {
+          "accepted": true,
+          "count": 754,
+          "failure_count": 1,
+          "maximum": 0.09243528723407136,
+          "mean": 0.0004800154141868748,
+          "median": 0.00024398937917526005,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.0005491875822646648,
+          "p99": 0.002868532062686054,
+          "pass_count": 753,
+          "pass_fraction": 0.9986737400530504,
+          "tolerance": 0.05
+        },
+        "xy_center_displacement_m": {
+          "accepted": true,
+          "count": 754,
+          "failure_count": 1,
+          "maximum": 0.45422324966708216,
+          "mean": 0.001932199515214993,
+          "median": 0.00043234278291507435,
+          "minimum_pass_fraction": 0.99,
+          "p95": 0.0014176294719089246,
+          "p99": 0.004194943005036172,
+          "pass_count": 753,
+          "pass_fraction": 0.9986737400530504,
+          "tolerance": 0.25
+        }
+      },
+      "distinct_high_confidence_continuous_outliers": {
+        "count": 3,
+        "denominator": 754,
+        "detections": [
+          {
+            "axis_yaw_difference_degrees": 1.0910817387745169,
+            "class_name": "truck",
+            "failed_metrics": [
+              "dimensions"
+            ],
+            "full_heading_difference_degrees": 1.0910817387745169,
+            "match": {
+              "bev_iou": 0.8880758856772671,
+              "candidate": {
+                "center_xyz": [
+                  32.735816955566406,
+                  -2.048161029815674,
+                  -0.13643395900726318
+                ],
+                "class_id": 1,
+                "class_name": "truck",
+                "score": 0.42823341488838196,
+                "size_lwh": [
+                  6.288740634918213,
+                  2.5049562454223633,
+                  2.596538543701172
+                ],
+                "velocity_xy": [
+                  -0.00384521484375,
+                  -0.0081024169921875
+                ],
+                "yaw_rad": -0.12646484375
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.23478032044947855,
+              "center_displacement_xy_m": 0.20886462575526105,
+              "center_displacement_z_absolute_m": 0.10722577571868896,
+              "circular_yaw_difference_degrees": 1.0910817387745169,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0009562075138092041,
+              "dimension_relative_error_lwh": [
+                0.055694912863682354,
+                0.05095358610452952,
+                0.09243528723407136
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  32.526954650878906,
+                  -2.0491456985473633,
+                  -0.24365973472595215
+                ],
+                "class_id": 1,
+                "class_name": "truck",
+                "score": 0.42727720737457275,
+                "size_lwh": [
+                  5.956967830657959,
+                  2.3835079669952393,
+                  2.3768351078033447
+                ],
+                "velocity_xy": [
+                  -0.005130767822265625,
+                  -0.00202178955078125
+                ],
+                "yaw_rad": -0.107421875
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+            "sample_index": 8
+          },
+          {
+            "axis_yaw_difference_degrees": 16.09869258078469,
+            "class_name": "car",
+            "failed_metrics": [
+              "xy",
+              "axis_yaw"
+            ],
+            "full_heading_difference_degrees": 163.9013074192153,
+            "match": {
+              "bev_iou": 0.6027752789072682,
+              "candidate": {
+                "center_xyz": [
+                  38.39923095703125,
+                  19.719255447387695,
+                  1.2177751064300537
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.3789186179637909,
+                "size_lwh": [
+                  4.6000871658325195,
+                  1.9742193222045898,
+                  1.7200285196304321
+                ],
+                "velocity_xy": [
+                  0.003116607666015625,
+                  0.0019683837890625
+                ],
+                "yaw_rad": 1.325493335723877
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.4582430956794925,
+              "center_displacement_xy_m": 0.45422324966708216,
+              "center_displacement_z_absolute_m": 0.06056380271911621,
+              "circular_yaw_difference_degrees": 163.9013074192153,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0009196996688842773,
+              "dimension_relative_error_lwh": [
+                0.021171423024737606,
+                0.0005644434426523833,
+                0.02326929132920148
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  37.99644470214844,
+                  19.92921257019043,
+                  1.27833890914917
+                ],
+                "class_id": 0,
+                "class_name": "car",
+                "score": 0.37983831763267517,
+                "size_lwh": [
+                  4.504715919494629,
+                  1.9753342866897583,
+                  1.7610058784484863
+                ],
+                "velocity_xy": [
+                  -0.001068115234375,
+                  -0.007755279541015625
+                ],
+                "yaw_rad": 4.748061180114746
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+            "sample_index": 29
+          },
+          {
+            "axis_yaw_difference_degrees": 7.487615368193988,
+            "class_name": "pedestrian",
+            "failed_metrics": [
+              "axis_yaw"
+            ],
+            "full_heading_difference_degrees": 7.487615368193988,
+            "match": {
+              "bev_iou": 0.8231091747665819,
+              "candidate": {
+                "center_xyz": [
+                  -7.286337375640869,
+                  12.112271308898926,
+                  -0.5883985757827759
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.446977436542511,
+                "size_lwh": [
+                  0.6616746187210083,
+                  0.5966750383377075,
+                  1.7018499374389648
+                ],
+                "velocity_xy": [
+                  0.8203125,
+                  0.0545654296875
+                ],
+                "yaw_rad": -0.52001953125
+              },
+              "candidate_high_confidence": true,
+              "center_displacement_3d_m": 0.045665089040386686,
+              "center_displacement_xy_m": 0.04566458489789617,
+              "center_displacement_z_absolute_m": 0.00021457672119140625,
+              "circular_yaw_difference_degrees": 7.487615368193988,
+              "class_equal": true,
+              "confidence_score_absolute_difference": 0.0,
+              "dimension_relative_error_lwh": [
+                0.009415810019419846,
+                0.010926248170659172,
+                0.0031687946277263314
+              ],
+              "high_confidence": true,
+              "reference": {
+                "center_xyz": [
+                  -7.254531383514404,
+                  12.07950496673584,
+                  -0.5886131525039673
+                ],
+                "class_id": 7,
+                "class_name": "pedestrian",
+                "score": 0.446977436542511,
+                "size_lwh": [
+                  0.6679640412330627,
+                  0.6032664775848389,
+                  1.7072598934173584
+                ],
+                "velocity_xy": [
+                  0.82958984375,
+                  0.058807373046875
+                ],
+                "yaw_rad": -0.6507030725479126
+              },
+              "reference_high_confidence": true
+            },
+            "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+            "sample_index": 46
+          }
+        ],
+        "fraction": 0.003978779840848806
+      },
+      "exported_counts": {
+        "absolute_difference": 0,
+        "per_sample_disagreements": [],
+        "pytorch_total": 885,
+        "relative_difference_from_pytorch": 0.0,
+        "tensorrt_total": 885
+      },
+      "failed_checks": [],
+      "full_heading_diagnostics": {
+        "accepted": true,
+        "agreement_count": 753,
+        "agreement_fraction": 0.9986737400530504,
+        "count": 754,
+        "direction_flips": [
+          {
+            "anchor_provenance_recovered": false,
+            "axis_yaw_difference_modulo_pi_degrees": 16.09869258078469,
+            "class_name": "car",
+            "classification": "heading_divergent_with_axis_error",
+            "full_circular_yaw_difference_degrees": 163.9013074192153,
+            "pytorch_direction_class": null,
+            "pytorch_direction_logits": null,
+            "pytorch_final_yaw_rad": 4.748061180114746,
+            "pytorch_winning_logit_margin": null,
+            "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+            "sample_index": 29,
+            "tensorrt_direction_class": null,
+            "tensorrt_direction_logits": null,
+            "tensorrt_final_yaw_rad": 1.325493335723877,
+            "tensorrt_winning_logit_margin": null
+          }
+        ],
+        "disagreement_count": 1,
+        "maximum": 163.9013074192153,
+        "mean": 0.2580037426524382,
+        "median": 0.010491170565139585,
+        "minimum_agreement_fraction": 0.99,
+        "p95": 0.11190581936148891,
+        "p99": 0.4705639704150655
+      },
+      "high_confidence_coverage": {
+        "pytorch_matched": 754,
+        "pytorch_to_tensorrt": 1.0,
+        "pytorch_total": 754,
+        "tensorrt_matched": 751,
+        "tensorrt_to_pytorch": 1.0,
+        "tensorrt_total": 751
+      },
+      "high_confidence_match_denominator": 754,
+      "overall_pass": true,
+      "recommended_next_experiment": null,
+      "stage": 1,
+      "stage_2_required": false,
+      "threshold_edge_disagreements": []
+    },
+    "identical_voxel_tensor_objects": true,
+    "raw_network_comparisons": {
+      "aggregate": {
+        "bbox_pred": {
+          "absolute_difference": {
+            "count": 100800000,
+            "maximum": 0.0498046875,
+            "mean": 0.0003902164844861106,
+            "median": 0.0001220703125,
+            "p95": 0.001708984375,
+            "p99": 0.00390625
+          },
+          "dtype_consistent_across_samples_and_runtimes": true,
+          "pytorch_dtypes": [
+            "float32"
+          ],
+          "sample_count": 20,
+          "shape_consistent_across_samples_and_runtimes": true,
+          "shapes": [
+            [
+              1,
+              126,
+              200,
+              200
+            ]
+          ],
+          "tensorrt_dtypes": [
+            "float32"
+          ]
+        },
+        "cls_score": {
+          "absolute_difference": {
+            "count": 112000000,
+            "maximum": 0.125,
+            "mean": 0.003332579363141741,
+            "median": 0.0,
+            "p95": 0.015625,
+            "p99": 0.015625
+          },
+          "dtype_consistent_across_samples_and_runtimes": true,
+          "pytorch_dtypes": [
+            "float32"
+          ],
+          "sample_count": 20,
+          "shape_consistent_across_samples_and_runtimes": true,
+          "shapes": [
+            [
+              1,
+              140,
+              200,
+              200
+            ]
+          ],
+          "tensorrt_dtypes": [
+            "float32"
+          ]
+        },
+        "dir_cls_pred": {
+          "absolute_difference": {
+            "count": 22400000,
+            "maximum": 0.0283203125,
+            "mean": 0.00158098468963589,
+            "median": 0.0009765625,
+            "p95": 0.0048828125,
+            "p99": 0.0078125
+          },
+          "dtype_consistent_across_samples_and_runtimes": true,
+          "pytorch_dtypes": [
+            "float32"
+          ],
+          "sample_count": 20,
+          "shape_consistent_across_samples_and_runtimes": true,
+          "shapes": [
+            [
+              1,
+              28,
+              200,
+              200
+            ]
+          ],
+          "tensorrt_dtypes": [
+            "float32"
+          ]
+        }
+      },
+      "per_sample": [
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+          "sample_index": 0,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0390625,
+                "mean": 0.0003310662238725594,
+                "median": 0.0001220703125,
+                "p95": 0.001251220703125,
+                "p99": 0.00341796875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.003154402553013393,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.00158835534623691,
+                "median": 0.0009765625,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.04296875,
+                "mean": 0.0003752549900185494,
+                "median": 0.0001220703125,
+                "p95": 0.0015869140625,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.109375,
+                "mean": 0.003279046456473214,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02734375,
+                "mean": 0.0015595189988613129,
+                "median": 0.0009765625,
+                "p95": 0.004638671875,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+          "sample_index": 8,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.033203125,
+                "mean": 0.00036771333298039817,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.003233582938058036,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0015229282549449376,
+                "median": 0.0009765625,
+                "p95": 0.0045166015625,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "0d0700a2284e477db876c3ee1d864668",
+          "sample_index": 12,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0390625,
+                "mean": 0.00037962517046502656,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.125,
+                "mean": 0.003301472865513393,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02490234375,
+                "mean": 0.0015421047679015569,
+                "median": 0.0009765625,
+                "p95": 0.004638671875,
+                "p99": 0.0076904296875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "0a0d6b8c2e884134a3b48df43d54c36a",
+          "sample_index": 16,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.041015625,
+                "mean": 0.0003649801739388042,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.0037841796875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.00326689697265625,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.025390625,
+                "mean": 0.0015346744120121002,
+                "median": 0.0009765625,
+                "p95": 0.0045166015625,
+                "p99": 0.00738525390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "d0ecf474e0e64950aa265cd44b9c9d75",
+          "sample_index": 21,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0498046875,
+                "mean": 0.0003602328383733356,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.003662109375
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0033255147879464285,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02734375,
+                "mean": 0.0015730810701847077,
+                "median": 0.0009765625,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+          "sample_index": 25,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0263671875,
+                "mean": 0.0003557822062382622,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0032353831263950894,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0015267619507653373,
+                "median": 0.0009765625,
+                "p95": 0.0045166015625,
+                "p99": 0.007568359375
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+          "sample_index": 29,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0487060546875,
+                "mean": 0.00035223659230839636,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.0037841796875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0031810885184151787,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.025390625,
+                "mean": 0.0015092759472983225,
+                "median": 0.0009765625,
+                "p95": 0.00439453125,
+                "p99": 0.00732421875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "9fcdc52b791045e99c623c5fc643331f",
+          "sample_index": 33,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0390625,
+                "mean": 0.0003554072609614758,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.0037841796875
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0032516845703125,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0015339506387710572,
+                "median": 0.0009765625,
+                "p95": 0.004608154296875,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "87e772078a494d42bd34cd16172808bc",
+          "sample_index": 37,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.02880859375,
+                "mean": 0.00034819400822595943,
+                "median": 0.0001220703125,
+                "p95": 0.00146484375,
+                "p99": 0.003662109375
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0032009512765066965,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0014763797461986542,
+                "median": 0.0009765625,
+                "p95": 0.00439453125,
+                "p99": 0.007080078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.025390625,
+                "mean": 0.0004035436358361963,
+                "median": 0.0001220703125,
+                "p95": 0.00177001953125,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0033609413364955355,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0016242502783026015,
+                "median": 0.0010986328125,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+          "sample_index": 46,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.029296875,
+                "mean": 0.00039502888418852336,
+                "median": 0.0001220703125,
+                "p95": 0.001708984375,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0034362076241629463,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02081298828125,
+                "mean": 0.001593989327124187,
+                "median": 0.00106048583984375,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.046875,
+                "mean": 0.00038324328826533425,
+                "median": 0.0001220703125,
+                "p95": 0.0015869140625,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.078125,
+                "mean": 0.0034303255789620538,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0283203125,
+                "mean": 0.0016249109063829694,
+                "median": 0.0010986328125,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "609d5177362340458a3bfd4949cd1e64",
+          "sample_index": 54,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0302734375,
+                "mean": 0.0004164317129623322,
+                "median": 0.0001220703125,
+                "p95": 0.001953125,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0033488633510044643,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0016033131062984467,
+                "median": 0.00103759765625,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+          "sample_index": 58,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.03515625,
+                "mean": 0.0004837219826049275,
+                "median": 0.000152587890625,
+                "p95": 0.001953125,
+                "p99": 0.0048828125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.078125,
+                "mean": 0.003404200613839286,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02734375,
+                "mean": 0.0016103451090199606,
+                "median": 0.0010986328125,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "8573a885a7cb41d185c05029eeb9a54e",
+          "sample_index": 63,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.03125,
+                "mean": 0.0004169587598670097,
+                "median": 0.0001220703125,
+                "p95": 0.001953125,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.078125,
+                "mean": 0.0034631940569196428,
+                "median": 0.0,
+                "p95": 0.01171875,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0283203125,
+                "mean": 0.0016610161449228014,
+                "median": 0.0010986328125,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "7bebe3c9be714f02837f8617c56df122",
+          "sample_index": 67,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.03125,
+                "mean": 0.0004044513670816308,
+                "median": 0.0001220703125,
+                "p95": 0.001708984375,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.0034527127511160714,
+                "median": 0.0,
+                "p95": 0.01171875,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.020263671875,
+                "mean": 0.00164343153323446,
+                "median": 0.0010986328125,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+          "sample_index": 71,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0390625,
+                "mean": 0.0004285022755700444,
+                "median": 0.0001373291015625,
+                "p95": 0.001953125,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.078125,
+                "mean": 0.003525601283482143,
+                "median": 0.0,
+                "p95": 0.015625,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.0234375,
+                "mean": 0.0016780462511948176,
+                "median": 0.001190185546875,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+          "sample_index": 75,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.03515625,
+                "mean": 0.00040905997931720716,
+                "median": 0.0001220703125,
+                "p95": 0.0019073486328125,
+                "p99": 0.00390625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.09375,
+                "mean": 0.003375819789341518,
+                "median": 0.0,
+                "p95": 0.01171875,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.02490234375,
+                "mean": 0.0015705241211823055,
+                "median": 0.0010223388671875,
+                "p95": 0.0047607421875,
+                "p99": 0.0074462890625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        },
+        {
+          "candidate_runtime": "structural_40k_tensorrt_fp16",
+          "reference_runtime": "original_30k_tensorrt_fp16",
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensors": {
+            "bbox_pred": {
+              "absolute_difference": {
+                "count": 5040000,
+                "maximum": 0.0390625,
+                "mean": 0.0004728950066462396,
+                "median": 0.000152587890625,
+                "p95": 0.001953125,
+                "p99": 0.0048828125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                126,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "cls_score": {
+              "absolute_difference": {
+                "count": 5600000,
+                "maximum": 0.125,
+                "mean": 0.0034236968122209823,
+                "median": 0.0,
+                "p95": 0.01171875,
+                "p99": 0.015625
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                140,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            },
+            "dir_cls_pred": {
+              "absolute_difference": {
+                "count": 1120000,
+                "maximum": 0.021484375,
+                "mean": 0.0016428358818803516,
+                "median": 0.0011444091796875,
+                "p95": 0.0048828125,
+                "p99": 0.0078125
+              },
+              "dtype_consistent": true,
+              "pytorch_dtype": "float32",
+              "shape": [
+                1,
+                28,
+                200,
+                200
+              ],
+              "shape_consistent": true,
+              "tensorrt_dtype": "float32"
+            }
+          }
+        }
+      ]
+    },
+    "reference_engine": {
+      "committed": false,
+      "logical_name": "engines/pointpillars_fp16.engine",
+      "sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+      "size_bytes": 31519476
+    },
+    "role": "characterization_only_not_acceptance_gate",
+    "same_session": true
+  },
+  "schema_version": "2.0",
+  "shared_inputs": [
+    {
+      "prepared_point_count": 33587,
+      "profile_fit": true,
+      "sample_id": "3e8750f331d7499e9b5123e9eb70f2e2",
+      "sample_index": 0,
+      "shared_object_identity": true,
+      "voxel_count": 4352,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 100.16865539550781,
+          "minimum": 0.0,
+          "sha256": "63e353942e0d66e20905607cf4b86060bf52bb724b5a4f9e1f01649f19d4bbe8",
+          "shape": [
+            4352,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 4.830422878265381,
+          "minimum": 1.0,
+          "sha256": "9808940e52695febdc6d9dd3f025735880376f32f139ec7a1ef31022850eca5a",
+          "shape": [
+            4352
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.95063018798828,
+          "mean": -0.023705409839749336,
+          "minimum": -49.95545959472656,
+          "sha256": "c948b451b855db787715a4035612f56b2eaf762504b80509b1ee307c1eb601ec",
+          "shape": [
+            4352,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 370352,
+      "profile_fit": true,
+      "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+      "sample_index": 4,
+      "shared_object_identity": true,
+      "voxel_count": 16203,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 96.21699523925781,
+          "minimum": 0.0,
+          "sha256": "44fe043139b65d8904f088dc2d504d5db2e401aa89bd3ecb17b61e3d49f53e36",
+          "shape": [
+            16203,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.839905738830566,
+          "minimum": 1.0,
+          "sha256": "5dfd1f9e38a34243613c73468ac4dbcda9c4594697ed4d3e0ec3a55a95cf5597",
+          "shape": [
+            16203
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.76627731323242,
+          "mean": -0.17234204709529877,
+          "minimum": -49.85707092285156,
+          "sha256": "acdc8471e733ada7ceee86a591e0a332fb85b9209b63080589b9db51b46712fd",
+          "shape": [
+            16203,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 366395,
+      "profile_fit": true,
+      "sample_id": "fa65a298c01f44e7a182bbf9e5fe3697",
+      "sample_index": 8,
+      "shared_object_identity": true,
+      "voxel_count": 19512,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 97.50629425048828,
+          "minimum": 0.0,
+          "sha256": "735d386402e06e91055f2a6b06bc692c120f13c63e7327b7b6bcb702de01918a",
+          "shape": [
+            19512,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.660414695739746,
+          "minimum": 1.0,
+          "sha256": "61b103df1b5da18ffa3efc56e05eb716df2a75a235cf64e864888483eb347267",
+          "shape": [
+            19512
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.990875244140625,
+          "mean": -0.15250788629055023,
+          "minimum": -49.99338150024414,
+          "sha256": "f8840a9a144ebbe93c50725a131116d30a268b20088251351f30b62509d7c3b0",
+          "shape": [
+            19512,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 367096,
+      "profile_fit": true,
+      "sample_id": "0d0700a2284e477db876c3ee1d864668",
+      "sample_index": 12,
+      "shared_object_identity": true,
+      "voxel_count": 19579,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 93.1460952758789,
+          "minimum": 0.0,
+          "sha256": "0f904ec3690cc454f39ae717bdd9c3d85dd613291396c0b0df9001a2b4026a5a",
+          "shape": [
+            19579,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.042494773864746,
+          "minimum": 1.0,
+          "sha256": "6fab964bc79bc241ca934e51db253f8e936b09fbddbc182664d3733e842c50b3",
+          "shape": [
+            19579
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.964881896972656,
+          "mean": -0.1573525220155716,
+          "minimum": -49.99636459350586,
+          "sha256": "2c25505b7a90f67111802f318762ba2d980c55b521c1607f86e030b8373c4872",
+          "shape": [
+            19579,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 366359,
+      "profile_fit": true,
+      "sample_id": "0a0d6b8c2e884134a3b48df43d54c36a",
+      "sample_index": 16,
+      "shared_object_identity": true,
+      "voxel_count": 15037,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 94.18141174316406,
+          "minimum": 0.0,
+          "sha256": "df371d6eee1a4f249200be6d3f06cacf97d8f2f299d6cbfd883ec5f0a100a45b",
+          "shape": [
+            15037,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 14.266142845153809,
+          "minimum": 1.0,
+          "sha256": "bdf9af70d1cf354cf1e112cac695d84a5d888e692138bc4f93035da26b27d225",
+          "shape": [
+            15037
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.99562072753906,
+          "mean": -0.13381248712539673,
+          "minimum": -49.98663330078125,
+          "sha256": "9e1b14f38b1eb9d75f18ffcecaffb462540aaf1a511061f0e6a34dcd4444eca0",
+          "shape": [
+            15037,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 364175,
+      "profile_fit": true,
+      "sample_id": "d0ecf474e0e64950aa265cd44b9c9d75",
+      "sample_index": 21,
+      "shared_object_identity": true,
+      "voxel_count": 13606,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 95.99783325195312,
+          "minimum": 0.0,
+          "sha256": "95699fada704acd2aee5e7fc2ddcd7f67d6406ebb9f53d4334f24e4bbf5b19b6",
+          "shape": [
+            13606,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 15.867558479309082,
+          "minimum": 1.0,
+          "sha256": "7185cc069e19e8e339238a06964cfd7da2d726044805918a30b591612dd38511",
+          "shape": [
+            13606
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.968204498291016,
+          "mean": -0.19555406272411346,
+          "minimum": -49.98817443847656,
+          "sha256": "30abad648045424eeec95a54227b01d4172e5851b1bac485f2d40acd2df03732",
+          "shape": [
+            13606,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 362081,
+      "profile_fit": true,
+      "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+      "sample_index": 25,
+      "shared_object_identity": true,
+      "voxel_count": 17453,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 96.28269958496094,
+          "minimum": 0.0,
+          "sha256": "398f67fddeec0862b7e324b9e225f01db4a13cec5fe6f041e72563c3496c1210",
+          "shape": [
+            17453,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.645849227905273,
+          "minimum": 1.0,
+          "sha256": "cfff24700200695732ecfd191328b1164d603e39837a87c8b4a73f158137c321",
+          "shape": [
+            17453
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.998111724853516,
+          "mean": -0.2072843313217163,
+          "minimum": -49.96636962890625,
+          "sha256": "025b64dbf500ea9ddacb1b66f8adf70cd64c4ce0e35f2025155aa7a0e032ab74",
+          "shape": [
+            17453,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 356035,
+      "profile_fit": true,
+      "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+      "sample_index": 29,
+      "shared_object_identity": true,
+      "voxel_count": 19589,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 100.36839294433594,
+          "minimum": 0.0,
+          "sha256": "b4e52df10101c0b2529929dcbdc2edef552bcefedd5c6f1eff269a48849d7e79",
+          "shape": [
+            19589,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.34371280670166,
+          "minimum": 1.0,
+          "sha256": "1ca364f4fe989288d69dced09c4dddbf9008855abdadbaf453af4a432a316b3c",
+          "shape": [
+            19589
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.989566802978516,
+          "mean": -0.14790581166744232,
+          "minimum": -49.99412155151367,
+          "sha256": "a520975cce5747708656bf10b72d9b3dc4d8bb7ea842954bd81b641ba1fb7ab5",
+          "shape": [
+            19589,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 357519,
+      "profile_fit": true,
+      "sample_id": "9fcdc52b791045e99c623c5fc643331f",
+      "sample_index": 33,
+      "shared_object_identity": true,
+      "voxel_count": 18130,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 98.62617492675781,
+          "minimum": 0.0,
+          "sha256": "abf8d14936d672b6997eeaee31e71f01ca7a712257e3b5d46623651c900f5960",
+          "shape": [
+            18130,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 13.013513565063477,
+          "minimum": 1.0,
+          "sha256": "372390e05bfc219c264daa807f2ec090a65b54f60a03b3cd3321361e2cff2fc9",
+          "shape": [
+            18130
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.85976028442383,
+          "mean": -0.19437666237354279,
+          "minimum": -49.98860168457031,
+          "sha256": "6009b8aa154993f5e19165ee7aa48faefb44203d92311fcf612525843e8e614d",
+          "shape": [
+            18130,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 364318,
+      "profile_fit": true,
+      "sample_id": "87e772078a494d42bd34cd16172808bc",
+      "sample_index": 37,
+      "shared_object_identity": true,
+      "voxel_count": 16270,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 95.23457336425781,
+          "minimum": 0.0,
+          "sha256": "628b8b7101bbbd4cc12d8a5f9a752ee83877291e4c84795cd4ae5b1f7e760126",
+          "shape": [
+            16270,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 13.308297157287598,
+          "minimum": 1.0,
+          "sha256": "1cea96273f0c4f1fae044943121909153a4441f36ad2f552eb00a46691e9f360",
+          "shape": [
+            16270
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.98023986816406,
+          "mean": -0.2624734044075012,
+          "minimum": -49.98809051513672,
+          "sha256": "be93cf77c100d373df6da8f63f3880e2f0c43665c9b894fe56e8955beb19ff8d",
+          "shape": [
+            16270,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 354182,
+      "profile_fit": true,
+      "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+      "sample_index": 42,
+      "shared_object_identity": true,
+      "voxel_count": 18207,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 105.6288070678711,
+          "minimum": 0.0,
+          "sha256": "031d04f610ed7923c32999816be44437aaa8537b096b2d359c19499795d59dc2",
+          "shape": [
+            18207,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 13.308452606201172,
+          "minimum": 1.0,
+          "sha256": "b08aedad718f69be86709f7b77a1e34d8f464d56743b35321e71709f1d933cec",
+          "shape": [
+            18207
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.93526840209961,
+          "mean": -0.11638930439949036,
+          "minimum": -47.3189697265625,
+          "sha256": "9bc33407b8cff8219454eac5e7ee449b9d0f6da270ca2a42f8f2c0906929cd87",
+          "shape": [
+            18207,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 346729,
+      "profile_fit": true,
+      "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+      "sample_index": 46,
+      "shared_object_identity": true,
+      "voxel_count": 22546,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 102.42626953125,
+          "minimum": 0.0,
+          "sha256": "7e80deee2a6350b3cfde25c2aa5ec7dabb963e9bba780e535d925f22a444d756",
+          "shape": [
+            22546,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 10.65718936920166,
+          "minimum": 1.0,
+          "sha256": "852ba3566e5adccd60350078ab69def8850862ed3222232ffa5652c39ab06d55",
+          "shape": [
+            22546
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.990299224853516,
+          "mean": -0.1539081335067749,
+          "minimum": -42.937339782714844,
+          "sha256": "71b903f549329aa2862f7dda05f4a3c6ab65e6f7a6607c532c56e3bd392805cd",
+          "shape": [
+            22546,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 346436,
+      "profile_fit": true,
+      "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+      "sample_index": 50,
+      "shared_object_identity": true,
+      "voxel_count": 19974,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 99.05567169189453,
+          "minimum": 0.0,
+          "sha256": "4700e48c62ca3c2ac67d08818b3468e327e2e8808f7a8c768f20ca09d65f2fdd",
+          "shape": [
+            19974,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.733804702758789,
+          "minimum": 1.0,
+          "sha256": "a5aaed313eea5809fc01544bdb226828fd5d557a2e9cd5e096408e8354b5cd89",
+          "shape": [
+            19974
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.91168212890625,
+          "mean": -0.189462810754776,
+          "minimum": -45.80955505371094,
+          "sha256": "27a67be2cc77d3f08fe2ad68c5daa4f1ce7b567347ae7869d98fd3bea631f91d",
+          "shape": [
+            19974,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 347495,
+      "profile_fit": true,
+      "sample_id": "609d5177362340458a3bfd4949cd1e64",
+      "sample_index": 54,
+      "shared_object_identity": true,
+      "voxel_count": 18207,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 97.40122985839844,
+          "minimum": 0.0,
+          "sha256": "1622d05aa62bf9a00769858c6365a8fc8ce68bcfbba36cc6757c011aac65085d",
+          "shape": [
+            18207,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 12.647223472595215,
+          "minimum": 1.0,
+          "sha256": "e2ea2f79737df033643e72764f572e17583816cb032fba4c1b1535f5f47f7860",
+          "shape": [
+            18207
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.97154235839844,
+          "mean": -0.19076688587665558,
+          "minimum": -49.45794677734375,
+          "sha256": "ef3030cf0322a939f53f4ed2d54926cf5cbafd6cba9f7bf7048163e7c31b8cf1",
+          "shape": [
+            18207,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 349245,
+      "profile_fit": true,
+      "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+      "sample_index": 58,
+      "shared_object_identity": true,
+      "voxel_count": 19134,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 101.97122955322266,
+          "minimum": 0.0,
+          "sha256": "5131fbed222f8b99176f31477d193e9345c23f2292def027d4144e0701b58adb",
+          "shape": [
+            19134,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.62830638885498,
+          "minimum": 1.0,
+          "sha256": "6b230fcd1756db9575d0f931cfc105922aeedb35a96167f315a672a1a04fd758",
+          "shape": [
+            19134
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.99636459350586,
+          "mean": -0.17754079401493073,
+          "minimum": -49.99742126464844,
+          "sha256": "9f6c68d9ad6876d759310e6c4e99ff65c2a1ec8367f6daa7fcaf7c1d321e793e",
+          "shape": [
+            19134,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 340767,
+      "profile_fit": true,
+      "sample_id": "8573a885a7cb41d185c05029eeb9a54e",
+      "sample_index": 63,
+      "shared_object_identity": true,
+      "voxel_count": 16074,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 99.51325225830078,
+          "minimum": 0.0,
+          "sha256": "2a382bbd4c817860801a2727382aa8a7d5a921977d7d39028564d67ed728bada",
+          "shape": [
+            16074,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 12.042863845825195,
+          "minimum": 1.0,
+          "sha256": "3ec7cff94a6800e29ed5d284bd004b86462a2d064bb7d18a423bb5cabc2f1e71",
+          "shape": [
+            16074
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.9998893737793,
+          "mean": -0.15314222872257233,
+          "minimum": -49.9981689453125,
+          "sha256": "6f73c6dca03b9c692d1703de14ec5e45e39bddbdad7197cadde9963c084ea0d2",
+          "shape": [
+            16074,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 342907,
+      "profile_fit": true,
+      "sample_id": "7bebe3c9be714f02837f8617c56df122",
+      "sample_index": 67,
+      "shared_object_identity": true,
+      "voxel_count": 17921,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 97.50240325927734,
+          "minimum": 0.0,
+          "sha256": "0c8e6d63072cee46873a40b343996d10e86a238e42dfc74442a379a7d6f6826f",
+          "shape": [
+            17921,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.077339172363281,
+          "minimum": 1.0,
+          "sha256": "0ad8071cf69fedc0118e1e12a663fc95df915e945fc879e4610969b637d4e41b",
+          "shape": [
+            17921
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.96858596801758,
+          "mean": -0.127508282661438,
+          "minimum": -49.997779846191406,
+          "sha256": "f6a47b7ea41559cfd84c8268cd78b904e1ba8b317644a188fee88977df69a0d1",
+          "shape": [
+            17921,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 338012,
+      "profile_fit": true,
+      "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+      "sample_index": 71,
+      "shared_object_identity": true,
+      "voxel_count": 18602,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 98.09418487548828,
+          "minimum": 0.0,
+          "sha256": "b0db2f5d5fa0b551a47d23f89681bf1603ff1f745883797c51fc4e9313a96367",
+          "shape": [
+            18602,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.270938873291016,
+          "minimum": 1.0,
+          "sha256": "1561c4b232d988dbfe611392ff44119b8c651d232862579cb87b5e8b51654642",
+          "shape": [
+            18602
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.998741149902344,
+          "mean": -0.12665972113609314,
+          "minimum": -49.99849319458008,
+          "sha256": "d9d810eca51679193a98d9dd4ee81962dd50eaac936bd258c2db313066c1afc6",
+          "shape": [
+            18602,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 337553,
+      "profile_fit": true,
+      "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+      "sample_index": 75,
+      "shared_object_identity": true,
+      "voxel_count": 19262,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 100.44295501708984,
+          "minimum": 0.0,
+          "sha256": "4c504ac81409e7b000f01ffa95a14be5b50f392c1df4ea538c87b0d55ca05e24",
+          "shape": [
+            19262,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 11.07371997833252,
+          "minimum": 1.0,
+          "sha256": "d42f7941d5d7e07ddbfaf757829e98de14f1876a8e4b59aa28a5cbde8b74ea2c",
+          "shape": [
+            19262
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.9946403503418,
+          "mean": -0.07367045432329178,
+          "minimum": -49.98511505126953,
+          "sha256": "4b5de84b2b4ff1c3db339c73190e7a3774adb3bb4ef826b90626e64b8d5dc0b5",
+          "shape": [
+            19262,
+            64,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "prepared_point_count": 340695,
+      "profile_fit": true,
+      "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+      "sample_index": 80,
+      "shared_object_identity": true,
+      "voxel_count": 18528,
+      "voxel_tensors": {
+        "coors": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 399.0,
+          "mean": 96.1050033569336,
+          "minimum": 0.0,
+          "sha256": "c3bfcf6c15f46db087c1289b11092e2579c962f87ecc46eea89c2dd0ad2e45ce",
+          "shape": [
+            18528,
+            4
+          ]
+        },
+        "num_points": {
+          "device": "cuda:0",
+          "dtype": "torch.int32",
+          "maximum": 64.0,
+          "mean": 12.112316131591797,
+          "minimum": 1.0,
+          "sha256": "c9cfbab9024c00a4150aa8132536c266931336727a67526ef4713e0deff4bee6",
+          "shape": [
+            18528
+          ]
+        },
+        "voxels": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "maximum": 49.99962615966797,
+          "mean": -0.1144065260887146,
+          "minimum": -49.99916458129883,
+          "sha256": "a6b4f87e39106e65c56d38d42caa1bad09d6b1555fccfc0038fa467ae678095e",
+          "shape": [
+            18528,
+            64,
+            4
+          ]
+        }
+      }
+    }
+  ],
+  "stage_1": {
+    "checks": {
+      "aggregate_exported_counts": true,
+      "high_confidence_axis_yaw": true,
+      "high_confidence_classes": true,
+      "high_confidence_dimensions_per_detection": true,
+      "high_confidence_heading_direction_agreement": true,
+      "high_confidence_score": true,
+      "high_confidence_xy_center": true,
+      "high_confidence_z_center": true,
+      "per_sample_exported_counts": true,
+      "pytorch_to_tensorrt_high_confidence_coverage": true,
+      "tensorrt_to_pytorch_high_confidence_coverage": true
+    },
+    "class_name_mismatches": 0,
+    "continuous_metrics": {
+      "absolute_score_difference": {
+        "accepted": true,
+        "count": 752,
+        "failure_count": 2,
+        "maximum": 0.1705223023891449,
+        "mean": 0.0018259058607385515,
+        "median": 0.00099906325340271,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.004519522190093991,
+        "p99": 0.00816117405891419,
+        "pass_count": 750,
+        "pass_fraction": 0.9973404255319149,
+        "tolerance": 0.05
+      },
+      "absolute_z_center_difference_m": {
+        "accepted": true,
+        "count": 752,
+        "failure_count": 0,
+        "maximum": 0.09230142831802368,
+        "mean": 0.001968041775708503,
+        "median": 0.0008202493190765381,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.004711073637008665,
+        "p99": 0.025189500451088007,
+        "pass_count": 752,
+        "pass_fraction": 1.0,
+        "tolerance": 0.25
+      },
+      "axis_yaw_difference_modulo_pi_degrees": {
+        "accepted": true,
+        "count": 752,
+        "failure_count": 2,
+        "maximum": 47.598416948376205,
+        "mean": 0.19024374322154539,
+        "median": 0.03869302164812223,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.3775431459954152,
+        "p99": 1.4262997734268728,
+        "pass_count": 750,
+        "pass_fraction": 0.9973404255319149,
+        "tolerance": 5.0
+      },
+      "maximum_dimension_relative_error_per_detection": {
+        "accepted": true,
+        "count": 752,
+        "failure_count": 2,
+        "maximum": 0.05621620164773394,
+        "mean": 0.0010442306490615948,
+        "median": 0.0005061469513560979,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.0017168620900774017,
+        "p99": 0.019245560831853317,
+        "pass_count": 750,
+        "pass_fraction": 0.9973404255319149,
+        "tolerance": 0.05
+      },
+      "xy_center_displacement_m": {
+        "accepted": true,
+        "count": 752,
+        "failure_count": 5,
+        "maximum": 0.9783314356122452,
+        "mean": 0.006640396424155661,
+        "median": 0.0013666045968273408,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.005695524375019372,
+        "p99": 0.12679796741798147,
+        "pass_count": 747,
+        "pass_fraction": 0.9933510638297872,
+        "tolerance": 0.25
+      }
+    },
+    "distinct_high_confidence_continuous_outliers": {
+      "count": 7,
+      "denominator": 752,
+      "detections": [
+        {
+          "axis_yaw_difference_degrees": 0.22829224281850619,
+          "class_name": "car",
+          "failed_metrics": [
+            "xy",
+            "score"
+          ],
+          "full_heading_difference_degrees": 0.22829224281850619,
+          "match": {
+            "bev_iou": 0.6027025276849446,
+            "candidate": {
+              "center_xyz": [
+                -8.998893737792969,
+                33.390602111816406,
+                0.7837335467338562
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.35398629307746887,
+              "size_lwh": [
+                4.665901184082031,
+                1.9263689517974854,
+                1.626354694366455
+              ],
+              "velocity_xy": [
+                0.0046844482421875,
+                0.007720947265625
+              ],
+              "yaw_rad": 4.695387840270996
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.8007922263790614,
+            "center_displacement_xy_m": 0.7968817248168227,
+            "center_displacement_z_absolute_m": 0.07904243469238281,
+            "circular_yaw_difference_degrees": 0.22829224281850619,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.07283616065979004,
+            "dimension_relative_error_lwh": [
+              0.02030505389207571,
+              0.0154387394538498,
+              0.009098852301251856
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                -8.826898574829102,
+                32.61250305175781,
+                0.7046911120414734
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.4268224537372589,
+              "size_lwh": [
+                4.573045253753662,
+                1.897080421447754,
+                1.6116901636123657
+              ],
+              "velocity_xy": [
+                0.010648710653185844,
+                0.0013104814570397139
+              ],
+              "yaw_rad": 4.699372291564941
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "0d0700a2284e477db876c3ee1d864668",
+          "sample_index": 12
+        },
+        {
+          "axis_yaw_difference_degrees": 0.5439562654998155,
+          "class_name": "car",
+          "failed_metrics": [
+            "xy",
+            "score"
+          ],
+          "full_heading_difference_degrees": 0.5439562654998155,
+          "match": {
+            "bev_iou": 0.5167453672682624,
+            "candidate": {
+              "center_xyz": [
+                -9.023780822753906,
+                30.451019287109375,
+                0.6567174792289734
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.42441198229789734,
+              "size_lwh": [
+                4.496749401092529,
+                1.9114654064178467,
+                1.6466306447982788
+              ],
+              "velocity_xy": [
+                0.011871337890625,
+                0.0043792724609375
+              ],
+              "yaw_rad": 4.603926658630371
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.9796329237187218,
+            "center_displacement_xy_m": 0.9783314356122452,
+            "center_displacement_z_absolute_m": 0.05048036575317383,
+            "circular_yaw_difference_degrees": 0.5439562654998155,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.1705223023891449,
+            "dimension_relative_error_lwh": [
+              0.018227616519090592,
+              0.016505460127420934,
+              0.00819967520962851
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                -8.875118255615234,
+                29.48404884338379,
+                0.6062371134757996
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.25388967990875244,
+              "size_lwh": [
+                4.4162516593933105,
+                1.8804280757904053,
+                1.660244107246399
+              ],
+              "velocity_xy": [
+                0.012173985131084919,
+                0.0025673608761280775
+              ],
+              "yaw_rad": 4.594432830810547
+            },
+            "reference_high_confidence": false
+          },
+          "sample_id": "0d0700a2284e477db876c3ee1d864668",
+          "sample_index": 12
+        },
+        {
+          "axis_yaw_difference_degrees": 16.359250637242337,
+          "class_name": "car",
+          "failed_metrics": [
+            "xy",
+            "axis_yaw"
+          ],
+          "full_heading_difference_degrees": 163.64074936275767,
+          "match": {
+            "bev_iou": 0.6018358347998123,
+            "candidate": {
+              "center_xyz": [
+                38.39923095703125,
+                19.719255447387695,
+                1.2177751064300537
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.3789186179637909,
+              "size_lwh": [
+                4.6000871658325195,
+                1.9742193222045898,
+                1.7200285196304321
+              ],
+              "velocity_xy": [
+                0.003116607666015625,
+                0.0019683837890625
+              ],
+              "yaw_rad": 1.325493335723877
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.4570359720516999,
+            "center_displacement_xy_m": 0.45383907494441655,
+            "center_displacement_z_absolute_m": 0.05396270751953125,
+            "circular_yaw_difference_degrees": 163.64074936275767,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.0008557140827178955,
+            "dimension_relative_error_lwh": [
+              0.01987432404959928,
+              0.000690847391394886,
+              0.023229883009454777
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                37.99485778808594,
+                19.925294876098633,
+                1.271737813949585
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.378062903881073,
+              "size_lwh": [
+                4.5104451179504395,
+                1.9755841493606567,
+                1.760934829711914
+              ],
+              "velocity_xy": [
+                -0.0010283301817253232,
+                -0.007625751197338104
+              ],
+              "yaw_rad": 4.752608776092529
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+          "sample_index": 29
+        },
+        {
+          "axis_yaw_difference_degrees": 0.31545911700620893,
+          "class_name": "pedestrian",
+          "failed_metrics": [
+            "dimensions"
+          ],
+          "full_heading_difference_degrees": 0.31545911700620893,
+          "match": {
+            "bev_iou": 0.5973029498095921,
+            "candidate": {
+              "center_xyz": [
+                -6.31186056137085,
+                5.8548665046691895,
+                -0.8292154669761658
+              ],
+              "class_id": 7,
+              "class_name": "pedestrian",
+              "score": 0.4315841495990753,
+              "size_lwh": [
+                0.8217602968215942,
+                0.6979244947433472,
+                1.754560112953186
+              ],
+              "velocity_xy": [
+                0.56396484375,
+                1.1943359375
+              ],
+              "yaw_rad": 1.258476734161377
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.17529524495180077,
+            "center_displacement_xy_m": 0.16925894427882177,
+            "center_displacement_z_absolute_m": 0.04560518264770508,
+            "circular_yaw_difference_degrees": 0.31545911700620893,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.0017822980880737305,
+            "dimension_relative_error_lwh": [
+              0.03694371222968339,
+              0.05207909351720321,
+              0.013362159144513991
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                -6.300329208374023,
+                6.0237321853637695,
+                -0.7836102843284607
+              ],
+              "class_id": 7,
+              "class_name": "pedestrian",
+              "score": 0.4298018515110016,
+              "size_lwh": [
+                0.7924830317497253,
+                0.6633764505386353,
+                1.7783223390579224
+              ],
+              "velocity_xy": [
+                0.5658776164054871,
+                1.3655565977096558
+              ],
+              "yaw_rad": 1.2529709339141846
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "edba7d0cf1c64d2a9c8a5ebddab507a9",
+          "sample_index": 46
+        },
+        {
+          "axis_yaw_difference_degrees": 47.598416948376205,
+          "class_name": "pedestrian",
+          "failed_metrics": [
+            "axis_yaw"
+          ],
+          "full_heading_difference_degrees": 47.598416948376205,
+          "match": {
+            "bev_iou": 0.5083917379430287,
+            "candidate": {
+              "center_xyz": [
+                -8.758134841918945,
+                1.4129502773284912,
+                -0.7936025261878967
+              ],
+              "class_id": 7,
+              "class_name": "pedestrian",
+              "score": 0.4450470805168152,
+              "size_lwh": [
+                0.6594973802566528,
+                0.631754994392395,
+                1.7735365629196167
+              ],
+              "velocity_xy": [
+                0.26318359375,
+                -0.447265625
+              ],
+              "yaw_rad": 1.210625171661377
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.20430259883054103,
+            "center_displacement_xy_m": 0.18226354056520938,
+            "center_displacement_z_absolute_m": 0.09230142831802368,
+            "circular_yaw_difference_degrees": 47.598416948376205,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.001234203577041626,
+            "dimension_relative_error_lwh": [
+              0.04386780157008537,
+              0.02770820045351216,
+              0.012278810913389135
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                -8.642654418945312,
+                1.5539618730545044,
+                -0.701301097869873
+              ],
+              "class_id": 7,
+              "class_name": "pedestrian",
+              "score": 0.4462812840938568,
+              "size_lwh": [
+                0.6317824721336365,
+                0.6497586369514465,
+                1.7955842018127441
+              ],
+              "velocity_xy": [
+                0.12900970876216888,
+                -0.15579581260681152
+              ],
+              "yaw_rad": 0.3798760771751404
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "048a45dd2cf54aa5808d8ccc85731d44",
+          "sample_index": 50
+        },
+        {
+          "axis_yaw_difference_degrees": 2.9414892679576914,
+          "class_name": "car",
+          "failed_metrics": [
+            "xy",
+            "dimensions"
+          ],
+          "full_heading_difference_degrees": 2.9414892679576914,
+          "match": {
+            "bev_iou": 0.7026824927145474,
+            "candidate": {
+              "center_xyz": [
+                5.4887237548828125,
+                33.197750091552734,
+                0.570918619632721
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.5457699298858643,
+              "size_lwh": [
+                4.474982738494873,
+                1.8859703540802002,
+                1.7072681188583374
+              ],
+              "velocity_xy": [
+                0.00048828125,
+                0.0008029937744140625
+              ],
+              "yaw_rad": 0.7050780653953552
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.3300110957999813,
+            "center_displacement_xy_m": 0.32994461558532573,
+            "center_displacement_z_absolute_m": 0.006623744964599609,
+            "circular_yaw_difference_degrees": 2.9414892679576914,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.0025968551635742188,
+            "dimension_relative_error_lwh": [
+              0.05621620164773394,
+              0.03730153470920398,
+              0.0008995780668426617
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                5.484837055206299,
+                33.527671813964844,
+                0.5642948746681213
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.5483667850494385,
+              "size_lwh": [
+                4.7415337562561035,
+                1.9590457677841187,
+                1.7088053226470947
+              ],
+              "velocity_xy": [
+                0.011128909885883331,
+                0.007663417607545853
+              ],
+              "yaw_rad": 0.6537393927574158
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+          "sample_index": 71
+        },
+        {
+          "axis_yaw_difference_degrees": 1.6106473987482168,
+          "class_name": "car",
+          "failed_metrics": [
+            "xy"
+          ],
+          "full_heading_difference_degrees": 1.6106473987482168,
+          "match": {
+            "bev_iou": 0.7886782101743338,
+            "candidate": {
+              "center_xyz": [
+                9.502936363220215,
+                23.637176513671875,
+                0.20921725034713745
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.511228621006012,
+              "size_lwh": [
+                4.581243991851807,
+                1.9223461151123047,
+                1.6448228359222412
+              ],
+              "velocity_xy": [
+                0.006320953369140625,
+                0.00452423095703125
+              ],
+              "yaw_rad": 0.4543456435203552
+            },
+            "candidate_high_confidence": true,
+            "center_displacement_3d_m": 0.320927373244353,
+            "center_displacement_xy_m": 0.31443762304286726,
+            "center_displacement_z_absolute_m": 0.06421339511871338,
+            "circular_yaw_difference_degrees": 1.6106473987482168,
+            "class_equal": true,
+            "confidence_score_absolute_difference": 0.001703023910522461,
+            "dimension_relative_error_lwh": [
+              0.0052976183998720925,
+              0.0059022099674685856,
+              0.02682255816837078
+            ],
+            "high_confidence": true,
+            "reference": {
+              "center_xyz": [
+                9.190272331237793,
+                23.60382652282715,
+                0.27343064546585083
+              ],
+              "class_id": 0,
+              "class_name": "car",
+              "score": 0.5129316449165344,
+              "size_lwh": [
+                4.557102203369141,
+                1.9337595701217651,
+                1.690157175064087
+              ],
+              "velocity_xy": [
+                0.005919317714869976,
+                0.003764438908547163
+              ],
+              "yaw_rad": 0.4824567437171936
+            },
+            "reference_high_confidence": true
+          },
+          "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+          "sample_index": 75
+        }
+      ],
+      "fraction": 0.009308510638297872
+    },
+    "exported_counts": {
+      "absolute_difference": 2,
+      "per_sample_disagreements": [
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 3,
+          "pytorch_count": 56,
+          "sample_id": "61d9340c5ad8418dafe7a4af1b96e6b9",
+          "sample_index": 25,
+          "tensorrt_count": 55
+        },
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 2,
+          "pytorch_count": 34,
+          "sample_id": "07fad91090c746ccaa1b2bdb55329e20",
+          "sample_index": 42,
+          "tensorrt_count": 35
+        },
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 3,
+          "pytorch_count": 48,
+          "sample_id": "8092909473464f80b9f791a4d31ddcb8",
+          "sample_index": 58,
+          "tensorrt_count": 49
+        },
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 3,
+          "pytorch_count": 45,
+          "sample_id": "c567f9b8e9f34817acdc9c49d791c557",
+          "sample_index": 71,
+          "tensorrt_count": 46
+        },
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 3,
+          "pytorch_count": 47,
+          "sample_id": "a1289b27ca1d41deb6fc982be9a3d03c",
+          "sample_index": 75,
+          "tensorrt_count": 48
+        },
+        {
+          "absolute_difference": 1,
+          "allowed_difference": 3,
+          "pytorch_count": 41,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_count": 40
+        }
+      ],
+      "pytorch_total": 883,
+      "relative_difference_from_pytorch": 0.0022650056625141564,
+      "tensorrt_total": 885
+    },
+    "failed_checks": [],
+    "full_heading_diagnostics": {
+      "accepted": true,
+      "agreement_count": 749,
+      "agreement_fraction": 0.9960106382978723,
+      "count": 752,
+      "direction_flips": [
+        {
+          "anchor_provenance_recovered": false,
+          "axis_yaw_difference_modulo_pi_degrees": 0.1812238153861988,
+          "class_name": "pedestrian",
+          "classification": "geometrically_axis_equivalent_but_heading_divergent",
+          "full_circular_yaw_difference_degrees": 179.8187761846138,
+          "pytorch_direction_class": null,
+          "pytorch_direction_logits": null,
+          "pytorch_final_yaw_rad": 4.05364465713501,
+          "pytorch_winning_logit_margin": null,
+          "sample_id": "747aa46b9a4641fe90db05d97db2acea",
+          "sample_index": 4,
+          "tensorrt_direction_class": null,
+          "tensorrt_direction_logits": null,
+          "tensorrt_final_yaw_rad": 0.9152149558067322,
+          "tensorrt_winning_logit_margin": null
+        },
+        {
+          "anchor_provenance_recovered": false,
+          "axis_yaw_difference_modulo_pi_degrees": 16.359250637242337,
+          "class_name": "car",
+          "classification": "heading_divergent_with_axis_error",
+          "full_circular_yaw_difference_degrees": 163.64074936275767,
+          "pytorch_direction_class": null,
+          "pytorch_direction_logits": null,
+          "pytorch_final_yaw_rad": 4.752608776092529,
+          "pytorch_winning_logit_margin": null,
+          "sample_id": "6d9984d09d52479e837da2fd09e192cc",
+          "sample_index": 29,
+          "tensorrt_direction_class": null,
+          "tensorrt_direction_logits": null,
+          "tensorrt_final_yaw_rad": 1.325493335723877,
+          "tensorrt_winning_logit_margin": null
+        },
+        {
+          "anchor_provenance_recovered": false,
+          "axis_yaw_difference_modulo_pi_degrees": 0.03604472948299277,
+          "class_name": "car",
+          "classification": "geometrically_axis_equivalent_but_heading_divergent",
+          "full_circular_yaw_difference_degrees": 179.963955270517,
+          "pytorch_direction_class": null,
+          "pytorch_direction_logits": null,
+          "pytorch_final_yaw_rad": 2.012035369873047,
+          "pytorch_winning_logit_margin": null,
+          "sample_id": "b4ff30109dd14c89b24789dc5713cf8c",
+          "sample_index": 80,
+          "tensorrt_direction_class": null,
+          "tensorrt_direction_logits": null,
+          "tensorrt_final_yaw_rad": 5.152998924255371,
+          "tensorrt_winning_logit_margin": null
+        }
+      ],
+      "disagreement_count": 3,
+      "maximum": 179.963955270517,
+      "mean": 0.8642423624180572,
+      "median": 0.03886377637737255,
+      "minimum_agreement_fraction": 0.99,
+      "p95": 0.4040463290318137,
+      "p99": 1.7843559799088942
+    },
+    "high_confidence_coverage": {
+      "pytorch_matched": 750,
+      "pytorch_to_tensorrt": 1.0,
+      "pytorch_total": 750,
+      "tensorrt_matched": 750,
+      "tensorrt_to_pytorch": 0.9986684420772304,
+      "tensorrt_total": 751
+    },
+    "high_confidence_match_denominator": 752,
+    "overall_pass": true,
+    "recommended_next_experiment": null,
+    "stage": 1,
+    "stage_2_required": false,
+    "threshold_edge_disagreements": [
+      {
+        "bev_iou": 0.9972842739940591,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            -11.553874969482422,
+            -0.7355841994285583,
+            -1.6078944206237793
+          ],
+          "class_id": 5,
+          "class_name": "bicycle",
+          "score": 0.25043973326683044,
+          "size_lwh": [
+            1.449522614479065,
+            0.7131124138832092,
+            1.4664673805236816
+          ],
+          "velocity_xy": [
+            0.12433004379272461,
+            -0.9436637759208679
+          ],
+          "yaw_rad": 4.882864475250244
+        },
+        "sample_index": 25,
+        "tensorrt": {
+          "center_xyz": [
+            -11.553832054138184,
+            -0.7363251447677612,
+            -1.6066277027130127
+          ],
+          "class_id": 5,
+          "class_name": "bicycle",
+          "score": 0.24908174574375153,
+          "size_lwh": [
+            1.451085090637207,
+            0.7125210165977478,
+            1.4688063859939575
+          ],
+          "velocity_xy": [
+            0.126708984375,
+            -0.943359375
+          ],
+          "yaw_rad": 4.881514549255371
+        }
+      },
+      {
+        "bev_iou": 0.5711112242499826,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            28.745492935180664,
+            -15.646676063537598,
+            -0.3538705110549927
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.25051555037498474,
+          "size_lwh": [
+            4.431562423706055,
+            1.9262478351593018,
+            1.7027809619903564
+          ],
+          "velocity_xy": [
+            -0.001979525899514556,
+            0.0029949448071420193
+          ],
+          "yaw_rad": -0.0580601692199707
+        },
+        "sample_index": 33,
+        "tensorrt": {
+          "center_xyz": [
+            28.75003433227539,
+            -16.14971351623535,
+            -0.3165113925933838
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.24908174574375153,
+          "size_lwh": [
+            4.622955799102783,
+            1.9665526151657104,
+            1.6938786506652832
+          ],
+          "velocity_xy": [
+            0.0006542205810546875,
+            0.0031986236572265625
+          ],
+          "yaw_rad": -0.08819580078125
+        }
+      },
+      {
+        "bev_iou": 0.9986422862638447,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            -8.819912910461426,
+            29.084043502807617,
+            0.11929547786712646
+          ],
+          "class_id": 1,
+          "class_name": "truck",
+          "score": 0.2488429695367813,
+          "size_lwh": [
+            5.499638080596924,
+            2.086381196975708,
+            2.0313892364501953
+          ],
+          "velocity_xy": [
+            -0.0018711031880229712,
+            -0.000668760621920228
+          ],
+          "yaw_rad": 4.723176002502441
+        },
+        "sample_index": 33,
+        "tensorrt": {
+          "center_xyz": [
+            -8.81963062286377,
+            29.081945419311523,
+            0.1221742033958435
+          ],
+          "class_id": 1,
+          "class_name": "truck",
+          "score": 0.2520156800746918,
+          "size_lwh": [
+            5.503245830535889,
+            2.0857324600219727,
+            2.0332629680633545
+          ],
+          "velocity_xy": [
+            -0.0018901824951171875,
+            -0.0006809234619140625
+          ],
+          "yaw_rad": 4.722784996032715
+        }
+      },
+      {
+        "bev_iou": 0.9936385271973381,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            7.016941547393799,
+            22.952781677246094,
+            -0.17560124397277832
+          ],
+          "class_id": 7,
+          "class_name": "pedestrian",
+          "score": 0.24749799072742462,
+          "size_lwh": [
+            0.6407124400138855,
+            0.6123796105384827,
+            1.6972641944885254
+          ],
+          "velocity_xy": [
+            0.15677697956562042,
+            -0.004329254850745201
+          ],
+          "yaw_rad": 1.1430377960205078
+        },
+        "sample_index": 42,
+        "tensorrt": {
+          "center_xyz": [
+            7.017366409301758,
+            22.9517765045166,
+            -0.17101836204528809
+          ],
+          "class_id": 7,
+          "class_name": "pedestrian",
+          "score": 0.2501792907714844,
+          "size_lwh": [
+            0.6421003937721252,
+            0.6129161715507507,
+            1.6992032527923584
+          ],
+          "velocity_xy": [
+            0.157958984375,
+            -0.004119873046875
+          ],
+          "yaw_rad": 1.138671875
+        }
+      },
+      {
+        "bev_iou": 0.9976951912578073,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            26.415538787841797,
+            -0.2564632296562195,
+            -0.673834502696991
+          ],
+          "class_id": 1,
+          "class_name": "truck",
+          "score": 0.24975544214248657,
+          "size_lwh": [
+            5.285972595214844,
+            2.1932716369628906,
+            1.8685566186904907
+          ],
+          "velocity_xy": [
+            -0.0070153516717255116,
+            -0.000724907498806715
+          ],
+          "yaw_rad": 2.6476805210113525
+        },
+        "sample_index": 58,
+        "tensorrt": {
+          "center_xyz": [
+            26.416135787963867,
+            -0.2562071979045868,
+            -0.6723126769065857
+          ],
+          "class_id": 1,
+          "class_name": "truck",
+          "score": 0.25275275111198425,
+          "size_lwh": [
+            5.29241943359375,
+            2.1949195861816406,
+            1.8731294870376587
+          ],
+          "velocity_xy": [
+            -0.00710296630859375,
+            -0.0007886886596679688
+          ],
+          "yaw_rad": 2.6469638347625732
+        }
+      },
+      {
+        "bev_iou": 0.9936929845607584,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            -3.7018182277679443,
+            35.564125061035156,
+            1.197028636932373
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.2495126724243164,
+          "size_lwh": [
+            4.655320167541504,
+            1.9933820962905884,
+            1.786492943763733
+          ],
+          "velocity_xy": [
+            0.004434951115399599,
+            0.006773144006729126
+          ],
+          "yaw_rad": 1.8791916370391846
+        },
+        "sample_index": 71,
+        "tensorrt": {
+          "center_xyz": [
+            -3.699350357055664,
+            35.566368103027344,
+            1.197587013244629
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.2549724578857422,
+          "size_lwh": [
+            4.658076763153076,
+            1.9912219047546387,
+            1.7861464023590088
+          ],
+          "velocity_xy": [
+            0.00423431396484375,
+            0.0061798095703125
+          ],
+          "yaw_rad": 1.883232593536377
+        }
+      },
+      {
+        "bev_iou": 0.9860678074703725,
+        "kind": "matched_threshold_crossing",
+        "pytorch": {
+          "center_xyz": [
+            -32.04561233520508,
+            -27.574092864990234,
+            -1.4017271995544434
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.2562966048717499,
+          "size_lwh": [
+            4.469222068786621,
+            1.9531090259552002,
+            1.6690616607666016
+          ],
+          "velocity_xy": [
+            0.036053743213415146,
+            -0.08401733636856079
+          ],
+          "yaw_rad": 5.01585578918457
+        },
+        "sample_index": 80,
+        "tensorrt": {
+          "center_xyz": [
+            -32.045284271240234,
+            -27.575864791870117,
+            -1.4083447456359863
+          ],
+          "class_id": 0,
+          "class_name": "car",
+          "score": 0.24436300992965698,
+          "size_lwh": [
+            4.468841552734375,
+            1.9541689157485962,
+            1.666295051574707
+          ],
+          "velocity_xy": [
+            0.08197021484375,
+            -0.1663818359375
+          ],
+          "yaw_rad": 5.005537986755371
+        }
+      }
+    ]
+  },
+  "stage_2": {
+    "confirmed_nms_survivor_swaps": [],
+    "investigations_performed": [],
+    "other_discrete_divergences": [],
+    "recommended_remediation": null,
+    "required": false,
+    "status": "not_required_stage_1_passed",
+    "unexplained_outliers": []
+  },
+  "status": "pass",
+  "threshold_edge_crossings": [
+    {
+      "bev_iou": 0.9972842739940591,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          -11.553874969482422,
+          -0.7355841994285583,
+          -1.6078944206237793
+        ],
+        "class_id": 5,
+        "class_name": "bicycle",
+        "score": 0.25043973326683044,
+        "size_lwh": [
+          1.449522614479065,
+          0.7131124138832092,
+          1.4664673805236816
+        ],
+        "velocity_xy": [
+          0.12433004379272461,
+          -0.9436637759208679
+        ],
+        "yaw_rad": 4.882864475250244
+      },
+      "sample_index": 25,
+      "tensorrt": {
+        "center_xyz": [
+          -11.553832054138184,
+          -0.7363251447677612,
+          -1.6066277027130127
+        ],
+        "class_id": 5,
+        "class_name": "bicycle",
+        "score": 0.24908174574375153,
+        "size_lwh": [
+          1.451085090637207,
+          0.7125210165977478,
+          1.4688063859939575
+        ],
+        "velocity_xy": [
+          0.126708984375,
+          -0.943359375
+        ],
+        "yaw_rad": 4.881514549255371
+      }
+    },
+    {
+      "bev_iou": 0.5711112242499826,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          28.745492935180664,
+          -15.646676063537598,
+          -0.3538705110549927
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.25051555037498474,
+        "size_lwh": [
+          4.431562423706055,
+          1.9262478351593018,
+          1.7027809619903564
+        ],
+        "velocity_xy": [
+          -0.001979525899514556,
+          0.0029949448071420193
+        ],
+        "yaw_rad": -0.0580601692199707
+      },
+      "sample_index": 33,
+      "tensorrt": {
+        "center_xyz": [
+          28.75003433227539,
+          -16.14971351623535,
+          -0.3165113925933838
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.24908174574375153,
+        "size_lwh": [
+          4.622955799102783,
+          1.9665526151657104,
+          1.6938786506652832
+        ],
+        "velocity_xy": [
+          0.0006542205810546875,
+          0.0031986236572265625
+        ],
+        "yaw_rad": -0.08819580078125
+      }
+    },
+    {
+      "bev_iou": 0.9986422862638447,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          -8.819912910461426,
+          29.084043502807617,
+          0.11929547786712646
+        ],
+        "class_id": 1,
+        "class_name": "truck",
+        "score": 0.2488429695367813,
+        "size_lwh": [
+          5.499638080596924,
+          2.086381196975708,
+          2.0313892364501953
+        ],
+        "velocity_xy": [
+          -0.0018711031880229712,
+          -0.000668760621920228
+        ],
+        "yaw_rad": 4.723176002502441
+      },
+      "sample_index": 33,
+      "tensorrt": {
+        "center_xyz": [
+          -8.81963062286377,
+          29.081945419311523,
+          0.1221742033958435
+        ],
+        "class_id": 1,
+        "class_name": "truck",
+        "score": 0.2520156800746918,
+        "size_lwh": [
+          5.503245830535889,
+          2.0857324600219727,
+          2.0332629680633545
+        ],
+        "velocity_xy": [
+          -0.0018901824951171875,
+          -0.0006809234619140625
+        ],
+        "yaw_rad": 4.722784996032715
+      }
+    },
+    {
+      "bev_iou": 0.9936385271973381,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          7.016941547393799,
+          22.952781677246094,
+          -0.17560124397277832
+        ],
+        "class_id": 7,
+        "class_name": "pedestrian",
+        "score": 0.24749799072742462,
+        "size_lwh": [
+          0.6407124400138855,
+          0.6123796105384827,
+          1.6972641944885254
+        ],
+        "velocity_xy": [
+          0.15677697956562042,
+          -0.004329254850745201
+        ],
+        "yaw_rad": 1.1430377960205078
+      },
+      "sample_index": 42,
+      "tensorrt": {
+        "center_xyz": [
+          7.017366409301758,
+          22.9517765045166,
+          -0.17101836204528809
+        ],
+        "class_id": 7,
+        "class_name": "pedestrian",
+        "score": 0.2501792907714844,
+        "size_lwh": [
+          0.6421003937721252,
+          0.6129161715507507,
+          1.6992032527923584
+        ],
+        "velocity_xy": [
+          0.157958984375,
+          -0.004119873046875
+        ],
+        "yaw_rad": 1.138671875
+      }
+    },
+    {
+      "bev_iou": 0.9976951912578073,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          26.415538787841797,
+          -0.2564632296562195,
+          -0.673834502696991
+        ],
+        "class_id": 1,
+        "class_name": "truck",
+        "score": 0.24975544214248657,
+        "size_lwh": [
+          5.285972595214844,
+          2.1932716369628906,
+          1.8685566186904907
+        ],
+        "velocity_xy": [
+          -0.0070153516717255116,
+          -0.000724907498806715
+        ],
+        "yaw_rad": 2.6476805210113525
+      },
+      "sample_index": 58,
+      "tensorrt": {
+        "center_xyz": [
+          26.416135787963867,
+          -0.2562071979045868,
+          -0.6723126769065857
+        ],
+        "class_id": 1,
+        "class_name": "truck",
+        "score": 0.25275275111198425,
+        "size_lwh": [
+          5.29241943359375,
+          2.1949195861816406,
+          1.8731294870376587
+        ],
+        "velocity_xy": [
+          -0.00710296630859375,
+          -0.0007886886596679688
+        ],
+        "yaw_rad": 2.6469638347625732
+      }
+    },
+    {
+      "bev_iou": 0.9936929845607584,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          -3.7018182277679443,
+          35.564125061035156,
+          1.197028636932373
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.2495126724243164,
+        "size_lwh": [
+          4.655320167541504,
+          1.9933820962905884,
+          1.786492943763733
+        ],
+        "velocity_xy": [
+          0.004434951115399599,
+          0.006773144006729126
+        ],
+        "yaw_rad": 1.8791916370391846
+      },
+      "sample_index": 71,
+      "tensorrt": {
+        "center_xyz": [
+          -3.699350357055664,
+          35.566368103027344,
+          1.197587013244629
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.2549724578857422,
+        "size_lwh": [
+          4.658076763153076,
+          1.9912219047546387,
+          1.7861464023590088
+        ],
+        "velocity_xy": [
+          0.00423431396484375,
+          0.0061798095703125
+        ],
+        "yaw_rad": 1.883232593536377
+      }
+    },
+    {
+      "bev_iou": 0.9860678074703725,
+      "kind": "matched_threshold_crossing",
+      "pytorch": {
+        "center_xyz": [
+          -32.04561233520508,
+          -27.574092864990234,
+          -1.4017271995544434
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.2562966048717499,
+        "size_lwh": [
+          4.469222068786621,
+          1.9531090259552002,
+          1.6690616607666016
+        ],
+        "velocity_xy": [
+          0.036053743213415146,
+          -0.08401733636856079
+        ],
+        "yaw_rad": 5.01585578918457
+      },
+      "sample_index": 80,
+      "tensorrt": {
+        "center_xyz": [
+          -32.045284271240234,
+          -27.575864791870117,
+          -1.4083447456359863
+        ],
+        "class_id": 0,
+        "class_name": "car",
+        "score": 0.24436300992965698,
+        "size_lwh": [
+          4.468841552734375,
+          1.9541689157485962,
+          1.666295051574707
+        ],
+        "velocity_xy": [
+          0.08197021484375,
+          -0.1663818359375
+        ],
+        "yaw_rad": 5.005537986755371
+      }
+    }
+  ],
+  "tracked_record": {
+    "full_local_evidence": {
+      "committed": false,
+      "logical_path": ".local/temp/m6b-r1/structural_40k_nuscenes_parity_v2.json",
+      "sha256": "2a25956786628b5e97f78cd75640909bbb85e02a7ff32dc14a76395d60a1b46b",
+      "size_bytes": 10668867
+    },
+    "kind": "sanitized_summary",
+    "omitted_high_volume_fields": [
+      "samples",
+      "same_session_original_vs_candidate.samples"
+    ]
+  },
+  "unexplained_outliers": []
+}

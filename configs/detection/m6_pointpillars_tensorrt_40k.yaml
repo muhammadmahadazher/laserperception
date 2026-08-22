@@ -1,6 +1,6 @@
 schema_version: "1.0"
 milestone: M6b-R1
-status: prospective_single_candidate_unbuilt
+status: candidate_validated_pending_owner_review
 
 cache:
   root_environment_variable: LASERPERCEPTION_M2_CACHE
@@ -63,7 +63,11 @@ artifacts:
   engine:
     logical_name: engines/m6/pointpillars_fp16_profile40k.engine
     committed: false
-    sha256: pending_build
+    sha256: 2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f
+    size_bytes: 31469076
+    device_memory_size_bytes: 1602800640
+    build_measurement_commit: 7feb5be8a2c529b55928a4bda180ae4bcb050cc7
+    validation_measurement_commit: d1f534d79b85f6d67c54ebc70b99d7b92cd31413
 
 validation:
   parity_protocol: configs/detection/m2_parity_v2.yaml

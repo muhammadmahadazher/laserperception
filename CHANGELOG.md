@@ -9,6 +9,8 @@ All notable changes to LaserPerception are documented here. The project follows
 
 - A CPU-only KITTI Raw dataset contract, exact Raw-devkit pose oracle, frozen KITTI-to-model basis,
   and deterministic 24-frame offline multi-sweep reconstruction hashes for future ROS validation.
+- A distinct, local-only TensorRT FP16 candidate built from the byte-identical M2 ONNX with the
+  structural 40,000-voxel maximum profile, plus sanitized build, parity, and repeatability evidence.
 
 ### Scientific chronology
 
@@ -16,6 +18,10 @@ All notable changes to LaserPerception are documented here. The project follows
   data/timing products. Prospective Protocol R2 then passed 271/271 exact adapter comparisons and a
   separate 108/108 canonical-drive transfer check without relaxing the original gate. No KITTI
   detector, TensorRT, ROS, training, tuning, or performance work occurred.
+- The original M6b run remains blocked after the historical 30k engine rejected valid 40k
+  `exact_fast` input before network execution. Prospective M6b-R1 validated one 40k candidate on the
+  frozen nuScenes suite and a frozen non-evaluation KITTI drive; evaluation remains blocked until
+  the owner explicitly approves the draft M6b Protocol R2.
 
 ## [0.2.0] - 2026-08-20
 
