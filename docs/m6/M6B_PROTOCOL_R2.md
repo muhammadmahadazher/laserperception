@@ -73,6 +73,15 @@ H10 versus H5 remains a compound temporal-and-density history ablation. It chang
 time-lag values, point count, density, occupied pillars, and cap pressure simultaneously; no isolated
 time-lag causal claim is permitted.
 
+`time_lag` is an explicit detector input feature. KITTI H10 exposes the frozen model to lag values
+extending to approximately 1.035 s, substantially beyond the temporal values represented by the
+nuScenes training input, while H5 reduces the span to approximately 0.518 s. Temporal-span/
+`time_lag` mismatch is therefore a motivated hypothesis for a future controlled study, not an
+established cause. Point density and other accumulated-history effects remain confounded. A future
+preregistered isolation experiment would need to hold temporal/history geometry fixed while
+controlling density, or hold the point/pillar population fixed while manipulating only `time_lag`;
+neither experiment is authorized or run here.
+
 The five frozen H10 sentinels must pass ten exact repetitions for all raw outputs and final
 `DetectionFrame` before the full run. Repeat #1 becomes the canonical H10 result, preventing an
 unnecessary eleventh inference. The remaining conditions run in frame order, H10 then H5, with
@@ -81,3 +90,27 @@ atomic local checkpoints and fail-closed resume identity.
 No evaluation definition may change after the first prediction. A fundamental defect requires a
 stop with the partial run preserved. R2 does not authorize tuning, training, another engine,
 performance optimization, M6c, ROS KITTI replay, or release activity.
+
+## Post-measurement evidence packaging
+
+This section is a non-normative repository-packaging record added after the completed measurement;
+it does not revise the frozen R2 protocol, inputs, outputs, metrics, or conclusions.
+
+Git tracks the compact canonical result at
+[`kitti_raw_cross_domain_characterization.json`](../../benchmarks/m6b/results/kitti_raw_cross_domain_characterization.json)
+and the compact 856-condition audit ledger at
+[`pre_inference_input_ledger.json`](../../benchmarks/m6b/diagnostics/pre_inference_input_ledger.json).
+The complete per-frame measurement artifact remains immutable external generated evidence under
+logical name `kitti_raw_cross_domain_characterization_full.json`, size 41,987,113 bytes, SHA256
+`87870b2aa0cc2a91d39331afc8154fdad0c8c796f1cabfb4f8530a3eb106de27`. The complete input ledger
+remains immutable external evidence under logical name `pre_inference_input_ledger_full.json`, size
+5,837,452 bytes, SHA256
+`e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa`. Neither full artifact is
+stored in the final tracked tree.
+
+The measurement commit remains `9159682fadfc069eeb70e07acb76dd0a929db98f`; the evidence-
+packaging commit is `969ee69d06685025ca09794ef7e1ef33f2b892b7`; the later PR #11 squash-merge
+commit is pending. At an appropriate future release, the immutable full artifacts may be published
+as hash-pinned GitHub Release assets. No release or asset publication occurs during M6b. PR #11
+must be squash-merged so the original large blobs in feature-branch history do not enter `main`;
+a normal merge is prohibited.

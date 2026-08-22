@@ -9,8 +9,10 @@ a cross-domain characterization, not the official KITTI benchmark, not ROS repla
 development. Poor detector quality is a finding rather than a protocol failure.
 
 The machine-readable freeze is [`configs/m6/kitti_m6b.yaml`](../../configs/m6/kitti_m6b.yaml).
-The complete sanitized GT/input-only ledger is
+The tracked compact GT/input audit ledger is
 [`benchmarks/m6b/diagnostics/pre_inference_input_ledger.json`](../../benchmarks/m6b/diagnostics/pre_inference_input_ledger.json).
+The complete pre-inference payload was frozen before inference and is preserved after measurement
+as immutable external evidence; the non-normative packaging identity is recorded below.
 
 ## Prospective pre-inference portability correction
 
@@ -94,8 +96,9 @@ The ordered 428-frame list has SHA256
 same list. There are 396 eligible Pedestrian poses on these frames after the frozen validity and
 reference-FOV rules, exceeding the preregistered LOW-N floor of 50.
 
-The committed pre-inference ledger records every frame's history IDs, source-row counts, time-lag
-set, model-ready SHA256, point count, pillar counts, and first-touch provenance. Its SHA256 is
+The original full pre-inference ledger recorded every frame's history IDs, source-row counts,
+time-lag set, model-ready SHA256, point count, pillar counts, and first-touch provenance. Its frozen
+internal audit digest is
 `2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480`. The ordered H10 and H5
 model-ready hash commitments are respectively
 `63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469` and
@@ -205,6 +208,16 @@ metric-selected, never hand-picked or called representative.
 
 Results are named **LaserPerception M6b cross-domain Raw-tracklet metrics**, never KITTI benchmark
 AP. No result authorizes threshold tuning, detector changes, optimization, ROS replay, M6c, or M5.
+
+## Post-measurement packaging note
+
+This note was added after characterization and is not part of the prospective protocol. The final
+tracked ledger is a compact audit artifact containing all 856 condition identities; its SHA256 is
+`2413224808b0140856a0e00f884c53bc9b49ec6b545172f5e7fa57d00802dc15`. The immutable full ledger
+is external generated evidence under logical name `pre_inference_input_ledger_full.json`, size
+5,837,452 bytes, SHA256
+`e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa`. This packaging change did
+not alter the preregistration barrier, frozen transforms, model-ready hashes, or detector results.
 
 ## Primary sources
 

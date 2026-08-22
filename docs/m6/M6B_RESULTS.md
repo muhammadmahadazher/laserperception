@@ -7,12 +7,14 @@ benchmark and not a claim about ROS or live-sensor operation.
 ## Result in one paragraph
 
 The unchanged nuScenes-trained PointPillars detector produced valid outputs for all 428 paired
-KITTI Raw frames under H10 and H5. At the frozen score threshold 0.25 and primary oriented BEV IoU
-0.50, H10 measured Car precision/recall/F1 of 0.100/0.242/0.142 and Pedestrian
-0.054/0.553/0.099. H5 measured Car 0.155/0.727/0.256 and Pedestrian 0.065/0.677/0.118. H5
-outperformed H10 in this corpus, but H10 versus H5 is a compound temporal-and-density history
-ablation: it changes temporal span, time-lag values, point density, occupied pillars, and cap
-pressure together. No isolated time-lag, pillar-drop, or domain-shift mechanism is claimed.
+KITTI Raw frames under H10 and H5. The strongest paired result was recall: Car increased from
+0.242 under H10 to 0.727 under H5, and Pedestrian increased from 0.553 to 0.677. At the frozen
+score threshold 0.25 and primary oriented BEV IoU 0.50, annotation-conditioned precision against
+the available incomplete KITTI Raw tracklets was 0.100/0.155 for Car and 0.054/0.065 for
+Pedestrian under H10/H5. H10 versus H5 is a compound temporal-and-density history ablation. The
+improvement under H5 establishes strong sensitivity to the accumulated-history configuration,
+but this experiment does not isolate temporal span, `time_lag`, point density, or another single
+factor.
 
 ## Preserved failure and remediation chronology
 
@@ -74,11 +76,14 @@ Ground-truth conversion uses the frozen bottom/contact-centre to geometric-centr
 `(h,w,l)` to `(l,w,h)`, the fixed KITTI-to-model basis, and `yaw_model = yaw_kitti + pi/2` with
 normalization. The analytic fixture passed exactly before aggregation.
 
-The following operating results use score at least 0.25 and oriented BEV IoU at least 0.50. AP is
-the preregistered all-points score-ranked PR-envelope area over the postprocessed population; it is
-reported as a LaserPerception M6b Raw-tracklet characterization, not KITTI benchmark AP.
+The following operating results use score at least 0.25 and oriented BEV IoU at least 0.50.
+Precision is annotation-conditioned against the available incomplete KITTI Raw tracklets; it is a
+conservative observed quantity under this frozen annotation protocol, not a true physical
+false-positive rate. AP is the preregistered all-points score-ranked PR-envelope area over the
+postprocessed population and carries the same annotation caveat. It is a LaserPerception M6b
+Raw-tracklet characterization, not KITTI benchmark AP.
 
-| Condition | Class | TP | FP | FN | Ignored | Precision | Recall | F1 | AP |
+| Condition | Class | TP | FP | FN | Ignored | Annotation-conditioned precision | Recall | F1 | Raw-tracklet AP |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | H10 | Car | 16 | 144 | 50 | 6 Van | 0.100 | 0.242 | 0.142 | 0.0601 |
 | H5 | Car | 48 | 261 | 18 | 8 Van | 0.155 | 0.727 | 0.256 | 0.2424 |
@@ -116,11 +121,21 @@ in H5, 15 were lost in H5, and 113 were missed by both. Relative to H5, H10 adde
 points and 5,891 candidate pillars per frame.
 
 These paired changes do not isolate time lag. H10 is current plus ten history sweeps; H5 is current
-plus five. The generated artifact's field named `history_sweep_count` records the ten frozen source
-transform records made available to reconstruction for both conditions. It is a provenance-ledger
-count, not the consumed H5 depth. H5 consumption is fixed by the builder configuration and verified
-by exact H5 model-ready hashes, six distinct time-lag values, a maximum 0.518104 s span, and its
-separate point/pillar summaries.
+plus five. The full generated artifact's field named `history_sweep_count` records the ten frozen
+source transform records made available to reconstruction for both conditions. It is a
+provenance-ledger count, not the consumed H5 depth. H5 consumption is fixed by the builder
+configuration and verified by exact H5 model-ready hashes, six distinct time-lag values, a maximum
+0.518104 s span, and its separate point/pillar summaries.
+
+`time_lag` is an explicit detector input feature. KITTI H10 exposes the frozen model to lag values
+extending to approximately 1.035 s, substantially beyond the temporal values represented by the
+nuScenes training input. H5 reduces the span to approximately 0.518 s. This makes temporal-span/
+`time_lag` mismatch a motivated hypothesis for future controlled study, not an established cause;
+point density and related history effects remain confounded. A future preregistered isolation
+experiment would need either to hold H10 temporal/history geometry fixed while controlling point
+density, or preserve the H10 point/pillar population while manipulating only the `time_lag`
+representation. Neither experiment was run, and these results do not select a production history
+configuration.
 
 ## Input shift and capacity
 
@@ -167,6 +182,8 @@ also overlapped H10 discarded pillars. No H5 target overlapped discarded pillars
 was 0.231 on overflow frames versus 0.245 on non-overflow frames; H10 Pedestrian recall was 0.638
 versus 0.535. These mixed associations, plus the compound H10/H5 intervention, do not support a
 causal statement that dropped pillars caused misses or that removing overflow caused H5's gains.
+The 40k cap was not supported as the primary explanation for the corpus-wide H10 deficit. This
+does not establish that overflow has no effect in general or on another dataset.
 
 ## Frozen visualizations
 
@@ -191,14 +208,41 @@ Frozen metric selection produced
 [`closest non-overflow comparison`](../assets/m6b/non_overflow_comparison.png), and the paired H10/H5
 frame above. No example was manually substituted for visual quality.
 
-## Evidence identity and limitations
+## Evidence identity and packaging
 
-The canonical result is
+The tracked canonical result is now a compact summary:
 [`kitti_raw_cross_domain_characterization.json`](../../benchmarks/m6b/results/kitti_raw_cross_domain_characterization.json),
-SHA256 `87870b2aa0cc2a91d39331afc8154fdad0c8c796f1cabfb4f8530a3eb106de27`. It records measurement
-commit `9159682fadfc069eeb70e07acb76dd0a929db98f`, the frozen input ledger, complete per-frame
-postprocessed records, raw-output hashes, all metric denominators, mechanism diagnostics, and
-visualization hashes. It contains no private paths, dataset bytes, checkpoint, ONNX, or engine.
+111,529 bytes, SHA256
+`b9d47120aabb38733d79f987f16277ebab626d2b7c13159c40c30a68b76c1d26`. It preserves the frozen
+population, denominators, metrics, engine and artifact identities, structural validation,
+repeatability hashes, mechanism summaries, visualization hashes, and scope guards without
+embedding the complete per-frame detection payload.
+
+The tracked compact input audit ledger is
+[`pre_inference_input_ledger.json`](../../benchmarks/m6b/diagnostics/pre_inference_input_ledger.json),
+594,264 bytes, SHA256
+`2413224808b0140856a0e00f884c53bc9b49ec6b545172f5e7fa57d00802dc15`. It retains all 856 frozen
+condition identities, model-ready hashes, source/history identities, point and voxel counts,
+compact lag identities, and completion status.
+
+The immutable full per-frame measurement artifact is external generated evidence, intentionally
+excluded from Git history. Its logical name is
+`kitti_raw_cross_domain_characterization_full.json`, its size is 41,987,113 bytes, and its SHA256
+is `87870b2aa0cc2a91d39331afc8154fdad0c8c796f1cabfb4f8530a3eb106de27`. The immutable full
+pre-inference ledger is likewise external; its logical name is
+`pre_inference_input_ledger_full.json`, its size is 5,837,452 bytes, and its SHA256 is
+`e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa`. At an appropriate future
+release, these hash-pinned artifacts may be attached as GitHub Release assets for independent
+download and verification. They are not published during M6b.
+
+The inference measurement and final preregistration identity remains
+`9159682fadfc069eeb70e07acb76dd0a929db98f`. The evidence-packaging commit is
+`969ee69d06685025ca09794ef7e1ef33f2b892b7`; it did not run inference or change any measurement.
+The eventual squash-merge commit is pending owner-approved squash merge of PR #11. A normal merge
+is prohibited because the earlier feature-branch history contains the original large generated
+blobs.
+
+## Limitations
 
 The characterization is limited to two official KITTI Raw drives, their incomplete Raw tracklet
 annotations, the reference-camera FOV, the frozen nuScenes-trained PointPillars model, and one

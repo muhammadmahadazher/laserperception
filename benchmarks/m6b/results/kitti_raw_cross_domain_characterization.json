@@ -2316,6 +2316,12 @@
         "status": "pass"
       },
       {
+        "path": "benchmarks/m6b/engine/structural_40k_kitti_non_eval_selection.json",
+        "sha256": "c5bcb93c2b2b7a4402181045194bd85f4408bdd34e4abb6146da58cdb801664b",
+        "size_bytes": 194552,
+        "status": "non_evaluation_input_only_selection_frozen"
+      },
+      {
         "path": "benchmarks/m6b/engine/structural_40k_repeatability.json",
         "sha256": "3343c6034d9a5c3fb46d0dd36c3606539551bd265762b0b5eae734f4bd12a800",
         "size_bytes": 3786,
@@ -2360,7 +2366,7 @@
     "tensorrt": "8.6.1"
   },
   "evidence_packaging_identity": {
-    "evidence_packaging_commit": "the Git commit containing this compact artifact; reported in PR #11, not self-referentially embedded",
+    "evidence_packaging_commit": "969ee69d06685025ca09794ef7e1ef33f2b892b7",
     "full_result_first_tracked_commit": "9f049c5a1b582c45866ef0c849f73f0b0c762407",
     "measurement_commit": "9159682fadfc069eeb70e07acb76dd0a929db98f",
     "squash_merge_commit": "pending owner-approved PR #11 squash merge"
