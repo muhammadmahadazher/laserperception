@@ -1,84 +1,211 @@
-# M6b frozen-engine input-profile blocker
+# M6b frozen PointPillars characterization on KITTI Raw
 
-Status: **M6b NOT READY**. This is a failed preflight record, not a detector result and not an
-official KITTI benchmark result.
+Status: **M6b READY FOR REVIEW**. The owner-approved Protocol R2 characterization completed on the
+entire frozen corpus. This is an offline cross-domain engineering study, not an official KITTI
+benchmark and not a claim about ROS or live-sensor operation.
 
-## What passed
+## Result in one paragraph
 
-The prospective portability correction was frozen at protocol commit
-`16e2f7734061a5d0c2c2dec7b44f8b31e21591ae`. From clean measurement commit
-`438e755d46f5768e429c1359ee99c353b325bad7`, WSL2 reproduced the frozen model-ready inputs exactly
-for all 428 frames under both H10 and H5: 856/856 hashes, history lists, point counts, and time-lag
-sets passed before backend initialization.
+The unchanged nuScenes-trained PointPillars detector produced valid outputs for all 428 paired
+KITTI Raw frames under H10 and H5. At the frozen score threshold 0.25 and primary oriented BEV IoU
+0.50, H10 measured Car precision/recall/F1 of 0.100/0.242/0.142 and Pedestrian
+0.054/0.553/0.099. H5 measured Car 0.155/0.727/0.256 and Pedestrian 0.065/0.677/0.118. H5
+outperformed H10 in this corpus, but H10 versus H5 is a compound temporal-and-density history
+ablation: it changes temporal span, time-lag values, point density, occupied pillars, and cap
+pressure together. No isolated time-lag, pillar-drop, or domain-shift mechanism is claimed.
 
-The source KITTI files were byte-identical across the Windows oracle and WSL2 measurement staging.
-The unchanged `MultiSweepBuilder` consumed the canonical float32 sweep transforms recorded before
-the first detector prediction.
+## Preserved failure and remediation chronology
 
-## Failed frozen-engine gate
+The original protocol was frozen at `16e2f7734061a5d0c2c2dec7b44f8b31e21591ae`. Its clean
+measurement at `438e755d46f5768e429c1359ee99c353b325bad7` reproduced all 856 H10/H5 inputs
+exactly, then stopped before network execution when the historical 30,000-profile TensorRT engine
+rejected a valid 40,000-voxel `exact_fast` input. The blocker record SHA256 is
+`dfd595dcab5ce41e8846e128de85092c2c8f9d3f98b9aba99f488b03332ed2fb`. That run remains failed
+with zero KITTI evaluation network outputs and zero predictions.
 
-The first repeatability sentinel, `2011_09_26_drive_0001/0000000010` H10, produced 41,437 candidate
-pillars and retained the frozen `max_voxels=40000`. The exact-fast input therefore had shape
-`(40000, 64, 4)`. The unchanged TensorRT engine's only optimization profile accepts at most
-`(30000, 64, 4)` voxels, with matching 30,000-row maxima for `num_points` and `coors`. The TensorRT
-wrapper rejected the shape before network execution.
+M6b-R1 was separately preregistered at `c3c4fd9faf41396ad5a7553757d222fc20981169`. It built one
+prospective candidate from the byte-identical M2 ONNX, with the historical 4,352 minimum and
+18,207 optimum and a structural 40,000 maximum. R1 then passed the frozen 20-sample nuScenes
+parity-v2 suite, same-session old-versus-new characterization, non-evaluation KITTI H10 parity,
+40,000-shape repeatability, and exact 856/856 WSL2 H10/H5 input reproduction. None of those accepted
+campaigns was rerun for R2.
 
-This is not an isolated sentinel: 218/428 H10 frames and 174/428 H5 frames retain more than 30,000
-voxels. Sixty-eight H10 frames reach 40,000. The frozen engine is therefore incompatible with a
-material part of the preregistered KITTI input corpus.
+The remaining 22,547–29,422 profile band was closed before evaluation using H5 from non-evaluation
+drive `2011_09_30_drive_0016`. Its 274-frame input-only census ranged from 23,488 to 40,000 retained
+voxels: 125 frames were at or below 30,000, 149 exceeded 30,000, and 71 reached 40,000. The frozen
+four frames were 131/23,488, 109/24,982, 101/26,981, and 193/29,011 voxels. Rewritten PyTorch FP32
+versus candidate TensorRT FP16 passed the unchanged parity-v2 Stage 1 gate: 16/16 exported
+detections, 15/15 high-confidence matches, every per-metric pass fraction 1.0, and no continuous
+tolerance outlier.
 
-## Scientific boundary
+Only then was [`M6B_PROTOCOL_R2.md`](M6B_PROTOCOL_R2.md) committed at
+`9159682fadfc069eeb70e07acb76dd0a929db98f`. The first evaluation prediction occurred afterward
+from the same clean commit. This commit is both the final preregistration boundary and the
+measurement implementation identity.
 
-No raw TensorRT output, postprocessed score, predicted box, DetectionFrame, metric, PR curve, AP,
-or detector visualization was generated. The preregistration was not contaminated by predictions.
-The failure is recorded in
-[`failed_engine_shape_preflight.json`](../../benchmarks/m6b/diagnostics/failed_engine_shape_preflight.json).
+## Execution and repeatability
 
-The frozen protocol forbade truncating the input, changing `max_voxels`, changing voxel geometry,
-rebuilding/replacing the engine, or skipping incompatible frames. The owner subsequently authorized
-the separate prospective M6b-R1 remediation below. The original failure and zero-prediction status
-remain unchanged.
+The corpus contains frames 10–107 from `2011_09_26_drive_0001` (98) and 10–339 from
+`2011_09_26_drive_0091` (330): 428 current frames, each evaluated as H10 and H5, for 856 conditions.
+All 856 completed. Each condition verified its identity, frozen model-ready SHA, and candidate
+engine SHA before inference. Atomic local checkpoints were used; the five accepted sentinel H10
+records were loaded as their canonical corpus outputs, and no completed condition was unnecessarily
+rerun.
 
-## Prospective M6b-R1 structural remediation
+Each H10 sentinel ran ten times before the corpus sweep. All ten hashes were identical for each raw
+output and final `DetectionFrame`:
 
-M6b-R1 built one distinct candidate engine from the byte-identical M2 ONNX. It retained the
-historical 4,352 minimum and 18,207 optimum while expanding only the profile maximum from 30,000 to
-the voxelizer's structural 40,000 ceiling. The original engine remains the canonical artifact for
-M2 through v0.2.0.
+| Frame | `cls_score` SHA256 | `bbox_pred` SHA256 | `dir_cls_pred` SHA256 | `DetectionFrame` SHA256 |
+|---|---|---|---|---|
+| 0001/10 | `cd065f7381305c14ffb1353d9c170a8be4a65d0227e0db8ce867731b006a7242` | `f19ba02133b698bdac6a56408eb0a3378b199517d965e43ac4899e7c925ba678` | `dd7a096abcc5591adeb59444304aa1430a66b23507c72b3c329fe2fa03dcd5ac` | `565cdd71123b78f2fd5b23456702c7ef0e6410d6f1195a36a0a02c1b4f47b132` |
+| 0001/83 | `dae2ef1c872016920d096a5c6256477936a5515946eadb3e65278389c4777c63` | `ebd67cb18f2cbcde0443c20ca20b68df7008bd368ad0cd524b3ed7e851209524` | `098097306c2c69a783427894c6070ba0293d7f771aeffe2c70c556bc802bbe2c` | `cd18f732c3bf936d4f348eed8f89a99d76bbc2685f16539af8203b9c2eba1605` |
+| 0001/11 | `27ccb58b20c84744b31a0594dc4e72282be7da09687e4d0d1ec76a287779cdb2` | `dc276e48a923626119b095111964678b62bec2ad52ceb479a30853862ff65fda` | `be11dcb1b7b2cd86e1bdfdaf6290ed7e232473c65b746f346cb4edc2ce2a7714` | `085aeb067ec7b8b4297df77f44067c757e41fe33d81da9ac418948fd9f4dc367` |
+| 0001/15 | `bfeac9f14ae8dc5abd4e4786f8e23342769fe778051923252c851e71b8f3e5f5` | `8a576541db1b680e5f84c611bf67301f11b104cb2b8b0b75d6cf7938b4e453c2` | `a2390bd2194e3e2bc3c6e8c62d26113cbb7c7ba7df4dba0ffce996a72c895024` | `a737f4fb8e54ee63a9e6d40936b40936bc486b3c7b0bca1ffccb6d7ef88a174c` |
+| 0091/10 | `4daa22d58a500baad6f4d7c56a5525b6d692166675e266216830f6a2683cf3c2` | `6207f4a6d7510655cc08096a9f6469f918195fdbe35f516173f391e275740f0e` | `ba436a9635c6e23d5b42e6008f2a4dbcebc1b5c9340f3a6b6dbb7daa7874ac02` | `536cd45814100ca8cd3389e734fabdf44c98e8bed81ebd60ca42ec9e81cf661f` |
 
-The candidate engine passed serialized profile and binding inspection. Its SHA256 is
-`2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f`; it requires 1,602,800,640
-bytes from TensorRT's `getDeviceMemorySize`, 390,459,904 bytes more than the historical engine's
-1,212,340,736 bytes.
+## Annotation and scoring contract
 
-The frozen 20-sample nuScenes parity-v2 suite passed at validation commit
-`d1f534d79b85f6d67c54ebc70b99d7b92cd31413`. All preregistered per-metric Stage 1 gates passed;
-7/752 high-confidence matches exceeded at least one continuous tolerance and remain included in the
-metric denominators. Same-session old-versus-new characterization found different raw values and
-three continuous final-detection outliers among 754 high-confidence matches, while both exported
-885 detections and the characterization satisfied the unchanged Stage 1 checks. This comparison is
-diagnostic, not an exact-equality requirement.
+The frozen reference-camera-0 FOV contains 66 eligible Car and 396 eligible Pedestrian poses. Car
+maps only to detector `car`; Pedestrian maps only to `pedestrian`. Van and Person (sitting) are
+neighbour-ignore classes. Truck, Cyclist, Tram, and Misc remain unmapped. No Raw `DontCare` boxes
+are synthesized, and precision is never claimed for the full 360-degree LiDAR field.
 
-An input-only census of all 269 eligible H10 frames from non-evaluation drive
-`2011_09_30_drive_0016` found 29,423–40,000 retained voxels; 251 exceeded 30,000 and 108 reached
-40,000. The deterministic frozen 12-frame set spans 29,423–40,000. Rewritten PyTorch FP32 versus
-candidate TensorRT FP16 then passed the unchanged parity-v2 Stage 1 gate: 42/42 exported detections,
-39/39 high-confidence matches, and no continuous-tolerance failures. Neither evaluation drive was
-used.
+Ground-truth conversion uses the frozen bottom/contact-centre to geometric-centre adjustment,
+`(h,w,l)` to `(l,w,h)`, the fixed KITTI-to-model basis, and `yaw_model = yaw_kitti + pi/2` with
+normalization. The analytic fixture passed exactly before aggregation.
 
-Candidate raw outputs were bit-exact across five repeats on the 40,000-voxel frame and across five
-repeats on frame 114 at 29,423 voxels. That second frame is the closest available full-history 0016
-frame to the frozen 18,207 optimum; the census minimum is 29,423.
+The following operating results use score at least 0.25 and oriented BEV IoU at least 0.50. AP is
+the preregistered all-points score-ranked PR-envelope area over the postprocessed population; it is
+reported as a LaserPerception M6b Raw-tracklet characterization, not KITTI benchmark AP.
 
-Sanitized tracked evidence is under [`benchmarks/m6b/engine`](../../benchmarks/m6b/engine).
+| Condition | Class | TP | FP | FN | Ignored | Precision | Recall | F1 | AP |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| H10 | Car | 16 | 144 | 50 | 6 Van | 0.100 | 0.242 | 0.142 | 0.0601 |
+| H5 | Car | 48 | 261 | 18 | 8 Van | 0.155 | 0.727 | 0.256 | 0.2424 |
+| H10 | Pedestrian | 219 | 3,831 | 177 | 0 | 0.054 | 0.553 | 0.099 | 0.0865 |
+| H5 | Pedestrian | 268 | 3,868 | 128 | 0 | 0.065 | 0.677 | 0.118 | 0.1269 |
 
-## Owner-approved Protocol R2 boundary
+At IoU 0.30/0.50/0.70, TP counts were respectively 16/16/16 for H10 Car, 48/48/44 for H5 Car,
+280/219/54 for H10 Pedestrian, and 316/268/76 for H5 Pedestrian. Person (sitting) ignored 4 H10 and
+3 H5 Pedestrian predictions at IoU 0.30, but none at the primary 0.50 gate. At score 0.25, Car had
+661 H10 and 944 H5 predictions outside the annotation FOV; Pedestrian had 8,540 and 7,610. Across
+all detector classes, the corresponding outside-FOV counts were 82,591 and 81,233. Those outputs
+are excluded from scored FP rather than mislabeled as hallucinations.
 
-The owner approved the structural candidate subject to one final non-evaluation H5 parity gate in
-the uncovered 22,547–29,422-voxel interval. An input-only census of 274 eligible drive-0016 H5
-frames froze frames 131, 109, 101, and 193 at 23,488, 24,982, 26,981, and 29,011 voxels. The
-unchanged parity-v2 Stage 1 gate passed with 16/16 exported detections, 15/15 high-confidence
-matches, and no continuous-tolerance failure.
+## Range and track characterization
 
-[`M6B_PROTOCOL_R2.md`](M6B_PROTOCOL_R2.md) is therefore the final prospective evaluation contract.
-The original protocol and failure remain preserved. M6c and M5 remain inactive.
+| Condition | Class | 0–20 m TP/GT (recall) | 20–35 m TP/GT (recall) | 35–50 m TP/GT (recall) |
+|---|---|---|---|---|
+| H10 | Car | 12/27 (0.444) | 4/30 (0.133) | 0/6 (0.000) |
+| H5 | Car | 27/27 (1.000) | 17/30 (0.567) | 4/6 (0.667) |
+| H10 | Pedestrian | 168/288 (0.583) | 51/106 (0.481) | 0/2 (0.000) |
+| H5 | Pedestrian | 191/288 (0.663) | 75/106 (0.708) | 2/2 (1.000) |
+
+Three eligible Car poses lie outside the frozen 0–50 m range bins; the reported class denominator
+remains 66. Across 11 Car tracks, aggregate detected-frame continuity was 16/66 (0.242) for H10 and
+48/66 (0.727) for H5; median per-track continuity was 0.250 and 0.778. Across 41 Pedestrian tracks,
+the aggregate figures were 219/396 (0.553) and 268/396 (0.677), with median per-track continuity
+0.500 and 0.750. The longest hit/miss runs were 2/3 and 2/2 for Car, and 4/4 for Pedestrian under
+both conditions. These are labelled-track summaries, not tracking output.
+
+## H10 versus H5 compound ablation
+
+At the primary gate, 16 Car poses were detected by both conditions, 32 were gained in H5, and 18
+were missed by both; none was lost in H5. For Pedestrian, 204 were detected by both, 64 were gained
+in H5, 15 were lost in H5, and 113 were missed by both. Relative to H5, H10 added a median 606,146
+points and 5,891 candidate pillars per frame.
+
+These paired changes do not isolate time lag. H10 is current plus ten history sweeps; H5 is current
+plus five. The generated artifact's field named `history_sweep_count` records the ten frozen source
+transform records made available to reconstruction for both conditions. It is a provenance-ledger
+count, not the consumed H5 depth. H5 consumption is fixed by the builder configuration and verified
+by exact H5 model-ready hashes, six distinct time-lag values, a maximum 0.518104 s span, and its
+separate point/pillar summaries.
+
+## Input shift and capacity
+
+| Statistic | H10 | H5 |
+|---|---:|---:|
+| Mean points | 1,330,654 | 726,561 |
+| Median points | 1,334,420 | 728,279 |
+| Time span, median | 1.035418 s | 0.517701 s |
+| Distinct time-lag values | 11 | 6 |
+| Candidate pillars, mean | 31,192 | 25,320 |
+| Candidate pillars, median | 30,699 | 24,792 |
+| Candidate pillars, range | 19,023–43,810 | 14,957–35,157 |
+| Retained pillars, maximum | 40,000 | 35,157 |
+| Overflow frames | 68/428 (15.89%) | 0/428 (0%) |
+| Discarded pillars, total | 124,696 | 0 |
+| Discarded pillars, maximum frame | 3,810 | 0 |
+
+The candidate engine SHA256 is
+`2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f`, with MIN/OPT/MAX
+4,352/18,207/40,000. Its TensorRT device-memory requirement is 1,602,800,640 bytes, an increase of
+390,459,904 bytes (about 32.2%) over the immutable historical engine's 1,212,340,736 bytes. The
+candidate was not rebuilt and no performance campaign was run.
+
+## Truncation, sweep provenance, and target overlap
+
+For H10 overflow frames, the preregistered Pearson 2x12 sector homogeneity statistic was
+19,354.05 versus the 24.72497 critical value at alpha 0.01, so sector homogeneity was rejected.
+The largest/smallest nonzero sector drop-rate ratio was 5.52. The additional practical gate did
+not pass because the aggregate highest-drop sector was each frame's highest in only 19.12% of
+overflow frames, below the frozen greater-than-50% rule. Therefore the preregistered combined
+classification is **not spatially non-uniform truncation**; the sector differences remain
+descriptive. H5 had no discarded pillars, so the test was inapplicable.
+
+First-touch provenance measured, rather than assumed, the deterministic retention behavior. H10
+discarded pillars were touched first only by the three oldest sweeps: sweep 8 contributed 5,165
+(4.14%), sweep 9 contributed 48,096 (38.57%), and sweep 10 contributed 71,435 (57.29%). Every
+pillar first touched by the current sweep or history sweeps 1–7 was retained. H5 discarded none.
+This shows that first-occurrence ordering protected recent/current first touches in this corpus;
+it does not establish a detector-quality cause.
+
+Of 66 Car targets, 65 overlapped at least one retained pillar under both conditions; four H10 Car
+targets overlapped discarded pillars. All 396 Pedestrian targets overlapped retained pillars; four
+also overlapped H10 discarded pillars. No H5 target overlapped discarded pillars. H10 Car recall
+was 0.231 on overflow frames versus 0.245 on non-overflow frames; H10 Pedestrian recall was 0.638
+versus 0.535. These mixed associations, plus the compound H10/H5 intervention, do not support a
+causal statement that dropped pillars caused misses or that removing overflow caused H5's gains.
+
+## Frozen visualizations
+
+All images are real outputs from the completed offline KITTI Raw evaluation. Red boxes are eligible
+ground truth, purple boxes are detector outputs, and orange points in truncation views mark
+discarded-pillar support. They are not ROS, live-LiDAR, or real-time-sensor evidence.
+
+![Paired H10 and H5 output](../assets/m6b/paired_H10_H5.png)
+
+The five preregistered sentinels are
+[`0001/10`](../assets/m6b/sentinel_canonical_first_full_history.png),
+[`0001/83`](../assets/m6b/sentinel_canonical_lower_median_candidate_pillars.png),
+[`0001/11`](../assets/m6b/sentinel_highest_overflow_full_history_m6a_sentinel.png),
+[`0001/15`](../assets/m6b/sentinel_non_overflow_closest_to_40000.png), and
+[`0091/10`](../assets/m6b/sentinel_second_drive_first_eligible_pedestrian.png).
+
+Frozen metric selection produced
+[`Car best`](../assets/m6b/car_best.png),
+[`Car median`](../assets/m6b/car_median.png),
+[`Car worst`](../assets/m6b/car_worst.png),
+[`highest overflow`](../assets/m6b/highest_overflow.png),
+[`closest non-overflow comparison`](../assets/m6b/non_overflow_comparison.png), and the paired H10/H5
+frame above. No example was manually substituted for visual quality.
+
+## Evidence identity and limitations
+
+The canonical result is
+[`kitti_raw_cross_domain_characterization.json`](../../benchmarks/m6b/results/kitti_raw_cross_domain_characterization.json),
+SHA256 `87870b2aa0cc2a91d39331afc8154fdad0c8c796f1cabfb4f8530a3eb106de27`. It records measurement
+commit `9159682fadfc069eeb70e07acb76dd0a929db98f`, the frozen input ledger, complete per-frame
+postprocessed records, raw-output hashes, all metric denominators, mechanism diagnostics, and
+visualization hashes. It contains no private paths, dataset bytes, checkpoint, ONNX, or engine.
+
+The characterization is limited to two official KITTI Raw drives, their incomplete Raw tracklet
+annotations, the reference-camera FOV, the frozen nuScenes-trained PointPillars model, and one
+pinned software/GPU environment. It does not measure official KITTI AP, generalization beyond the
+frozen corpus, safety, latency, or deployment performance. No threshold, model, ONNX, checkpoint,
+precision, taxonomy, matching rule, `exact_fast` behavior, voxel geometry, or `max_voxels` was
+changed. No training, tuning, ROS KITTI replay, M6c work, M5 work, or release activity occurred.
+
+M6a is complete. M6b is complete and ready for review. M6 remains in progress because M6c is not
+started and requires separate owner authorization. M5 remains conditional and inactive.
