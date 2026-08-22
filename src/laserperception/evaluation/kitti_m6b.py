@@ -528,6 +528,8 @@ def _read_keyed_floats(path: Path) -> Mapping[str, tuple[float, ...]]:
         if not raw.strip() or ":" not in raw:
             continue
         key, text = raw.split(":", 1)
+        if key == "calib_time":
+            continue
         try:
             values[key] = tuple(float(value) for value in text.split())
         except ValueError as error:
