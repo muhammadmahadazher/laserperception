@@ -15,7 +15,6 @@ from typing import Any
 
 import numpy as np
 import yaml
-from laserperception.evaluation.m6b_pillars import analyze_pillars
 
 from laserperception.datasets.kitti_raw import KittiRawSequence
 from laserperception.detection.artifacts import ExternalArtifactMetadata
@@ -42,6 +41,7 @@ from laserperception.evaluation.m6b_input_oracle import (
     freeze_sweep_transforms,
     reconstruct_from_frozen_transforms,
 )
+from laserperception.evaluation.m6b_pillars import analyze_pillars
 
 RAW_NAMES = ("cls_score", "bbox_pred", "dir_cls_pred")
 HISTORY = 10
