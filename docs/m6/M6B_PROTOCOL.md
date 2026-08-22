@@ -76,7 +76,7 @@ reference-FOV rules, exceeding the preregistered LOW-N floor of 50.
 
 The committed pre-inference ledger records every frame's history IDs, source-row counts, time-lag
 set, model-ready SHA256, point count, pillar counts, and first-touch provenance. Its SHA256 is
-`aef47f754a639e89ceed48c5246215a4eb78c4a324ffb0ae934335754d5a50cf`. The ordered H10 and H5
+`3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8`. The ordered H10 and H5
 model-ready hash commitments are respectively
 `63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469` and
 `e5f43d6511d96f6db232c880f94b5464ab5d217f5e5bfdf34bd1626ab8ac7f89`. Ten independent H5

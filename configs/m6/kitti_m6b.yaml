@@ -107,7 +107,7 @@ evaluation_frames:
 
 input_oracles:
   committed_ledger: benchmarks/m6b/diagnostics/pre_inference_input_ledger.json
-  committed_ledger_sha256: aef47f754a639e89ceed48c5246215a4eb78c4a324ffb0ae934335754d5a50cf
+  committed_ledger_sha256: 3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8
   h10_ordered_model_ready_hashes_sha256: 63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469
   h5_ordered_model_ready_hashes_sha256: e5f43d6511d96f6db232c880f94b5464ab5d217f5e5bfdf34bd1626ab8ac7f89
   H10:
