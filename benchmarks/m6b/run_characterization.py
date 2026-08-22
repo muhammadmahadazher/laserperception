@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 import yaml
 
-from laserperception.datasets.kitti_raw import KittiRawSequence
+from laserperception.datasets.kitti_raw import KittiRawSequence, KittiReconstructionResult
 from laserperception.detection.m1_assets import resolve_m1_asset_paths
 from laserperception.detection.m2_assets import resolve_m2_asset_paths
 from laserperception.detection.m2_backend import M2Backend
@@ -39,6 +39,7 @@ from laserperception.evaluation.kitti_m6b import (
     parse_kitti_tracklets,
     visible_in_reference_camera,
 )
+from laserperception.evaluation.m6b_input_oracle import reconstruct_from_frozen_transforms
 from laserperception.evaluation.m6b_metrics import (
     RankedDisposition,
     all_points_average_precision,
@@ -56,9 +57,9 @@ from laserperception.evaluation.m6b_pillars import (
     spatial_regions,
 )
 
-PROTOCOL_COMMIT = "422abc8bbcdb20e1815b1c4aef0d9845beec2634"
+PROTOCOL_COMMIT = "16e2f7734061a5d0c2c2dec7b44f8b31e21591ae"
 EXPECTED_CONFIG_PATH = "configs/m6/kitti_m6b.yaml"
-EXPECTED_LEDGER_SHA256 = "3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8"
+EXPECTED_LEDGER_SHA256 = "2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480"
 BASE_MAIN_COMMIT = "91fecf94dc5373c77d614b042e2db58cbe5f7063"
 M6A_EVIDENCE_PATH = "benchmarks/m6a/results/kitti_raw_offline_reconstruction.json"
 M6A_EVIDENCE_SHA256 = "a62da9808079994d971c4d47bbdf04f2c50d44ddcfd0c7958f7534512552155b"
@@ -450,6 +451,68 @@ def _pillar_spatial(audit: PillarAudit) -> dict[str, object]:
     }
 
 
+def _reconstruct_input(
+    sequence: KittiRawSequence,
+    frame_index: int,
+    history: int,
+    expected: Mapping[str, object],
+) -> KittiReconstructionResult:
+    records = expected.get("frozen_sweep_transforms")
+    if not isinstance(records, list):
+        raise RuntimeError("input ledger frozen transform records are malformed")
+    validated_records: list[Mapping[str, object]] = []
+    for record in records:
+        if not isinstance(record, Mapping):
+            raise RuntimeError("input ledger frozen transform records are malformed")
+        validated_records.append(record)
+    return reconstruct_from_frozen_transforms(
+        sequence,
+        frame_index,
+        validated_records,
+        builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=history)),
+    )
+
+
+def _verify_input_oracles(
+    sequences: Mapping[str, KittiRawSequence],
+    ledger_frames: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    verified_conditions = 0
+    for position, expected in enumerate(ledger_frames, start=1):
+        frame_id = str(expected["frame_id"])
+        drive, raw_index = frame_id.split("/", 1)
+        for condition, history in CONDITIONS.items():
+            reconstruction = _reconstruct_input(
+                sequences[drive],
+                int(raw_index),
+                history,
+                expected,
+            )
+            points = reconstruction.point_cloud.points_xyzt
+            expected_condition = expected[condition.lower()]
+            if not isinstance(expected_condition, Mapping):
+                raise RuntimeError("input ledger condition is malformed")
+            if _array_sha256(points) != expected_condition["model_ready_sha256"]:
+                raise RuntimeError(f"model-ready input hash mismatch at {frame_id} {condition}")
+            if int(len(points)) != expected_condition["point_count"]:
+                raise RuntimeError(f"model-ready point-count mismatch at {frame_id} {condition}")
+            if list(reconstruction.selected_indices) != expected_condition["selected_indices"]:
+                raise RuntimeError(f"history ID mismatch at {frame_id} {condition}")
+            actual_lags = [float(value) for value in np.unique(points[:, 3])]
+            if actual_lags != expected_condition["time_lag_values"]:
+                raise RuntimeError(f"time-lag mismatch at {frame_id} {condition}")
+            verified_conditions += 1
+        if position == 1 or position % 50 == 0 or position == len(ledger_frames):
+            print(f"verified input oracles for {position}/{len(ledger_frames)} frames", flush=True)
+    return {
+        "passed": True,
+        "frame_count": len(ledger_frames),
+        "condition_count": verified_conditions,
+        "conditions": list(CONDITIONS),
+        "detector_inference_performed": False,
+    }
+
+
 def _run_inference(
     backend: M2Backend,
     engine: Path,
@@ -458,10 +521,7 @@ def _run_inference(
     history: int,
     expected: Mapping[str, object],
 ) -> tuple[DetectionFrame, dict[str, object], PillarAudit, dict[str, list[Any]]]:
-    reconstruction = sequence.reconstruct(
-        frame_index,
-        builder=MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=history)),
-    )
+    reconstruction = _reconstruct_input(sequence, frame_index, history, expected)
     points = reconstruction.point_cloud.points_xyzt
     condition = f"h{history}"
     expected_condition = expected[condition]
@@ -1100,6 +1160,7 @@ def _render_visualizations(
     sequences: Mapping[str, KittiRawSequence],
     poses_by_frame: Mapping[str, Sequence[KittiTrackletPose]],
     camera: KittiReferenceCamera,
+    ledger_by_id: Mapping[str, Mapping[str, object]],
 ) -> list[dict[str, object]]:
     import matplotlib.pyplot as plt
     from matplotlib.patches import Polygon
@@ -1119,11 +1180,11 @@ def _render_visualizations(
         drive, raw_index = frame_id.split("/", 1)
         eligible = _eligible_poses(poses_by_frame.get(frame_id, ()), camera)
         for axis, condition in zip(axes[0], conditions, strict=True):
-            reconstruction = sequences[drive].reconstruct(
+            reconstruction = _reconstruct_input(
+                sequences[drive],
                 int(raw_index),
-                builder=MultiSweepBuilder(
-                    MultiSweepBuilderConfig(max_historical_sweeps=CONDITIONS[condition])
-                ),
+                CONDITIONS[condition],
+                ledger_by_id[frame_id],
             )
             points = reconstruction.point_cloud.points_xyzt
             axis.scatter(points[::5, 0], points[::5, 1], s=0.08, c="#777777", alpha=0.45)
@@ -1202,6 +1263,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=_root() / "docs/assets/m6b",
     )
+    parser.add_argument("--verify-input-oracles-only", action="store_true")
     return parser
 
 
@@ -1238,6 +1300,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     sequences = {
         drive: KittiRawSequence(date_root, date_root / f"{drive}_sync") for drive in drive_ids
     }
+    input_verification = _verify_input_oracles(sequences, ledger_frames)
+    if args.verify_input_oracles_only:
+        print(json.dumps(input_verification, indent=2, sort_keys=True), flush=True)
+        return 0
     all_poses: dict[str, tuple[KittiTrackletPose, ...]] = {}
     poses_by_frame: dict[str, list[KittiTrackletPose]] = defaultdict(list)
     track_labelled_counts: dict[tuple[str, int], int] = defaultdict(int)
@@ -1298,6 +1364,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "path": str(config["input_oracles"]["committed_ledger"]),
                 "sha256": sha256_file(ledger_path),
             },
+            "pre_inference_input_verification": input_verification,
             "environment": {"gpu": _gpu_record(), "cuda_device": "cuda:0"},
             "artifacts": artifacts,
             "repeatability": repeatability,
@@ -1332,7 +1399,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     selection = _visualization_selection(h10, h5, config["repeatability"]["sentinels"])
     lookup = {(str(frame["condition"]), str(frame["frame_id"])): frame for frame in (*h10, *h5)}
     visuals = _render_visualizations(
-        args.visual_directory, selection, lookup, sequences, poses_by_frame, camera
+        args.visual_directory, selection, lookup, sequences, poses_by_frame, camera, ledger_by_id
     )
     for frame in (*h10, *h5):
         frame.pop("_detections")
@@ -1359,6 +1426,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "sha256": sha256_file(ledger_path),
             "frame_count": len(ledger_frames),
         },
+        "pre_inference_input_verification": input_verification,
         "environment": {
             "gpu": _gpu_record(),
             "laserperception": installed_version,
