@@ -226,10 +226,16 @@ def parse_kitti_tracklets(path: str | Path) -> tuple[KittiTrackletPose, ...]:
                     height=height,
                     width=width,
                     length=length,
-                    translation_xyz=tuple(
-                        _required_float(pose, name) for name in ("tx", "ty", "tz")
+                    translation_xyz=(
+                        _required_float(pose, "tx"),
+                        _required_float(pose, "ty"),
+                        _required_float(pose, "tz"),
                     ),
-                    rotation_xyz=tuple(_required_float(pose, name) for name in ("rx", "ry", "rz")),
+                    rotation_xyz=(
+                        _required_float(pose, "rx"),
+                        _required_float(pose, "ry"),
+                        _required_float(pose, "rz"),
+                    ),
                     state=_required_int(pose, "state"),
                     occlusion=_required_int(pose, "occlusion"),
                     truncation=_required_int(pose, "truncation"),
@@ -252,7 +258,11 @@ def convert_tracklet_pose(pose: KittiTrackletPose) -> M6bGroundTruthBox:
         source_type=pose.object_type,
         evaluation_role=pose.evaluation_role,
         class_name=pose.evaluation_class,
-        center_xyz=tuple(float(value) for value in centre_model),
+        center_xyz=(
+            float(centre_model[0]),
+            float(centre_model[1]),
+            float(centre_model[2]),
+        ),
         size_lwh=(pose.length, pose.width, pose.height),
         yaw_rad=normalize_angle(pose.rotation_xyz[2] + math.pi / 2.0),
     )
@@ -505,7 +515,7 @@ def _line_intersection(
         return second.copy()
     offset = edge_start - first
     fraction = (offset[0] * edge[1] - offset[1] * edge[0]) / denominator
-    return first + fraction * direction
+    return np.asarray(first + fraction * direction, dtype=np.float64)
 
 
 def _polygon_area(points: np.ndarray) -> float:

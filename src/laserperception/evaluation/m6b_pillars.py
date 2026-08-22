@@ -165,7 +165,7 @@ def pillar_box_overlap_mask(
     if min(size_lw) <= 0.0:
         raise ValueError("box dimensions must be positive")
     cosine, sine = np.cos(yaw_rad), np.sin(yaw_rad)
-    delta = centres - np.asarray(center_xy, dtype=np.float64)
+    delta: np.ndarray = centres - np.asarray(center_xy, dtype=np.float64)
     local_x = cosine * delta[:, 0] + sine * delta[:, 1]
     local_y = -sine * delta[:, 0] + cosine * delta[:, 1]
     half_cell = math_sqrt_two() * VOXEL_SIZE_XY[0] / 2.0
