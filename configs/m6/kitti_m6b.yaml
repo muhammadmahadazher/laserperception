@@ -195,7 +195,7 @@ metrics:
     - [0.0, 20.0]
     - [20.0, 35.0]
     - [35.0, 50.0]
-  range_axis: model_positive_x_GT_geometric_centre
+  range_axis: model_positive_y_GT_geometric_centre
   interval_policy: lower_inclusive_upper_exclusive_except_final_upper_inclusive
   occlusion_truncation_minimum_denominator: 10
 

@@ -137,7 +137,7 @@ claim to rank raw anchors below the upstream postprocess floor. Matched pairs re
 centre error, wrapped yaw error,
 and score. Independently tested 3D IoU is absent, so M6b will not report it.
 
-Forward-distance strata use model-frame GT-centre X in `[0,20)`, `[20,35)`, and `[35,50]` metres.
+Forward-distance strata use model-frame GT-centre Y in `[0,20)`, `[20,35)`, and `[35,50]` metres.
 Occlusion/truncation strata require denominator 10. Tracklet IDs summarize per-track labelled and
 eligible frames, detection continuity, longest hit/miss runs, matched-score median, and range span;
 they do not connect predictions or implement tracking.
