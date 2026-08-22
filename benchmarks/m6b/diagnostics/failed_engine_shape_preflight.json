@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "milestone": "M6b",
+  "status": "FAILED_FROZEN_ENGINE_INPUT_PROFILE",
+  "canonical_result": false,
+  "generated_at_utc": "2026-08-22T11:35:46.0152631Z",
+  "base_main_commit": "91fecf94dc5373c77d614b042e2db58cbe5f7063",
+  "protocol_commit": "16e2f7734061a5d0c2c2dec7b44f8b31e21591ae",
+  "measurement_commit": "438e755d46f5768e429c1359ee99c353b325bad7",
+  "project_version": "0.2.0",
+  "input_verification": {
+    "passed": true,
+    "frame_count": 428,
+    "condition_count": 856,
+    "conditions": [
+      "H10",
+      "H5"
+    ],
+    "detector_inference_performed": false
+  },
+  "failure_stage": {
+    "protocol_stage": "first H10 repeatability sentinel",
+    "frame_id": "2011_09_26_drive_0001/0000000010",
+    "model_ready_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a",
+    "candidate_pillars": 41437,
+    "retained_voxels": 40000,
+    "actual_voxels_shape": [
+      40000,
+      64,
+      4
+    ],
+    "actual_num_points_shape": [
+      40000
+    ],
+    "actual_coors_shape": [
+      40000,
+      4
+    ]
+  },
+  "frozen_engine": {
+    "sha256": "a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b",
+    "optimization_profiles": 1,
+    "input_profiles": {
+      "voxels": {
+        "min": [
+          4352,
+          64,
+          4
+        ],
+        "opt": [
+          18207,
+          64,
+          4
+        ],
+        "max": [
+          30000,
+          64,
+          4
+        ]
+      },
+      "num_points": {
+        "min": [
+          4352
+        ],
+        "opt": [
+          18207
+        ],
+        "max": [
+          30000
+        ]
+      },
+      "coors": {
+        "min": [
+          4352,
+          4
+        ],
+        "opt": [
+          18207,
+          4
+        ],
+        "max": [
+          30000,
+          4
+        ]
+      }
+    }
+  },
+  "corpus_profile_conflicts": {
+    "H10_retained_voxels_above_30000": 218,
+    "H10_retained_voxels_equal_40000": 68,
+    "H10_retained_voxels_min_median_max": [
+      19023,
+      30699.0,
+      40000
+    ],
+    "H5_retained_voxels_above_30000": 174,
+    "H5_retained_voxels_equal_40000": 0,
+    "H5_retained_voxels_min_median_max": [
+      14957,
+      24792.0,
+      35157
+    ]
+  },
+  "execution": {
+    "model_ready_preparation_performed": true,
+    "voxelization_performed": true,
+    "tensorrt_wrapper_shape_assertion_passed": false,
+    "raw_network_execution_performed": false,
+    "postprocess_performed": false,
+    "detector_prediction_generated": false,
+    "prediction_score_generated": false,
+    "prediction_box_generated": false
+  },
+  "stop_reason": "The unchanged engine accepts at most 30000 voxels, while the frozen exact_fast/max_voxels=40000 contract retains 40000 on the first sentinel and exceeds 30000 on many H10 and H5 frames.",
+  "prohibited_remediation_not_attempted": [
+    "truncate_or_slice_voxels_to_30000",
+    "change_max_voxels",
+    "rebuild_or_replace_engine",
+    "change_model_or_onnx",
+    "change_voxel_geometry",
+    "tune_or_skip_frames"
+  ],
+  "scope": {
+    "M6b_complete": false,
+    "M6c_started": false,
+    "ROS_KITTI_replay_implemented": false,
+    "performance_campaign_run": false
+  }
+}

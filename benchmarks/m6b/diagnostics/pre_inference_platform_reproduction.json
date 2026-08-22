@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "status": "resolved_before_first_detector_prediction",
+  "attempt_commit": "bb279cfadd8bcf6a0d6bd1c2356882427bc2d780",
+  "protocol_commit_at_attempt": "422abc8bbcdb20e1815b1c4aef0d9845beec2634",
+  "frame_id": "2011_09_26_drive_0001/0000000010",
+  "condition": "H10",
+  "detector_runtime_initialized": true,
+  "model_ready_preparation_performed": false,
+  "voxelization_performed": false,
+  "raw_network_inference_performed": false,
+  "postprocess_performed": false,
+  "detector_prediction_generated": false,
+  "source_files": {
+    "windows_wsl_manifest_sha256": "e1f889b37a732f603d6c2bc2587e40d8109135c6999ee58e74d53e6fe6351fa7",
+    "manifest_file_count": 123,
+    "byte_identical": true
+  },
+  "environments": {
+    "canonical_windows": {
+      "numpy": "2.2.1",
+      "blas": "OpenBLAS 0.3.28"
+    },
+    "gpu_wsl2": {
+      "numpy": "1.26.4",
+      "blas": "OpenBLAS 0.3.23.dev"
+    }
+  },
+  "model_ready_comparison": {
+    "shape": [
+      1312220,
+      4
+    ],
+    "dtype": "float32",
+    "canonical_m6a_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a",
+    "windows_reproduction_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a",
+    "native_wsl2_sha256": "fc219983c7e028d67a27206258e1e7611dbbfdc126691ab76a4a18f66d04cc5e",
+    "different_elements": 423,
+    "different_rows": 423,
+    "total_elements": 5248880,
+    "different_columns": [
+      "x"
+    ],
+    "maximum_absolute_difference_metres": 1.4901161193847656e-08,
+    "affected_source_index": 6,
+    "affected_time_lag_seconds": 0.4122951030731201
+  },
+  "transform_comparison": {
+    "matrix_element": "lidar2sensor[0,3]",
+    "canonical_windows_float32": -0.005938164424151182,
+    "native_wsl2_float32": -0.0059381648898124695,
+    "difference_float32_ulp": 1,
+    "canonical_transform_substitution_output_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a"
+  },
+  "resolution": {
+    "policy": "freeze canonical float32 sweep transforms before inference, then use the unchanged MultiSweepBuilder",
+    "builder_semantics_changed": false,
+    "model_ready_hash_commitments_changed": false,
+    "prospective": true,
+    "full_wsl2_input_verification_required_before_inference": true
+  }
+}

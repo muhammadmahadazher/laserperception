@@ -42,8 +42,9 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def _manifest(name: str) -> dict[str, Any]:
-    path = _repository_root() / "configs" / "detection" / name
+def _manifest(name: str | Path) -> dict[str, Any]:
+    value = Path(name)
+    path = value if value.is_absolute() else _repository_root() / "configs" / "detection" / value
     return dict(yaml.safe_load(path.read_text(encoding="utf-8")))
 
 
@@ -135,7 +136,23 @@ def _artifact_or_stop(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", help="nuScenes root; defaults to environment variable")
+    parser.add_argument(
+        "--deployment-manifest",
+        type=Path,
+        default=Path("m2_pointpillars_tensorrt.yaml"),
+        help="deployment manifest under configs/detection or an absolute path",
+    )
     parser.add_argument("--engine", type=Path, help="override the external frozen TensorRT engine")
+    parser.add_argument(
+        "--expected-engine-sha256",
+        help="required when the selected manifest has a pending candidate engine hash",
+    )
+    parser.add_argument(
+        "--characterization-engine",
+        type=Path,
+        help="optional original engine for same-session old-vs-new characterization",
+    )
+    parser.add_argument("--expected-characterization-engine-sha256")
     parser.add_argument("--output", type=Path, help="override the external sanitized JSON")
     parser.add_argument(
         "--diagnostic-index",
@@ -149,10 +166,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     repository_root = _repository_root()
     m1_manifest = _manifest("m1_pointpillars_nuscenes.yaml")
-    m2_manifest = _manifest("m2_pointpillars_tensorrt.yaml")
+    m2_manifest = _manifest(args.deployment_manifest)
     parity_manifest = _manifest("m2_parity_v2.yaml")
     if int(parity_manifest.get("protocol_version", 0)) != 2:
         raise SystemExit("error: parity runner requires protocol_version 2")
+    if str(m2_manifest.get("milestone")) == "M6b-R1":
+        validation = m2_manifest.get("validation")
+        if not isinstance(validation, Mapping):
+            raise SystemExit("error: M6b-R1 manifest validation contract is malformed")
+        parity_path = repository_root / str(validation["parity_protocol"])
+        if parity_path != repository_root / "configs/detection/m2_parity_v2.yaml":
+            raise SystemExit("error: M6b-R1 must reuse the historical M2 parity-v2 protocol")
+        if sha256_file(parity_path) != str(validation["parity_protocol_sha256"]):
+            raise SystemExit("error: M2 parity-v2 protocol changed; M6b-R1 refuses to run")
 
     m1_assets = resolve_m1_asset_paths(m1_manifest)
     m2_assets = resolve_m2_asset_paths(m2_manifest)
@@ -174,12 +200,30 @@ def main(argv: Sequence[str] | None = None) -> int:
         expected_sha256=str(frozen_artifacts["onnx_sha256"]),
         kind="ONNX",
     )
+    manifest_engine_sha = str(m2_manifest["artifacts"]["engine"]["sha256"])
+    expected_engine_sha = args.expected_engine_sha256 or manifest_engine_sha
+    if len(expected_engine_sha) != 64:
+        raise SystemExit("error: candidate engine SHA256 is pending; pass --expected-engine-sha256")
     engine_artifact = _artifact_or_stop(
         engine_path,
         logical_name=str(m2_manifest["artifacts"]["engine"]["logical_name"]),
-        expected_sha256=str(frozen_artifacts["tensorrt_fp16_engine_sha256"]),
+        expected_sha256=expected_engine_sha,
         kind="TensorRT engine",
     )
+    characterization_artifact = None
+    if args.characterization_engine is not None:
+        expected_characterization_sha = args.expected_characterization_engine_sha256
+        if not expected_characterization_sha:
+            raise SystemExit(
+                "error: --characterization-engine requires "
+                "--expected-characterization-engine-sha256"
+            )
+        characterization_artifact = _artifact_or_stop(
+            args.characterization_engine,
+            logical_name="engines/pointpillars_fp16.engine",
+            expected_sha256=expected_characterization_sha,
+            kind="characterization TensorRT engine",
+        )
 
     model_info = m1_manifest["model"]
     checkpoint_info = model_info["checkpoint"]
@@ -211,6 +255,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     relevant_pytorch_direction: list[np.ndarray] = []
     relevant_tensorrt_direction: list[np.ndarray] = []
     relevant_disagreements: list[dict[str, object]] = []
+    characterization_reports: list[dict[str, object]] = []
+    characterization_raw_records: list[dict[str, object]] = []
+    characterization_differences: dict[str, list[np.ndarray]] = {
+        name: [] for name in _RAW_TENSOR_NAMES
+    }
 
     for index in indices:
         prepared = backend.prepare_sample(data_root, split="mini_val", index=index)
@@ -221,6 +270,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "frozen TensorRT profile; classify as profile_or_binding_failure"
             )
         pytorch_raw = backend.run_rewritten_pytorch_raw(voxelized)
+        characterization_raw = (
+            backend.run_tensorrt_raw(voxelized, args.characterization_engine)
+            if args.characterization_engine is not None
+            else None
+        )
         tensorrt_raw = backend.run_tensorrt_raw(voxelized, engine_path)
 
         sample_tensor_records: dict[str, object] = {}
@@ -239,6 +293,25 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "tensors": sample_tensor_records,
             }
         )
+        if characterization_raw is not None:
+            characterization_tensor_records: dict[str, object] = {}
+            for name in _RAW_TENSOR_NAMES:
+                original_array = _raw_array(characterization_raw, name)
+                candidate_array = _raw_array(tensorrt_raw, name)
+                comparison, difference = raw_tensor_difference_statistics(
+                    original_array, candidate_array
+                )
+                characterization_tensor_records[name] = comparison
+                characterization_differences[name].append(difference.astype(np.float32, copy=False))
+            characterization_raw_records.append(
+                {
+                    "sample_index": index,
+                    "sample_id": prepared.sample_id,
+                    "reference_runtime": "original_30k_tensorrt_fp16",
+                    "candidate_runtime": "structural_40k_tensorrt_fp16",
+                    "tensors": characterization_tensor_records,
+                }
+            )
 
         pytorch_direction_raw, tensorrt_direction_raw = raw_arrays["dir_cls_pred"]
         pytorch_class_raw, tensorrt_class_raw = raw_arrays["cls_score"]
@@ -285,6 +358,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             backend_name="tensorrt",
             precision="fp16",
         )
+        if characterization_raw is not None:
+            characterization_frame = backend.postprocess_raw(
+                characterization_raw,
+                voxelized,
+                backend_name="original_30k_tensorrt",
+                precision="fp16",
+            )
+            characterization_reports.append(
+                analyze_sample(
+                    characterization_frame,
+                    tensorrt_frame,
+                    sample_index=index,
+                    exported_threshold=exported_threshold,
+                    high_confidence_threshold=high_threshold,
+                    minimum_bev_iou=minimum_iou,
+                )
+            )
         report = analyze_sample(
             pytorch_frame,
             tensorrt_frame,
@@ -334,6 +424,45 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
     )
     raw_network_summary = _aggregate_raw_differences(raw_sample_records, raw_differences)
+    same_session_characterization = None
+    if characterization_artifact is not None:
+        characterization_stage_1 = aggregate_acceptance_v2(
+            characterization_reports,
+            minimum_coverage=float(coverage_config["pytorch_to_tensorrt_minimum"]),
+            minimum_metric_pass_fraction=float(
+                matched_config["minimum_per_detection_pass_fraction"]
+            ),
+            maximum_xy_m=float(matched_config["maximum_xy_center_displacement_m"]),
+            maximum_z_m=float(matched_config["maximum_absolute_z_center_difference_m"]),
+            maximum_dimension_relative_error=float(
+                matched_config["maximum_relative_error_per_lwh_dimension"]
+            ),
+            maximum_axis_yaw_degrees=float(
+                matched_config["maximum_axis_yaw_difference_degrees_modulo_pi"]
+            ),
+            maximum_score_difference=float(matched_config["maximum_absolute_score_difference"]),
+            minimum_direction_agreement=float(
+                matched_config["minimum_heading_direction_agreement"]
+            ),
+            maximum_aggregate_count_relative_difference=float(
+                count_config["aggregate_maximum_relative_difference"]
+            ),
+        )
+        same_session_characterization = {
+            "role": "characterization_only_not_acceptance_gate",
+            "reference_engine": characterization_artifact.to_dict(),
+            "candidate_engine": engine_artifact.to_dict(),
+            "same_session": True,
+            "identical_voxel_tensor_objects": True,
+            "raw_network_comparisons": {
+                "aggregate": _aggregate_raw_differences(
+                    characterization_raw_records, characterization_differences
+                ),
+                "per_sample": characterization_raw_records,
+            },
+            "final_detection_comparison": characterization_stage_1,
+            "samples": characterization_reports,
+        }
     all_direction_summary = direction_population_summary(
         np.concatenate(all_pytorch_direction),
         np.concatenate(all_tensorrt_direction),
@@ -398,7 +527,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "diagnostic_only": diagnostic_only,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "commit_sha": repository_git_sha(repository_root),
-        "milestone": "M2",
+        "milestone": str(m2_manifest.get("milestone", "M2")),
         "reference_to": {
             **parity_manifest["reference_to"],
             "v1_config_sha256": sha256_file(v1_protocol_path),
@@ -419,6 +548,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "onnx": onnx_artifact.to_dict(),
             "engine": engine_artifact.to_dict(),
             "engine_rebuilt_for_v2": False,
+            "candidate_engine_built_for_m6b_r1": str(m2_manifest.get("milestone")) == "M6b-R1",
             "layer_precision_changes": False,
         },
         "environment": {
@@ -440,7 +570,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             "matching": parity_manifest["matching"],
             "stage_1_acceptance": parity_manifest["stage_1_acceptance"],
             "threshold_edge_policy": parity_manifest["threshold_edge_policy"],
+            "deployment_manifest": str(args.deployment_manifest),
+            "thresholds_mutated": False,
         },
+        "same_session_original_vs_candidate": same_session_characterization,
         "shared_inputs": input_diagnostics,
         "raw_network_comparisons": {
             "aggregate": raw_network_summary,

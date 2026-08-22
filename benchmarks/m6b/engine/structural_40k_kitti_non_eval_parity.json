@@ -1,0 +1,1438 @@
+{
+  "M6b_evaluation_started": false,
+  "artifacts": {
+    "candidate_engine": {
+      "committed": false,
+      "logical_name": "engines/m6/pointpillars_fp16_profile40k.engine",
+      "sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+      "size_bytes": 31469076
+    },
+    "checkpoint": {
+      "committed": false,
+      "logical_name": "checkpoints/pointpillars_nuscenes.pth",
+      "sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+      "size_bytes": 19778089
+    },
+    "onnx": {
+      "committed": false,
+      "logical_name": "m2/pointpillars.onnx",
+      "sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+      "size_bytes": 60711828
+    }
+  },
+  "drive_id": "2011_09_30_drive_0016",
+  "environment": {
+    "backend_versions": {
+      "mmcv": "2.1.0",
+      "mmdet": "3.2.0",
+      "mmdet3d": "1.4.0",
+      "mmengine": "0.10.7",
+      "torch": "2.1.0+cu118"
+    },
+    "mmdeploy": "1.3.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "tensorrt": "8.6.1"
+  },
+  "evaluation_drives_used": [],
+  "executions": [
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000010",
+      "frame_index": 10,
+      "model_ready_sha256": "6a82d88385d1c4b126109a1e9b2f39b6a34aa19f755ce56ea279104679cfbd59",
+      "point_count": 1318992,
+      "pytorch_detection_frame_sha256": "496902c8928f2a3b346cc3cbd729989aa8ed99debcf331b1618e0de078bbbcde",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "fde5be312d15cab3c643e8ea33777b073a7b331a60debdb3c34a7aeb3625597c",
+        "cls_score": "8b36c5c17708eb2e0c4cff67bcb35f82882b17fae0b3356fa41e179cb6cfc9f9",
+        "dir_cls_pred": "0dc2aefa53183e154694647f47510430101a97b237f99cca9a865bf65600c51c"
+      },
+      "tensorrt_detection_frame_sha256": "cde968017e0dee984ca82a6bdda34bd84d3db6db109273833a7e0cfdbea279cc",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "3998f06c9bee40f9a692972ecf89aafa4e20fbada16d572b7c333c4f513ef256",
+        "cls_score": "9ea8147145b8382b1f64276308af9fd99bac39a5e460c785c213d8bc449cad7d",
+        "dir_cls_pred": "0ce95780818f0bac29ff1ce6016d0101b457b45d7c3554f61a95073a61a86062"
+      },
+      "voxel_count": 40000,
+      "voxel_hashes": {
+        "coors": "1552e2b85833509b4c80b95de9b2303f1f9419df81c950217a9327493a1b6489",
+        "num_points": "9591671ed08c165144a152620c530eb4d501d27dd2adcf3a773c3d9d35e7f320",
+        "voxels": "3436beca61d33d0d22da4612cbd4acc3fbe094c780ef872898bb941ddd1f1174"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000090",
+      "frame_index": 90,
+      "model_ready_sha256": "5ae0180c1d76ca5fbccfdad41dbb698d4710680e930c3a187ebdbe2c6db77435",
+      "point_count": 1372759,
+      "pytorch_detection_frame_sha256": "6c1970dd69007d2ca212748f088df9745f3f32910911bf0d42398e9c8bfda276",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "ac1a62bbaad1ecc2718fc485f1ddc68b78b1fa10f482aa51793185beaa1938ce",
+        "cls_score": "b6740e044835f71b493e2220cbd1640981dcb6971c005f984c5c25ecb2a39393",
+        "dir_cls_pred": "64a27242c8ce1766c25a6c9886cc69f770b4e61c92208444659c2bee8ef5926f"
+      },
+      "tensorrt_detection_frame_sha256": "5eddf72cc702c6b9154e362134fec851c73dd847a23ac716b9663207615abab7",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "24faa945c3218fc5c03c32bc658c4217380647b3a37238e2e608692727e36ce8",
+        "cls_score": "3af94415f17f4b56b0c86f2f81f4e86321123c532f3ee693539d833d2350aa54",
+        "dir_cls_pred": "fba683da9cc86702385367364c031505e5f967caf70dac77c8bf11c066a4ff78"
+      },
+      "voxel_count": 38780,
+      "voxel_hashes": {
+        "coors": "3d925da35dfb77f880d23dd653ce05ff98e7847fdd154c600c32530ba381e1f5",
+        "num_points": "e6927f326ddb6156689f15846a02f864e03f94b336d6de452de567d86eebec04",
+        "voxels": "fc6c6d6d0ef39f1236f273eeb01fbc402e26bf42ba6df8b45dff5e40fd290a72"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000101",
+      "frame_index": 101,
+      "model_ready_sha256": "2ef2ef2f736edce5e2dfa04c463a4f37d8c81a83b3e74c6e427dccc2a9b50c67",
+      "point_count": 1376655,
+      "pytorch_detection_frame_sha256": "3ae155107d45825e5aa7c81d7efdd1147ce1a5a3b942b194361192a1e77354c4",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "e0ed4bcba447af74640ba76b907471fe4a86026829ab208dc5c5a2c259f68ae4",
+        "cls_score": "bbb703a8ab3a9e255fb9dad152c7a81c7bb2d3cb0bbae5275ece0d8bba7826f3",
+        "dir_cls_pred": "0f55c35d6feb2f4683ae423d0704154416eaa461388e472036df5e4ae87e8501"
+      },
+      "tensorrt_detection_frame_sha256": "2163afd351a2b5f94b7a5953a34a19f0331351e7b0542294d80d7e3e59e55c67",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "3935dcbe864a34fcb236fc32f6de14a122796111b622b0234502f77f5d5506d8",
+        "cls_score": "441d19323bfae22520d706807f20a4f019aec99bf73664e882474d368ba935cc",
+        "dir_cls_pred": "312a5d92be143bf96905ee230946472244346c87484bc83707a133e36e3d22af"
+      },
+      "voxel_count": 33573,
+      "voxel_hashes": {
+        "coors": "f565a6d2d1e2c3ac6cb59d6e6361db205be75aad39d2b821e66fbf26836f655d",
+        "num_points": "bb156e29ad03d4e8b8c3b48f155ca02a14a13ee534182a4e4f81015b2cbeb1d2",
+        "voxels": "a0811c2b42e7cf58d63a9fb4719e34ddf247c1ce81ed27835a50183a83591bb3"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000114",
+      "frame_index": 114,
+      "model_ready_sha256": "d5427cfcb1e6494861e89a4641b2af409eaa524eb4cd3583f327a7c0be24aca6",
+      "point_count": 1374389,
+      "pytorch_detection_frame_sha256": "5cb5e90b317794d4743b5df4da6a077272288d0eba518e38f2b2d7342ff97b54",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "8f1450c2c59bd70de101bf1a1a5309d8d56b43500559c74a86fe386df31d1145",
+        "cls_score": "af6a5b23723bfe0b97850fa9121c96613134e3ae3342a485626d9557f42aa68c",
+        "dir_cls_pred": "631bda566aeee98af05f8784ccc20483dd0b17b2e476d82d0b81738620c836ef"
+      },
+      "tensorrt_detection_frame_sha256": "b61cee0de8dfdc5cb55bfb705e875da96f6c9ba550a056fe2d91b276c177dfd5",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "c637d6d1a3ecf4c9a74cc3ab530eb61bc22d66fb73d25df7144a2cd0a9c624a2",
+        "cls_score": "da1b5fc19e658722c47b9d87f565a3b6b9b4c7b322e1d2de60b25b494e121148",
+        "dir_cls_pred": "ffb599b91330f6573b6a565dc08948cea3e8305f2a31e1ad2f95aac42f09a176"
+      },
+      "voxel_count": 29423,
+      "voxel_hashes": {
+        "coors": "4da878983fb829d0b4a9f1d363eada79c50f7be8bea0b844d07a8a5fcd4acea1",
+        "num_points": "1c3380993aacac3897150bccc9b5a436c3193938a8e595845e30c0b2bcc2842c",
+        "voxels": "612f8bbfb1c68b1b20ed8621be10e0b7ce16f4304505705ff5c0f351ee05a1f7"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000142",
+      "frame_index": 142,
+      "model_ready_sha256": "6b08b0dcb934c4bbdc717ee7132652b957ee27e1140c33340ab179578b6f7ff1",
+      "point_count": 1370655,
+      "pytorch_detection_frame_sha256": "f3ef78d55504fc6885e6aa17f67f83ef04573706754fa6ba14b7a40bace5621e",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "68a8f50c6831be6c8be3f661d1aa7e1bdb1a6f10cd518f6529c17ec338e7c527",
+        "cls_score": "73bb634d7a71e34c906ee84219f960e376bf5941462b2823ef67b79df4e98adc",
+        "dir_cls_pred": "e46a3ef56c8e58b5ccd91709bfde2206b971d940a8efbbd472bba38e053c461d"
+      },
+      "tensorrt_detection_frame_sha256": "2aecc81e9162657de57a2e2a795dc861d13280673258f15973344a067e507db3",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "ea5a37028b19bb9b0a70373193b283394a7325947f421a66b24848d455cd6959",
+        "cls_score": "345a3e584766be0d25d9ec1cdccf10e3b965d3024efa1cfbb29fbdd58be314b1",
+        "dir_cls_pred": "15b3061972fbb95e32c6bb9547405c14f150273b903f78882ae990873b148a7c"
+      },
+      "voxel_count": 30443,
+      "voxel_hashes": {
+        "coors": "d40804994dabd6dec6f672f6cf18de988f9c7bf210ef40e41b56b1ed05ebeb41",
+        "num_points": "a722fe7e4224792fd5f9807ff864c37d80998bc128aa813dc75ebc4ede579189",
+        "voxels": "25b04eb2e1f709ef1dbc58f2f0fadf9f197589ebd1173ecad86b6ca8ccfda75a"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000145",
+      "frame_index": 145,
+      "model_ready_sha256": "25efce9003aecf047ddfa2e75ad30ea758ca0a13b8005bcfda7bfb17593fe086",
+      "point_count": 1372950,
+      "pytorch_detection_frame_sha256": "b5f9989a3ff0c09a31eaf0491146f3a3cd00cad350776fb2d4bac2ff22d9c3da",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "402022897eec75bbfddb1f32e8e66c34d067a711e681e7c74f1bdc453d50adcd",
+        "cls_score": "09f54485e5db23e5f2a7bd56b4a499ef6ca060a1c451aa757db3fa6dbf1bd8dd",
+        "dir_cls_pred": "b5dc539d47f1b5793236b358cadfb4d36b648a7c2e9ec3f4ac502c11c6f6c10f"
+      },
+      "tensorrt_detection_frame_sha256": "ed34920c388d01dd8b07709446cccf7b8e452a633866ba6c966e4853a0df76d7",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "8af9b802b27cb9ca7944bd6771dd4475c308b7e9f31b8b0695789ea8d96b9238",
+        "cls_score": "242aa7fa2b492794181a42ec2fe0771a85a53afb9f51def6f7212165e6b56b77",
+        "dir_cls_pred": "7e4a3bc070071323d188ae7399cefde894b8b1ee95a12c76f4c6c0050651b868"
+      },
+      "voxel_count": 31252,
+      "voxel_hashes": {
+        "coors": "39ce3d7d11be958468b9fa7d6d6a0a1365056a11fa202bc6bdec4d9da237a466",
+        "num_points": "30cfb2fab41365609851749c768d9673584fa27cedfae48dc801cf00cbb76496",
+        "voxels": "f8f50c813511f93269d42ff0c4be375990d6e611f47bdf131f7dce0f72631bb9"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000150",
+      "frame_index": 150,
+      "model_ready_sha256": "3db95e7b1c2132df8183cea748de6756ac03f5fd386f69718e1dee17970e3751",
+      "point_count": 1375862,
+      "pytorch_detection_frame_sha256": "952b320c6aa9b1fd376d559e8aaf94ff459ecd8854df3a4908932b50511d1b82",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "84d13ea08b963528d6dddf8b5dfee375ab47eb836305e840cb6c9ff393b45bc6",
+        "cls_score": "0fbb0b37270fae9e9aa1f572b63a4182425a79fec0a3350f6d64dda0d2c24560",
+        "dir_cls_pred": "6e50490a243000caec1965932e7b44ef66da06c21ded9985a7745a53772d6ffb"
+      },
+      "tensorrt_detection_frame_sha256": "3576c5a419694e3113ae06d411c2466582c57bb06c87988035f965f8709f57d4",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "f1df344cd2fbf36356e771e837a990135e533581935700e7563234d7f29a0541",
+        "cls_score": "929969f282ccc3b979e3795d7b03bfec50bc1c1738dbfa4abe1f61d18aefa62e",
+        "dir_cls_pred": "87667e2cf9a8af0df96259ff01b41e72a146551c22148ec4ef4e21472754707c"
+      },
+      "voxel_count": 32140,
+      "voxel_hashes": {
+        "coors": "a98178f819f03ca25f98fc250b2286123b396016329ea55d2ae535fa2098fd90",
+        "num_points": "8232d900c5f35e9d8fccfec3afde7523155a09167d4e5b7b03ed38228b8b8179",
+        "voxels": "9ddcf7999187661dc22ade36f4fe4942846dfd526acf39679a05763fdbe46052"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000160",
+      "frame_index": 160,
+      "model_ready_sha256": "75da38e88649c533a5fb4c31a34d3cf6944bef2640265fe54d7d5dc9efc7df0f",
+      "point_count": 1378368,
+      "pytorch_detection_frame_sha256": "ac72309066059eec8424404fa94dc19b292f60b1180d48b97573cf851595d591",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "4868680e2df3f93349f8dd6d723770de3d7398f67e6df27b16e2e219f0bf00b9",
+        "cls_score": "2abbedc3dd8581b90f2070a8c85871861e14bd96477bd256c9fad6ed8959e276",
+        "dir_cls_pred": "cc963def66bb611d3b44197f9a3fc86e138f67bee0d6540dc61b77df8999daa4"
+      },
+      "tensorrt_detection_frame_sha256": "15438880fbef1a1a2a6964ca8485f07bcafd896be4981a94d8383886f0169836",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "6c83aaa7bdecad28063090837b370bf515f7671468426e071f78eeb78cf04d3a",
+        "cls_score": "ddbb0271150edcd09e47cc5bd516ae101356596c4c4e80b67a8ec101d88b5d6f",
+        "dir_cls_pred": "818ea0f630671e69f207da9d353998641c10781279a38b212b4c5bc94275cb73"
+      },
+      "voxel_count": 32858,
+      "voxel_hashes": {
+        "coors": "c6214dc6b43429ea21168799c0504f76768068bd7a49136e0df0e2e2aca3f917",
+        "num_points": "ab572e8398b8b0b8bf8668f91f58134b95b40678933e7beb781f2a9a9ac1880b",
+        "voxels": "d161688eac281fade5dd3e9e08c7d3faf8a029396bd46621da4e48411f588015"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000186",
+      "frame_index": 186,
+      "model_ready_sha256": "9647259979350c3d0742aac14dedf3843c668d6e46eca739fc93596de12b7768",
+      "point_count": 1374716,
+      "pytorch_detection_frame_sha256": "039b225f99be9cb1f2af885dfb42e8d8e9bde4fa53a4ba5fbc3f80a2caa7114f",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "517d3a48f7b6f0082076c803ba9ebd056d36d8593143769d63a98f358f8f7acc",
+        "cls_score": "1c11531b88bd4ac170a3a600b3551b7a247450fc3f287d02838b5910c13aee99",
+        "dir_cls_pred": "fc18b92ca8a107b128bf52145ff1d94480f90500f3ee8957dd115fd5cdf4e0e1"
+      },
+      "tensorrt_detection_frame_sha256": "5f60d3527c0893fcf17e760a4e723dd29e43f8f12285fea01a1d57031d64bed2",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "68519df35383577be96381939f7fc6c2858fc29392f624c7f66e8e7f2fdf98b2",
+        "cls_score": "c732a83bdc2bba5dd2a22d0fdb45ca2d7187c2a68db353e11ab143760ab6d31e",
+        "dir_cls_pred": "4313db09f0ec46341673a068d7b7a1633b13cd7bc0eaa4982d928055159ac5e0"
+      },
+      "voxel_count": 34403,
+      "voxel_hashes": {
+        "coors": "adcc9d519a319f866f9ae79d17aeac24fd8251cc3054f04cb7faa33589e58fc5",
+        "num_points": "53d72a707d72b114edfc607d8009ef185dc4ef9b1a5a794eb8f6cd9d907d7aee",
+        "voxels": "bd6c85dd34c93de3506fedb8d4884e7de9abd016948941681f75248ebb44abda"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000194",
+      "frame_index": 194,
+      "model_ready_sha256": "af6eaf1d1508ddefc4882875ec5a2fcc9764107b6e5ef586c15746fe1e5cb33d",
+      "point_count": 1374632,
+      "pytorch_detection_frame_sha256": "85bdeae84b14b4b7a9164577dd17ba71e05789a3fc2f00e6bb69478610faacfe",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "36886df4c312f7d6a53916cafa7c0c5d0c4ddaad58fd886c71e5c6017bda17f0",
+        "cls_score": "750056dd461978f4f695f0b72c8496a3fa54885ed12a9b571e7dd1aae01b8bb5",
+        "dir_cls_pred": "32c7d6c421b929a0dac5fb4d1b7702f2f386b5fe22c44eaf37b71e179c8c14a5"
+      },
+      "tensorrt_detection_frame_sha256": "8c51690cf65b27bd81b9ea5a4d230872f6cb01d15fd7de92b8b63e0eca0dc91c",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "82483086f7f2c512169073945f0d46495094d394f238a301edc9a15ad246f42b",
+        "cls_score": "6d2754b8e3f16576cbb2c6bdddd38f3f97cd9f40ed0770ea6386606f8520fe1a",
+        "dir_cls_pred": "23786e76cbaa4aa5203ebe22835b00646b7cad8e718314d2c90b6ac782828e58"
+      },
+      "voxel_count": 35267,
+      "voxel_hashes": {
+        "coors": "1fb28df7cc4c1cdb5b94a0549c330be1bd0b2e9abf072f39edba2d2c31f09e2d",
+        "num_points": "246ff74065bd2aefc33aba0f63127be6e26e1a6dffe7629a080b2afa75182642",
+        "voxels": "c99ae6b0e0abf3773d917192ee93b98bef7852168e3b8eb849516642169bb3a9"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000201",
+      "frame_index": 201,
+      "model_ready_sha256": "00f2b42cdc1f49a72fea021b579a03d67dd4d3eae6793e1bc850d468b0b24cdb",
+      "point_count": 1371689,
+      "pytorch_detection_frame_sha256": "246b0318172f41dfdcba886106258af242504648c14daae1d27b1c2a63bbfb38",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "9ec0f55a989d5af70f6e215b4ce0790dc4598f0dd3026718fe1e6c5bc3aa53f8",
+        "cls_score": "f0c557b04ddb071501f130086b0b498ddecf6a8a44df90979eda92637333cd48",
+        "dir_cls_pred": "f69c23b8ccf76563335799d59b489abebc84405d8d9cc6f6396180fba282ae9a"
+      },
+      "tensorrt_detection_frame_sha256": "3187b4a24f4b782ddabbf0040f6a43462ee07c001f54c665df83f2e26f9cb54b",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "14318c35d882fb7aa7ea3e0cc58d3768377557a293d7f2d8f5f0b6ec5e308f24",
+        "cls_score": "cf639bd1644b1ed9c559bdfca44854ff99b85468c27ee30e6fe44c119f4c6fc1",
+        "dir_cls_pred": "6e6a59577c16cb2aeaa29adb80eb3224fb9ff77a2b497e6324726fdbd9aba2d9"
+      },
+      "voxel_count": 36448,
+      "voxel_hashes": {
+        "coors": "ca31cbc89d87e2d816fae7e397f4e5d1c9ca95441f1177c6c1bd67652be68442",
+        "num_points": "f5c83b1f214cc50fe3d6c07206201ce36c4bb84dfa9409886f098c41fea88385",
+        "voxels": "18fe1e30ac47d3c63f9c27d098d2c7b024aac0a00d8534488280623d46330639"
+      }
+    },
+    {
+      "frame_id": "2011_09_30_drive_0016/0000000207",
+      "frame_index": 207,
+      "model_ready_sha256": "0ad6baa1173646ff0848e888e621fb929e04aba07424e1945b806aa58ab1fcfc",
+      "point_count": 1364038,
+      "pytorch_detection_frame_sha256": "688d8e808a8a3709dc5871ca90a0d102e25da2d8ca3db457342be38fd6221ad1",
+      "pytorch_raw_hashes": {
+        "bbox_pred": "9eb2f31de99354239cbe76a0e1405fb273895cd9964c4bed406241f79a07d329",
+        "cls_score": "908375d0c32d5011133bdb3a8a65e41e2cf15c3094f394d60c2880d91b4a82ac",
+        "dir_cls_pred": "b73fb58816fb8cd4df4bdb07b0b32239ca525c04a6020e06c78b80fd7fcfb951"
+      },
+      "tensorrt_detection_frame_sha256": "665c415b37a8b37ed1aa7976919e9b942a90f6247f5a0c4d1cc1a8a9de1133e5",
+      "tensorrt_raw_hashes": {
+        "bbox_pred": "d16fd51cbe969ef9797575e209af11281d3c0cb3927fe8bd666c193c85f923e3",
+        "cls_score": "0f557bda29c20f51b61fbade1a3d8e661d596b6144f302d148cd3ec92d9885fd",
+        "dir_cls_pred": "65078bdccff35fb2e582cb88e3af1b3a705e76ec25463f237bc0c8adbb78383f"
+      },
+      "voxel_count": 37551,
+      "voxel_hashes": {
+        "coors": "33ed3bc59d889b4461b8899119d469d0a3bcc89a9831a5c6a55dc7e701a1b6bb",
+        "num_points": "5e3b7e1135276b4d87c531b2fc2904bc0920d7783693a3d276686ef4d1e904af",
+        "voxels": "adbe52dc10c1046e9fbff0c584621dbf055e430928c6fb8266e7fa23b13a269d"
+      }
+    }
+  ],
+  "gate": "non_evaluation_KITTI_rewritten_PyTorch_FP32_vs_structural_40k_TensorRT_FP16",
+  "generated_at_utc": "2026-08-22T13:11:43.714972+00:00",
+  "ground_truth_metrics_run": false,
+  "measurement_commit": "d1f534d79b85f6d67c54ebc70b99d7b92cd31413",
+  "milestone": "M6b-R1",
+  "overall_pass": true,
+  "protocol": {
+    "matching": {
+      "candidate_selection": "maximum_bev_iou_among_unmatched_tensorrt_detections",
+      "class_wise": true,
+      "minimum_bev_iou": 0.5,
+      "one_to_one": true,
+      "reference": "pytorch",
+      "reference_order": "descending_score_then_detection_sort_key",
+      "scipy_required": false
+    },
+    "parity_config": "configs/detection/m2_parity_v2.yaml",
+    "parity_config_sha256": "91e7cde19076c6452d9ff8e0fefc893a6d429622ed30c2da88127d29d4418df0",
+    "stage_1_acceptance": {
+      "count_guards": {
+        "aggregate_maximum_relative_difference": 0.05,
+        "per_sample_maximum_absolute_difference": "max(1,ceil(0.05*pytorch_count))"
+      },
+      "distinct_continuous_outlier_policy": {
+        "count_each_detection_match_once": true,
+        "record_failed_metrics": true,
+        "retained_in_denominator": true
+      },
+      "high_confidence_match_coverage": {
+        "pytorch_to_tensorrt_minimum": 0.99,
+        "tensorrt_to_pytorch_minimum": 0.99
+      },
+      "matched_high_confidence": {
+        "dimensions_detection_passes_only_if_all_lwh_pass": true,
+        "maximum_absolute_score_difference": 0.05,
+        "maximum_absolute_z_center_difference_m": 0.25,
+        "maximum_axis_yaw_difference_degrees_modulo_pi": 5.0,
+        "maximum_class_name_mismatches": 0,
+        "maximum_relative_error_per_lwh_dimension": 0.05,
+        "maximum_xy_center_displacement_m": 0.25,
+        "minimum_heading_direction_agreement": 0.99,
+        "minimum_per_detection_pass_fraction": 0.99
+      }
+    },
+    "thresholds": {
+      "exported_detection": 0.25,
+      "high_confidence_guard": 0.3,
+      "threshold_edge_band": {
+        "maximum_inclusive": 0.3,
+        "minimum_inclusive": 0.2
+      }
+    },
+    "thresholds_mutated": false
+  },
+  "raw_network_comparisons": {
+    "aggregate": {
+      "bbox_pred": {
+        "absolute_difference": {
+          "count": 60480000,
+          "maximum": 0.3781867027282715,
+          "mean": 0.002253883974899774,
+          "median": 0.0007189810276031494,
+          "p95": 0.009320855140686035,
+          "p99": 0.02342367172241211
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 12,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            126,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      },
+      "cls_score": {
+        "absolute_difference": {
+          "count": 67200000,
+          "maximum": 0.7055587768554688,
+          "mean": 0.012301432668046937,
+          "median": 0.008786201477050781,
+          "p95": 0.035582542419433594,
+          "p99": 0.0615386962890625
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 12,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            140,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      },
+      "dir_cls_pred": {
+        "absolute_difference": {
+          "count": 13440000,
+          "maximum": 0.15338259935379028,
+          "mean": 0.005921957523449549,
+          "median": 0.004053890705108643,
+          "p95": 0.017728865146636963,
+          "p99": 0.029739292878657526
+        },
+        "dtype_consistent_across_samples_and_runtimes": true,
+        "pytorch_dtypes": [
+          "float32"
+        ],
+        "sample_count": 12,
+        "shape_consistent_across_samples_and_runtimes": true,
+        "shapes": [
+          [
+            1,
+            28,
+            200,
+            200
+          ]
+        ],
+        "tensorrt_dtypes": [
+          "float32"
+        ]
+      }
+    },
+    "per_sample": [
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000010",
+        "frame_index": 10,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.2068791389465332,
+              "mean": 0.00209208483629869,
+              "median": 0.0006913435645401478,
+              "p95": 0.008449645340442652,
+              "p99": 0.022076249718666063
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.4056968688964844,
+              "mean": 0.011728686212961163,
+              "median": 0.008602142333984375,
+              "p95": 0.033203125,
+              "p99": 0.05414105415344217
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11598759889602661,
+              "mean": 0.005854600937557448,
+              "median": 0.003945022821426392,
+              "p95": 0.017797890305519107,
+              "p99": 0.030504530966281897
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000090",
+        "frame_index": 90,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.3781867027282715,
+              "mean": 0.002346964051310572,
+              "median": 0.0007148981094360352,
+              "p95": 0.009542703814804553,
+              "p99": 0.024908662438392626
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.7055587768554688,
+              "mean": 0.012200432598697287,
+              "median": 0.008594036102294922,
+              "p95": 0.03548622131347656,
+              "p99": 0.06237220764160156
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.14607787132263184,
+              "mean": 0.005825026320289596,
+              "median": 0.0039020180702209473,
+              "p95": 0.017770777642726908,
+              "p99": 0.030837776064872743
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000101",
+        "frame_index": 101,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.2528254985809326,
+              "mean": 0.0023312814500680073,
+              "median": 0.0007259249687194824,
+              "p95": 0.009613335132598877,
+              "p99": 0.02525072172284118
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.47776222229003906,
+              "mean": 0.012945953204929828,
+              "median": 0.009157180786132812,
+              "p95": 0.0377960205078125,
+              "p99": 0.06575108528137186
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.09865400195121765,
+              "mean": 0.005837587280526973,
+              "median": 0.004057146608829498,
+              "p95": 0.017241239547729492,
+              "p99": 0.028914044350385675
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000114",
+        "frame_index": 114,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.19837164878845215,
+              "mean": 0.002197128040355198,
+              "median": 0.0007214844226837158,
+              "p95": 0.00911671221256255,
+              "p99": 0.02231312036514277
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.43285179138183594,
+              "mean": 0.01209903748714498,
+              "median": 0.008687973022460938,
+              "p95": 0.035053253173828125,
+              "p99": 0.05980874061584451
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.09267717599868774,
+              "mean": 0.006179882261467615,
+              "median": 0.004265382885932922,
+              "p95": 0.01846015453338623,
+              "p99": 0.030856804102659226
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000142",
+        "frame_index": 142,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.26015281677246094,
+              "mean": 0.002136603241569458,
+              "median": 0.0007162094116210938,
+              "p95": 0.008784861862659449,
+              "p99": 0.021212279871106146
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3596916198730469,
+              "mean": 0.012158584337468659,
+              "median": 0.008668899536132812,
+              "p95": 0.03551769256591797,
+              "p99": 0.06046485900878906
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.1021926999092102,
+              "mean": 0.0058331721869025,
+              "median": 0.004108011722564697,
+              "p95": 0.017064335942268374,
+              "p99": 0.02749331057071687
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000145",
+        "frame_index": 145,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.27096617221832275,
+              "mean": 0.0022497745510216883,
+              "median": 0.0007228143513202667,
+              "p95": 0.009258908219635483,
+              "p99": 0.02372595697641372
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.527470588684082,
+              "mean": 0.012216403401259865,
+              "median": 0.0086669921875,
+              "p95": 0.035584449768066406,
+              "p99": 0.06278038024902344
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11259102821350098,
+              "mean": 0.006160082492638945,
+              "median": 0.004187021404504776,
+              "p95": 0.018533590435981753,
+              "p99": 0.031659954935312276
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000150",
+        "frame_index": 150,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.28462088108062744,
+              "mean": 0.0022139151293673314,
+              "median": 0.0007230937480926514,
+              "p95": 0.009213897865265603,
+              "p99": 0.021854763627052187
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.521270751953125,
+              "mean": 0.012029875943490437,
+              "median": 0.008566856384277344,
+              "p95": 0.03473999500274649,
+              "p99": 0.060760498046875
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.11210739612579346,
+              "mean": 0.005886160378572822,
+              "median": 0.004027664661407471,
+              "p95": 0.017723025381565095,
+              "p99": 0.029399758279323583
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000160",
+        "frame_index": 160,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.214197039604187,
+              "mean": 0.002101152032277299,
+              "median": 0.0006981343030929565,
+              "p95": 0.008530378341674805,
+              "p99": 0.02143383026123047
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3235635757446289,
+              "mean": 0.012111288029572793,
+              "median": 0.0085296630859375,
+              "p95": 0.035831451416015625,
+              "p99": 0.06142997741699219
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.09222954511642456,
+              "mean": 0.0056783130799680035,
+              "median": 0.003981202840805054,
+              "p95": 0.01673102378845215,
+              "p99": 0.02688860420137645
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000186",
+        "frame_index": 186,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.3234260082244873,
+              "mean": 0.0024404424167979444,
+              "median": 0.0007364749908447266,
+              "p95": 0.010159612447023389,
+              "p99": 0.026238205432891792
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.4599113464355469,
+              "mean": 0.012179750764391251,
+              "median": 0.00881195068359375,
+              "p95": 0.03468132019042969,
+              "p99": 0.05984973907470703
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.15338259935379028,
+              "mean": 0.006057248640619634,
+              "median": 0.004065677523612976,
+              "p95": 0.018312573432922363,
+              "p99": 0.030663910508155826
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000194",
+        "frame_index": 194,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.2745792865753174,
+              "mean": 0.002349959788079331,
+              "median": 0.0007437914609909058,
+              "p95": 0.009939330071210853,
+              "p99": 0.024179269224405192
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.3823566436767578,
+              "mean": 0.01276798406577536,
+              "median": 0.009280204772949219,
+              "p95": 0.03646659851074219,
+              "p99": 0.06200123786926248
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.09969437122344971,
+              "mean": 0.006076826501714407,
+              "median": 0.00413358211517334,
+              "p95": 0.018240459263324744,
+              "p99": 0.030584578178823
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000201",
+        "frame_index": 201,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.3598613440990448,
+              "mean": 0.0022562322962642266,
+              "median": 0.0007088854908943176,
+              "p95": 0.00933420956134795,
+              "p99": 0.023487095236778166
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.6043357849121094,
+              "mean": 0.012817564336423363,
+              "median": 0.009055137634277344,
+              "p95": 0.037270545959472656,
+              "p99": 0.06621360778808594
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.13724878430366516,
+              "mean": 0.005824283912679363,
+              "median": 0.0040122270584106445,
+              "p95": 0.017217884957790384,
+              "p99": 0.029096897542476678
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      },
+      {
+        "frame_id": "2011_09_30_drive_0016/0000000207",
+        "frame_index": 207,
+        "tensors": {
+          "bbox_pred": {
+            "absolute_difference": {
+              "count": 5040000,
+              "maximum": 0.17887498438358307,
+              "mean": 0.0023310698653875505,
+              "median": 0.0007272493094205856,
+              "p95": 0.009995968639850611,
+              "p99": 0.024473465383052673
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              126,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "cls_score": {
+            "absolute_difference": {
+              "count": 5600000,
+              "maximum": 0.38581085205078125,
+              "mean": 0.012361631634448256,
+              "median": 0.008862495422363281,
+              "p95": 0.03544330596923828,
+              "p99": 0.06265832901000934
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              140,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          },
+          "dir_cls_pred": {
+            "absolute_difference": {
+              "count": 1120000,
+              "maximum": 0.12419956922531128,
+              "mean": 0.005850306288457276,
+              "median": 0.003975413739681244,
+              "p95": 0.01769557520747186,
+              "p99": 0.029579967800527813
+            },
+            "dtype_consistent": true,
+            "pytorch_dtype": "float32",
+            "shape": [
+              1,
+              28,
+              200,
+              200
+            ],
+            "shape_consistent": true,
+            "tensorrt_dtype": "float32"
+          }
+        }
+      }
+    ]
+  },
+  "schema_version": 1,
+  "selection": {
+    "frame_count": 12,
+    "frame_ids": [
+      "2011_09_30_drive_0016/0000000010",
+      "2011_09_30_drive_0016/0000000090",
+      "2011_09_30_drive_0016/0000000101",
+      "2011_09_30_drive_0016/0000000114",
+      "2011_09_30_drive_0016/0000000142",
+      "2011_09_30_drive_0016/0000000145",
+      "2011_09_30_drive_0016/0000000150",
+      "2011_09_30_drive_0016/0000000160",
+      "2011_09_30_drive_0016/0000000186",
+      "2011_09_30_drive_0016/0000000194",
+      "2011_09_30_drive_0016/0000000201",
+      "2011_09_30_drive_0016/0000000207"
+    ],
+    "path_class": "external_local_input_only_evidence",
+    "sha256": "c5bcb93c2b2b7a4402181045194bd85f4408bdd34e4abb6146da58cdb801664b",
+    "voxel_counts": [
+      40000,
+      38780,
+      33573,
+      29423,
+      30443,
+      31252,
+      32140,
+      32858,
+      34403,
+      35267,
+      36448,
+      37551
+    ]
+  },
+  "stage_1": {
+    "checks": {
+      "aggregate_exported_counts": true,
+      "high_confidence_axis_yaw": true,
+      "high_confidence_classes": true,
+      "high_confidence_dimensions_per_detection": true,
+      "high_confidence_heading_direction_agreement": true,
+      "high_confidence_score": true,
+      "high_confidence_xy_center": true,
+      "high_confidence_z_center": true,
+      "per_sample_exported_counts": true,
+      "pytorch_to_tensorrt_high_confidence_coverage": true,
+      "tensorrt_to_pytorch_high_confidence_coverage": true
+    },
+    "class_name_mismatches": 0,
+    "continuous_metrics": {
+      "absolute_score_difference": {
+        "accepted": true,
+        "count": 39,
+        "failure_count": 0,
+        "maximum": 0.00929182767868042,
+        "mean": 0.0026662128093915107,
+        "median": 0.0017585158348083496,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.008310657739639283,
+        "p99": 0.009088727235794066,
+        "pass_count": 39,
+        "pass_fraction": 1.0,
+        "tolerance": 0.05
+      },
+      "absolute_z_center_difference_m": {
+        "accepted": true,
+        "count": 39,
+        "failure_count": 0,
+        "maximum": 0.005998969078063965,
+        "mean": 0.0013158764594640487,
+        "median": 0.0011324882507324219,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.0031157612800598146,
+        "p99": 0.004995652437210076,
+        "pass_count": 39,
+        "pass_fraction": 1.0,
+        "tolerance": 0.25
+      },
+      "axis_yaw_difference_modulo_pi_degrees": {
+        "accepted": true,
+        "count": 39,
+        "failure_count": 0,
+        "maximum": 0.10436529051779483,
+        "mean": 0.03146781987111042,
+        "median": 0.026651398141389754,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.07986813404062712,
+        "p99": 0.09915358297350826,
+        "pass_count": 39,
+        "pass_fraction": 1.0,
+        "tolerance": 5.0
+      },
+      "maximum_dimension_relative_error_per_detection": {
+        "accepted": true,
+        "count": 39,
+        "failure_count": 0,
+        "maximum": 0.002464154637923942,
+        "mean": 0.0008734041241284792,
+        "median": 0.0007308296080135458,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.0017408067048398737,
+        "p99": 0.002197018732457155,
+        "pass_count": 39,
+        "pass_fraction": 1.0,
+        "tolerance": 0.05
+      },
+      "xy_center_displacement_m": {
+        "accepted": true,
+        "count": 39,
+        "failure_count": 0,
+        "maximum": 0.010654885269594138,
+        "mean": 0.0030014221119989883,
+        "median": 0.0027097376525238542,
+        "minimum_pass_fraction": 0.99,
+        "p95": 0.0056395433256939045,
+        "p99": 0.008924905535190953,
+        "pass_count": 39,
+        "pass_fraction": 1.0,
+        "tolerance": 0.25
+      }
+    },
+    "distinct_high_confidence_continuous_outliers": {
+      "count": 0,
+      "denominator": 39,
+      "detections": [],
+      "fraction": 0.0
+    },
+    "exported_counts": {
+      "absolute_difference": 0,
+      "per_sample_disagreements": [],
+      "pytorch_total": 42,
+      "relative_difference_from_pytorch": 0.0,
+      "tensorrt_total": 42
+    },
+    "failed_checks": [],
+    "full_heading_diagnostics": {
+      "accepted": true,
+      "agreement_count": 39,
+      "agreement_fraction": 1.0,
+      "count": 39,
+      "direction_flips": [],
+      "disagreement_count": 0,
+      "maximum": 0.10436529051779483,
+      "mean": 0.03146781987111042,
+      "median": 0.026651398141389754,
+      "minimum_agreement_fraction": 0.99,
+      "p95": 0.07986813404062712,
+      "p99": 0.09915358297350826
+    },
+    "high_confidence_coverage": {
+      "pytorch_matched": 39,
+      "pytorch_to_tensorrt": 1.0,
+      "pytorch_total": 39,
+      "tensorrt_matched": 39,
+      "tensorrt_to_pytorch": 1.0,
+      "tensorrt_total": 39
+    },
+    "high_confidence_match_denominator": 39,
+    "overall_pass": true,
+    "recommended_next_experiment": null,
+    "stage": 1,
+    "stage_2_required": false,
+    "threshold_edge_disagreements": []
+  },
+  "status": "pass",
+  "tracked_record": {
+    "full_local_evidence": {
+      "committed": false,
+      "logical_path": ".local/temp/m6b-r1/structural_40k_kitti_non_eval_parity.json",
+      "sha256": "6a5e99351cfe426e3dca26cd768e7912ea0ce509bbf1d466fff72214dea6bd6a",
+      "size_bytes": 1997506
+    },
+    "kind": "sanitized_summary",
+    "omitted_high_volume_fields": [
+      "samples"
+    ]
+  }
+}

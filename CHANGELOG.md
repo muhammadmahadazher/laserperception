@@ -9,6 +9,11 @@ All notable changes to LaserPerception are documented here. The project follows
 
 - A CPU-only KITTI Raw dataset contract, exact Raw-devkit pose oracle, frozen KITTI-to-model basis,
   and deterministic 24-frame offline multi-sweep reconstruction hashes for future ROS validation.
+- A distinct, local-only TensorRT FP16 candidate built from the byte-identical M2 ONNX with the
+  structural 40,000-voxel maximum profile, plus sanitized build, parity, and repeatability evidence.
+- The owner-approved M6b Protocol R2 frozen-detector characterization across 428 paired KITTI Raw
+  frames under H10 and H5, with Raw-tracklet metrics, capacity diagnostics, and real offline
+  visualizations.
 
 ### Scientific chronology
 
@@ -16,6 +21,14 @@ All notable changes to LaserPerception are documented here. The project follows
   data/timing products. Prospective Protocol R2 then passed 271/271 exact adapter comparisons and a
   separate 108/108 canonical-drive transfer check without relaxing the original gate. No KITTI
   detector, TensorRT, ROS, training, tuning, or performance work occurred.
+- The original M6b run remains failed after the historical 30k engine rejected valid 40k
+  `exact_fast` input before network execution, producing zero evaluation predictions. Prospective
+  M6b-R1 validated one 40k candidate on frozen nuScenes and non-evaluation KITTI inputs; a final H5
+  profile-gap parity gate then passed before Protocol R2 was committed and any evaluation output
+  existed.
+- Protocol R2 completed 856/856 frozen H10/H5 conditions. At score 0.25 and oriented BEV IoU 0.50,
+  H10 Car/Pedestrian recall was 0.242/0.553 and H5 was 0.727/0.677. H10 versus H5 remains a compound
+  temporal-and-density history ablation; no tuning or isolated causal claim followed.
 
 ## [0.2.0] - 2026-08-20
 

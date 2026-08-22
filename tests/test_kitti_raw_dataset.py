@@ -21,7 +21,15 @@ from laserperception.datasets.kitti_raw import (
     rotation_angle_radians,
     select_m6a_reconstruction_frames,
 )
-from laserperception.detection.multisweep import SweepTransform
+from laserperception.detection.multisweep import (
+    MultiSweepBuilder,
+    MultiSweepBuilderConfig,
+    SweepTransform,
+)
+from laserperception.evaluation.m6b_input_oracle import (
+    freeze_sweep_transforms,
+    reconstruct_from_frozen_transforms,
+)
 
 
 def _identity_calibration(root: Path, *, imu_translation: str = "0 0 0") -> None:
@@ -274,6 +282,32 @@ def test_sequence_reconstructs_current_shallow_and_full_history_exactly(tmp_path
     assert sequence.reconstruct(11).point_cloud.sha256 == full.point_cloud.sha256
     assert full.point_cloud.points_xyzt.dtype == np.float32
     assert full.point_cloud.points_xyzt.flags.c_contiguous
+
+
+def test_frozen_transform_reconstruction_preserves_builder_bytes(tmp_path: Path) -> None:
+    sequence = _synthetic_sequence(tmp_path)
+    transforms = freeze_sweep_transforms(sequence, 11)
+    builder = MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=5))
+    expected = sequence.reconstruct(11, builder=builder)
+    actual = reconstruct_from_frozen_transforms(
+        sequence,
+        11,
+        transforms,
+        builder=builder,
+    )
+    assert actual.selected_indices == expected.selected_indices
+    assert actual.source_counts == expected.source_counts
+    assert np.array_equal(actual.point_cloud.points_xyzt, expected.point_cloud.points_xyzt)
+
+    corrupted = [dict(record) for record in transforms]
+    corrupted[0]["lidar2sensor_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="SHA256"):
+        reconstruct_from_frozen_transforms(
+            sequence,
+            11,
+            corrupted,
+            builder=builder,
+        )
 
 
 def test_zero_motion_changes_only_lag_and_preserves_source_order(tmp_path: Path) -> None:

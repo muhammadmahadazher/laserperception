@@ -1,0 +1,214 @@
+{
+  "builder": {
+    "build_time_seconds": 38.93660762600001,
+    "fp16_mode": true,
+    "int8_mode": false,
+    "mmdeploy_commit": "bc75c9d6c8940aa03d0e1e5b5962bd930478ba77",
+    "mmdeploy_version": "1.3.1",
+    "name": "MMDeploy official onnx2tensorrt",
+    "official_config": "configs/mmdet3d/voxel-detection/voxel-detection_tensorrt_dynamic-nus-64x4.py",
+    "requested_builder_flags": [
+      "FP16"
+    ],
+    "tensorrt_version": "8.6.1",
+    "tf32_policy": "TensorRT 8.6.1 builder default; not overridden",
+    "workspace_size_bytes": 4294967296
+  },
+  "engine": {
+    "bindings": [
+      {
+        "dtype": "DataType.FLOAT",
+        "index": 0,
+        "is_input": true,
+        "name": "voxels",
+        "profile": {
+          "max_shape": [
+            40000,
+            64,
+            4
+          ],
+          "min_shape": [
+            4352,
+            64,
+            4
+          ],
+          "opt_shape": [
+            18207,
+            64,
+            4
+          ]
+        },
+        "shape": [
+          -1,
+          64,
+          4
+        ]
+      },
+      {
+        "dtype": "DataType.INT32",
+        "index": 1,
+        "is_input": true,
+        "name": "num_points",
+        "profile": {
+          "max_shape": [
+            40000
+          ],
+          "min_shape": [
+            4352
+          ],
+          "opt_shape": [
+            18207
+          ]
+        },
+        "shape": [
+          -1
+        ]
+      },
+      {
+        "dtype": "DataType.INT32",
+        "index": 2,
+        "is_input": true,
+        "name": "coors",
+        "profile": {
+          "max_shape": [
+            40000,
+            4
+          ],
+          "min_shape": [
+            4352,
+            4
+          ],
+          "opt_shape": [
+            18207,
+            4
+          ]
+        },
+        "shape": [
+          -1,
+          4
+        ]
+      },
+      {
+        "dtype": "DataType.FLOAT",
+        "index": 3,
+        "is_input": false,
+        "name": "cls_score0",
+        "shape": [
+          1,
+          140,
+          200,
+          200
+        ]
+      },
+      {
+        "dtype": "DataType.FLOAT",
+        "index": 4,
+        "is_input": false,
+        "name": "bbox_pred0",
+        "shape": [
+          1,
+          126,
+          200,
+          200
+        ]
+      },
+      {
+        "dtype": "DataType.FLOAT",
+        "index": 5,
+        "is_input": false,
+        "name": "dir_cls_pred0",
+        "shape": [
+          1,
+          28,
+          200,
+          200
+        ]
+      }
+    ],
+    "committed": false,
+    "engine_device_memory_size_bytes": 1602800640,
+    "execution_context_created": true,
+    "has_implicit_batch_dimension": false,
+    "inspector_fp16_token_count": 0,
+    "inspector_sha256": "d46d254e5dd53b7a1b73f76d58880b8c52475d5d94af99869e53297fd0e2a640",
+    "inspector_size_bytes": 2563,
+    "logical_name": "engines/m6/pointpillars_fp16_profile40k.engine",
+    "optimization_profiles": 1,
+    "sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+    "size_bytes": 31469076,
+    "tensorrt_version": "8.6.1"
+  },
+  "engine_memory_comparison": {
+    "api": "ICudaEngine.getDeviceMemorySize / engine.device_memory_size",
+    "candidate_40k_bytes": 1602800640,
+    "difference_bytes": 390459904,
+    "historical_30k_bytes": 1212340736,
+    "required": true
+  },
+  "environment": {
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "nvidia_driver": "610.88",
+    "onnx_version": "1.14.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "torch_cuda_runtime": "11.8"
+  },
+  "generated_at_utc": "2026-08-22T12:23:42.128251+00:00",
+  "manifest": {
+    "path": "configs/detection/m6_pointpillars_tensorrt_40k.yaml",
+    "sha256": "6eb56473aa805282935864227a681dc0a61da42dd3b646b8c8b8e7e7c94e8a52"
+  },
+  "measurement_commit": "7feb5be8a2c529b55928a4bda180ae4bcb050cc7",
+  "profile": {
+    "coors": {
+      "max_shape": [
+        40000,
+        4
+      ],
+      "min_shape": [
+        4352,
+        4
+      ],
+      "opt_shape": [
+        18207,
+        4
+      ]
+    },
+    "num_points": {
+      "max_shape": [
+        40000
+      ],
+      "min_shape": [
+        4352
+      ],
+      "opt_shape": [
+        18207
+      ]
+    },
+    "voxels": {
+      "max_shape": [
+        40000,
+        64,
+        4
+      ],
+      "min_shape": [
+        4352,
+        64,
+        4
+      ],
+      "opt_shape": [
+        18207,
+        64,
+        4
+      ]
+    }
+  },
+  "schema_version": "1.0",
+  "source_onnx": {
+    "committed": false,
+    "logical_name": "m2/pointpillars.onnx",
+    "sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+    "size_bytes": 60711828
+  },
+  "status": "pass"
+}

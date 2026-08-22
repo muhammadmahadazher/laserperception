@@ -1,0 +1,3574 @@
+{
+  "all_input_only_frames": [
+    {
+      "candidate_voxel_count": 50441,
+      "frame_id": "2011_09_30_drive_0016/0000000005",
+      "frame_index": 5,
+      "model_ready_sha256": "4f068abc7f82e35fad855d69e240c50260cad9ac29c93f2f1661e7597d6a3efc",
+      "point_count": 725990,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50601,
+      "frame_id": "2011_09_30_drive_0016/0000000006",
+      "frame_index": 6,
+      "model_ready_sha256": "328699b8ee421da9454155dc944ba493a3d9eb51040f399656d202f3588b075f",
+      "point_count": 725678,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50774,
+      "frame_id": "2011_09_30_drive_0016/0000000007",
+      "frame_index": 7,
+      "model_ready_sha256": "2d3f25cfab3d26d7a4f6a64ecbbdf0f533727552e69b64751aa7ab1848993d2a",
+      "point_count": 724042,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50913,
+      "frame_id": "2011_09_30_drive_0016/0000000008",
+      "frame_index": 8,
+      "model_ready_sha256": "b3305a39bd824c8e99ea319e768fba1ebdd0f91888e8615f5a1d41a428c81eb5",
+      "point_count": 721914,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50927,
+      "frame_id": "2011_09_30_drive_0016/0000000009",
+      "frame_index": 9,
+      "model_ready_sha256": "82deea2a992fb85dc8ed6e847b20772514b70ece01d5e3c60cea266de9352f19",
+      "point_count": 719928,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50913,
+      "frame_id": "2011_09_30_drive_0016/0000000010",
+      "frame_index": 10,
+      "model_ready_sha256": "bde5dd1a9678a86097407d28d670992b33f803ced5d314b70aafb0bce2f9c151",
+      "point_count": 718996,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51466,
+      "frame_id": "2011_09_30_drive_0016/0000000011",
+      "frame_index": 11,
+      "model_ready_sha256": "36f42a77d68926e6efe315983f522d45487615b03ef3fc4d5114dc21be492022",
+      "point_count": 718553,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51275,
+      "frame_id": "2011_09_30_drive_0016/0000000012",
+      "frame_index": 12,
+      "model_ready_sha256": "f4800d45d925115536e35655b3a2ba3f63ad0366cf0ec501c8ac95a7eca165fc",
+      "point_count": 720100,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51329,
+      "frame_id": "2011_09_30_drive_0016/0000000013",
+      "frame_index": 13,
+      "model_ready_sha256": "c5286ea38df8abe60f3e1ab99d22af15194fe12faf352fc977942900c08be1b7",
+      "point_count": 719520,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51153,
+      "frame_id": "2011_09_30_drive_0016/0000000014",
+      "frame_index": 14,
+      "model_ready_sha256": "765e3b65da63b4fd5831101878b82edbc514079dc7ea7d58c503c533a902439e",
+      "point_count": 719228,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51217,
+      "frame_id": "2011_09_30_drive_0016/0000000015",
+      "frame_index": 15,
+      "model_ready_sha256": "a9530d84f7179bd8b4b5f6e12182895b1d8c89f4208b27c74104f8ea299eadd6",
+      "point_count": 718720,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51581,
+      "frame_id": "2011_09_30_drive_0016/0000000016",
+      "frame_index": 16,
+      "model_ready_sha256": "af0108fc7393bd483bebfe0f21a354956bd0879bc9875d2cd5c081e6388d3c3f",
+      "point_count": 718975,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51428,
+      "frame_id": "2011_09_30_drive_0016/0000000017",
+      "frame_index": 17,
+      "model_ready_sha256": "65edb79b5135046cb6ee9be7a91ef06367eb87a0588e11c2d014e9a51ce31a36",
+      "point_count": 718303,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51196,
+      "frame_id": "2011_09_30_drive_0016/0000000018",
+      "frame_index": 18,
+      "model_ready_sha256": "046cb40bee95b168cb82ea03d588cf056f6e9962115fa065015293cb554af3bd",
+      "point_count": 717496,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50615,
+      "frame_id": "2011_09_30_drive_0016/0000000019",
+      "frame_index": 19,
+      "model_ready_sha256": "1d6b5b465c5988c0ab0f93fb05634e920a46eeeccac799bc55ec7e9d9823853b",
+      "point_count": 716765,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50515,
+      "frame_id": "2011_09_30_drive_0016/0000000020",
+      "frame_index": 20,
+      "model_ready_sha256": "12e5e1e55f817d0c92766471f815a45b818318b4b6aab31ebeadcd47d839149d",
+      "point_count": 716371,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50025,
+      "frame_id": "2011_09_30_drive_0016/0000000021",
+      "frame_index": 21,
+      "model_ready_sha256": "0c89654e60edfb488bb646f0169273422d02cf02161f875223663076ce2b62bc",
+      "point_count": 714151,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 49554,
+      "frame_id": "2011_09_30_drive_0016/0000000022",
+      "frame_index": 22,
+      "model_ready_sha256": "910002935d3bfd2fbbdab8bb0123604be718364c2850e1b6d966b14b9139941d",
+      "point_count": 714142,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 48889,
+      "frame_id": "2011_09_30_drive_0016/0000000023",
+      "frame_index": 23,
+      "model_ready_sha256": "9b5e7a119ab33db4ca30b66613067b3e92d6ff5081e6a52a9b8f85114f62523b",
+      "point_count": 714314,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 48022,
+      "frame_id": "2011_09_30_drive_0016/0000000024",
+      "frame_index": 24,
+      "model_ready_sha256": "55f95cd8564e0aaae3a0aa7a70cfddc8136d4ee1297508d75ed21208196e7e77",
+      "point_count": 714906,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 47120,
+      "frame_id": "2011_09_30_drive_0016/0000000025",
+      "frame_index": 25,
+      "model_ready_sha256": "7c8f8d08285224bc59dcca9cf2806c6513b1e2e34681527aeb2a3f8992e62230",
+      "point_count": 715622,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 45535,
+      "frame_id": "2011_09_30_drive_0016/0000000026",
+      "frame_index": 26,
+      "model_ready_sha256": "5a637d94263f8dfe5e817f82aba4757f3825a209530cf30ea18c31367ca74533",
+      "point_count": 715282,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 43976,
+      "frame_id": "2011_09_30_drive_0016/0000000027",
+      "frame_index": 27,
+      "model_ready_sha256": "0531b99c70d24f4f366fee32b52c6fd44bf579bba79b1bd7e9961f6c41927893",
+      "point_count": 715798,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 42407,
+      "frame_id": "2011_09_30_drive_0016/0000000028",
+      "frame_index": 28,
+      "model_ready_sha256": "0cd81d72b1b62639dc160273773aca909175e0753532ae7798359f4bb1ee8639",
+      "point_count": 716201,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 41105,
+      "frame_id": "2011_09_30_drive_0016/0000000029",
+      "frame_index": 29,
+      "model_ready_sha256": "9f9d1aad37230e6f27762b741faa6ca51656ca61b052735de7287c056b14336e",
+      "point_count": 716455,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 40411,
+      "frame_id": "2011_09_30_drive_0016/0000000030",
+      "frame_index": 30,
+      "model_ready_sha256": "21c329efaf855edaba42853334ac0b7782d67dc21972a6b72f1256b937899947",
+      "point_count": 717760,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 39771,
+      "frame_id": "2011_09_30_drive_0016/0000000031",
+      "frame_index": 31,
+      "model_ready_sha256": "85a63aa611bcc7b7ed1bef8bbf1707207d565110620ca172f88b9b50081c2ca6",
+      "point_count": 719397,
+      "voxel_count": 39771
+    },
+    {
+      "candidate_voxel_count": 39468,
+      "frame_id": "2011_09_30_drive_0016/0000000032",
+      "frame_index": 32,
+      "model_ready_sha256": "e18dcba10ee7d5fbf89e342fbe3299d92d6c263d630078a428e1be8dd48c2033",
+      "point_count": 721099,
+      "voxel_count": 39468
+    },
+    {
+      "candidate_voxel_count": 39282,
+      "frame_id": "2011_09_30_drive_0016/0000000033",
+      "frame_index": 33,
+      "model_ready_sha256": "b054e0f1895515fc3f1eefa81e4e5d1d7118b42c1a2c3563e489884ff3aa3d15",
+      "point_count": 723156,
+      "voxel_count": 39282
+    },
+    {
+      "candidate_voxel_count": 38782,
+      "frame_id": "2011_09_30_drive_0016/0000000034",
+      "frame_index": 34,
+      "model_ready_sha256": "0bd9ee0bbbbab25c3958fe31753c21a85ed31b7da4b03628687fd2e6687d95ff",
+      "point_count": 725123,
+      "voxel_count": 38782
+    },
+    {
+      "candidate_voxel_count": 38603,
+      "frame_id": "2011_09_30_drive_0016/0000000035",
+      "frame_index": 35,
+      "model_ready_sha256": "307eb980ed08e920ef825a85026b89bc5592dcbea3d3f6bced7f3bf79644b61f",
+      "point_count": 726165,
+      "voxel_count": 38603
+    },
+    {
+      "candidate_voxel_count": 38139,
+      "frame_id": "2011_09_30_drive_0016/0000000036",
+      "frame_index": 36,
+      "model_ready_sha256": "4faefb4b80b4a387fb357940239fbae1eba2ead6c48334bc4d2edbe614bdd4fc",
+      "point_count": 727618,
+      "voxel_count": 38139
+    },
+    {
+      "candidate_voxel_count": 37888,
+      "frame_id": "2011_09_30_drive_0016/0000000037",
+      "frame_index": 37,
+      "model_ready_sha256": "881490b356f7124c8b1fb7194db70b20efb7f0857ebfb80a8298e1ca48c67981",
+      "point_count": 728835,
+      "voxel_count": 37888
+    },
+    {
+      "candidate_voxel_count": 37721,
+      "frame_id": "2011_09_30_drive_0016/0000000038",
+      "frame_index": 38,
+      "model_ready_sha256": "055187fed772845baa33526950d11372f7423be2f913f7ec8eee85685b80b421",
+      "point_count": 730364,
+      "voxel_count": 37721
+    },
+    {
+      "candidate_voxel_count": 37477,
+      "frame_id": "2011_09_30_drive_0016/0000000039",
+      "frame_index": 39,
+      "model_ready_sha256": "1e120c8321b3e01fe166651132161ef83eb465c68c5b96936be9a9f250ecfe8c",
+      "point_count": 731725,
+      "voxel_count": 37477
+    },
+    {
+      "candidate_voxel_count": 37126,
+      "frame_id": "2011_09_30_drive_0016/0000000040",
+      "frame_index": 40,
+      "model_ready_sha256": "0d63c38b9f7265efe28d754a954325b5e48b6f2698b0c460c1edf256faaf9a8e",
+      "point_count": 732914,
+      "voxel_count": 37126
+    },
+    {
+      "candidate_voxel_count": 36847,
+      "frame_id": "2011_09_30_drive_0016/0000000041",
+      "frame_index": 41,
+      "model_ready_sha256": "bd0a8cb48ac3049f3f3806b19ebd4a07e4811bfb36b9a34fd359a0df5c8c7f22",
+      "point_count": 734167,
+      "voxel_count": 36847
+    },
+    {
+      "candidate_voxel_count": 36442,
+      "frame_id": "2011_09_30_drive_0016/0000000042",
+      "frame_index": 42,
+      "model_ready_sha256": "7b04d1840753d73be16de825b44c95e517fd7d65ecd04bbc3bb9bb1a39646d7f",
+      "point_count": 735269,
+      "voxel_count": 36442
+    },
+    {
+      "candidate_voxel_count": 36131,
+      "frame_id": "2011_09_30_drive_0016/0000000043",
+      "frame_index": 43,
+      "model_ready_sha256": "00d4d53ba0a92e8cb53091f9c8e9c7dca187099b5a4f3333db2b1e73234f6a72",
+      "point_count": 735809,
+      "voxel_count": 36131
+    },
+    {
+      "candidate_voxel_count": 35849,
+      "frame_id": "2011_09_30_drive_0016/0000000044",
+      "frame_index": 44,
+      "model_ready_sha256": "520d81e7b90b1e136e9328980df61c8523cba1a9980ab0c009b6012d8058422f",
+      "point_count": 735539,
+      "voxel_count": 35849
+    },
+    {
+      "candidate_voxel_count": 35492,
+      "frame_id": "2011_09_30_drive_0016/0000000045",
+      "frame_index": 45,
+      "model_ready_sha256": "b8d2d38a014cdf8975ee58e870296fb8b6b9860ca22c9f0836579947a4ac652d",
+      "point_count": 734963,
+      "voxel_count": 35492
+    },
+    {
+      "candidate_voxel_count": 35122,
+      "frame_id": "2011_09_30_drive_0016/0000000046",
+      "frame_index": 46,
+      "model_ready_sha256": "ba956ea50e890638baf21ce6152491b3a0d1d77686d00c30a13beecc797832e9",
+      "point_count": 734131,
+      "voxel_count": 35122
+    },
+    {
+      "candidate_voxel_count": 34826,
+      "frame_id": "2011_09_30_drive_0016/0000000047",
+      "frame_index": 47,
+      "model_ready_sha256": "f8af8d99d6e4b13e4981d4b95a5becc127e95720ce2f5bea5433eafa9d1fa232",
+      "point_count": 734053,
+      "voxel_count": 34826
+    },
+    {
+      "candidate_voxel_count": 34138,
+      "frame_id": "2011_09_30_drive_0016/0000000048",
+      "frame_index": 48,
+      "model_ready_sha256": "fa064590fa8b3a8119a649822c30451d8f1b25eeebb218d2300d92292a6f7dac",
+      "point_count": 733775,
+      "voxel_count": 34138
+    },
+    {
+      "candidate_voxel_count": 33683,
+      "frame_id": "2011_09_30_drive_0016/0000000049",
+      "frame_index": 49,
+      "model_ready_sha256": "822efcb73b41f28522881be8ef4d9a5e88c1d4e6a52797c4e29affe15aa2eba0",
+      "point_count": 733731,
+      "voxel_count": 33683
+    },
+    {
+      "candidate_voxel_count": 33264,
+      "frame_id": "2011_09_30_drive_0016/0000000050",
+      "frame_index": 50,
+      "model_ready_sha256": "461013ad3ca7eb2d60814771bbf93471c01192cf61b5574d5aaf496b6204b44a",
+      "point_count": 735017,
+      "voxel_count": 33264
+    },
+    {
+      "candidate_voxel_count": 32625,
+      "frame_id": "2011_09_30_drive_0016/0000000051",
+      "frame_index": 51,
+      "model_ready_sha256": "f51c9062dd942a748563b4d968497b8b772ccc9941ef21747183179aa1ba0d55",
+      "point_count": 736405,
+      "voxel_count": 32625
+    },
+    {
+      "candidate_voxel_count": 32141,
+      "frame_id": "2011_09_30_drive_0016/0000000052",
+      "frame_index": 52,
+      "model_ready_sha256": "f885e4ac43fcf2b2f7d85eff33023a08f8b3f4d491bc76dd4ca1411fcf3f8410",
+      "point_count": 738110,
+      "voxel_count": 32141
+    },
+    {
+      "candidate_voxel_count": 31649,
+      "frame_id": "2011_09_30_drive_0016/0000000053",
+      "frame_index": 53,
+      "model_ready_sha256": "bf19a6c86e4aa3fe8ffb9cf958d75c96d37e9750cd5e9785a093f749adef15d3",
+      "point_count": 739667,
+      "voxel_count": 31649
+    },
+    {
+      "candidate_voxel_count": 31134,
+      "frame_id": "2011_09_30_drive_0016/0000000054",
+      "frame_index": 54,
+      "model_ready_sha256": "acf4b8567941e3c93ff58469c8b3f401eab2fc9e78e18967dfe6fd9b0c5396c2",
+      "point_count": 741092,
+      "voxel_count": 31134
+    },
+    {
+      "candidate_voxel_count": 30443,
+      "frame_id": "2011_09_30_drive_0016/0000000055",
+      "frame_index": 55,
+      "model_ready_sha256": "4aa2004762a00e55217edc19ec244dc156d4fb5b1cec1b19e23d440eb5c8e58c",
+      "point_count": 742212,
+      "voxel_count": 30443
+    },
+    {
+      "candidate_voxel_count": 29921,
+      "frame_id": "2011_09_30_drive_0016/0000000056",
+      "frame_index": 56,
+      "model_ready_sha256": "752cfb143061c203dcc256d06e1d0470cace8e38d01d805a8b7696d9383b5405",
+      "point_count": 743119,
+      "voxel_count": 29921
+    },
+    {
+      "candidate_voxel_count": 29278,
+      "frame_id": "2011_09_30_drive_0016/0000000057",
+      "frame_index": 57,
+      "model_ready_sha256": "c9ff7765a2d74c1809c91b933c9f3fa09a3c444fc34b09094eab2d37f5c36fec",
+      "point_count": 743869,
+      "voxel_count": 29278
+    },
+    {
+      "candidate_voxel_count": 28965,
+      "frame_id": "2011_09_30_drive_0016/0000000058",
+      "frame_index": 58,
+      "model_ready_sha256": "240e16a7bb78c505239d96e4625c362959dce114944c6a5083d43832293f8ce4",
+      "point_count": 744144,
+      "voxel_count": 28965
+    },
+    {
+      "candidate_voxel_count": 28649,
+      "frame_id": "2011_09_30_drive_0016/0000000059",
+      "frame_index": 59,
+      "model_ready_sha256": "fc215f8d2be416c06533d8156cb5b5601eeb72a98d5db80b44cb8acef9ee225d",
+      "point_count": 744916,
+      "voxel_count": 28649
+    },
+    {
+      "candidate_voxel_count": 28496,
+      "frame_id": "2011_09_30_drive_0016/0000000060",
+      "frame_index": 60,
+      "model_ready_sha256": "7eec5d2cfb406aa619ae2375bac8aca203b05f222d13271284e768c408665146",
+      "point_count": 745720,
+      "voxel_count": 28496
+    },
+    {
+      "candidate_voxel_count": 28231,
+      "frame_id": "2011_09_30_drive_0016/0000000061",
+      "frame_index": 61,
+      "model_ready_sha256": "b5e0b47318112a4dbcd92c92ffaad8a13a6bfabdf5606ad844e29235110b8f77",
+      "point_count": 746235,
+      "voxel_count": 28231
+    },
+    {
+      "candidate_voxel_count": 27995,
+      "frame_id": "2011_09_30_drive_0016/0000000062",
+      "frame_index": 62,
+      "model_ready_sha256": "0b1a78989c2275b50e553e3a04c698f6e412bb68fe9e15294dafe6623a8f5e4d",
+      "point_count": 746712,
+      "voxel_count": 27995
+    },
+    {
+      "candidate_voxel_count": 27811,
+      "frame_id": "2011_09_30_drive_0016/0000000063",
+      "frame_index": 63,
+      "model_ready_sha256": "76b05003d58cc3a4c12edbc08d7174db2be25f91b417bc4f588204b72a250d2c",
+      "point_count": 747587,
+      "voxel_count": 27811
+    },
+    {
+      "candidate_voxel_count": 27758,
+      "frame_id": "2011_09_30_drive_0016/0000000064",
+      "frame_index": 64,
+      "model_ready_sha256": "76a0b3013be442d29a0f88f576dd748eeff4d7b8f0b8969390ff0d9be5cb8b18",
+      "point_count": 748265,
+      "voxel_count": 27758
+    },
+    {
+      "candidate_voxel_count": 27502,
+      "frame_id": "2011_09_30_drive_0016/0000000065",
+      "frame_index": 65,
+      "model_ready_sha256": "a225680acce01d8ab34e325b469f6cde2e87c2edecc45f2eaa85d1f759648945",
+      "point_count": 748292,
+      "voxel_count": 27502
+    },
+    {
+      "candidate_voxel_count": 27475,
+      "frame_id": "2011_09_30_drive_0016/0000000066",
+      "frame_index": 66,
+      "model_ready_sha256": "06a3a1ee9a647bf9a1499903a22ca79868707380217a55b49d1730ed65ddb707",
+      "point_count": 748390,
+      "voxel_count": 27475
+    },
+    {
+      "candidate_voxel_count": 27610,
+      "frame_id": "2011_09_30_drive_0016/0000000067",
+      "frame_index": 67,
+      "model_ready_sha256": "a90e85bd25d95465b329969d53fa59bddcd8d92632950bdddfdab739ca23acea",
+      "point_count": 748942,
+      "voxel_count": 27610
+    },
+    {
+      "candidate_voxel_count": 27937,
+      "frame_id": "2011_09_30_drive_0016/0000000068",
+      "frame_index": 68,
+      "model_ready_sha256": "9c72df19b80a35ec57f7a8d23c35567bb6b19aafe4de759adac993ae63867f7a",
+      "point_count": 749216,
+      "voxel_count": 27937
+    },
+    {
+      "candidate_voxel_count": 28197,
+      "frame_id": "2011_09_30_drive_0016/0000000069",
+      "frame_index": 69,
+      "model_ready_sha256": "fbc45f9eea1459ff510ca72bb1a9d22d8149c05bbfeddcf7436ea1d2f2faf139",
+      "point_count": 749543,
+      "voxel_count": 28197
+    },
+    {
+      "candidate_voxel_count": 28363,
+      "frame_id": "2011_09_30_drive_0016/0000000070",
+      "frame_index": 70,
+      "model_ready_sha256": "b846f95a06ad6d03694cd626f642c3243a0cd415ee9ffbc8329767cd5f2a60c5",
+      "point_count": 749562,
+      "voxel_count": 28363
+    },
+    {
+      "candidate_voxel_count": 28788,
+      "frame_id": "2011_09_30_drive_0016/0000000071",
+      "frame_index": 71,
+      "model_ready_sha256": "bfd2e36d0fed36df8e44dc7fb79827b41b64d3283e3916e7e37f16f431ec8699",
+      "point_count": 749818,
+      "voxel_count": 28788
+    },
+    {
+      "candidate_voxel_count": 29081,
+      "frame_id": "2011_09_30_drive_0016/0000000072",
+      "frame_index": 72,
+      "model_ready_sha256": "e0356f438d3d4144692d3632730713f7089ccedd5a49775fc19958e1e8f1cbb2",
+      "point_count": 749690,
+      "voxel_count": 29081
+    },
+    {
+      "candidate_voxel_count": 29366,
+      "frame_id": "2011_09_30_drive_0016/0000000073",
+      "frame_index": 73,
+      "model_ready_sha256": "390f32bb324dcac894226886b576210d33d95f2664e0a5a8f684a564db656943",
+      "point_count": 748829,
+      "voxel_count": 29366
+    },
+    {
+      "candidate_voxel_count": 29721,
+      "frame_id": "2011_09_30_drive_0016/0000000074",
+      "frame_index": 74,
+      "model_ready_sha256": "c97eb02e5748c8694e7055745c7faad368138d1cbd2eadf48185dfaf6b0a984f",
+      "point_count": 749505,
+      "voxel_count": 29721
+    },
+    {
+      "candidate_voxel_count": 30073,
+      "frame_id": "2011_09_30_drive_0016/0000000075",
+      "frame_index": 75,
+      "model_ready_sha256": "a8c6b44d4cd501492860729ee26cdbe6f299be13ea9f29c48063f58af469fb0d",
+      "point_count": 750100,
+      "voxel_count": 30073
+    },
+    {
+      "candidate_voxel_count": 30694,
+      "frame_id": "2011_09_30_drive_0016/0000000076",
+      "frame_index": 76,
+      "model_ready_sha256": "0205d6473c1f4089f8034655ad84295cc3ea3d354d1c4c3e8f00c63dbf093f8f",
+      "point_count": 750173,
+      "voxel_count": 30694
+    },
+    {
+      "candidate_voxel_count": 31223,
+      "frame_id": "2011_09_30_drive_0016/0000000077",
+      "frame_index": 77,
+      "model_ready_sha256": "5b81fd214aa34f33a44e697b2399f97b0383493bbbd4d16b2dd26b972f13e903",
+      "point_count": 750103,
+      "voxel_count": 31223
+    },
+    {
+      "candidate_voxel_count": 31813,
+      "frame_id": "2011_09_30_drive_0016/0000000078",
+      "frame_index": 78,
+      "model_ready_sha256": "c168bd893dc984ec247ff823c13f26a98bc063579ec1f449ced4f9740c5055f1",
+      "point_count": 750037,
+      "voxel_count": 31813
+    },
+    {
+      "candidate_voxel_count": 32438,
+      "frame_id": "2011_09_30_drive_0016/0000000079",
+      "frame_index": 79,
+      "model_ready_sha256": "5ec86dd47d46ddc873d8ebaf78f3e793cbc3e17d097bb89c329a18908172d019",
+      "point_count": 750052,
+      "voxel_count": 32438
+    },
+    {
+      "candidate_voxel_count": 32875,
+      "frame_id": "2011_09_30_drive_0016/0000000080",
+      "frame_index": 80,
+      "model_ready_sha256": "fb8aed03d6eb3b8e6ebb4fdaca93c504a9e702691cbdc469ffb66fe811e9cb5e",
+      "point_count": 749660,
+      "voxel_count": 32875
+    },
+    {
+      "candidate_voxel_count": 33445,
+      "frame_id": "2011_09_30_drive_0016/0000000081",
+      "frame_index": 81,
+      "model_ready_sha256": "c9719be8abb396e959c78f9452f7d8c1441e55d575e38aaf6cbc73dc1546773d",
+      "point_count": 749412,
+      "voxel_count": 33445
+    },
+    {
+      "candidate_voxel_count": 33694,
+      "frame_id": "2011_09_30_drive_0016/0000000082",
+      "frame_index": 82,
+      "model_ready_sha256": "44bf0f5054055e8f91e44cbb98af9534dade94317caf6dc98f1b7e7d1fab612a",
+      "point_count": 749620,
+      "voxel_count": 33694
+    },
+    {
+      "candidate_voxel_count": 33602,
+      "frame_id": "2011_09_30_drive_0016/0000000083",
+      "frame_index": 83,
+      "model_ready_sha256": "7ba0185e7d6b905859c792441860b1f9bd96df887007b63afea5d8619bdf50f9",
+      "point_count": 749536,
+      "voxel_count": 33602
+    },
+    {
+      "candidate_voxel_count": 33342,
+      "frame_id": "2011_09_30_drive_0016/0000000084",
+      "frame_index": 84,
+      "model_ready_sha256": "4826fb54c8d3a1e3c357a1f1554e00d01f92b72cfb273c99a457e4bac2a48082",
+      "point_count": 749158,
+      "voxel_count": 33342
+    },
+    {
+      "candidate_voxel_count": 32884,
+      "frame_id": "2011_09_30_drive_0016/0000000085",
+      "frame_index": 85,
+      "model_ready_sha256": "dc6bf522d50651a3dc40df1647a1bd086c589976d58fbd84d9213b352a855801",
+      "point_count": 749177,
+      "voxel_count": 32884
+    },
+    {
+      "candidate_voxel_count": 32232,
+      "frame_id": "2011_09_30_drive_0016/0000000086",
+      "frame_index": 86,
+      "model_ready_sha256": "56a35951e1b7ba25c9c2669c6669e1812b4ea27418bbe9c81a8e61aa6e7a9881",
+      "point_count": 749256,
+      "voxel_count": 32232
+    },
+    {
+      "candidate_voxel_count": 31840,
+      "frame_id": "2011_09_30_drive_0016/0000000087",
+      "frame_index": 87,
+      "model_ready_sha256": "13a4074f7fd70eaf82fa8ea16677d0f07d8c705edea49dad2eac765a12835297",
+      "point_count": 749788,
+      "voxel_count": 31840
+    },
+    {
+      "candidate_voxel_count": 31708,
+      "frame_id": "2011_09_30_drive_0016/0000000088",
+      "frame_index": 88,
+      "model_ready_sha256": "6760028a081671d008e26cd8294fcd5aa168d7a0b397b54a3ce5482bcdfee224",
+      "point_count": 749956,
+      "voxel_count": 31708
+    },
+    {
+      "candidate_voxel_count": 31107,
+      "frame_id": "2011_09_30_drive_0016/0000000089",
+      "frame_index": 89,
+      "model_ready_sha256": "959f2a98fcb1c85e6edbedbb15cee428af331e13116763127c8da62eadd8ed0f",
+      "point_count": 750005,
+      "voxel_count": 31107
+    },
+    {
+      "candidate_voxel_count": 30633,
+      "frame_id": "2011_09_30_drive_0016/0000000090",
+      "frame_index": 90,
+      "model_ready_sha256": "9cdb498144e50a70867dde2c8e2c9d80cfec03af28794a85ccc2062a13b57647",
+      "point_count": 750218,
+      "voxel_count": 30633
+    },
+    {
+      "candidate_voxel_count": 30351,
+      "frame_id": "2011_09_30_drive_0016/0000000091",
+      "frame_index": 91,
+      "model_ready_sha256": "158afd7c380df115dfc015068faa2a92820d59b64b32a3c143bc488c3a14174a",
+      "point_count": 750423,
+      "voxel_count": 30351
+    },
+    {
+      "candidate_voxel_count": 30034,
+      "frame_id": "2011_09_30_drive_0016/0000000092",
+      "frame_index": 92,
+      "model_ready_sha256": "77ceaa42bb68739b06f194c638c41caa8cf14588fbf8a8a2d4ce214ebd23922f",
+      "point_count": 751255,
+      "voxel_count": 30034
+    },
+    {
+      "candidate_voxel_count": 29641,
+      "frame_id": "2011_09_30_drive_0016/0000000093",
+      "frame_index": 93,
+      "model_ready_sha256": "9ec1abcc7c7b974b497a0e8c0c63c262ae1ce0557b8d076d3089117f62641479",
+      "point_count": 752085,
+      "voxel_count": 29641
+    },
+    {
+      "candidate_voxel_count": 29299,
+      "frame_id": "2011_09_30_drive_0016/0000000094",
+      "frame_index": 94,
+      "model_ready_sha256": "2f557501c423eb891f786c374c6ead47488defd18249a20d2a8821f2a95dd474",
+      "point_count": 752628,
+      "voxel_count": 29299
+    },
+    {
+      "candidate_voxel_count": 29035,
+      "frame_id": "2011_09_30_drive_0016/0000000095",
+      "frame_index": 95,
+      "model_ready_sha256": "d62892d5981cb5d52de57a475b7b884d260829c34c76ebcaf14306887759a4e7",
+      "point_count": 752909,
+      "voxel_count": 29035
+    },
+    {
+      "candidate_voxel_count": 28724,
+      "frame_id": "2011_09_30_drive_0016/0000000096",
+      "frame_index": 96,
+      "model_ready_sha256": "7a6d16812a7818eb30a39eed8928421da514d03a29daead2de44c6be50eb27fd",
+      "point_count": 753199,
+      "voxel_count": 28724
+    },
+    {
+      "candidate_voxel_count": 28291,
+      "frame_id": "2011_09_30_drive_0016/0000000097",
+      "frame_index": 97,
+      "model_ready_sha256": "b813e44904b7aa101499798d8a3b922566aa1c750f542b0ecad8046482463722",
+      "point_count": 753664,
+      "voxel_count": 28291
+    },
+    {
+      "candidate_voxel_count": 28056,
+      "frame_id": "2011_09_30_drive_0016/0000000098",
+      "frame_index": 98,
+      "model_ready_sha256": "1877e3e6f69e4ddca7fa7ba683283b4df0dff7d8d59a7e1430dde66efdd48dd6",
+      "point_count": 753480,
+      "voxel_count": 28056
+    },
+    {
+      "candidate_voxel_count": 27468,
+      "frame_id": "2011_09_30_drive_0016/0000000099",
+      "frame_index": 99,
+      "model_ready_sha256": "fd953827a25fb1af297d975d750f83e689de7cd56f820d3a0b292dfd3f35df99",
+      "point_count": 753093,
+      "voxel_count": 27468
+    },
+    {
+      "candidate_voxel_count": 27336,
+      "frame_id": "2011_09_30_drive_0016/0000000100",
+      "frame_index": 100,
+      "model_ready_sha256": "55d1d416321ab64ae33e09e74a9c674f50249d5948b8a2d1905bba8b95b54fdb",
+      "point_count": 752926,
+      "voxel_count": 27336
+    },
+    {
+      "candidate_voxel_count": 26981,
+      "frame_id": "2011_09_30_drive_0016/0000000101",
+      "frame_index": 101,
+      "model_ready_sha256": "935eefbbe9390c6055f57b83b2fa0d6a885de8debd1441c8af52c5164dcfdebe",
+      "point_count": 752433,
+      "voxel_count": 26981
+    },
+    {
+      "candidate_voxel_count": 26650,
+      "frame_id": "2011_09_30_drive_0016/0000000102",
+      "frame_index": 102,
+      "model_ready_sha256": "93b2877e18da67b8150fb51f4461560f33a1b39381f0829fc3122e7efac781a0",
+      "point_count": 752648,
+      "voxel_count": 26650
+    },
+    {
+      "candidate_voxel_count": 26463,
+      "frame_id": "2011_09_30_drive_0016/0000000103",
+      "frame_index": 103,
+      "model_ready_sha256": "bf86bac644327fc22f412990c36b409a1c03c600ce0c81b849d6fb4c66d2d6d8",
+      "point_count": 752638,
+      "voxel_count": 26463
+    },
+    {
+      "candidate_voxel_count": 26210,
+      "frame_id": "2011_09_30_drive_0016/0000000104",
+      "frame_index": 104,
+      "model_ready_sha256": "6b3f53108533dcb3856b483c505b9c223eba238f15bf127786b7c036c4a3942f",
+      "point_count": 752397,
+      "voxel_count": 26210
+    },
+    {
+      "candidate_voxel_count": 26023,
+      "frame_id": "2011_09_30_drive_0016/0000000105",
+      "frame_index": 105,
+      "model_ready_sha256": "25d385ca1ae066e0ea712b06554c123d0c9fe5e97c50f344e2284208253489cb",
+      "point_count": 751627,
+      "voxel_count": 26023
+    },
+    {
+      "candidate_voxel_count": 25587,
+      "frame_id": "2011_09_30_drive_0016/0000000106",
+      "frame_index": 106,
+      "model_ready_sha256": "bb0cf5510c4a944459e8e7a63aeea82709a80b8784c41f2afc853abe0420c62f",
+      "point_count": 750873,
+      "voxel_count": 25587
+    },
+    {
+      "candidate_voxel_count": 25432,
+      "frame_id": "2011_09_30_drive_0016/0000000107",
+      "frame_index": 107,
+      "model_ready_sha256": "f06e84c58b9c99c4da5fada51c70e01ee3d84a66e34e3ba9ee697bbade7056bc",
+      "point_count": 750514,
+      "voxel_count": 25432
+    },
+    {
+      "candidate_voxel_count": 25178,
+      "frame_id": "2011_09_30_drive_0016/0000000108",
+      "frame_index": 108,
+      "model_ready_sha256": "621f1c384423eef847f188c8f8ff643318b49832019ebee193e0290fc7be06f2",
+      "point_count": 750431,
+      "voxel_count": 25178
+    },
+    {
+      "candidate_voxel_count": 24982,
+      "frame_id": "2011_09_30_drive_0016/0000000109",
+      "frame_index": 109,
+      "model_ready_sha256": "0cbca5a54f79ac442dc48b50b2059a7b9e416c2cb9aeeda21b4070a12919a657",
+      "point_count": 750469,
+      "voxel_count": 24982
+    },
+    {
+      "candidate_voxel_count": 24791,
+      "frame_id": "2011_09_30_drive_0016/0000000110",
+      "frame_index": 110,
+      "model_ready_sha256": "fcf7379320fec51a081901d450cd834a71eff33a70b69645b0a3dad49257f0ef",
+      "point_count": 750472,
+      "voxel_count": 24791
+    },
+    {
+      "candidate_voxel_count": 24375,
+      "frame_id": "2011_09_30_drive_0016/0000000111",
+      "frame_index": 111,
+      "model_ready_sha256": "c4608be003bc8e11900f24811bc381d83d29bfef91ca0af17bf1431337ca0c89",
+      "point_count": 750928,
+      "voxel_count": 24375
+    },
+    {
+      "candidate_voxel_count": 24118,
+      "frame_id": "2011_09_30_drive_0016/0000000112",
+      "frame_index": 112,
+      "model_ready_sha256": "2c4ad7fcef6af628424ce3ba95388800881f22e8f4604f25205cc89a388d84f8",
+      "point_count": 751112,
+      "voxel_count": 24118
+    },
+    {
+      "candidate_voxel_count": 24051,
+      "frame_id": "2011_09_30_drive_0016/0000000113",
+      "frame_index": 113,
+      "model_ready_sha256": "329e48a162a847ffb98e03f39fd02db60da4fa4303279e35d8602bbfb612645a",
+      "point_count": 751572,
+      "voxel_count": 24051
+    },
+    {
+      "candidate_voxel_count": 24035,
+      "frame_id": "2011_09_30_drive_0016/0000000114",
+      "frame_index": 114,
+      "model_ready_sha256": "57f625d37e770b50de82725716f070a514b6e990f3ee536c24a6f55aa58730ac",
+      "point_count": 751917,
+      "voxel_count": 24035
+    },
+    {
+      "candidate_voxel_count": 24205,
+      "frame_id": "2011_09_30_drive_0016/0000000115",
+      "frame_index": 115,
+      "model_ready_sha256": "1216a4cd32f117c12376e43d9168409476408d5bcb4cf830689cb659f3a12131",
+      "point_count": 752031,
+      "voxel_count": 24205
+    },
+    {
+      "candidate_voxel_count": 24477,
+      "frame_id": "2011_09_30_drive_0016/0000000116",
+      "frame_index": 116,
+      "model_ready_sha256": "a668a416906c4d21d91cdce1187875da7b7920d52109678efc47349017571c22",
+      "point_count": 751962,
+      "voxel_count": 24477
+    },
+    {
+      "candidate_voxel_count": 24776,
+      "frame_id": "2011_09_30_drive_0016/0000000117",
+      "frame_index": 117,
+      "model_ready_sha256": "a23995e683a24a26892ea83bdec4766eabd3c83891c3bc26df1cc87a360ab1fd",
+      "point_count": 751841,
+      "voxel_count": 24776
+    },
+    {
+      "candidate_voxel_count": 25073,
+      "frame_id": "2011_09_30_drive_0016/0000000118",
+      "frame_index": 118,
+      "model_ready_sha256": "8b18c89af28776cdf7c0165bce10f6ed74c07aeb7a9d5b960a4049359411286e",
+      "point_count": 751680,
+      "voxel_count": 25073
+    },
+    {
+      "candidate_voxel_count": 25316,
+      "frame_id": "2011_09_30_drive_0016/0000000119",
+      "frame_index": 119,
+      "model_ready_sha256": "31791220aec352b47310635894432b69d0382054817a4ef5f3cb08911363c320",
+      "point_count": 751457,
+      "voxel_count": 25316
+    },
+    {
+      "candidate_voxel_count": 25553,
+      "frame_id": "2011_09_30_drive_0016/0000000120",
+      "frame_index": 120,
+      "model_ready_sha256": "d4d5e4593cb6f66fb2048cc7d2bbcce3e130cae2c9ac08ed1c7bae2afeb76892",
+      "point_count": 751354,
+      "voxel_count": 25553
+    },
+    {
+      "candidate_voxel_count": 25790,
+      "frame_id": "2011_09_30_drive_0016/0000000121",
+      "frame_index": 121,
+      "model_ready_sha256": "6a060c97dc64378dc1e1d5c9436ce0c7b4e89833d4c01ae5d04989781a6c6ae5",
+      "point_count": 751436,
+      "voxel_count": 25790
+    },
+    {
+      "candidate_voxel_count": 25836,
+      "frame_id": "2011_09_30_drive_0016/0000000122",
+      "frame_index": 122,
+      "model_ready_sha256": "5b4096281eab314876fa4f1e1e0f5302060b5681ee2f81dd990280b91d757931",
+      "point_count": 751873,
+      "voxel_count": 25836
+    },
+    {
+      "candidate_voxel_count": 25654,
+      "frame_id": "2011_09_30_drive_0016/0000000123",
+      "frame_index": 123,
+      "model_ready_sha256": "d3e51ea6c8eb6dc978b80cc5935eb7c323807d8977dce6bd3e65f88a61e4ab70",
+      "point_count": 752265,
+      "voxel_count": 25654
+    },
+    {
+      "candidate_voxel_count": 25235,
+      "frame_id": "2011_09_30_drive_0016/0000000124",
+      "frame_index": 124,
+      "model_ready_sha256": "9792bf28bc5ed8561c675e8aef356736105f6f87be3ecdbfd5c494fe4254d895",
+      "point_count": 752584,
+      "voxel_count": 25235
+    },
+    {
+      "candidate_voxel_count": 24925,
+      "frame_id": "2011_09_30_drive_0016/0000000125",
+      "frame_index": 125,
+      "model_ready_sha256": "95eaaae66f147018fdb377dd6731683e4f3cea83d2328a56f4e10e99b8865492",
+      "point_count": 752844,
+      "voxel_count": 24925
+    },
+    {
+      "candidate_voxel_count": 24701,
+      "frame_id": "2011_09_30_drive_0016/0000000126",
+      "frame_index": 126,
+      "model_ready_sha256": "f4b4efaf380605c90b3765b6d761dfffc2bf826a679e01050102b20c457eb794",
+      "point_count": 753190,
+      "voxel_count": 24701
+    },
+    {
+      "candidate_voxel_count": 24322,
+      "frame_id": "2011_09_30_drive_0016/0000000127",
+      "frame_index": 127,
+      "model_ready_sha256": "29c5299526431ab10ba9ac45f6330aecc5c1eba8fedf47c4e18f382ce9f71bce",
+      "point_count": 753269,
+      "voxel_count": 24322
+    },
+    {
+      "candidate_voxel_count": 24009,
+      "frame_id": "2011_09_30_drive_0016/0000000128",
+      "frame_index": 128,
+      "model_ready_sha256": "1098069c440fc30fc7d7d4e306f8084ab3013c326ee1364c86ab036ae08b9ea2",
+      "point_count": 753157,
+      "voxel_count": 24009
+    },
+    {
+      "candidate_voxel_count": 23639,
+      "frame_id": "2011_09_30_drive_0016/0000000129",
+      "frame_index": 129,
+      "model_ready_sha256": "ca27c29e819b3c8441c5fb268a104231e9e5e00b90be0791a5a11af8e58188cd",
+      "point_count": 752520,
+      "voxel_count": 23639
+    },
+    {
+      "candidate_voxel_count": 23554,
+      "frame_id": "2011_09_30_drive_0016/0000000130",
+      "frame_index": 130,
+      "model_ready_sha256": "0eb3fe054cb23bebe3af711fba49de63e98a412d1d89e153ac3bb4158c9196d0",
+      "point_count": 752358,
+      "voxel_count": 23554
+    },
+    {
+      "candidate_voxel_count": 23488,
+      "frame_id": "2011_09_30_drive_0016/0000000131",
+      "frame_index": 131,
+      "model_ready_sha256": "dfdc1f3fb847e26f2d898176623b5f0aa46ba74bddf91aef3dd6ea615a15ad8c",
+      "point_count": 751618,
+      "voxel_count": 23488
+    },
+    {
+      "candidate_voxel_count": 23679,
+      "frame_id": "2011_09_30_drive_0016/0000000132",
+      "frame_index": 132,
+      "model_ready_sha256": "62c7103e83b947fd934e78ac24fd9701df8b02fc1c8553af19a4a9de807e8937",
+      "point_count": 750022,
+      "voxel_count": 23679
+    },
+    {
+      "candidate_voxel_count": 23884,
+      "frame_id": "2011_09_30_drive_0016/0000000133",
+      "frame_index": 133,
+      "model_ready_sha256": "d20d5e0d5c4db14dbe9b14933f2a8a49312f66d7c8cdce4b2c3543f9f688967a",
+      "point_count": 748707,
+      "voxel_count": 23884
+    },
+    {
+      "candidate_voxel_count": 24193,
+      "frame_id": "2011_09_30_drive_0016/0000000134",
+      "frame_index": 134,
+      "model_ready_sha256": "5f2c37024ce84ffbe26caa6f05e3a42e4195d1474e2147985faebce36de0f90d",
+      "point_count": 747414,
+      "voxel_count": 24193
+    },
+    {
+      "candidate_voxel_count": 24411,
+      "frame_id": "2011_09_30_drive_0016/0000000135",
+      "frame_index": 135,
+      "model_ready_sha256": "77e0f4e56215e5f8bb255aa2436a5140ea15739ad178d13931e35f0a3c83405a",
+      "point_count": 746072,
+      "voxel_count": 24411
+    },
+    {
+      "candidate_voxel_count": 24471,
+      "frame_id": "2011_09_30_drive_0016/0000000136",
+      "frame_index": 136,
+      "model_ready_sha256": "d0dd1f2f88d53113c71c0a89a0f3b22512ebcbd61065f79a5ffd6af9ddfa5df2",
+      "point_count": 745702,
+      "voxel_count": 24471
+    },
+    {
+      "candidate_voxel_count": 24518,
+      "frame_id": "2011_09_30_drive_0016/0000000137",
+      "frame_index": 137,
+      "model_ready_sha256": "7c9d3fc52b80d59f0d44174f5e27d0ae05932019f862526e3abe2e40cc561ba7",
+      "point_count": 745702,
+      "voxel_count": 24518
+    },
+    {
+      "candidate_voxel_count": 24573,
+      "frame_id": "2011_09_30_drive_0016/0000000138",
+      "frame_index": 138,
+      "model_ready_sha256": "4720917cb48f5f7e8c67d2bbefa8cf0fd77d74649a937c3e764140b3ce0b6ca4",
+      "point_count": 746994,
+      "voxel_count": 24573
+    },
+    {
+      "candidate_voxel_count": 24583,
+      "frame_id": "2011_09_30_drive_0016/0000000139",
+      "frame_index": 139,
+      "model_ready_sha256": "8fa2d92234fd7c33038bc3590ec9fde94ec612fecaddfe073431e94ca6cf1975",
+      "point_count": 748218,
+      "voxel_count": 24583
+    },
+    {
+      "candidate_voxel_count": 24661,
+      "frame_id": "2011_09_30_drive_0016/0000000140",
+      "frame_index": 140,
+      "model_ready_sha256": "9586219c6735f0308ce6c3f46145e0f90bcf403df8eb1ec27f0c319e275fbda7",
+      "point_count": 749476,
+      "voxel_count": 24661
+    },
+    {
+      "candidate_voxel_count": 24806,
+      "frame_id": "2011_09_30_drive_0016/0000000141",
+      "frame_index": 141,
+      "model_ready_sha256": "3fb5ed20f4579e562b08bff4f59f7d55019370e617a40331bca414270bd129e1",
+      "point_count": 750963,
+      "voxel_count": 24806
+    },
+    {
+      "candidate_voxel_count": 25176,
+      "frame_id": "2011_09_30_drive_0016/0000000142",
+      "frame_index": 142,
+      "model_ready_sha256": "3cffd6fa30aff347f817f320c5c62e2b9fd56529062f1567b1c37c71782523c8",
+      "point_count": 751880,
+      "voxel_count": 25176
+    },
+    {
+      "candidate_voxel_count": 25620,
+      "frame_id": "2011_09_30_drive_0016/0000000143",
+      "frame_index": 143,
+      "model_ready_sha256": "4fce4cc7a6a830909ad9eaa34d560cd96999c33f574c9c6d3700fbbf91a590aa",
+      "point_count": 751669,
+      "voxel_count": 25620
+    },
+    {
+      "candidate_voxel_count": 25980,
+      "frame_id": "2011_09_30_drive_0016/0000000144",
+      "frame_index": 144,
+      "model_ready_sha256": "fda1f1eee086640bf55a6cb3419749cd45906b25b44db88e826134fe5aac8275",
+      "point_count": 751305,
+      "voxel_count": 25980
+    },
+    {
+      "candidate_voxel_count": 26499,
+      "frame_id": "2011_09_30_drive_0016/0000000145",
+      "frame_index": 145,
+      "model_ready_sha256": "5ffa8ddad81e1bb5469c00bc5bdd21829bea0baf82020b43fb2151caf95e52cd",
+      "point_count": 751152,
+      "voxel_count": 26499
+    },
+    {
+      "candidate_voxel_count": 26911,
+      "frame_id": "2011_09_30_drive_0016/0000000146",
+      "frame_index": 146,
+      "model_ready_sha256": "e158fe3245e4cf48158be69af29df56870e0ebc9c1d34180ed70ce04e5cad1fb",
+      "point_count": 751111,
+      "voxel_count": 26911
+    },
+    {
+      "candidate_voxel_count": 27048,
+      "frame_id": "2011_09_30_drive_0016/0000000147",
+      "frame_index": 147,
+      "model_ready_sha256": "582ea8a24b9b15e839e8198d79c4f5a4e75532ec76c8f5ba40d7d17f961f7fd6",
+      "point_count": 751272,
+      "voxel_count": 27048
+    },
+    {
+      "candidate_voxel_count": 27073,
+      "frame_id": "2011_09_30_drive_0016/0000000148",
+      "frame_index": 148,
+      "model_ready_sha256": "b237c7719f5ed4a2cba8d8aaeaa34915c1414b6bc20d3062b00419e3420655c6",
+      "point_count": 751413,
+      "voxel_count": 27073
+    },
+    {
+      "candidate_voxel_count": 27147,
+      "frame_id": "2011_09_30_drive_0016/0000000149",
+      "frame_index": 149,
+      "model_ready_sha256": "4a02bd7004bc9d05c65e545e7ac8932625e99eb5e0546d824ceab38af31c945e",
+      "point_count": 751655,
+      "voxel_count": 27147
+    },
+    {
+      "candidate_voxel_count": 27020,
+      "frame_id": "2011_09_30_drive_0016/0000000150",
+      "frame_index": 150,
+      "model_ready_sha256": "747d39a30d66973a462e7885cb570e7caf8c24ed6ffd96367332a74c79e08974",
+      "point_count": 751681,
+      "voxel_count": 27020
+    },
+    {
+      "candidate_voxel_count": 26946,
+      "frame_id": "2011_09_30_drive_0016/0000000151",
+      "frame_index": 151,
+      "model_ready_sha256": "693996ead793e5ff98303a8ba5102fa3a1765270eafdeefcca61abedb8998601",
+      "point_count": 751914,
+      "voxel_count": 26946
+    },
+    {
+      "candidate_voxel_count": 27023,
+      "frame_id": "2011_09_30_drive_0016/0000000152",
+      "frame_index": 152,
+      "model_ready_sha256": "651c3eb8ba419a4ecd092852a9750ee6d0aa0398f0c5bad0747455d2eb6a2fa4",
+      "point_count": 752046,
+      "voxel_count": 27023
+    },
+    {
+      "candidate_voxel_count": 27135,
+      "frame_id": "2011_09_30_drive_0016/0000000153",
+      "frame_index": 153,
+      "model_ready_sha256": "9c59f022dbbb5de77503e98a65877dde6e096a757837a144724e86188ebf74d8",
+      "point_count": 752248,
+      "voxel_count": 27135
+    },
+    {
+      "candidate_voxel_count": 27359,
+      "frame_id": "2011_09_30_drive_0016/0000000154",
+      "frame_index": 154,
+      "model_ready_sha256": "f0b6bf8fd23972f7c8389bdc4bb4c2cec01901bf987b6154c16caca071cd5f51",
+      "point_count": 752067,
+      "voxel_count": 27359
+    },
+    {
+      "candidate_voxel_count": 27462,
+      "frame_id": "2011_09_30_drive_0016/0000000155",
+      "frame_index": 155,
+      "model_ready_sha256": "df072af45803b9f0cfa0cb6017f58b7910e2789e3c45ca9666ad5d9566057512",
+      "point_count": 752354,
+      "voxel_count": 27462
+    },
+    {
+      "candidate_voxel_count": 27611,
+      "frame_id": "2011_09_30_drive_0016/0000000156",
+      "frame_index": 156,
+      "model_ready_sha256": "5d80a5336ead782d5acc6198b2f9236a41095ec1de019445f4e293ad9ec88c61",
+      "point_count": 752597,
+      "voxel_count": 27611
+    },
+    {
+      "candidate_voxel_count": 27632,
+      "frame_id": "2011_09_30_drive_0016/0000000157",
+      "frame_index": 157,
+      "model_ready_sha256": "f1294e0f05f87369fc8e6211d1479d34f161471c93ab885b47c9a044a9681b53",
+      "point_count": 752917,
+      "voxel_count": 27632
+    },
+    {
+      "candidate_voxel_count": 27468,
+      "frame_id": "2011_09_30_drive_0016/0000000158",
+      "frame_index": 158,
+      "model_ready_sha256": "bff12c1b0a7ea96a18db16aefe9b82c4f3adbc9d29cf79ef23a1567fa26029fc",
+      "point_count": 753067,
+      "voxel_count": 27468
+    },
+    {
+      "candidate_voxel_count": 27220,
+      "frame_id": "2011_09_30_drive_0016/0000000159",
+      "frame_index": 159,
+      "model_ready_sha256": "6c0ca11483d6a09b6034d61569bd530ea5cf47032ddd55f8861bc0d9b6e628f6",
+      "point_count": 753104,
+      "voxel_count": 27220
+    },
+    {
+      "candidate_voxel_count": 26981,
+      "frame_id": "2011_09_30_drive_0016/0000000160",
+      "frame_index": 160,
+      "model_ready_sha256": "3e9127e01da978fd8f405699d85f21b7a213ec89c8ecc43ef727092762bbabd9",
+      "point_count": 753248,
+      "voxel_count": 26981
+    },
+    {
+      "candidate_voxel_count": 26789,
+      "frame_id": "2011_09_30_drive_0016/0000000161",
+      "frame_index": 161,
+      "model_ready_sha256": "9aa92a15d4b955ef7941095bc3b6e83278291c26bc18f354f97a76ad0574873a",
+      "point_count": 753674,
+      "voxel_count": 26789
+    },
+    {
+      "candidate_voxel_count": 26687,
+      "frame_id": "2011_09_30_drive_0016/0000000162",
+      "frame_index": 162,
+      "model_ready_sha256": "bb7501b70a4fd00ff1c67eb8675ac2ed7c2bcb6223f29d2fd28bad57b3d693eb",
+      "point_count": 753986,
+      "voxel_count": 26687
+    },
+    {
+      "candidate_voxel_count": 26674,
+      "frame_id": "2011_09_30_drive_0016/0000000163",
+      "frame_index": 163,
+      "model_ready_sha256": "964a1f12444202107829bffbc15d175120c057b475974fb7cf1d044ad72ad5d1",
+      "point_count": 754263,
+      "voxel_count": 26674
+    },
+    {
+      "candidate_voxel_count": 26587,
+      "frame_id": "2011_09_30_drive_0016/0000000164",
+      "frame_index": 164,
+      "model_ready_sha256": "dc963d51a24244b3bb3f4d839a3154f4cdcd267216579c25c686571e0d7d8232",
+      "point_count": 754109,
+      "voxel_count": 26587
+    },
+    {
+      "candidate_voxel_count": 26599,
+      "frame_id": "2011_09_30_drive_0016/0000000165",
+      "frame_index": 165,
+      "model_ready_sha256": "8e8a5bb832e799993320e93ca7efa7f120d092fa104067ad632278cad0bfeb5b",
+      "point_count": 754154,
+      "voxel_count": 26599
+    },
+    {
+      "candidate_voxel_count": 26610,
+      "frame_id": "2011_09_30_drive_0016/0000000166",
+      "frame_index": 166,
+      "model_ready_sha256": "0bcbfdbf780432c78d7c5ed28e362c564fbd2bfa7db12990f47c18952f81f9e8",
+      "point_count": 754137,
+      "voxel_count": 26610
+    },
+    {
+      "candidate_voxel_count": 26425,
+      "frame_id": "2011_09_30_drive_0016/0000000167",
+      "frame_index": 167,
+      "model_ready_sha256": "46919a331039056c4191fc1fab03502120a137054605dadfccd79255c860674f",
+      "point_count": 753205,
+      "voxel_count": 26425
+    },
+    {
+      "candidate_voxel_count": 26595,
+      "frame_id": "2011_09_30_drive_0016/0000000168",
+      "frame_index": 168,
+      "model_ready_sha256": "d17e14776f1daf58a5c2bc7a3d53662017bbb11ffe04896d287a84789d134b66",
+      "point_count": 752961,
+      "voxel_count": 26595
+    },
+    {
+      "candidate_voxel_count": 26544,
+      "frame_id": "2011_09_30_drive_0016/0000000169",
+      "frame_index": 169,
+      "model_ready_sha256": "141cab9fe15c4f9e7da7eb93c2e92efd1ac54154c23bfbe61d4fd192402e23ca",
+      "point_count": 752663,
+      "voxel_count": 26544
+    },
+    {
+      "candidate_voxel_count": 26552,
+      "frame_id": "2011_09_30_drive_0016/0000000170",
+      "frame_index": 170,
+      "model_ready_sha256": "294aa2ce3af0a37ea8ccdb2c8f0fbbd711453ff6b0caa0793bce16e3654344f5",
+      "point_count": 752417,
+      "voxel_count": 26552
+    },
+    {
+      "candidate_voxel_count": 26555,
+      "frame_id": "2011_09_30_drive_0016/0000000171",
+      "frame_index": 171,
+      "model_ready_sha256": "4c1e7b4fc65883d72a6ce38169c4bc7abc01214b7cd7cdb285e3c39df6b76a73",
+      "point_count": 752354,
+      "voxel_count": 26555
+    },
+    {
+      "candidate_voxel_count": 26590,
+      "frame_id": "2011_09_30_drive_0016/0000000172",
+      "frame_index": 172,
+      "model_ready_sha256": "5c91f02c589ed3aedec33fcb05d523ce2ca25e0b2522c495159dd7c011508052",
+      "point_count": 752221,
+      "voxel_count": 26590
+    },
+    {
+      "candidate_voxel_count": 26555,
+      "frame_id": "2011_09_30_drive_0016/0000000173",
+      "frame_index": 173,
+      "model_ready_sha256": "dfc930c71c6e867dff7f418282ebf992f6e9019cd26a858ef5bf15a0a2a43538",
+      "point_count": 752206,
+      "voxel_count": 26555
+    },
+    {
+      "candidate_voxel_count": 26487,
+      "frame_id": "2011_09_30_drive_0016/0000000174",
+      "frame_index": 174,
+      "model_ready_sha256": "0eae0227ac2281ddb61c59387a86f2961a6f27dcd081325139b868537c5e6008",
+      "point_count": 752421,
+      "voxel_count": 26487
+    },
+    {
+      "candidate_voxel_count": 26507,
+      "frame_id": "2011_09_30_drive_0016/0000000175",
+      "frame_index": 175,
+      "model_ready_sha256": "ef54b5c003be1fa9c2c18cf6201d2b4d48befe8981e03d1b83951ed28944f2e0",
+      "point_count": 752332,
+      "voxel_count": 26507
+    },
+    {
+      "candidate_voxel_count": 26711,
+      "frame_id": "2011_09_30_drive_0016/0000000176",
+      "frame_index": 176,
+      "model_ready_sha256": "f644e4a2dd1b0563656d39c6f285f40b95606f2d9334592c52ebfe4db34b866e",
+      "point_count": 752450,
+      "voxel_count": 26711
+    },
+    {
+      "candidate_voxel_count": 26643,
+      "frame_id": "2011_09_30_drive_0016/0000000177",
+      "frame_index": 177,
+      "model_ready_sha256": "55f762a70d994c6bb085304a3dddb3148d985b3f4d4e03ce2eb88b347e55d207",
+      "point_count": 752262,
+      "voxel_count": 26643
+    },
+    {
+      "candidate_voxel_count": 26643,
+      "frame_id": "2011_09_30_drive_0016/0000000178",
+      "frame_index": 178,
+      "model_ready_sha256": "34347bb227cb7d81c28aca1eb11a9f430361e9fb680b2d0f5abb0d338b69a0be",
+      "point_count": 751920,
+      "voxel_count": 26643
+    },
+    {
+      "candidate_voxel_count": 27096,
+      "frame_id": "2011_09_30_drive_0016/0000000179",
+      "frame_index": 179,
+      "model_ready_sha256": "683bc3844a012fc49f0d8b19b46bce7f7f2a6afe330640f9808f64d52c56b033",
+      "point_count": 752071,
+      "voxel_count": 27096
+    },
+    {
+      "candidate_voxel_count": 27596,
+      "frame_id": "2011_09_30_drive_0016/0000000180",
+      "frame_index": 180,
+      "model_ready_sha256": "ab635790f61c08a453908db9bf4bb9dfee501667fc84087cb42dc379d0d74203",
+      "point_count": 752255,
+      "voxel_count": 27596
+    },
+    {
+      "candidate_voxel_count": 28022,
+      "frame_id": "2011_09_30_drive_0016/0000000181",
+      "frame_index": 181,
+      "model_ready_sha256": "db344c1c82ab2186d0f7c3eee679d216650d438308b6bcfc89c3e546a4edc144",
+      "point_count": 752529,
+      "voxel_count": 28022
+    },
+    {
+      "candidate_voxel_count": 28467,
+      "frame_id": "2011_09_30_drive_0016/0000000182",
+      "frame_index": 182,
+      "model_ready_sha256": "64050d361634520c33a7b94184d1d98c3f86a737ed14a8baee9e33dab5ebadb2",
+      "point_count": 752609,
+      "voxel_count": 28467
+    },
+    {
+      "candidate_voxel_count": 28629,
+      "frame_id": "2011_09_30_drive_0016/0000000183",
+      "frame_index": 183,
+      "model_ready_sha256": "de1ffce6f2c5fe83108aa1a6834ff1442ccf458615b81e9401c9ae45626e5e06",
+      "point_count": 752523,
+      "voxel_count": 28629
+    },
+    {
+      "candidate_voxel_count": 28615,
+      "frame_id": "2011_09_30_drive_0016/0000000184",
+      "frame_index": 184,
+      "model_ready_sha256": "89377b747568d3353bce395950eddef21ba229122c79166bc4a5b1a578514f3e",
+      "point_count": 752814,
+      "voxel_count": 28615
+    },
+    {
+      "candidate_voxel_count": 28540,
+      "frame_id": "2011_09_30_drive_0016/0000000185",
+      "frame_index": 185,
+      "model_ready_sha256": "53693b0da5cf60cd8879ff0fe4eb76f1db1a7985ba9c7c929670afa9bd6b9619",
+      "point_count": 752334,
+      "voxel_count": 28540
+    },
+    {
+      "candidate_voxel_count": 28317,
+      "frame_id": "2011_09_30_drive_0016/0000000186",
+      "frame_index": 186,
+      "model_ready_sha256": "c2879b819a2c22c55281754ce0bd6e1f2159ae07ef4c40b341df8c4243a658db",
+      "point_count": 751041,
+      "voxel_count": 28317
+    },
+    {
+      "candidate_voxel_count": 28204,
+      "frame_id": "2011_09_30_drive_0016/0000000187",
+      "frame_index": 187,
+      "model_ready_sha256": "1d0b45eaf03178bd03aafec9978a2d356473d0e474f7acb332421845f8a1b4fa",
+      "point_count": 750458,
+      "voxel_count": 28204
+    },
+    {
+      "candidate_voxel_count": 28089,
+      "frame_id": "2011_09_30_drive_0016/0000000188",
+      "frame_index": 188,
+      "model_ready_sha256": "5eb053478d93364cb5e51fac5865595b245359bd8ec22c850f21d9329f552689",
+      "point_count": 750626,
+      "voxel_count": 28089
+    },
+    {
+      "candidate_voxel_count": 28060,
+      "frame_id": "2011_09_30_drive_0016/0000000189",
+      "frame_index": 189,
+      "model_ready_sha256": "380be09684ba3df736acf0fa60d52ec28a64838ccf63901d64d929f3e3229cbf",
+      "point_count": 750733,
+      "voxel_count": 28060
+    },
+    {
+      "candidate_voxel_count": 28305,
+      "frame_id": "2011_09_30_drive_0016/0000000190",
+      "frame_index": 190,
+      "model_ready_sha256": "64a2f054437ffe47fb6ec79204b2877acf4aa6143ec94eef5ad8a4f4e317585e",
+      "point_count": 750845,
+      "voxel_count": 28305
+    },
+    {
+      "candidate_voxel_count": 28465,
+      "frame_id": "2011_09_30_drive_0016/0000000191",
+      "frame_index": 191,
+      "model_ready_sha256": "04121d8ae764dcf333d688d48576794c745ea938c6b607b4abe3f440902f35e6",
+      "point_count": 751064,
+      "voxel_count": 28465
+    },
+    {
+      "candidate_voxel_count": 28730,
+      "frame_id": "2011_09_30_drive_0016/0000000192",
+      "frame_index": 192,
+      "model_ready_sha256": "a2f782ecbc13802474192cfbdf0f66d890618e22d8121660706a4c2ae5ee1b62",
+      "point_count": 751072,
+      "voxel_count": 28730
+    },
+    {
+      "candidate_voxel_count": 29011,
+      "frame_id": "2011_09_30_drive_0016/0000000193",
+      "frame_index": 193,
+      "model_ready_sha256": "74a4fc86693d4f87f8672af365d646c8cc8a92b073101454ad55e429c0c5e109",
+      "point_count": 751351,
+      "voxel_count": 29011
+    },
+    {
+      "candidate_voxel_count": 29137,
+      "frame_id": "2011_09_30_drive_0016/0000000194",
+      "frame_index": 194,
+      "model_ready_sha256": "6dca9fb637b8d20fbf47f1c601d3b50f733392c5ce58b6d403cda2de75a790b8",
+      "point_count": 751441,
+      "voxel_count": 29137
+    },
+    {
+      "candidate_voxel_count": 29401,
+      "frame_id": "2011_09_30_drive_0016/0000000195",
+      "frame_index": 195,
+      "model_ready_sha256": "7f6419777f1c133b4c57754858ff617d68bf66b53dec14083a41c68c65e59d7a",
+      "point_count": 751459,
+      "voxel_count": 29401
+    },
+    {
+      "candidate_voxel_count": 29462,
+      "frame_id": "2011_09_30_drive_0016/0000000196",
+      "frame_index": 196,
+      "model_ready_sha256": "951a8810beaf8fa0385bbbff47cd98a37c8d282c6274865225c72582d97588d8",
+      "point_count": 751568,
+      "voxel_count": 29462
+    },
+    {
+      "candidate_voxel_count": 29618,
+      "frame_id": "2011_09_30_drive_0016/0000000197",
+      "frame_index": 197,
+      "model_ready_sha256": "6f172512aba407c4d95a42a84e3c72786e27fa60eaf72dc2a0cdde42c7ab120b",
+      "point_count": 751333,
+      "voxel_count": 29618
+    },
+    {
+      "candidate_voxel_count": 29902,
+      "frame_id": "2011_09_30_drive_0016/0000000198",
+      "frame_index": 198,
+      "model_ready_sha256": "77b5e9fa668db617f501feb8ac2d2d12d87caff6fa17fa267d9c42e8351285fb",
+      "point_count": 751391,
+      "voxel_count": 29902
+    },
+    {
+      "candidate_voxel_count": 30001,
+      "frame_id": "2011_09_30_drive_0016/0000000199",
+      "frame_index": 199,
+      "model_ready_sha256": "8308adc876f9ee88238b1e95b85415910ee5d6eb83f56d2f9e4183647ee54288",
+      "point_count": 751092,
+      "voxel_count": 30001
+    },
+    {
+      "candidate_voxel_count": 30366,
+      "frame_id": "2011_09_30_drive_0016/0000000200",
+      "frame_index": 200,
+      "model_ready_sha256": "a7304caf923ee1f054d898f48b0f0fee01f3236983cc3c4d0fab8273d481930a",
+      "point_count": 749869,
+      "voxel_count": 30366
+    },
+    {
+      "candidate_voxel_count": 30774,
+      "frame_id": "2011_09_30_drive_0016/0000000201",
+      "frame_index": 201,
+      "model_ready_sha256": "6fb6365fb4df9c788c350f27782ee5b6aec9b6b29547e777c374b19313953802",
+      "point_count": 749202,
+      "voxel_count": 30774
+    },
+    {
+      "candidate_voxel_count": 31246,
+      "frame_id": "2011_09_30_drive_0016/0000000202",
+      "frame_index": 202,
+      "model_ready_sha256": "0ac49ccab564e2914b296e99270b28a7850c708940adccb18900761578ab689f",
+      "point_count": 748602,
+      "voxel_count": 31246
+    },
+    {
+      "candidate_voxel_count": 31365,
+      "frame_id": "2011_09_30_drive_0016/0000000203",
+      "frame_index": 203,
+      "model_ready_sha256": "887e7118fc2f4079510a77967906551d8d9d7b908713125c59901486cada5885",
+      "point_count": 747337,
+      "voxel_count": 31365
+    },
+    {
+      "candidate_voxel_count": 31486,
+      "frame_id": "2011_09_30_drive_0016/0000000204",
+      "frame_index": 204,
+      "model_ready_sha256": "acf276fd426647398028df9c6707671713af6ae9a2986b751065e16c43f2ccc3",
+      "point_count": 746338,
+      "voxel_count": 31486
+    },
+    {
+      "candidate_voxel_count": 31573,
+      "frame_id": "2011_09_30_drive_0016/0000000205",
+      "frame_index": 205,
+      "model_ready_sha256": "a5915e6990f2bbdb9e64b12ef2ac16c5b52600b9f36003d1bae6caad9c9dc3e9",
+      "point_count": 745647,
+      "voxel_count": 31573
+    },
+    {
+      "candidate_voxel_count": 31393,
+      "frame_id": "2011_09_30_drive_0016/0000000206",
+      "frame_index": 206,
+      "model_ready_sha256": "b4af3f24cca1a1b56cd359bed272d00b764a50191f6c3fbefca8b4976d2b61f2",
+      "point_count": 744775,
+      "voxel_count": 31393
+    },
+    {
+      "candidate_voxel_count": 31402,
+      "frame_id": "2011_09_30_drive_0016/0000000207",
+      "frame_index": 207,
+      "model_ready_sha256": "61d3e617761e86d3a5518cab7d4a1565ed714bc8947fd98ac137dccdf22a8b55",
+      "point_count": 744432,
+      "voxel_count": 31402
+    },
+    {
+      "candidate_voxel_count": 31444,
+      "frame_id": "2011_09_30_drive_0016/0000000208",
+      "frame_index": 208,
+      "model_ready_sha256": "8f6515614637873aa4bbc2ff1c37ef3eda810382a1d46a089ad1671912754b3d",
+      "point_count": 743998,
+      "voxel_count": 31444
+    },
+    {
+      "candidate_voxel_count": 31410,
+      "frame_id": "2011_09_30_drive_0016/0000000209",
+      "frame_index": 209,
+      "model_ready_sha256": "4fb2e0b25a89b8aa77b44588521a9c3b3ae6e37a619b00ecc6d5e58471b3020e",
+      "point_count": 743670,
+      "voxel_count": 31410
+    },
+    {
+      "candidate_voxel_count": 31485,
+      "frame_id": "2011_09_30_drive_0016/0000000210",
+      "frame_index": 210,
+      "model_ready_sha256": "ca0470f7615bd03c2e292802960ef01ec2749f28b1d5ceec3d71089b85c2812f",
+      "point_count": 743541,
+      "voxel_count": 31485
+    },
+    {
+      "candidate_voxel_count": 31483,
+      "frame_id": "2011_09_30_drive_0016/0000000211",
+      "frame_index": 211,
+      "model_ready_sha256": "e64cc87d357dac07475a43632880af734ae34bd9c5e4040c758b8d16bb86ed04",
+      "point_count": 743244,
+      "voxel_count": 31483
+    },
+    {
+      "candidate_voxel_count": 31406,
+      "frame_id": "2011_09_30_drive_0016/0000000212",
+      "frame_index": 212,
+      "model_ready_sha256": "84448eda622b8179fc6ca5ccc24ef60cc9cd11e6ab1547a781ccc68a7b42bea4",
+      "point_count": 742818,
+      "voxel_count": 31406
+    },
+    {
+      "candidate_voxel_count": 31489,
+      "frame_id": "2011_09_30_drive_0016/0000000213",
+      "frame_index": 213,
+      "model_ready_sha256": "f2363d1f454c881c6973446f136ac39874b951c7a18178ad026e5b18740c5f91",
+      "point_count": 741920,
+      "voxel_count": 31489
+    },
+    {
+      "candidate_voxel_count": 31568,
+      "frame_id": "2011_09_30_drive_0016/0000000214",
+      "frame_index": 214,
+      "model_ready_sha256": "eec60bbacf5ee16b159ea0721843a107124cf29b14c8c32035e76e5bdc9d4db7",
+      "point_count": 741514,
+      "voxel_count": 31568
+    },
+    {
+      "candidate_voxel_count": 31950,
+      "frame_id": "2011_09_30_drive_0016/0000000215",
+      "frame_index": 215,
+      "model_ready_sha256": "0f0fadb47b702041eb5fc58e05979aed7918fdb3255b86d0d809f924c5390073",
+      "point_count": 741498,
+      "voxel_count": 31950
+    },
+    {
+      "candidate_voxel_count": 32447,
+      "frame_id": "2011_09_30_drive_0016/0000000216",
+      "frame_index": 216,
+      "model_ready_sha256": "55228b4223f4c2bf81f1908db15cc3c8ef67bc0b1a53af8208508786206c8969",
+      "point_count": 742137,
+      "voxel_count": 32447
+    },
+    {
+      "candidate_voxel_count": 33125,
+      "frame_id": "2011_09_30_drive_0016/0000000217",
+      "frame_index": 217,
+      "model_ready_sha256": "22ff9e8cc783add0c5471dcc5c97b4b8e5ee8a2d06d8245f07558aa4c140138b",
+      "point_count": 742389,
+      "voxel_count": 33125
+    },
+    {
+      "candidate_voxel_count": 33835,
+      "frame_id": "2011_09_30_drive_0016/0000000218",
+      "frame_index": 218,
+      "model_ready_sha256": "b5b7af1104780d4a8d74ef2370e366bbe3c91d9827ad20a22a624d0445f11227",
+      "point_count": 742769,
+      "voxel_count": 33835
+    },
+    {
+      "candidate_voxel_count": 34751,
+      "frame_id": "2011_09_30_drive_0016/0000000219",
+      "frame_index": 219,
+      "model_ready_sha256": "d46dc7a04a20aa188d979b2c8d64962efe6a763357d366c12de769a078f98985",
+      "point_count": 743198,
+      "voxel_count": 34751
+    },
+    {
+      "candidate_voxel_count": 35693,
+      "frame_id": "2011_09_30_drive_0016/0000000220",
+      "frame_index": 220,
+      "model_ready_sha256": "d580f585c7748289fad3baa5c672eefd39cc6415a1311efc3cac65486b0c9c1c",
+      "point_count": 743550,
+      "voxel_count": 35693
+    },
+    {
+      "candidate_voxel_count": 36730,
+      "frame_id": "2011_09_30_drive_0016/0000000221",
+      "frame_index": 221,
+      "model_ready_sha256": "521866e1f25096241b99e0b36073f776c661331323b59c710f5ae5f2f5c0184a",
+      "point_count": 743512,
+      "voxel_count": 36730
+    },
+    {
+      "candidate_voxel_count": 37648,
+      "frame_id": "2011_09_30_drive_0016/0000000222",
+      "frame_index": 222,
+      "model_ready_sha256": "821b390fe30d278e0627c1549d311d14c8f984498d8e62799d0160fb4d6651a6",
+      "point_count": 743583,
+      "voxel_count": 37648
+    },
+    {
+      "candidate_voxel_count": 38468,
+      "frame_id": "2011_09_30_drive_0016/0000000223",
+      "frame_index": 223,
+      "model_ready_sha256": "10108b81bae7042db2243e4c4397cb2b3b2af51507ca406d76fa31740ba9e490",
+      "point_count": 743653,
+      "voxel_count": 38468
+    },
+    {
+      "candidate_voxel_count": 39407,
+      "frame_id": "2011_09_30_drive_0016/0000000224",
+      "frame_index": 224,
+      "model_ready_sha256": "a7744d16d3a46c4c1baeafbbe6b6a2e19742d87d9589baf0a91372fa6351718f",
+      "point_count": 744005,
+      "voxel_count": 39407
+    },
+    {
+      "candidate_voxel_count": 40387,
+      "frame_id": "2011_09_30_drive_0016/0000000225",
+      "frame_index": 225,
+      "model_ready_sha256": "559fd3169f2254a56da47f5176af76913b0b6e1d656bd34093dcaa28406bd34f",
+      "point_count": 744735,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 41296,
+      "frame_id": "2011_09_30_drive_0016/0000000226",
+      "frame_index": 226,
+      "model_ready_sha256": "82514839a972da9536f2a4c07b4d3e6c5207bba72feb1d29672160ba309277e5",
+      "point_count": 744780,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 42193,
+      "frame_id": "2011_09_30_drive_0016/0000000227",
+      "frame_index": 227,
+      "model_ready_sha256": "29d5b6b23456cca3c928b812a6b4458aa25770bca159949919f78cc7f4b7e0cd",
+      "point_count": 744721,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 42857,
+      "frame_id": "2011_09_30_drive_0016/0000000228",
+      "frame_index": 228,
+      "model_ready_sha256": "88f95c2e226d38e14cf631dc31c3263ec184ac6002f054de1d0eef3e892c0827",
+      "point_count": 743935,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 43621,
+      "frame_id": "2011_09_30_drive_0016/0000000229",
+      "frame_index": 229,
+      "model_ready_sha256": "b475b027d1b531dde20b82df2b191a07a22e950ca842e3a731fa3177df8c1e99",
+      "point_count": 743323,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 44482,
+      "frame_id": "2011_09_30_drive_0016/0000000230",
+      "frame_index": 230,
+      "model_ready_sha256": "3efab7d5542a79a526470b712a59cb831d26fba1f436b9afc0dc90e7fd7e3db6",
+      "point_count": 743009,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 45148,
+      "frame_id": "2011_09_30_drive_0016/0000000231",
+      "frame_index": 231,
+      "model_ready_sha256": "1056810f053cb052a4ecb57adde8246db7dc7f9ec205813ecd28db0440ee137f",
+      "point_count": 741921,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 45964,
+      "frame_id": "2011_09_30_drive_0016/0000000232",
+      "frame_index": 232,
+      "model_ready_sha256": "b0c1ba9642d0fa395207cd26f290a8b4cee9b4ebb97b5bc7f998ea3cccaa1074",
+      "point_count": 741048,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 46809,
+      "frame_id": "2011_09_30_drive_0016/0000000233",
+      "frame_index": 233,
+      "model_ready_sha256": "bd7e60bad75c0dddeab0aef3749f563a812843bc486ca8e48648b83bba667123",
+      "point_count": 739832,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 47731,
+      "frame_id": "2011_09_30_drive_0016/0000000234",
+      "frame_index": 234,
+      "model_ready_sha256": "1afe2ec61136af141d97f4e738eddbbb03edff11938321148c7b869d4c21af68",
+      "point_count": 739767,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 48614,
+      "frame_id": "2011_09_30_drive_0016/0000000235",
+      "frame_index": 235,
+      "model_ready_sha256": "c34990cbbbe11583255391e06c04c4ff13df06ac15929b71eb104779d04ca5b6",
+      "point_count": 739276,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 49618,
+      "frame_id": "2011_09_30_drive_0016/0000000236",
+      "frame_index": 236,
+      "model_ready_sha256": "de6831dc37b4a6a2f665ad6cd9a84632d4315e9e30a8c7177863b7953fef78cd",
+      "point_count": 738220,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50754,
+      "frame_id": "2011_09_30_drive_0016/0000000237",
+      "frame_index": 237,
+      "model_ready_sha256": "a952792b04208c9b4f5ab0c72eba7f995aabfe5ac075d927ee9d52babfc958d2",
+      "point_count": 737204,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51415,
+      "frame_id": "2011_09_30_drive_0016/0000000238",
+      "frame_index": 238,
+      "model_ready_sha256": "b8aac8904881ba9a502d84bb8925bc3f023b3143388b3f558754e30b1b6652f7",
+      "point_count": 737074,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51657,
+      "frame_id": "2011_09_30_drive_0016/0000000239",
+      "frame_index": 239,
+      "model_ready_sha256": "2484daf04b075b0533c8cec50b76943286c395e4421ff61214aa984106ee9d6f",
+      "point_count": 735926,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 52512,
+      "frame_id": "2011_09_30_drive_0016/0000000240",
+      "frame_index": 240,
+      "model_ready_sha256": "5d79ddbf446a231f466a76f956dde4ad31d183b8ea4b2569fb36b9599b9678b8",
+      "point_count": 735636,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 53076,
+      "frame_id": "2011_09_30_drive_0016/0000000241",
+      "frame_index": 241,
+      "model_ready_sha256": "893fe5cd289d2018096e585a4e092a43f194f1a8cfd779ad82fe344d1d665d29",
+      "point_count": 734815,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 53819,
+      "frame_id": "2011_09_30_drive_0016/0000000242",
+      "frame_index": 242,
+      "model_ready_sha256": "e3b80cf38671ae06028f37f990e07d059db2958ee343e24696f812fc31125808",
+      "point_count": 734722,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54200,
+      "frame_id": "2011_09_30_drive_0016/0000000243",
+      "frame_index": 243,
+      "model_ready_sha256": "d63cccc419f058c9e23777c6030ee998bdc1d3a2e66537fc2703375b6957039b",
+      "point_count": 734420,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54882,
+      "frame_id": "2011_09_30_drive_0016/0000000244",
+      "frame_index": 244,
+      "model_ready_sha256": "29de489ad0ba0ef600154afd845d3d8c0f8b57b7fbb1b57d07d980fa741732c7",
+      "point_count": 734595,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54984,
+      "frame_id": "2011_09_30_drive_0016/0000000245",
+      "frame_index": 245,
+      "model_ready_sha256": "4813ad58cc6df8bc2fd8730210df0018cc3145c402ecb64a0221d5bd524405c1",
+      "point_count": 734199,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54888,
+      "frame_id": "2011_09_30_drive_0016/0000000246",
+      "frame_index": 246,
+      "model_ready_sha256": "71ab96a7ae7bd6a585d078a4ec4307b938671c751d8f4784875ddc1144b53ef9",
+      "point_count": 734158,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54834,
+      "frame_id": "2011_09_30_drive_0016/0000000247",
+      "frame_index": 247,
+      "model_ready_sha256": "a8234e0f85342349edcc16131ddbb7137d3811aa5226c4d862e0dc69120eb4d8",
+      "point_count": 733552,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54528,
+      "frame_id": "2011_09_30_drive_0016/0000000248",
+      "frame_index": 248,
+      "model_ready_sha256": "ea8a9884bcee14455f48a38db74bb64fee2edd986bc9834ec8a673aab6e4cf15",
+      "point_count": 733092,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 54433,
+      "frame_id": "2011_09_30_drive_0016/0000000249",
+      "frame_index": 249,
+      "model_ready_sha256": "46716ee071f0b29109b43602607a87a9940e85d031243646fd902fc085c80b53",
+      "point_count": 732713,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 53994,
+      "frame_id": "2011_09_30_drive_0016/0000000250",
+      "frame_index": 250,
+      "model_ready_sha256": "c74f21ba338c26f17f59a23e275a8e74e33b4e591aad96fb447481bebfdb7b06",
+      "point_count": 731926,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 53500,
+      "frame_id": "2011_09_30_drive_0016/0000000251",
+      "frame_index": 251,
+      "model_ready_sha256": "6c6e33651f2b5a0a8a742028684a87bf559fafe33285d966340bf3948933112c",
+      "point_count": 730826,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 52786,
+      "frame_id": "2011_09_30_drive_0016/0000000252",
+      "frame_index": 252,
+      "model_ready_sha256": "f2c47601c662cc1cfa2e66df6617a993e8812124675013dd7c7c345d2096af7f",
+      "point_count": 729772,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 52230,
+      "frame_id": "2011_09_30_drive_0016/0000000253",
+      "frame_index": 253,
+      "model_ready_sha256": "418b2465909166fb4f4d3ef1dbefd66b6553f54000172f194a5f92c0a475ed7a",
+      "point_count": 728977,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51845,
+      "frame_id": "2011_09_30_drive_0016/0000000254",
+      "frame_index": 254,
+      "model_ready_sha256": "8cb5f97a9a3ffc0b5e8a0b3a91c1ab66024a0421049cd700f63f74bf983aed4f",
+      "point_count": 729082,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51490,
+      "frame_id": "2011_09_30_drive_0016/0000000255",
+      "frame_index": 255,
+      "model_ready_sha256": "7809560021cc800b249d04df455d0f022adb284dafafefc36836bc3d01e9c102",
+      "point_count": 729786,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 51004,
+      "frame_id": "2011_09_30_drive_0016/0000000256",
+      "frame_index": 256,
+      "model_ready_sha256": "d9d78361ee16363c37966c5fbd5bf6a8f944a3d0a91b3c9860c19970e4cfce4e",
+      "point_count": 730406,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 50543,
+      "frame_id": "2011_09_30_drive_0016/0000000257",
+      "frame_index": 257,
+      "model_ready_sha256": "26c681fb500084c45a3fa8fe3e8e233061680cbb9c9fa17c4ef0836af84eea81",
+      "point_count": 730554,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 49847,
+      "frame_id": "2011_09_30_drive_0016/0000000258",
+      "frame_index": 258,
+      "model_ready_sha256": "fdde5fe4539d9cbc56cfd638ba8f4cc9e13bcf30d0c067dc15e417e7387c413c",
+      "point_count": 731007,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 49568,
+      "frame_id": "2011_09_30_drive_0016/0000000259",
+      "frame_index": 259,
+      "model_ready_sha256": "0a04f75aca3c76dfacf422554313d21366c713f88486891927bb2aefaddf63de",
+      "point_count": 731714,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 48605,
+      "frame_id": "2011_09_30_drive_0016/0000000260",
+      "frame_index": 260,
+      "model_ready_sha256": "b626ea3e72f882b0803729c807191387efd6b4729686eba07290edf06d749c5f",
+      "point_count": 732105,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 47736,
+      "frame_id": "2011_09_30_drive_0016/0000000261",
+      "frame_index": 261,
+      "model_ready_sha256": "084a7d368b2cbaad1e5923f409522eb7b253ba331de17d83a1b255d77018fff4",
+      "point_count": 731955,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 46380,
+      "frame_id": "2011_09_30_drive_0016/0000000262",
+      "frame_index": 262,
+      "model_ready_sha256": "d4445c91ed0411d4a56f8abfb7d3507c50ba03e9a21e0b5dd832a3fb0dd967c2",
+      "point_count": 730346,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 44937,
+      "frame_id": "2011_09_30_drive_0016/0000000263",
+      "frame_index": 263,
+      "model_ready_sha256": "61e85310416ed6453b927f09bcac3f8bd280cc5c7cae31c58cb9a8e606d1fdfd",
+      "point_count": 728656,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 43770,
+      "frame_id": "2011_09_30_drive_0016/0000000264",
+      "frame_index": 264,
+      "model_ready_sha256": "11a260adaa8fd65660704bc9cd1e870578fd38c2eb968ada2d6c86a97d3b4b01",
+      "point_count": 726495,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 42801,
+      "frame_id": "2011_09_30_drive_0016/0000000265",
+      "frame_index": 265,
+      "model_ready_sha256": "7ceaea48c724825319a8947d1f65b680710d250af7fe03703394dc36f9303bf5",
+      "point_count": 725455,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 41970,
+      "frame_id": "2011_09_30_drive_0016/0000000266",
+      "frame_index": 266,
+      "model_ready_sha256": "3b43e998769d7219bfe7447307aeb74e6a8b3931b6776c12db41c98a6c9ef1eb",
+      "point_count": 724675,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 41010,
+      "frame_id": "2011_09_30_drive_0016/0000000267",
+      "frame_index": 267,
+      "model_ready_sha256": "ac6e376beb000d7dc304f8932be9e09a5653aa74ad6b7c80f40b927d6f640a7e",
+      "point_count": 722022,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 40325,
+      "frame_id": "2011_09_30_drive_0016/0000000268",
+      "frame_index": 268,
+      "model_ready_sha256": "0f4102f5ad1a379ba9f13824eaea6a389cf6e989c3cd2bf13bc32e48b5a193a6",
+      "point_count": 718362,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 40029,
+      "frame_id": "2011_09_30_drive_0016/0000000269",
+      "frame_index": 269,
+      "model_ready_sha256": "f38eeaeca5a8a84bbc0a6ba0a4267ae8db8dc0e517a991c5421b0bc3d7f3dcfa",
+      "point_count": 716771,
+      "voxel_count": 40000
+    },
+    {
+      "candidate_voxel_count": 39746,
+      "frame_id": "2011_09_30_drive_0016/0000000270",
+      "frame_index": 270,
+      "model_ready_sha256": "97d2b2e0dcfb0769d09906c49dc7d252cbe546ce97065fe2003a8d11dca7aa98",
+      "point_count": 716154,
+      "voxel_count": 39746
+    },
+    {
+      "candidate_voxel_count": 39455,
+      "frame_id": "2011_09_30_drive_0016/0000000271",
+      "frame_index": 271,
+      "model_ready_sha256": "ecaa58507006dccfce73148cec69803f17b63ae12dfc430bc807042599abc57a",
+      "point_count": 715896,
+      "voxel_count": 39455
+    },
+    {
+      "candidate_voxel_count": 39076,
+      "frame_id": "2011_09_30_drive_0016/0000000272",
+      "frame_index": 272,
+      "model_ready_sha256": "60efee78b9a5d143c4f7adb227547e00990584a8cca16775d95edce1ad6ab1b4",
+      "point_count": 717551,
+      "voxel_count": 39076
+    },
+    {
+      "candidate_voxel_count": 38546,
+      "frame_id": "2011_09_30_drive_0016/0000000273",
+      "frame_index": 273,
+      "model_ready_sha256": "21233fdea2badd6dce58ae76f503e3a84248cec353b2cc1dcaf81711ecbfde26",
+      "point_count": 720417,
+      "voxel_count": 38546
+    },
+    {
+      "candidate_voxel_count": 38088,
+      "frame_id": "2011_09_30_drive_0016/0000000274",
+      "frame_index": 274,
+      "model_ready_sha256": "d0038a51c136c5e9c7183cfec1332357d947a164edfa8784fcbffcb6e3aae255",
+      "point_count": 721938,
+      "voxel_count": 38088
+    },
+    {
+      "candidate_voxel_count": 37492,
+      "frame_id": "2011_09_30_drive_0016/0000000275",
+      "frame_index": 275,
+      "model_ready_sha256": "859751dee5eb09b55a555103169e640e33dd9021ba06023d55d30862973191d5",
+      "point_count": 723788,
+      "voxel_count": 37492
+    },
+    {
+      "candidate_voxel_count": 37215,
+      "frame_id": "2011_09_30_drive_0016/0000000276",
+      "frame_index": 276,
+      "model_ready_sha256": "b4d3cfee74f4451bf4e32410e7354d68544e11ba2bf3e0c277285d53c1642eb9",
+      "point_count": 725870,
+      "voxel_count": 37215
+    },
+    {
+      "candidate_voxel_count": 36887,
+      "frame_id": "2011_09_30_drive_0016/0000000277",
+      "frame_index": 277,
+      "model_ready_sha256": "18dfb88eabe3e9d44fe8f793478374504098ba2f6ddedaf8dfe399212796a566",
+      "point_count": 727094,
+      "voxel_count": 36887
+    },
+    {
+      "candidate_voxel_count": 36639,
+      "frame_id": "2011_09_30_drive_0016/0000000278",
+      "frame_index": 278,
+      "model_ready_sha256": "74ed6b7112bf48a9455d105255999852f49ed2473138831e67b58ba0e899c881",
+      "point_count": 726716,
+      "voxel_count": 36639
+    }
+  ],
+  "coverage": {
+    "above_30000": 0,
+    "at_40000": 0,
+    "at_or_above_39000": 0,
+    "at_or_below_30000": 4,
+    "count": 4,
+    "maximum": 29011,
+    "median": 25981.5,
+    "minimum": 23488,
+    "p90_nearest_rank": 29011,
+    "p95_nearest_rank": 29011
+  },
+  "drive_id": "2011_09_30_drive_0016",
+  "eligible_frame_count": 274,
+  "evaluation_drives_used": [],
+  "generated_at_utc": "2026-08-22T13:54:48.039603+00:00",
+  "history": {
+    "current_plus_history": 6,
+    "historical_sweeps": 5
+  },
+  "measurement_commit": "a53e82beab78bd8044ff8d08514cfeadcf34837b",
+  "milestone": "M6b-R2",
+  "network_output_produced": false,
+  "schema_version": 1,
+  "selected_frames": [
+    {
+      "candidate_voxel_count": 23488,
+      "frame_id": "2011_09_30_drive_0016/0000000131",
+      "frame_index": 131,
+      "frozen_sweep_transforms": [
+        {
+          "lidar2sensor": [
+            [
+              0.9999956488609314,
+              -0.0015931931557133794,
+              0.0024884631857275963,
+              0.013905133120715618
+            ],
+            [
+              0.0015934617258608341,
+              0.9999987483024597,
+              -0.00010590899910312146,
+              1.3227969408035278
+            ],
+            [
+              -0.0024882908910512924,
+              0.00010987379937432706,
+              0.9999969005584717,
+              0.0023531995248049498
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "3b731694893c240484a6640a6da22047c715c88ba84dbc38ecd444483e054c84",
+          "source_id": "2011_09_30_drive_0016_sync/0000000130",
+          "source_index": 130,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999818801879883,
+              -0.0024391862098127604,
+              0.005504002794623375,
+              0.025622406974434853
+            ],
+            [
+              0.002432234352454543,
+              0.9999962449073792,
+              0.0012694444740191102,
+              2.777890682220459
+            ],
+            [
+              -0.005507078021764755,
+              -0.0012560342438519,
+              0.9999840259552002,
+              -0.0021521293092519045
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "657f7762fffdb00bcfdee5d3655155836bfb3c9ee69fc8269a6356b3b9fc3ebf",
+          "source_id": "2011_09_30_drive_0016_sync/0000000129",
+          "source_index": 129,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999845027923584,
+              -0.002302946290001273,
+              0.005065965931862593,
+              0.03803246468305588
+            ],
+            [
+              0.0022868243977427483,
+              0.999992311000824,
+              0.0031859218142926693,
+              4.102315425872803
+            ],
+            [
+              -0.005073263309895992,
+              -0.0031742870341986418,
+              0.9999821186065674,
+              0.004227327182888985
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "66452bc66a43b73057d679dd2031b3ceae93835d403a748e2d31c41278772516",
+          "source_id": "2011_09_30_drive_0016_sync/0000000128",
+          "source_index": 128,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999971985816956,
+              -0.00176604266744107,
+              0.001584338373504579,
+              0.044501882046461105
+            ],
+            [
+              0.0017568228067830205,
+              0.9999816417694092,
+              0.0058020493015646935,
+              5.556939601898193
+            ],
+            [
+              -0.0015945557970553637,
+              -0.005799248814582825,
+              0.9999819397926331,
+              0.006161441560834646
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "7ffba2bffec0bdd6342fa069303de82138752590a705da4e293f31656dbc68a9",
+          "source_id": "2011_09_30_drive_0016_sync/0000000127",
+          "source_index": 127,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.999994695186615,
+              -0.0014932065969333053,
+              -0.0028854645788669586,
+              0.06295967102050781
+            ],
+            [
+              0.0015120600583031774,
+              0.9999774694442749,
+              0.006542822811752558,
+              6.871036529541016
+            ],
+            [
+              0.002875629346817732,
+              -0.006547150202095509,
+              0.9999744296073914,
+              0.014659494161605835
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "3a1850408496ff311631b0c2deffeca45dec1db97e3ffb175c5c22355bd54291",
+          "source_id": "2011_09_30_drive_0016_sync/0000000126",
+          "source_index": 126,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999698400497437,
+              -0.0016884134383872151,
+              -0.007578452117741108,
+              0.08224669843912125
+            ],
+            [
+              0.001728489063680172,
+              0.9999845623970032,
+              0.005284653510898352,
+              8.178422927856445
+            ],
+            [
+              0.007569411303848028,
+              -0.005297592841088772,
+              0.9999573230743408,
+              0.027785155922174454
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "5fbf58bfac01775ef60b9be06e06e1a475f491566e5a2ab89203436dd51d9038",
+          "source_id": "2011_09_30_drive_0016_sync/0000000125",
+          "source_index": 125,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999334216117859,
+              -0.0022423258051276207,
+              -0.01131720282137394,
+              0.07501649856567383
+            ],
+            [
+              0.002268096897751093,
+              0.9999948740005493,
+              0.0022648335434496403,
+              9.616786003112793
+            ],
+            [
+              0.011312064714729786,
+              -0.0022903508506715298,
+              0.9999334216117859,
+              0.07050181925296783
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "fbcc94d1695988e234662f276c36ecf5f1392ef9645cf6557610f2799b4df1a5",
+          "source_id": "2011_09_30_drive_0016_sync/0000000124",
+          "source_index": 124,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999101758003235,
+              -0.0027432728093117476,
+              -0.013121378608047962,
+              0.06987833231687546
+            ],
+            [
+              0.0027428988832980394,
+              0.9999962449073792,
+              -4.6510300308000296e-05,
+              10.92253303527832
+            ],
+            [
+              0.01312145497649908,
+              1.0515520443732385e-05,
+              0.9999139308929443,
+              0.1093684583902359
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "76a1088a98cb0133a2608792d5b2b6e8b0af7362f36180681d4045abbda7693c",
+          "source_id": "2011_09_30_drive_0016_sync/0000000123",
+          "source_index": 123,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9998852014541626,
+              -0.003001222852617502,
+              -0.014852283522486687,
+              0.06968609988689423
+            ],
+            [
+              0.002997182309627533,
+              0.9999954700469971,
+              -0.00029431807342916727,
+              12.358100891113281
+            ],
+            [
+              0.0148530974984169,
+              0.0002497692476026714,
+              0.9998896718025208,
+              0.1335023045539856
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "a2551fc67c0a384b9a77ab0509547ee7420a827382ad9ec4b8251a123f021b6a",
+          "source_id": "2011_09_30_drive_0016_sync/0000000122",
+          "source_index": 122,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9998555779457092,
+              -0.0025910709518939257,
+              -0.016797583550214767,
+              0.07582879066467285
+            ],
+            [
+              0.002609222661703825,
+              0.9999960064888,
+              0.0010587743017822504,
+              13.662737846374512
+            ],
+            [
+              0.016794772818684578,
+              -0.0011024498380720615,
+              0.9998583793640137,
+              0.13369286060333252
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "53148abd93f4e23aeea39b4f49221e91c729a63ceb0e5a8ec14179b73997c4e6",
+          "source_id": "2011_09_30_drive_0016_sync/0000000121",
+          "source_index": 121,
+          "target_id": "2011_09_30_drive_0016_sync/0000000131"
+        }
+      ],
+      "model_ready_sha256": "dfdc1f3fb847e26f2d898176623b5f0aa46ba74bddf91aef3dd6ea615a15ad8c",
+      "point_count": 751618,
+      "selection_target_voxels": 23000,
+      "voxel_count": 23488
+    },
+    {
+      "candidate_voxel_count": 24982,
+      "frame_id": "2011_09_30_drive_0016/0000000109",
+      "frame_index": 109,
+      "frozen_sweep_transforms": [
+        {
+          "lidar2sensor": [
+            [
+              0.9999721646308899,
+              -0.0013698869151994586,
+              0.007337462622672319,
+              0.0006701846141368151
+            ],
+            [
+              0.0013632954796776175,
+              0.9999986886978149,
+              0.0009032671223394573,
+              1.29517662525177
+            ],
+            [
+              -0.007338689174503088,
+              -0.0008932386408559978,
+              0.9999727010726929,
+              0.021990898996591568
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "96a96f0b84f3727dec5352b8e19daf628c21bc23afdf64aab032fdf60d407012",
+          "source_id": "2011_09_30_drive_0016_sync/0000000108",
+          "source_index": 108,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9998910427093506,
+              -0.0025523914955556393,
+              0.014539720490574837,
+              -0.005779733881354332
+            ],
+            [
+              0.002497403882443905,
+              0.9999896883964539,
+              0.003798806108534336,
+              2.721999406814575
+            ],
+            [
+              -0.014549264684319496,
+              -0.0037620801012963057,
+              0.9998870491981506,
+              0.048979535698890686
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "fee2ffbf1fa203b163542bb26417d439ab34c5ff561c0184097ce99e71deaa0e",
+          "source_id": "2011_09_30_drive_0016_sync/0000000107",
+          "source_index": 107,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9997965097427368,
+              -0.0036136885173618793,
+              0.01984545961022377,
+              -0.01399210561066866
+            ],
+            [
+              0.003567555220797658,
+              0.9999908804893494,
+              0.0023595443926751614,
+              4.014591693878174
+            ],
+            [
+              -0.019853800535202026,
+              -0.00228826398961246,
+              0.9998002648353577,
+              0.07735829055309296
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "fe953c42e583834b443bf8c852be568ca7ccde921f6abfeaa48b2ae9652d3d54",
+          "source_id": "2011_09_30_drive_0016_sync/0000000106",
+          "source_index": 106,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9997544288635254,
+              -0.004636127967387438,
+              0.021669788286089897,
+              -0.027699971571564674
+            ],
+            [
+              0.004626289010047913,
+              0.9999891519546509,
+              0.0005041583208367229,
+              5.43753719329834
+            ],
+            [
+              -0.02167188748717308,
+              -0.00040378374978899956,
+              0.9997650384902954,
+              0.11014062166213989
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "4d90e1e3490bc99b4e676d9097ca4178224621de972187c98309081decfb61e3",
+          "source_id": "2011_09_30_drive_0016_sync/0000000105",
+          "source_index": 105,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9997422099113464,
+              -0.0056324549950659275,
+              0.021995292976498604,
+              -0.04339570924639702
+            ],
+            [
+              0.005632076878100634,
+              0.9999841451644897,
+              7.9152021498885e-05,
+              6.732482433319092
+            ],
+            [
+              -0.021995386108756065,
+              4.474759043660015e-05,
+              0.9997580647468567,
+              0.1344650685787201
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "4ff870d08aa41c18704931908d09b3672e4ad795a3786599c2422f5425695066",
+          "source_id": "2011_09_30_drive_0016_sync/0000000104",
+          "source_index": 104,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9997290968894958,
+              -0.006828556302934885,
+              0.022252080962061882,
+              -0.06202833727002144
+            ],
+            [
+              0.006837968714535236,
+              0.9999765753746033,
+              -0.0003469151852186769,
+              8.027507781982422
+            ],
+            [
+              -0.022249186411499977,
+              0.0004989801673218608,
+              0.9997523427009583,
+              0.1614099144935608
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "1d77dea4c530d3318d47432e2ed145781b478ef2dc0e6b68aa0c3f0f40265642",
+          "source_id": "2011_09_30_drive_0016_sync/0000000103",
+          "source_index": 103,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9997013211250305,
+              -0.008194231428205967,
+              0.02302364818751812,
+              -0.08661214262247086
+            ],
+            [
+              0.008206512778997421,
+              0.9999662041664124,
+              -0.00043898800504393876,
+              9.453404426574707
+            ],
+            [
+              -0.023019270971417427,
+              0.0006278007058426738,
+              0.9997348189353943,
+              0.195201113820076
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "b74a9cf95ca6250d54a72631b2e55799a3a5815c743041595976efd8d5bce919",
+          "source_id": "2011_09_30_drive_0016_sync/0000000102",
+          "source_index": 102,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9996569156646729,
+              -0.00916510634124279,
+              0.024536386132240295,
+              -0.10577166825532913
+            ],
+            [
+              0.009170840494334698,
+              0.9999579191207886,
+              -0.000121191049402114,
+              10.749646186828613
+            ],
+            [
+              -0.02453424036502838,
+              0.0003461687592789531,
+              0.9996989369392395,
+              0.2163003534078598
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "663c2a2e4119f187e75733536988124dfc677d983c356dfff851502a8c1f8107",
+          "source_id": "2011_09_30_drive_0016_sync/0000000101",
+          "source_index": 101,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9996122717857361,
+              -0.010298086330294609,
+              0.02587037906050682,
+              -0.13105478882789612
+            ],
+            [
+              0.010277188383042812,
+              0.9999467730522156,
+              0.0009406684548594058,
+              12.177416801452637
+            ],
+            [
+              -0.02587868459522724,
+              -0.0006744288257323205,
+              0.999664843082428,
+              0.23198382556438446
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "df5cd5a11a684b0b23a672a369f20992d99443f25f31f35ba5e6a21f117beeb1",
+          "source_id": "2011_09_30_drive_0016_sync/0000000100",
+          "source_index": 100,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9995579719543457,
+              -0.011501820757985115,
+              0.027415426447987556,
+              -0.15728135406970978
+            ],
+            [
+              0.011482588946819305,
+              0.9999337196350098,
+              0.0008588280761614442,
+              13.473488807678223
+            ],
+            [
+              -0.02742348238825798,
+              -0.0005436482024379075,
+              0.9996237754821777,
+              0.25713568925857544
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "96aca3c00f563d3619ba9ceab3940e2ff74d60b3805e6ffa562af7929ccf4e38",
+          "source_id": "2011_09_30_drive_0016_sync/0000000099",
+          "source_index": 99,
+          "target_id": "2011_09_30_drive_0016_sync/0000000109"
+        }
+      ],
+      "model_ready_sha256": "0cbca5a54f79ac442dc48b50b2059a7b9e416c2cb9aeeda21b4070a12919a657",
+      "point_count": 750469,
+      "selection_target_voxels": 25000,
+      "voxel_count": 24982
+    },
+    {
+      "candidate_voxel_count": 26981,
+      "frame_id": "2011_09_30_drive_0016/0000000101",
+      "frame_index": 101,
+      "frozen_sweep_transforms": [
+        {
+          "lidar2sensor": [
+            [
+              0.9999984502792358,
+              -0.0011335042072460055,
+              0.0013342947931960225,
+              -0.013387122191488743
+            ],
+            [
+              0.0011321244528517127,
+              0.9999988079071045,
+              0.0010343926260247827,
+              1.4276787042617798
+            ],
+            [
+              -0.001335465582087636,
+              -0.001032880274578929,
+              0.9999985694885254,
+              0.02664562687277794
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "1cc022452ad6630617d67579d190580bef07aa4b03284e8820d13b5212504c94",
+          "source_id": "2011_09_30_drive_0016_sync/0000000100",
+          "source_index": 100,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999931454658508,
+              -0.002337872749194503,
+              0.002879793057218194,
+              -0.027002012357115746
+            ],
+            [
+              0.002335223602131009,
+              0.9999968409538269,
+              0.0009229987044818699,
+              2.723923683166504
+            ],
+            [
+              -0.002881941618397832,
+              -0.0009162672213278711,
+              0.9999954104423523,
+              0.05038104206323624
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "ed4dc54aafdb3576e2c8473758dacb6e7071677a7ccb00997764605044996b0d",
+          "source_id": "2011_09_30_drive_0016_sync/0000000099",
+          "source_index": 99,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999857544898987,
+              -0.0029045133851468563,
+              0.004477072972804308,
+              -0.04532172158360481
+            ],
+            [
+              0.0029021394439041615,
+              0.9999956488609314,
+              0.0005366484401747584,
+              4.150789260864258
+            ],
+            [
+              -0.004478611517697573,
+              -0.0005236476426944137,
+              0.9999898076057434,
+              0.08565104007720947
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "c5196c64c38f250e138df8ae78589a11020da0ad1841f3f6b713bc7337c75ff4",
+          "source_id": "2011_09_30_drive_0016_sync/0000000098",
+          "source_index": 98,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999763369560242,
+              -0.0032054835464805365,
+              0.006082744803279638,
+              -0.0605776309967041
+            ],
+            [
+              0.0031989908311516047,
+              0.9999942779541016,
+              0.001076867338269949,
+              5.448596477508545
+            ],
+            [
+              -0.006086161360144615,
+              -0.0010573830222710967,
+              0.9999809265136719,
+              0.11405593901872635
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "02b0fa1daf7bd1c5a4cad187165b32b27a540c8c5611e8b0e3a6622c23b2189d",
+          "source_id": "2011_09_30_drive_0016_sync/0000000097",
+          "source_index": 97,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999622106552124,
+              -0.003223392879590392,
+              0.00807665940374136,
+              -0.07113982737064362
+            ],
+            [
+              0.003211810253560543,
+              0.9999938011169434,
+              0.0014466623542830348,
+              6.748990535736084
+            ],
+            [
+              -0.008081271313130856,
+              -0.0014206666965037584,
+              0.9999663233757019,
+              0.13539768755435944
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "e138418796622c373415f59d4c15307ef04e3d4524d159ee4c5a0671084a99b0",
+          "source_id": "2011_09_30_drive_0016_sync/0000000096",
+          "source_index": 96,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999537467956543,
+              -0.002894745673984289,
+              0.00916988868266344,
+              -0.08052458614110947
+            ],
+            [
+              0.002880810061469674,
+              0.999994695186615,
+              0.001532569294795394,
+              8.176465034484863
+            ],
+            [
+              -0.00917427521198988,
+              -0.0015060815494507551,
+              0.9999567866325378,
+              0.158347487449646
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "8e2f6f12eee3cd2a4f13c2e4baade82a9ee897cfb41d5a459187245fb4d8e2a5",
+          "source_id": "2011_09_30_drive_0016_sync/0000000095",
+          "source_index": 95,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999469518661499,
+              -0.0020957288797944784,
+              0.010084719397127628,
+              -0.09006164968013763
+            ],
+            [
+              0.0020652879029512405,
+              0.9999932646751404,
+              0.0030280081555247307,
+              9.48076057434082
+            ],
+            [
+              -0.010090996511280537,
+              -0.0030070191714912653,
+              0.9999445676803589,
+              0.17438994348049164
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "7cdd9206fc59d8409599a3a6a04b25cee144eab65bdb542b5b17a65436b67700",
+          "source_id": "2011_09_30_drive_0016_sync/0000000094",
+          "source_index": 94,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999425411224365,
+              -0.001296329777687788,
+              0.01064019463956356,
+              -0.09735040366649628
+            ],
+            [
+              0.00125517463311553,
+              0.9999917149543762,
+              0.003873661858960986,
+              10.911211967468262
+            ],
+            [
+              -0.01064512599259615,
+              -0.003860083408653736,
+              0.9999358654022217,
+              0.19302591681480408
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "1e044f0a86852336389b0c68889eddc397e8827df38d279889bf8bd8c3be1eaf",
+          "source_id": "2011_09_30_drive_0016_sync/0000000093",
+          "source_index": 93,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999342560768127,
+              -0.00040990914567373693,
+              0.011457604356110096,
+              -0.10556682199239731
+            ],
+            [
+              0.00036890283809043467,
+              0.9999935030937195,
+              0.0035808486863970757,
+              12.216265678405762
+            ],
+            [
+              -0.011458996683359146,
+              -0.003576386021450162,
+              0.9999279379844666,
+              0.22808893024921417
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "9aa68c17aa4dbb13de2a5652a54b029f2be9b6df02a85e5d5c84eff4ce73462b",
+          "source_id": "2011_09_30_drive_0016_sync/0000000092",
+          "source_index": 92,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999456405639648,
+              0.0006433054222725332,
+              0.010408908128738403,
+              -0.1053079217672348
+            ],
+            [
+              -0.0006749876774847507,
+              0.9999951720237732,
+              0.003040535841137171,
+              13.51640510559082
+            ],
+            [
+              -0.010406901128590107,
+              -0.0030473959632217884,
+              0.9999412298202515,
+              0.25328612327575684
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "7521d3e3b126f7521aedfc274f74bb59956129559c782ffde45a6ee4673aff1a",
+          "source_id": "2011_09_30_drive_0016_sync/0000000091",
+          "source_index": 91,
+          "target_id": "2011_09_30_drive_0016_sync/0000000101"
+        }
+      ],
+      "model_ready_sha256": "935eefbbe9390c6055f57b83b2fa0d6a885de8debd1441c8af52c5164dcfdebe",
+      "point_count": 752433,
+      "selection_target_voxels": 27000,
+      "voxel_count": 26981
+    },
+    {
+      "candidate_voxel_count": 29011,
+      "frame_id": "2011_09_30_drive_0016/0000000193",
+      "frame_index": 193,
+      "frozen_sweep_transforms": [
+        {
+          "lidar2sensor": [
+            [
+              0.9999992251396179,
+              0.0006954770069569349,
+              -0.001053864718414843,
+              -0.002374621108174324
+            ],
+            [
+              -0.0006955414428375661,
+              0.9999997615814209,
+              -6.078638762119226e-05,
+              1.6302696466445923
+            ],
+            [
+              0.0010538219939917326,
+              6.151933484943584e-05,
+              0.999999463558197,
+              0.03720785677433014
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "66f65533aae23edc60903e30b26cbeaa754645e214d94beb4ab931ae3abaf780",
+          "source_id": "2011_09_30_drive_0016_sync/0000000192",
+          "source_index": 192,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.999999463558197,
+              0.0009840693091973662,
+              -0.0002137125702574849,
+              -0.0007827272056601942
+            ],
+            [
+              -0.000984401791356504,
+              0.9999982714653015,
+              -0.0015607381938025355,
+              3.1100094318389893
+            ],
+            [
+              0.000212176310014911,
+              0.0015609475085511804,
+              0.9999987483024597,
+              0.07025016844272614
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "9b8361685a721ca13e4501345812d003f025ef3bd451ad4c1115e3ca2374d611",
+          "source_id": "2011_09_30_drive_0016_sync/0000000191",
+          "source_index": 191,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999976754188538,
+              0.00115021294914186,
+              0.0018156098667532206,
+              0.002188804792240262
+            ],
+            [
+              -0.0011454237392172217,
+              0.9999958872795105,
+              -0.0026367059908807278,
+              4.738727569580078
+            ],
+            [
+              -0.0018186349188908935,
+              0.002634619828313589,
+              0.9999948740005493,
+              0.11329919844865799
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "0d02f4c65b311f290d788dd4ceda4ad671db499a79f3f0cd69944736a654c41d",
+          "source_id": "2011_09_30_drive_0016_sync/0000000190",
+          "source_index": 190,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999948740005493,
+              0.001574567286297679,
+              0.002795356558635831,
+              0.003272755304351449
+            ],
+            [
+              -0.00157432712148875,
+              0.9999987483024597,
+              -8.814835746306926e-05,
+              6.222782135009766
+            ],
+            [
+              -0.00279549160040915,
+              8.37470797705464e-05,
+              0.9999960660934448,
+              0.12702085077762604
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "08b2b39933c0b07594d4816df3dfaf2144152f88cee2f0a47acc8d54bf698512",
+          "source_id": "2011_09_30_drive_0016_sync/0000000189",
+          "source_index": 189,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999868869781494,
+              0.002121880417689681,
+              0.004664971027523279,
+              0.009995149448513985
+            ],
+            [
+              -0.0021296285558491945,
+              0.9999963641166687,
+              0.0016565549885854125,
+              7.704147815704346
+            ],
+            [
+              -0.004661438055336475,
+              -0.0016664676368236542,
+              0.9999877214431763,
+              0.13634103536605835
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "39be5df774423e5308438fe0bd75ecdafe85c0343d369d70ef3c14946009c267",
+          "source_id": "2011_09_30_drive_0016_sync/0000000188",
+          "source_index": 188,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999802708625793,
+              0.0018837589304894209,
+              0.0059915571473538876,
+              0.013409341685473919
+            ],
+            [
+              -0.0018855968955904245,
+              0.999998152256012,
+              0.00030110141960904,
+              9.328730583190918
+            ],
+            [
+              -0.005990978330373764,
+              -0.0003123930946458131,
+              0.9999819993972778,
+              0.1650855541229248
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "a56c3d20cda902255f4970fe923dc62cae356170cde405201b5bb9703b7c970a",
+          "source_id": "2011_09_30_drive_0016_sync/0000000187",
+          "source_index": 187,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999707937240601,
+              0.0015926322666928172,
+              0.007477551698684692,
+              0.015817372128367424
+            ],
+            [
+              -0.0015893515665084124,
+              0.9999986290931702,
+              -0.0004446615930646658,
+              10.805534362792969
+            ],
+            [
+              -0.007478248793631792,
+              0.0004327640635892749,
+              0.9999719262123108,
+              0.19009211659431458
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "fe532d53b4815d8c22923d2a510bd73c319935c71e0bacbbbeab6b26ee62ea05",
+          "source_id": "2011_09_30_drive_0016_sync/0000000186",
+          "source_index": 186,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.999944269657135,
+              0.0016518065240234137,
+              0.010427984409034252,
+              0.023037374019622803
+            ],
+            [
+              -0.0016579687362536788,
+              0.9999984502792358,
+              0.0005823125829920173,
+              12.431632995605469
+            ],
+            [
+              -0.010427005589008331,
+              -0.0005995692918077111,
+              0.9999454617500305,
+              0.1991003155708313
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "7adc6540d99d486faf472bec0c78a94d6bf58a0a7c6e5846a8a287130786b505",
+          "source_id": "2011_09_30_drive_0016_sync/0000000185",
+          "source_index": 185,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.999928891658783,
+              0.0015485875774174929,
+              0.011825772933661938,
+              0.025178823620080948
+            ],
+            [
+              -0.0015657988842576742,
+              0.9999977350234985,
+              0.0014462820254266262,
+              13.908939361572266
+            ],
+            [
+              -0.011823505163192749,
+              -0.0014646956697106361,
+              0.9999290108680725,
+              0.20603545010089874
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "672de7a8ea349d8071984f06ed2323afd40217d4ba0a95a93dba92034d8cb1a6",
+          "source_id": "2011_09_30_drive_0016_sync/0000000184",
+          "source_index": 184,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        },
+        {
+          "lidar2sensor": [
+            [
+              0.9999097585678101,
+              0.001561381621286273,
+              0.013343114405870438,
+              0.02911204844713211
+            ],
+            [
+              -0.0015849455958232284,
+              0.9999971985816956,
+              0.0017556051025167108,
+              15.385334014892578
+            ],
+            [
+              -0.01334033440798521,
+              -0.0017765945522114635,
+              0.9999094605445862,
+              0.21863584220409393
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "lidar2sensor_sha256": "2407f754460d460c1922eeb41a6e8bc8e5ad0d6c261a2dfa0f6e3a2b9fd6ead7",
+          "source_id": "2011_09_30_drive_0016_sync/0000000183",
+          "source_index": 183,
+          "target_id": "2011_09_30_drive_0016_sync/0000000193"
+        }
+      ],
+      "model_ready_sha256": "74a4fc86693d4f87f8672af365d646c8cc8a92b073101454ad55e429c0c5e109",
+      "point_count": 751351,
+      "selection_target_voxels": 29000,
+      "voxel_count": 29011
+    }
+  ],
+  "selection_policy": {
+    "blind_interval_inclusive": [
+      22547,
+      29422
+    ],
+    "choice": "minimum_absolute_voxel_count_distance",
+    "minimum_distinct_frames": 3,
+    "target_voxel_counts": [
+      23000,
+      25000,
+      27000,
+      29000
+    ],
+    "tie_break": "lower_frame_index"
+  },
+  "status": "non_evaluation_H5_profile_gap_selection_frozen",
+  "voxel_count_distribution": {
+    "above_30000": 149,
+    "at_40000": 71,
+    "at_or_above_39000": 78,
+    "at_or_below_30000": 125,
+    "count": 274,
+    "maximum": 40000,
+    "median": 31234.5,
+    "minimum": 23488,
+    "p90_nearest_rank": 40000,
+    "p95_nearest_rank": 40000
+  }
+}

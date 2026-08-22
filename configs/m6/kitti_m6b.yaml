@@ -1,0 +1,278 @@
+schema_version: "1.0"
+milestone: M6b
+status: owner_approved_protocol_R2_before_detector_inference
+protocol_document: docs/m6/M6B_PROTOCOL_R2.md
+protocol_contamination: false
+
+scope:
+  mode: offline_frozen_detector_cross_domain_characterization
+  ros: false
+  training: false
+  fine_tuning: false
+  domain_adaptation: false
+  threshold_tuning: false
+
+frozen_detector:
+  source_manifest: configs/detection/m6_pointpillars_tensorrt_40k.yaml
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  onnx_sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+  tensorrt_engine_sha256: 2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f
+  historical_tensorrt_engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+  precision: fp16
+  device: cuda:0
+  voxelization_mode: exact_fast
+  provenance_mode: full
+  score_threshold: 0.25
+  max_voxels: 40000
+  max_points_per_voxel: 64
+  voxel_size_m: [0.25, 0.25, 8.0]
+  point_cloud_range_m: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+
+profile_gap_gate:
+  status: pass
+  drive_id: 2011_09_30_drive_0016
+  condition: H5
+  evidence_path: benchmarks/m6b/engine/structural_40k_h5_profile_gap_parity.json
+  evidence_sha256: 784f193d43805f1f9f460b0ac61be78587c0355eab4fdbaf4ca3d67242b8bba4
+  selection_path: benchmarks/m6b/engine/structural_40k_h5_profile_gap_selection.json
+  selection_sha256: 33bbe6bfaa23145238c4f235fae561244b4e2ad00f53d4dde2a05ca2305c088d
+  frame_ids:
+    - 2011_09_30_drive_0016/0000000131
+    - 2011_09_30_drive_0016/0000000109
+    - 2011_09_30_drive_0016/0000000101
+    - 2011_09_30_drive_0016/0000000193
+  retained_voxel_counts: [23488, 24982, 26981, 29011]
+  evaluation_drives_used: []
+
+dataset:
+  name: KITTI Raw
+  date: "2011_09_26"
+  external: true
+  canonical_drive: 2011_09_26_drive_0001
+  selected_secondary_drive: 2011_09_26_drive_0091
+  selected_secondary_category: City
+  selection_policy:
+    eligible_categories: [City, Residential]
+    primary: descending_valid_pedestrian_labelled_poses
+    tie_break:
+      - descending_pedestrian_tracklets
+      - descending_total_labelled_frame_count
+      - lexicographic_drive_id
+    detector_outputs_used: false
+  archives:
+    calibration:
+      filename: 2011_09_26_calib.zip
+      size_bytes: 4068
+      sha256: e0108cfd000cf802c14ed94fba38601185c792e5640abba015a34b7a85b812e0
+    canonical_sync:
+      filename: 2011_09_26_drive_0001_sync.zip
+      size_bytes: 458643963
+      sha256: 7827a821ddc0a973bdf66de3a005a8825bd37c304aa9750f3c018f80d5b18458
+    secondary_sync:
+      filename: 2011_09_26_drive_0091_sync.zip
+      size_bytes: 1419552280
+      sha256: 52a1131b3158cd1411d450ed671fafe36e8965a1112bfaee6837edf81338b6af
+  tracklets:
+    canonical_sha256: 34f0672dee9dc94535893e653b4a66e6ddf534a09d2533bac4e62965935a91b8
+    secondary_sha256: 3d363ee40129e51aaf44764b9637bc7e946b6e3ec628784adcdedd395505feab
+
+candidate_census:
+  digest_sha256: 62614e020bd9a577cb721aa105afe591a1986e1d069a3c09117e7f03e07c197b
+  columns: [drive_id, category, valid_pedestrian_poses, pedestrian_tracklets, labelled_frames]
+  rows:
+    - [2011_09_26_drive_0001, City, 0, 0, 73]
+    - [2011_09_26_drive_0002, City, 0, 0, 23]
+    - [2011_09_26_drive_0005, City, 5, 2, 91]
+    - [2011_09_26_drive_0011, City, 22, 1, 129]
+    - [2011_09_26_drive_0013, City, 0, 0, 52]
+    - [2011_09_26_drive_0017, City, 0, 0, 9]
+    - [2011_09_26_drive_0018, City, 0, 0, 167]
+    - [2011_09_26_drive_0019, Residential, 71, 3, 231]
+    - [2011_09_26_drive_0020, Residential, 0, 0, 20]
+    - [2011_09_26_drive_0022, Residential, 21, 2, 367]
+    - [2011_09_26_drive_0023, Residential, 0, 1, 308]
+    - [2011_09_26_drive_0035, Residential, 2, 2, 102]
+    - [2011_09_26_drive_0046, Residential, 0, 0, 31]
+    - [2011_09_26_drive_0048, City, 0, 0, 21]
+    - [2011_09_26_drive_0051, City, 7, 3, 252]
+    - [2011_09_26_drive_0056, City, 8, 2, 176]
+    - [2011_09_26_drive_0057, City, 0, 0, 91]
+    - [2011_09_26_drive_0059, City, 23, 5, 188]
+    - [2011_09_26_drive_0060, City, 16, 1, 38]
+    - [2011_09_26_drive_0061, Residential, 0, 0, 368]
+    - [2011_09_26_drive_0064, Residential, 0, 0, 219]
+    - [2011_09_26_drive_0084, City, 25, 3, 271]
+    - [2011_09_26_drive_0091, City, 398, 42, 268]
+
+evaluation_frames:
+  rule: all_frames_with_full_H10_history
+  exact_ranges:
+    - drive_id: 2011_09_26_drive_0001
+      first_index: 10
+      last_index: 107
+      count: 98
+    - drive_id: 2011_09_26_drive_0091
+      first_index: 10
+      last_index: 339
+      count: 330
+  total: 428
+  ordered_frame_ids_sha256: 76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95
+  same_current_frames_for_H10_and_H5: true
+  pedestrian_eligible_eval_pose_count: 396
+  pedestrian_low_n_floor: 50
+  pedestrian_low_n: false
+
+input_oracles:
+  committed_ledger: benchmarks/m6b/diagnostics/pre_inference_input_ledger.json
+  committed_ledger_sha256: 2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480
+  h10_ordered_model_ready_hashes_sha256: 63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469
+  h5_ordered_model_ready_hashes_sha256: e5f43d6511d96f6db232c880f94b5464ab5d217f5e5bfdf34bd1626ab8ac7f89
+  platform_reproduction_diagnostic: benchmarks/m6b/diagnostics/pre_inference_platform_reproduction.json
+  portable_reproduction:
+    policy: frozen_float32_sweep_transforms_then_unchanged_multisweep_builder
+    canonical_transform_records_required: true
+    full_wsl2_verification_required_before_detector_inference: true
+    model_ready_hash_commitments_changed: false
+    builder_semantics_changed: false
+  H10:
+    max_historical_sweeps: 10
+    current_plus_history: 11
+  H5:
+    max_historical_sweeps: 5
+    current_plus_history: 6
+    sentinel_repeat_count: 10
+    sentinel_repeats_exact: true
+
+reference_camera_region:
+  camera: rectified_camera_0
+  calibration_fields: [R_rect_00, P_rect_00, S_rect_00, R, T]
+  image_size_wh: [1242, 375]
+  prediction_box_points: all_8_corners_plus_near_plane_edge_intersections
+  near_plane_metres: 0.000001
+  positive_depth_rule: depth_greater_than_or_equal_to_near_plane
+  inside_rule: projected_extent_intersects_half_open_image_rectangle
+  outside_predictions: excluded_from_FP_and_reported_separately
+
+ground_truth:
+  valid_pose:
+    state: [2]
+    occlusion: [0, 1]
+    truncation: [0, 1]
+  source_frame: KITTI_native_Velodyne
+  source_dimensions: [height, width, length]
+  source_translation: bottom_contact_centre
+  source_yaw: rz_about_positive_Z
+  model_basis:
+    - [0.0, -1.0, 0.0]
+    - [1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  centre_rule: [x, y, z_plus_height_over_2]
+  output_dimensions: [length, width, height]
+  output_yaw: normalize_angle(source_rz_plus_pi_over_2)
+
+taxonomy:
+  targets:
+    Car: car
+    Pedestrian: pedestrian
+  neighbour_ignores:
+    Van: car
+    Person (sitting): pedestrian
+  unmapped: [Truck, Cyclist, Tram, Misc]
+  dontcare_boxes_synthesized: false
+  terminology: benchmark-inspired neighbour ignore semantics
+
+matching:
+  geometry: oriented_BEV_IoU
+  target_thresholds: [0.30, 0.50, 0.70]
+  primary_threshold: 0.50
+  neighbour_ignore_threshold: same_as_target_threshold
+  order:
+    - predictions_descending_score
+    - stable_original_detection_index
+  per_prediction_target_choice:
+    - maximum_BEV_IoU_among_unmatched_targets
+    - lowest_GT_track_id_on_equal_IoU
+  processing:
+    - match_target_class_GT
+    - explain_unmatched_with_real_neighbour_box
+    - score_remaining_inside_FOV_as_FP
+
+metrics:
+  operating_point: [TP, FP, FN, precision, recall, F1]
+  primary_class: car
+  secondary_class: pedestrian
+  score_ranked_curve:
+    enabled: true
+    population: all_unchanged_MMDeploy_postprocess_survivors
+    upstream_postprocess_score_floor: 0.05
+    raw_anchor_curve_claimed: false
+    tie_break: [descending_score, drive_id, frame_index, detection_index]
+    ap_method: all_points_monotonic_precision_envelope_area
+    no_threshold_selection: true
+  matched_geometry:
+    - BEV_IoU
+    - centre_distance_metres
+    - absolute_wrapped_yaw_error_radians
+    - score
+  three_dimensional_IoU: not_reported_not_independently_tested
+  forward_range_bins_metres:
+    - [0.0, 20.0]
+    - [20.0, 35.0]
+    - [35.0, 50.0]
+  range_axis: model_positive_y_GT_geometric_centre
+  interval_policy: lower_inclusive_upper_exclusive_except_final_upper_inclusive
+  occlusion_truncation_minimum_denominator: 10
+
+pillar_analysis:
+  azimuth_sectors: 12
+  azimuth_sector_width_degrees: 30
+  cartesian_quadrants: 4
+  radial_bins_metres: [[0.0, 20.0], [20.0, 35.0], [35.0, 50.0]]
+  homogeneity_test: Pearson_chi_square_2x12_candidate_vs_discarded_sector_proportions
+  alpha: 0.01
+  df: 11
+  critical_statistic: 24.724970311318277
+  minimum_expected_count: 5
+  practical_rate_ratio: 2.0
+  consistency_rule: aggregate_highest_drop_sector_is_frame_highest_in_more_than_half_overflow_frames
+  first_touch_sweep_indices: {current: 0, nearest_history: 1, oldest_H10: 10}
+  GT_overlap: pillar_cell_area_intersects_oriented_target_BEV_footprint
+
+repeatability:
+  condition: H10
+  repetitions_per_sentinel: 10
+  require_exact: [cls_score, bbox_pred, dir_cls_pred, DetectionFrame]
+  sentinels:
+    - {role: canonical_first_full_history, frame_id: 2011_09_26_drive_0001/0000000010}
+    - {role: canonical_lower_median_candidate_pillars, frame_id: 2011_09_26_drive_0001/0000000083}
+    - {role: highest_overflow_full_history_m6a_sentinel, frame_id: 2011_09_26_drive_0001/0000000011}
+    - {role: non_overflow_closest_to_40000, frame_id: 2011_09_26_drive_0001/0000000015}
+    - {role: second_drive_first_eligible_pedestrian, frame_id: 2011_09_26_drive_0091/0000000010}
+
+hypotheses:
+  H1: compound_history_shift_association_not_time_lag_causality
+  H2: pillar_cap_association_not_causality
+  H3: sensor_density_and_beam_geometry_context_not_independently_manipulated
+  H4: mounting_environment_and_dataset_context_not_causally_isolated
+
+visualization_selection:
+  always_show: repeatability_sentinels
+  car_best_worst:
+    metric: frame_car_recall_score_0_25_BEV_IoU_0_50
+    eligible_frames: frames_with_at_least_one_eligible_car_GT
+    best_tie_break: [higher_median_matched_IoU, lexicographic_frame_id]
+    worst_tie_break: [lower_median_matched_IoU, lexicographic_frame_id]
+  car_median:
+    ordering: [recall, median_matched_IoU, lexicographic_frame_id]
+    rank: lower_median
+  highest_overflow: maximum_H10_overflow_then_lexicographic_frame_id
+  non_overflow_comparison: closest_candidate_count_to_highest_overflow_then_lexicographic_frame_id
+  paired_H10_H5: largest_absolute_car_recall_change_then_lexicographic_frame_id
+
+execution_order:
+  - protocol_commit
+  - clean_measurement_commit
+  - H10_repeatability
+  - paired_H10_then_H5_per_frame
+  - frozen_metrics
+  - protocol_selected_visualizations

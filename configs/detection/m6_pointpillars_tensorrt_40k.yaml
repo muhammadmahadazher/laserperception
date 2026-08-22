@@ -1,0 +1,86 @@
+schema_version: "1.0"
+milestone: M6b-R1
+status: candidate_validated_pending_owner_review
+
+cache:
+  root_environment_variable: LASERPERCEPTION_M2_CACHE
+  default_root: ~/.cache/laserperception
+  mmdeploy_checkout_relative: mmdeploy-v1.3.1
+  artifact_directory_relative: m2
+  engine_directory_relative: engines
+
+source_model:
+  reference: M1 official pretrained PointPillars
+  framework: MMDetection3D
+  framework_version: 1.4.0
+  framework_commit: fe25f7a51d36e3702f961e198894580d83c4387b
+  checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
+  training: false
+
+deployment:
+  exporter: MMDeploy
+  exporter_version: 1.3.1
+  exporter_commit: bc75c9d6c8940aa03d0e1e5b5962bd930478ba77
+  official_deployment_config: configs/mmdet3d/voxel-detection/voxel-detection_tensorrt_dynamic-nus-64x4.py
+  tensorrt_target_version: 8.6.1
+  precision: fp16
+  int8: false
+  device: cuda:0
+
+voxel_contract:
+  implementation: exact_fast
+  point_features: 4
+  max_points_per_voxel: 64
+  upstream_max_voxels: {training: 30000, validation: 40000}
+
+profile:
+  selected_min_shapes:
+    voxels: [4352, 64, 4]
+    num_points: [4352]
+    coors: [4352, 4]
+  selected_opt_shapes:
+    voxels: [18207, 64, 4]
+    num_points: [18207]
+    coors: [18207, 4]
+  selected_max_shapes:
+    voxels: [40000, 64, 4]
+    num_points: [40000]
+    coors: [40000, 4]
+  rationale: >-
+    Only the structurally insufficient maximum changes. The historical nuScenes-derived minimum
+    and optimum remain frozen so the candidate is not tuned around the KITTI evaluation corpus.
+
+artifacts:
+  onnx:
+    logical_name: m2/pointpillars.onnx
+    committed: false
+    sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
+    size_bytes: 60711828
+  historical_engine:
+    logical_name: engines/pointpillars_fp16.engine
+    sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+    device_memory_size_bytes: 1212340736
+  engine:
+    logical_name: engines/m6/pointpillars_fp16_profile40k.engine
+    committed: false
+    sha256: 2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f
+    size_bytes: 31469076
+    device_memory_size_bytes: 1602800640
+    build_measurement_commit: 7feb5be8a2c529b55928a4bda180ae4bcb050cc7
+    validation_measurement_commit: d1f534d79b85f6d67c54ebc70b99d7b92cd31413
+
+validation:
+  parity_protocol: configs/detection/m2_parity_v2.yaml
+  parity_protocol_sha256: 91e7cde19076c6452d9ff8e0fefc893a6d429622ed30c2da88127d29d4418df0
+  parity_thresholds_mutable: false
+  home_domain_samples: 20
+  non_evaluation_drive: 2011_09_30_drive_0016
+  forbidden_evaluation_drives: [2011_09_26_drive_0001, 2011_09_26_drive_0091]
+  non_evaluation_frame_count: 12
+  repeatability_runs_per_frame: 5
+  repeatability_roles: [highest_shape, mid_range_near_opt]
+
+provenance:
+  historical_manifest: configs/detection/m2_pointpillars_tensorrt.yaml
+  historical_engine_immutable: true
+  reason: structural_40000_voxel_contract_exceeded_historical_30000_profile
