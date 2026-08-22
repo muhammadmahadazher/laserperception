@@ -1,6 +1,9 @@
 # Local Git metadata fallback for Google Drive workspaces
 .git-data/
 
+# Project-local datasets, environments, caches, and deployment artifacts
+.local/
+
 # Python
 __pycache__/
 *.py[cod]
