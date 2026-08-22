@@ -55,7 +55,7 @@ questions:
 That separation mattered because both stages produced useful failures before the final
 characterization.
 
-## M6a: a failed pose product before a passing oracle
+## A Failed Pose Oracle, and Why the Reference Was Wrong
 
 The first Tier-A pose-oracle attempt failed. It compared KITTI Raw synced OXTS poses with KITTI
 Odometry poses as though they were interchangeable samples of one trajectory. They are distinct
@@ -92,7 +92,7 @@ geometric centers, KITTI `(h, w, l)` becomes detector `(l, w, h)`, and yaw is no
 improve detections. The full convention is recorded in
 [MODEL_FRAME_ALIGNMENT.md](MODEL_FRAME_ALIGNMENT.md).
 
-## M6b's first failure: the engine could not represent a valid input
+## When the Deployment Engine Could Not Accept a Valid Input
 
 The historical M2 TensorRT profile accepted at most 30,000 voxels, while the pinned deterministic
 preprocessing contract may retain 40,000. The original M6b corpus generation reproduced all 856
@@ -215,12 +215,14 @@ on only 19.12% of overflow frames, below the frozen greater-than-50% practical-d
 The combined conclusion was therefore **“spatially non-uniform truncation” not established**. The
 large statistic remains descriptive evidence, not permission to omit the failed practical gate.
 
-## Geometric and range transfer
+## Matched Car Detections Retained Strong BEV Localization
 
 H5 Car true-positive counts were 48, 48, and 44 at oriented BEV IoU thresholds 0.30, 0.50, and
 0.70. That stability through 0.50 and modest reduction at 0.70 suggests that many matched H5 Car
 boxes retained useful BEV geometry. It is a narrow observation about matched detections, not a
 general localization or calibration guarantee.
+
+## Range Characterization
 
 | Condition | Class | 0–20 m TP/GT (recall) | 20–35 m TP/GT (recall) | 35–50 m TP/GT (recall) |
 |---|---|---|---|---|
@@ -312,7 +314,7 @@ preserve H10 temporal timestamps while subsampling or otherwise controlling dens
 point and pillar population. Either experiment would need its own preregistered protocol and frozen
 corpus. M6 did not run either study and does not choose a production history setting.
 
-## The M6c boundary
+## What This Does Not Cover: ROS and Live Sensing
 
 M6c, if separately authorized, is an integration-correctness task:
 
