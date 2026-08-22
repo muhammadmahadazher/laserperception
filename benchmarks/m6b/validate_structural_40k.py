@@ -15,7 +15,7 @@ from typing import Any
 
 import numpy as np
 import yaml
-from laserperception.evaluation.pillar_analysis import analyze_pillars
+from laserperception.evaluation.m6b_pillars import analyze_pillars
 
 from laserperception.datasets.kitti_raw import KittiRawSequence
 from laserperception.detection.artifacts import ExternalArtifactMetadata
