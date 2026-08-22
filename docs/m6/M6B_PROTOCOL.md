@@ -12,6 +12,26 @@ The machine-readable freeze is [`configs/m6/kitti_m6b.yaml`](../../configs/m6/ki
 The complete sanitized GT/input-only ledger is
 [`benchmarks/m6b/diagnostics/pre_inference_input_ledger.json`](../../benchmarks/m6b/diagnostics/pre_inference_input_ledger.json).
 
+## Prospective pre-inference portability correction
+
+The first GPU-environment attempt at commit `bb279cf` stopped on the model-ready SHA check before
+model-ready preparation, voxelization, raw network execution, postprocessing, or any detector
+prediction. The detector runtime had initialized, but no KITTI score or predicted box was produced;
+the preregistration barrier therefore remained intact. The complete diagnostic is
+[`pre_inference_platform_reproduction.json`](../../benchmarks/m6b/diagnostics/pre_inference_platform_reproduction.json).
+
+Windows reproduced the canonical M6a frame-10 H10 hash exactly. Byte-identical source files in WSL2
+produced the same shape, sweep order, and time lags, but one float32 transform translation differed
+by one ULP across the two NumPy/OpenBLAS environments. That affected 423 X-coordinate values in one
+sweep, with a maximum absolute difference of `1.4901161193847656e-08 m`. Substituting the already
+canonical float32 transform reproduced the exact M6a hash in WSL2.
+
+Prospectively, before the first detector prediction, the input ledger therefore freezes each
+canonical float32 sweep transform. The unchanged `MultiSweepBuilder` consumes those matrices. H10
+and H5 frame sets, histories, points, time lags, pillar records, and model-ready hash commitments do
+not change. Every one of the 428 paired H10/H5 inputs must reproduce its frozen hash in WSL2 before
+detector inference may begin.
+
 ## Frozen detector and input contracts
 
 The checkpoint, ONNX, TensorRT FP16 engine, MMDeploy postprocess, exact-fast voxelizer, voxel
@@ -76,7 +96,7 @@ reference-FOV rules, exceeding the preregistered LOW-N floor of 50.
 
 The committed pre-inference ledger records every frame's history IDs, source-row counts, time-lag
 set, model-ready SHA256, point count, pillar counts, and first-touch provenance. Its SHA256 is
-`3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8`. The ordered H10 and H5
+`2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480`. The ordered H10 and H5
 model-ready hash commitments are respectively
 `63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469` and
 `e5f43d6511d96f6db232c880f94b5464ab5d217f5e5bfdf34bd1626ab8ac7f89`. Ten independent H5

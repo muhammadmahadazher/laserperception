@@ -21,6 +21,10 @@ from laserperception.evaluation.kitti_m6b import (
     parse_kitti_tracklets,
     visible_in_reference_camera,
 )
+from laserperception.evaluation.m6b_input_oracle import (
+    freeze_sweep_transforms,
+    reconstruct_from_frozen_transforms,
+)
 from laserperception.evaluation.m6b_pillars import analyze_pillars
 
 CITY_DRIVES = (
@@ -52,6 +56,9 @@ RESIDENTIAL_DRIVES = (
 )
 CANONICAL_DRIVE = "2011_09_26_drive_0001"
 EXPECTED_SELECTED_DRIVE = "2011_09_26_drive_0091"
+EXPECTED_PRE_AUGMENT_LEDGER_SHA256 = (
+    "3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8"
+)
 
 
 def _sha256(array: np.ndarray) -> str:
@@ -124,8 +131,19 @@ def _drive_record(
     h5_builder = MultiSweepBuilder(MultiSweepBuilderConfig(max_historical_sweeps=5))
     frames: list[dict[str, object]] = []
     for frame_index in range(10, len(sequence)):
-        h10 = sequence.reconstruct(frame_index, builder=h10_builder)
-        h5 = sequence.reconstruct(frame_index, builder=h5_builder)
+        frozen_transforms = freeze_sweep_transforms(sequence, frame_index)
+        h10 = reconstruct_from_frozen_transforms(
+            sequence,
+            frame_index,
+            frozen_transforms,
+            builder=h10_builder,
+        )
+        h5 = reconstruct_from_frozen_transforms(
+            sequence,
+            frame_index,
+            frozen_transforms,
+            builder=h5_builder,
+        )
         h10_points = h10.point_cloud.points_xyzt
         h5_points = h5.point_cloud.points_xyzt
         h10_pillars = analyze_pillars(h10_points)
@@ -146,6 +164,7 @@ def _drive_record(
                 "pedestrian": sum(pose.evaluation_class == "pedestrian" for pose in valid_targets),
             },
             "eligible_target_track_ids": sorted({pose.track_id for pose in valid_targets}),
+            "frozen_sweep_transforms": list(frozen_transforms),
             "h10": {
                 "selected_indices": list(h10.selected_indices),
                 "source_counts": list(h10.source_counts),
@@ -315,17 +334,57 @@ def _verify_h5_repeatability(
     return results
 
 
+def _augment_existing_ledger(date_root: Path, output: Path) -> None:
+    existing = json.loads(output.read_text(encoding="utf-8"))
+    canonical = (json.dumps(existing, indent=2, sort_keys=True) + "\n").encode()
+    if hashlib.sha256(canonical).hexdigest() != EXPECTED_PRE_AUGMENT_LEDGER_SHA256:
+        raise RuntimeError("existing pre-inference ledger does not match the frozen semantic hash")
+    if existing.get("detector_inference_performed") is not False:
+        raise RuntimeError("refusing to augment a ledger after detector inference")
+
+    sequences: dict[str, KittiRawSequence] = {}
+    frames = existing.get("frames")
+    if not isinstance(frames, list):
+        raise RuntimeError("existing pre-inference ledger has no frame list")
+    for position, frame in enumerate(frames, start=1):
+        if not isinstance(frame, dict):
+            raise RuntimeError("existing pre-inference ledger contains a malformed frame")
+        drive, raw_index = str(frame["frame_id"]).split("/", 1)
+        if drive not in sequences:
+            sequences[drive] = KittiRawSequence(date_root, date_root / f"{drive}_sync")
+        frame["frozen_sweep_transforms"] = list(
+            freeze_sweep_transforms(sequences[drive], int(raw_index))
+        )
+        if position == 1 or position % 100 == 0 or position == len(frames):
+            print(f"froze transforms for {position}/{len(frames)} frames", flush=True)
+
+    existing["portable_input_reproduction"] = {
+        "policy": "frozen_float32_sweep_transforms_then_unchanged_multisweep_builder",
+        "reason": "pre-inference cross-platform BLAS/LAPACK one-ULP transform finding",
+        "semantics_changed": False,
+    }
+    encoded = json.dumps(existing, indent=2, sort_keys=True) + "\n"
+    forbidden = (str(Path.home()), "J:\\", "/root/")
+    if any(value in encoded for value in forbidden):
+        raise RuntimeError("refusing to write discovery data containing a private absolute path")
+    output.write_text(encoded, encoding="utf-8")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--tracklet-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--augment-existing", action="store_true")
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     date_root = args.data_root.expanduser().resolve() / "2011_09_26"
+    if args.augment_existing:
+        _augment_existing_ledger(date_root, args.output)
+        return 0
     tracklet_root = args.tracklet_root.expanduser().resolve()
     census = _census(tracklet_root)
     selected = _select_drive(census)
@@ -348,6 +407,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "schema_version": 1,
         "status": "pre_inference_gt_and_input_discovery_complete",
         "detector_inference_performed": False,
+        "portable_input_reproduction": {
+            "policy": "frozen_float32_sweep_transforms_then_unchanged_multisweep_builder",
+            "reason": "pre-inference cross-platform BLAS/LAPACK one-ULP transform finding",
+            "semantics_changed": False,
+        },
         "category_source": "official_KITTI_Raw_page_City_and_Residential_groupings",
         "candidate_census": census,
         "selection_order": [

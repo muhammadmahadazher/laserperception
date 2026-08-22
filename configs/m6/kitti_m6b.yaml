@@ -107,9 +107,16 @@ evaluation_frames:
 
 input_oracles:
   committed_ledger: benchmarks/m6b/diagnostics/pre_inference_input_ledger.json
-  committed_ledger_sha256: 3b1a452e7056d6493978b496359d7299795153f57800bb6d2edf14e774eefcf8
+  committed_ledger_sha256: 2c41c9b21f9d30016ca22c46f75650e753cfe2a9b825077e715d65803610b480
   h10_ordered_model_ready_hashes_sha256: 63f4bd20d33a62948dc9a2593b57509380848cb48980827d0b0352c47fa37469
   h5_ordered_model_ready_hashes_sha256: e5f43d6511d96f6db232c880f94b5464ab5d217f5e5bfdf34bd1626ab8ac7f89
+  platform_reproduction_diagnostic: benchmarks/m6b/diagnostics/pre_inference_platform_reproduction.json
+  portable_reproduction:
+    policy: frozen_float32_sweep_transforms_then_unchanged_multisweep_builder
+    canonical_transform_records_required: true
+    full_wsl2_verification_required_before_detector_inference: true
+    model_ready_hash_commitments_changed: false
+    builder_semantics_changed: false
   H10:
     max_historical_sweeps: 10
     current_plus_history: 11
