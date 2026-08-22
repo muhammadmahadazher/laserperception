@@ -1,7 +1,7 @@
 schema_version: "1.0"
 milestone: M6b
-status: preregistered_before_detector_inference
-protocol_document: docs/m6/M6B_PROTOCOL.md
+status: owner_approved_protocol_R2_before_detector_inference
+protocol_document: docs/m6/M6B_PROTOCOL_R2.md
 protocol_contamination: false
 
 scope:
@@ -13,10 +13,11 @@ scope:
   threshold_tuning: false
 
 frozen_detector:
-  source_manifest: configs/detection/m2_pointpillars_tensorrt.yaml
+  source_manifest: configs/detection/m6_pointpillars_tensorrt_40k.yaml
   checkpoint_sha256: f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0
   onnx_sha256: 61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16
-  tensorrt_engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
+  tensorrt_engine_sha256: 2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f
+  historical_tensorrt_engine_sha256: a005f75852097cd9b193750560b214cc3d5237ae9b6c106c7fca3d4fc348714b
   precision: fp16
   device: cuda:0
   voxelization_mode: exact_fast
@@ -26,6 +27,22 @@ frozen_detector:
   max_points_per_voxel: 64
   voxel_size_m: [0.25, 0.25, 8.0]
   point_cloud_range_m: [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+
+profile_gap_gate:
+  status: pass
+  drive_id: 2011_09_30_drive_0016
+  condition: H5
+  evidence_path: benchmarks/m6b/engine/structural_40k_h5_profile_gap_parity.json
+  evidence_sha256: 784f193d43805f1f9f460b0ac61be78587c0355eab4fdbaf4ca3d67242b8bba4
+  selection_path: benchmarks/m6b/engine/structural_40k_h5_profile_gap_selection.json
+  selection_sha256: 33bbe6bfaa23145238c4f235fae561244b4e2ad00f53d4dde2a05ca2305c088d
+  frame_ids:
+    - 2011_09_30_drive_0016/0000000131
+    - 2011_09_30_drive_0016/0000000109
+    - 2011_09_30_drive_0016/0000000101
+    - 2011_09_30_drive_0016/0000000193
+  retained_voxel_counts: [23488, 24982, 26981, 29011]
+  evaluation_drives_used: []
 
 dataset:
   name: KITTI Raw
@@ -256,7 +273,6 @@ execution_order:
   - protocol_commit
   - clean_measurement_commit
   - H10_repeatability
-  - full_H10
-  - full_H5
+  - paired_H10_then_H5_per_frame
   - frozen_metrics
   - protocol_selected_visualizations

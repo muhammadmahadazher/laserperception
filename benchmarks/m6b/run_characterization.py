@@ -725,7 +725,9 @@ def _initialize_progress(
         if existing != dict(identity):
             raise RuntimeError("local M6b-R2 resume identity differs from this measurement")
     else:
-        if progress_path.exists() or (progress_root / "predictions").exists():
+        prediction_root = progress_root / "predictions"
+        has_prediction_records = prediction_root.exists() and any(prediction_root.rglob("*.json"))
+        if progress_path.exists() or has_prediction_records:
             raise RuntimeError("local M6b-R2 progress exists without a validated identity")
         _atomic_write_json(identity_path, dict(identity))
     expected_keys = [

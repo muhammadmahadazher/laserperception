@@ -1,6 +1,8 @@
 # M6b Protocol R2 — draft structural-engine revision
 
-> **DRAFT — REQUIRES OWNER APPROVAL BEFORE M6b RESUMES**
+> **Historical draft.** The owner approved this proposal subject to the H5 profile-gap gate. That
+> gate passed before evaluation, and the final frozen protocol is
+> [`M6B_PROTOCOL_R2.md`](M6B_PROTOCOL_R2.md).
 
 ## Prospective revision and preserved chronology
 

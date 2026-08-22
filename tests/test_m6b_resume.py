@@ -33,6 +33,7 @@ def _ledger() -> list[dict[str, object]]:
 def test_progress_ledger_is_atomic_resumable_and_identity_bound(tmp_path: Path) -> None:
     runner = _runner()
     identity = {"measurement_commit": "1" * 40, "candidate_engine_sha256": "2" * 64}
+    (tmp_path / "predictions").mkdir()
 
     progress = runner._initialize_progress(tmp_path, identity, _ledger())
     assert progress["totals"] == {

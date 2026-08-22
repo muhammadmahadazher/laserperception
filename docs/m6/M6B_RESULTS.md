@@ -70,6 +70,15 @@ Candidate raw outputs were bit-exact across five repeats on the 40,000-voxel fra
 repeats on frame 114 at 29,423 voxels. That second frame is the closest available full-history 0016
 frame to the frozen 18,207 optimum; the census minimum is 29,423.
 
-Sanitized tracked evidence is under [`benchmarks/m6b/engine`](../../benchmarks/m6b/engine). The
-prospective protocol is still only a draft: M6b evaluation remains blocked pending explicit owner
-approval of [`M6B_PROTOCOL_R2_DRAFT.md`](M6B_PROTOCOL_R2_DRAFT.md). M6c and M5 remain inactive.
+Sanitized tracked evidence is under [`benchmarks/m6b/engine`](../../benchmarks/m6b/engine).
+
+## Owner-approved Protocol R2 boundary
+
+The owner approved the structural candidate subject to one final non-evaluation H5 parity gate in
+the uncovered 22,547–29,422-voxel interval. An input-only census of 274 eligible drive-0016 H5
+frames froze frames 131, 109, 101, and 193 at 23,488, 24,982, 26,981, and 29,011 voxels. The
+unchanged parity-v2 Stage 1 gate passed with 16/16 exported detections, 15/15 high-confidence
+matches, and no continuous-tolerance failure.
+
+[`M6B_PROTOCOL_R2.md`](M6B_PROTOCOL_R2.md) is therefore the final prospective evaluation contract.
+The original protocol and failure remain preserved. M6c and M5 remain inactive.
