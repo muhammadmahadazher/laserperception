@@ -130,7 +130,11 @@ box is explained and excluded from TP/FP. Any remaining inside-FOV prediction is
 At score 0.25, each class/condition reports GT and prediction denominators, TP/FP/FN, explained
 ignores, outside-FOV predictions, precision, recall, and F1. Clean mapped classes also receive an
 all-points score-ranked PR curve and monotonic precision-envelope area; the curve is descriptive
-and cannot select a new threshold. Matched pairs report BEV IoU, centre error, wrapped yaw error,
+and cannot select a new threshold. Its frozen population is every survivor of the unchanged
+MMDetection3D/MMDeploy postprocess, whose pinned `score_thr=0.05` is below the 0.25 deployment
+operating point. It is therefore the full ranked curve of postprocessed detector outputs, not a
+claim to rank raw anchors below the upstream postprocess floor. Matched pairs report BEV IoU,
+centre error, wrapped yaw error,
 and score. Independently tested 3D IoU is absent, so M6b will not report it.
 
 Forward-distance strata use model-frame GT-centre X in `[0,20)`, `[20,35)`, and `[35,50]` metres.

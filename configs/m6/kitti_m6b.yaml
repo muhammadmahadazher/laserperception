@@ -179,6 +179,9 @@ metrics:
   secondary_class: pedestrian
   score_ranked_curve:
     enabled: true
+    population: all_unchanged_MMDeploy_postprocess_survivors
+    upstream_postprocess_score_floor: 0.05
+    raw_anchor_curve_claimed: false
     tie_break: [descending_score, drive_id, frame_index, detection_index]
     ap_method: all_points_monotonic_precision_envelope_area
     no_threshold_selection: true
