@@ -34,6 +34,11 @@ ROS suite matched accepted model-ready inputs, voxel tensors, TensorRT tensors, 
 message semantics exactly on 20/20 samples. [Read the raw ROS contract](docs/RAW_LIDAR_ROS2.md) or
 the [multi-sweep evidence](docs/MULTISWEEP.md).
 
+**Cross-domain KITTI Raw study:** the frozen detector's Car recall changed from 0.242 under H10 to
+0.727 under H5 without fine-tuning. H10/H5 is a compound temporal-and-density ablation, and the
+preregistered 40,000-voxel-cap hypothesis was not supported as the primary corpus-wide explanation.
+[Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICAL_NOTE.md).
+
 ## What v0.2.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |
