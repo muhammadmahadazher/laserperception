@@ -3,8 +3,8 @@
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
 M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is in
 progress. M6a is complete under prospective Protocol R2; the original Tier-A failure remains
-preserved as a failure. M6b is not started and awaits explicit owner authorization. M5 remains
-conditional and inactive. No M6 technical submilestone is currently active.
+preserved as a failure. M6b is active as an offline frozen-detector cross-domain characterization.
+M6c is planned but not started. M5 remains conditional and inactive.
 
 ## Completed foundations
 
@@ -56,14 +56,17 @@ M4.6 did not reopen runtime implementation, correctness protocols, or performanc
 later milestone activates automatically; any next technical work requires explicit owner
 authorization.
 
-## M6 — in progress at the completed M6a boundary
+## M6 — in progress with M6b active
 
 - [x] **M6a — complete under Protocol R2:** authoritative KITTI Raw discovery, dataset contract,
   direct official Raw-devkit pose/calibration verification, model-frame alignment, exact raw
   decoding, and a 24-frame deterministic offline reconstruction oracle.
-- [ ] **M6b — not started / awaiting explicit owner authorization:** raw ROS replay, time-aware tf2
-  integration, frozen detector execution, ground-truth/domain-shift characterization, and
-  visualization.
+- [ ] **M6b — active:** offline frozen-detector execution on verified KITTI Raw model-ready inputs,
+  Raw-tracklet ground-truth/domain-shift characterization, paired history-10/history-5 analysis,
+  and deterministic offline visualization.
+- [ ] **M6c — planned / not started:** KITTI Raw PointCloud2 replay, time-aware tf2, live
+  reconstruction exactness against M6a/M6b inputs, and ROS detector-path verification. M6c awaits
+  separate explicit owner authorization.
 
 At measurement commit `ec9e341056807d5549353c8ef362fd109b25f2f2`, 271 mapped frames differed
 from the official odometry oracle by as much as 0.0884767 m translation and 0.000416629 rad
@@ -81,7 +84,8 @@ repeats each. See `docs/m6/M6A_RESULTS_R2.md`.
 
 M6a remains limited to engineering interoperability. It did not initialize or run the detector on
 KITTI, inspect predictions, implement ROS replay, or begin M6b evaluation. No later M6 work starts
-automatically.
+automatically. M6b is now the sole active technical submilestone and remains offline; M6c does not
+start automatically.
 
 ## M5 — conditional physical Jetson measurement
 

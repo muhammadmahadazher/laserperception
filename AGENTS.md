@@ -9,9 +9,8 @@ LaserPerception is an open-source 3D LiDAR object-detection and deployment-engin
 M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
 is in progress. M6a is complete under prospective Protocol R2: the original Tier-A failure remains
 failed, R1 diagnosed its data-product/timing cause, and the new canonical offline oracle passed
-without relaxing that historical gate. M6b is not started and awaits explicit owner authorization.
-M5 remains conditional and inactive. No M6 technical submilestone is currently active; further
-work requires explicit owner authorization.
+without relaxing that historical gate. M6b is active as an offline frozen-detector cross-domain
+characterization. M6c is planned but not started. M5 remains conditional and inactive.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -50,15 +49,17 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 - M6a: KITTI Raw discovery, dataset contract, exact Raw-devkit pose/calibration verification,
   model-frame alignment, and ROS-independent reconstruction oracle — complete under prospective
   Protocol R2. Preserve the original Tier-A FAIL and the post-failure R1 diagnosis.
-- M6b: raw ROS replay, tf2, frozen detector execution, domain-shift characterization, and
-  visualization — not started; awaiting explicit owner authorization.
+- M6b: offline frozen-detector execution, Raw-tracklet domain-shift characterization, history-10
+  versus history-5 comparison, and visualization — active.
+- M6c: KITTI Raw ROS replay, time-aware tf2, live reconstruction exactness, and ROS detector-path
+  verification — planned; not started.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. No technical
-submilestone is active. M6b requires explicit owner authorization. M6a did not initialize or run
-the detector on KITTI, change the frozen runtime, implement ROS replay, or begin any M6b work; its
-canonical output is an offline exactness oracle for a future authorized M6b path.
+optimization, or unrelated features unless the owner explicitly changes scope. M6b is the only
+active technical submilestone. M6c requires separate explicit owner authorization. M6a did not
+initialize or run the detector on KITTI, change the frozen runtime, implement ROS replay, or begin
+any M6b work; its canonical output is the offline exactness oracle used by M6b and a future M6c.
 
 ## Detection and deployment architecture
 
