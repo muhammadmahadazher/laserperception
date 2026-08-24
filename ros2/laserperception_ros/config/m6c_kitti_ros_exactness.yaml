@@ -1,0 +1,40 @@
+laserperception_kitti_raw_replay:
+  ros__parameters:
+    raw_points_topic: /laserperception/m6c/points_raw
+    data_root: ""
+    date: "2011_09_26"
+    drive_id: "2011_09_26_drive_0001"
+    start_frame: 0
+    end_frame: 107
+    publish_period_sec: 0.25
+    auto_start: true
+    fixed_frame: kitti_world
+    lidar_frame: kitti_model_aligned_lidar
+    raw_qos_depth: 5
+
+laserperception_multisweep_builder:
+  ros__parameters:
+    raw_points_topic: /laserperception/m6c/points_raw
+    model_ready_topic: /laserperception/m6c/points_model_ready
+    fixed_frame: kitti_world
+    target_frame: kitti_model_aligned_lidar
+    max_historical_sweeps: 10
+    transform_timeout_sec: 0.2
+    history_reset_gap_sec: 0.0
+    tf_cache_time_sec: 60.0
+    raw_qos_depth: 5
+    model_ready_qos_depth: 1
+
+laserperception_detector:
+  ros__parameters:
+    input_topic: /laserperception/m6c/points_model_ready
+    output_topic: /laserperception/m6c/detections
+    marker_topic: /laserperception/m6c/markers
+    publish_markers: false
+    input_qos_depth: 1
+    input_reliability: best_effort
+    output_qos_depth: 5
+    output_reliability: reliable
+    voxelization_mode: exact_fast
+    provenance_mode: full
+    engine_path: ""

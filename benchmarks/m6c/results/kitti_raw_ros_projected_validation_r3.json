@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "scientific_classification": "M6C_R3_POSITIVE_PROJECTED_REFERENCE_ROS_VALIDATION",
+  "recorded_at_utc": "2026-08-24T13:24:02.259017+00:00",
+  "final_cycle": true,
+  "performance_campaign": false,
+  "identities": {
+    "base_main": "ebbbc0bbc4423e3be476abcd1165f75a136fa54c",
+    "starting_head": "4e996b81df9481ff3a5b253db58c6580bbff91d7",
+    "reference_generation_commit": "03ce7729bea0d76028783234dee559fe32cf21db",
+    "measurement_implementation_commit": "28d81f3f9d4a5ce92d2dde7b3a6635c5079d1f4b",
+    "protocol_commit": "07c4ba293c3d0efbf01c7efb18d389a67828c3fc",
+    "protocol_path": "docs/m6/M6C_PROTOCOL_R3.md",
+    "protocol_file_sha256_at_measurement": "4ccce1b29e8b49239992aeb9afba467028cccd94959cd8f4d966c105cff5b39d",
+    "gate_1_evidence_commit": "27e3a00df915c77ddde579d43a0f91e011898496",
+    "gate_2_evidence_commit": "8dcabb123a839ff4bb343108c6eae7506a3c049f"
+  },
+  "projected_reference": {
+    "path": "benchmarks/m6c/preregistration/projected_reference_manifest.json",
+    "sha256": "c06cddc6884fef87de99d1c68ec2b5c1f1945f7f9e5ecae6fcb3e4275dd952a2",
+    "size_bytes": 606411,
+    "unique_conditions": 860,
+    "gate_1a_memberships": 24,
+    "gate_1b_memberships": 856,
+    "overlapping_memberships": 20,
+    "lineage": "accepted KITTI poses -> unit-quaternion projection -> independent matrix reconstruction -> offline relative composition -> MultiSweepBuilder -> float32 XYZT",
+    "platform_qualified": true
+  },
+  "original_vs_projected_characterization": {
+    "path": "benchmarks/m6c/diagnostics/r3_projected_vs_original_characterization.json",
+    "sha256": "3b4c04e4347af6d2d3640147b17be5152f90317c7943ca5a6132826e044d14f8",
+    "size_bytes": 4062,
+    "status": "DESCRIPTIVE_ONLY_NOT_A_GATE",
+    "total": {
+      "conditions": 856,
+      "model_ready_sha_identical": 0,
+      "model_ready_sha_different": 856,
+      "point_count_identical": 856,
+      "point_count_different": 0,
+      "signed_point_count_delta_min": 0,
+      "signed_point_count_delta_max": 0,
+      "maximum_absolute_point_count_delta": 0,
+      "total_original_points": 880487994,
+      "total_projected_points": 880487994
+    },
+    "H10": {
+      "conditions": 428,
+      "model_ready_sha_identical": 0,
+      "model_ready_sha_different": 428,
+      "point_count_identical": 428,
+      "point_count_different": 0,
+      "maximum_absolute_point_count_delta": 0,
+      "total_original_points": 569520061,
+      "total_projected_points": 569520061
+    },
+    "H5": {
+      "conditions": 428,
+      "model_ready_sha_identical": 0,
+      "model_ready_sha_different": 428,
+      "point_count_identical": 428,
+      "point_count_different": 0,
+      "maximum_absolute_point_count_delta": 0,
+      "total_original_points": 310967933,
+      "total_projected_points": 310967933
+    }
+  },
+  "gate_1": {
+    "status": "PASS",
+    "evidence_path": "benchmarks/m6c/results/r3_projected_ros_input_exactness.json",
+    "evidence_sha256": "a84a501fd7c5a48fc5421c8c507102b2b8a02aea2266b8fe0cbf18a3f3874549",
+    "evidence_size_bytes": 379364,
+    "gate_1a": {
+      "exact": 24,
+      "required": 24,
+      "failed": 0
+    },
+    "gate_1b": {
+      "exact": 856,
+      "required": 856,
+      "failed": 0
+    },
+    "unique_live_conditions": {
+      "exact": 860,
+      "required": 860,
+      "failed": 0
+    },
+    "overlap": {
+      "shared_conditions": 20,
+      "redundantly_replayed": false
+    },
+    "ros_counters": {
+      "raw_frames_received": 886,
+      "valid_raw_frames": 886,
+      "model_ready_outputs": 886,
+      "rejected_frames": 0,
+      "tf_failures": 0,
+      "history_resets": 0,
+      "invalid_points_filtered": 0
+    }
+  },
+  "gate_2": {
+    "status": "PASS",
+    "evidence_path": "benchmarks/m6c/results/r3_detector_parity_and_ros_contract.json",
+    "evidence_sha256": "e415b3067b12a0c501ef4854e2fa7df9cbf809456ffd3dbd7979d2ce7b50177b",
+    "evidence_size_bytes": 1457343,
+    "sentinel_conditions": 10,
+    "model_ready_inputs_reverified_exact": 10,
+    "parity_v2_stage_1": {
+      "overall_pass": true,
+      "failed_checks": [],
+      "exported_counts": {
+        "reference": 113,
+        "candidate": 113,
+        "absolute_difference": 0,
+        "per_condition_disagreements": 0
+      },
+      "high_confidence_coverage": {
+        "reference_to_candidate": 1.0,
+        "candidate_to_reference": 1.0,
+        "reference_matched": 81,
+        "reference_total": 81,
+        "candidate_matched": 81,
+        "candidate_total": 81
+      },
+      "continuous_metrics": {
+        "matched_detections": 81,
+        "each_metric_passed": 81,
+        "each_metric_pass_fraction": 1.0,
+        "maximum_xy_center_displacement_m": 0.06535089259586002,
+        "maximum_absolute_z_center_difference_m": 0.01766437292098999,
+        "maximum_dimension_relative_error": 0.0218415489563902,
+        "maximum_absolute_score_difference": 0.0019260644912719727,
+        "maximum_axis_yaw_difference_degrees": 0.6294702339083751,
+        "continuous_outliers": 0
+      },
+      "heading_direction": {
+        "agreement": 81,
+        "required": 81,
+        "agreement_fraction": 1.0
+      },
+      "high_confidence_class_mismatches": 0,
+      "threshold_edge_disagreements": 0,
+      "stage_2_required": false
+    },
+    "parity_inheritance_caveat": "The unchanged parity-v2 envelope was inherited from FP32/TensorRT deployment parity and was not statistically derived for quaternion-projection input noise. PASS means the representation-induced detector change stayed within the pre-existing semantic deployment envelope; it does not equate the two perturbation sources.",
+    "detector_node_counters": {
+      "received": 10,
+      "accepted": 10,
+      "published": 10,
+      "rejected": 0
+    }
+  },
+  "detection3darray_contract": {
+    "status": "PASS",
+    "passed": 10,
+    "required": 10,
+    "velocity_exposed": false,
+    "comparison": "each published Detection3DArray exactly represented its own candidate DetectionFrame under the accepted ROS semantic comparison"
+  },
+  "frozen_artifacts": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "onnx_sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+    "structural_40k_engine_sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f"
+  },
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "architecture": "x86_64",
+    "python": "3.10.12",
+    "numpy": "1.26.4",
+    "ros_distro": "Humble",
+    "rmw_implementation": "rmw_fastrtps_cpp"
+  },
+  "preserved_chronology": {
+    "r2": "FAIL: original-M6a byte equality stopped at frame 1; no downstream gate ran",
+    "d1": "DIAGNOSTIC: separated platform arithmetic, unit-quaternion/SO(3) projection, tf2 fidelity, float32 storage, and one downstream divergence",
+    "r3_feasibility": "PASS: projected-reference byte gate was achievable at full H10 depth",
+    "r3": "PASS: projected-reference ROS exactness, inherited parity-v2 Stage 1, and ROS output conversion"
+  },
+  "serialization_note": "The protocol commit is canonical. Gate 1 recorded the LF-materialized protocol SHA above. The frozen sentinel and parity evaluator identities retain their preregistered Windows CRLF byte identities. Git worktree line-ending materialization changed redundant file-byte hashes but did not change commits, source semantics, protocol thresholds, or observed outputs; no code or protocol was revised after observation.",
+  "claim_boundary": {
+    "validated": [
+      "raw PointCloud2 transport and decoding",
+      "timestamp handling",
+      "unit-quaternion TF publication and transport",
+      "time-aware fixed-frame tf2 composition",
+      "live history selection and ROS builder orchestration",
+      "model-ready PointCloud2 serialization",
+      "detector behavior inside the inherited parity-v2 semantic envelope",
+      "DetectionFrame to Detection3DArray semantic conversion"
+    ],
+    "not_revalidated": [
+      "official KITTI pose derivation",
+      "the internal mathematical correctness of MultiSweepBuilder"
+    ],
+    "not_claimed": [
+      "physical-LiDAR validation",
+      "portable byte hashes across arbitrary NumPy or platform combinations",
+      "performance, latency, throughput, or real-time operation",
+      "equivalence between quaternion-projection noise and FP16 numerical noise"
+    ]
+  },
+  "governance_outcome": {
+    "m6a": "complete",
+    "m6b": "complete",
+    "m6c": "complete — positive projected-reference ROS validation",
+    "m6": "complete",
+    "m5": "conditional and inactive",
+    "active_technical_submilestone": null,
+    "r4_authorized": false
+  }
+}

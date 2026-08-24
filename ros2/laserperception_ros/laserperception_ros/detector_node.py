@@ -23,8 +23,13 @@ from laserperception_ros.runtime import M3DetectorRuntime
 class LaserPerceptionDetectorNode(Node):
     """Bounded-QoS TensorRT detector initialized once at node startup."""
 
-    def __init__(self, *, runtime: Any | None = None) -> None:
-        super().__init__("laserperception_detector")
+    def __init__(
+        self,
+        *,
+        runtime: Any | None = None,
+        parameter_overrides: list[Any] | None = None,
+    ) -> None:
+        super().__init__("laserperception_detector", parameter_overrides=parameter_overrides)
         self.declare_parameter("input_topic", "/laserperception/points_model_ready")
         self.declare_parameter("output_topic", "/laserperception/detections")
         self.declare_parameter("marker_topic", "/laserperception/markers")

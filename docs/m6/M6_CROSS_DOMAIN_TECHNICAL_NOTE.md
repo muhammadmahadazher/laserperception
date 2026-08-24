@@ -10,15 +10,19 @@ from 0.242 with ten historical sweeps (H10) to 0.727 with five (H5), while Pedes
 from 0.553 to 0.677. H10 versus H5 was a compound history ablation, so the result establishes
 strong sensitivity to accumulated-history configuration but does not isolate temporal span,
 `time_lag`, point density, pillar population, or another individual cause. The 40,000-voxel cap was
-not supported as the primary explanation for the corpus-wide H10 deficit.
+not supported as the primary explanation for the corpus-wide H10 deficit. A final ROS integration
+cycle then reproduced 860/860 same-platform projected model-ready references exactly and passed the
+unchanged detector semantic envelope on ten frozen sentinels.
 
 ## Scope and claim boundary
 
-This is an offline, preregistered cross-domain characterization on two selected official KITTI Raw
-drives. It is not official KITTI AP, a leaderboard submission, a KITTI-trained detector result, a
-safety claim, evidence about every sensor or scene, or proof that H5 is universally preferable. It
-does not evaluate ROS, live sensing, latency, or real-time operation. The model, checkpoint, ONNX,
-precision, postprocessing, score threshold, class mapping, and voxel geometry remained frozen.
+The detector study is an offline, preregistered cross-domain characterization on two selected
+official KITTI Raw drives. The later M6c study is ROS integration-correctness evidence against a
+same-platform projected reference; it is not a new model experiment. Neither is official KITTI AP,
+a leaderboard submission, a KITTI-trained detector result, a safety claim, evidence about every
+sensor or scene, physical-LiDAR validation, or proof that H5 is universally preferable. M6 does not
+measure ROS latency or real-time operation. The model, checkpoint, ONNX, precision,
+postprocessing, score threshold, class mapping, and voxel geometry remained frozen.
 
 The first practical problem was not a score: the source and target data products expose the frozen
 deployment to materially different sampling and accumulation regimes.
@@ -262,6 +266,8 @@ The public Markdown result documents are the starting point:
 - [M6a R2 reconstruction result](M6A_RESULTS_R2.md)
 - [M6b Protocol R2](M6B_PROTOCOL_R2.md)
 - [M6b final result](M6B_RESULTS.md)
+- [M6c final Protocol R3](M6C_PROTOCOL_R3.md)
+- [M6c final R3 result](M6C_RESULTS_R3.md)
 
 The exact implementation/evidence identities are:
 
@@ -314,19 +320,56 @@ preserve H10 temporal timestamps while subsampling or otherwise controlling dens
 point and pillar population. Either experiment would need its own preregistered protocol and frozen
 corpus. M6 did not run either study and does not choose a production history setting.
 
-## What This Does Not Cover: ROS and Live Sensing
+## Final ROS integration: projected-reference exactness
 
-M6c, if separately authorized, is an integration-correctness task:
+M6c tested the completed integration chain:
 
 ```text
 KITTI Raw
   -> raw PointCloud2
   -> time-aware TF
   -> live multi-sweep builder
-  -> byte-exact comparison with the offline oracle
+  -> byte-exact comparison with a projected offline reference
   -> 40,000-profile engine
   -> Detection3DArray
 ```
 
-It is not another model study and has not started. M6b establishes the offline frozen-detector
-characterization; it does not pre-claim ROS reconstruction exactness, live behavior, or performance.
+The first R2 protocol remains failed. It asked ROS to reproduce the original M6a bytes. The
+serialized KITTI pose rotations were close to, but not exactly on, SO(3); ROS TF necessarily carries
+a unit quaternion. Consequently the original matrix cannot pass unchanged through that
+representation. Frame 0 passed, frame 1 failed, and no downstream R2 gate ran.
+
+The post-failure D1 ladder separated the boundaries:
+
+- T0 was the frozen Windows matrix;
+- T1 recomputed the matrix on WSL and exposed a small platform-arithmetic contribution;
+- T2 projected through a unit quaternion and produced the dominant representation difference;
+- T3 used real tf2 and was float32-faithful to T2;
+- T4 stored the builder transform and changed no float32 transform or output after projection.
+
+Frame 1 kept identical range membership, discrete voxel structure, retained membership, `coors`,
+and `num_points` despite feature perturbations. By frame 10, accumulated differences moved six
+points across voxel coordinates, changed retained-point membership and `num_points`, altered raw
+TensorRT outputs, and produced 302 rather than 301 detections. This was a real diagnostic finding,
+not evidence that tf2 was broken and not a reason to adopt a tolerance.
+
+Prospective R3 froze a same-platform reference only after mapping the accepted poses through the
+unit-quaternion representation. Its live Gate 1 passed 24/24 M6a target memberships, 856/856 full
+M6b H10/H5 memberships, and 860/860 unique conditions byte-for-byte. Gate 2 reverified all ten
+projected inputs, then passed every unchanged parity-v2 Stage 1 check: aggregate exported counts
+were 113/113, bidirectional high-confidence coverage was 81/81, all five continuous metrics passed
+81/81, class mismatches were zero, heading agreement was 81/81, and Stage 2 was not required. The
+final `Detection3DArray` conversion contract passed 10/10.
+
+Parity-v2 was originally accepted for FP32/TensorRT differences on identical model-ready inputs.
+R3 inherited it as the project's existing semantic envelope; it was not statistically derived for
+quaternion-projection noise. Passing means the resulting detector variation stayed inside that
+pre-existing envelope, not that the perturbation sources are experimentally equivalent.
+
+Gate 1 independently exercised PointCloud2 transport, timestamp handling, TF transport and
+fixed-frame composition, live history selection, ROS orchestration, and model-ready transport. It
+shared accepted KITTI decoding/poses and builder mathematics with the offline reference, so it did
+not independently revalidate pose derivation or the internal builder arithmetic. The result is
+platform-qualified WSL2/ROS software evidence. It does not claim original-M6a byte identity,
+physical-LiDAR validation, performance, or portability of the projected hashes. See the
+[frozen R3 protocol](M6C_PROTOCOL_R3.md) and [final result](M6C_RESULTS_R3.md).

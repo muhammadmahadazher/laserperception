@@ -1,0 +1,104 @@
+{
+  "comparison": "projected R3 reference minus frozen original M6b model-ready identity",
+  "generated_at_utc": "2026-08-24T12:38:41.870628+00:00",
+  "populations": {
+    "H10": {
+      "conditions_compared": 428,
+      "maximum_absolute_point_count_delta": 0,
+      "median_absolute_nonzero_point_count_delta": null,
+      "model_ready_sha_different": 428,
+      "model_ready_sha_identical": 0,
+      "point_count_different": 0,
+      "point_count_identical": 428,
+      "signed_point_count_delta_max": 0,
+      "signed_point_count_delta_min": 0,
+      "total_original_points": 569520061,
+      "total_projected_points": 569520061
+    },
+    "H5": {
+      "conditions_compared": 428,
+      "maximum_absolute_point_count_delta": 0,
+      "median_absolute_nonzero_point_count_delta": null,
+      "model_ready_sha_different": 428,
+      "model_ready_sha_identical": 0,
+      "point_count_different": 0,
+      "point_count_identical": 428,
+      "signed_point_count_delta_max": 0,
+      "signed_point_count_delta_min": 0,
+      "total_original_points": 310967933,
+      "total_projected_points": 310967933
+    },
+    "total": {
+      "conditions_compared": 856,
+      "maximum_absolute_point_count_delta": 0,
+      "median_absolute_nonzero_point_count_delta": null,
+      "model_ready_sha_different": 856,
+      "model_ready_sha_identical": 0,
+      "point_count_different": 0,
+      "point_count_identical": 856,
+      "signed_point_count_delta_max": 0,
+      "signed_point_count_delta_min": 0,
+      "total_original_points": 880487994,
+      "total_projected_points": 880487994
+    }
+  },
+  "project_commit": "3b39e2b3d47d39d57f21c75e87fb8122e31cd058",
+  "schema_version": 1,
+  "scope": {
+    "detector_executed": false,
+    "gpu_initialized": false,
+    "point_count_equality_is_gate": false,
+    "ros_outputs_observed": false
+  },
+  "source_artifacts": {
+    "d1_downstream": {
+      "path": "benchmarks/m6c/diagnostics/post_failure_downstream_frame10_h10.json",
+      "sha256": "6346a9d0f9916ea4c6e2abb4e7f9c58587a49a5f3b4cbe7ac9d2a6b4b2c3cd3c",
+      "size_bytes": 7245,
+      "verification_source": "current worktree"
+    },
+    "d1_transform": {
+      "path": "benchmarks/m6c/diagnostics/post_failure_tf_representation.json",
+      "sha256": "07ea0434fb5833c96d8e6c619a8459cb43c30bbde97d5cfdba96ac8288f3db5d",
+      "size_bytes": 12477,
+      "verification_source": "current worktree"
+    },
+    "detector_sentinels": {
+      "path": "benchmarks/m6c/preregistration/detector_sentinels.json",
+      "sha256": "e80e803fe8923a52ced1bdecd17841a4cf915352a56ea5427607746409cf3be3",
+      "size_bytes": 1492097,
+      "verification_source": "external canonical tracked bytes"
+    },
+    "m6a": {
+      "path": "benchmarks/m6a/results/kitti_raw_offline_reconstruction.json",
+      "sha256": "a62da9808079994d971c4d47bbdf04f2c50d44ddcfd0c7958f7534512552155b",
+      "size_bytes": 204306,
+      "verification_source": "current worktree"
+    },
+    "m6b": {
+      "path": "benchmarks/m6b/results/kitti_raw_cross_domain_characterization.json",
+      "sha256": "b9d47120aabb38733d79f987f16277ebab626d2b7c13159c40c30a68b76c1d26",
+      "size_bytes": 111529,
+      "verification_source": "current worktree"
+    },
+    "m6b_input_ledger": {
+      "path": "benchmarks/m6b/diagnostics/pre_inference_input_ledger.json",
+      "sha256": "2413224808b0140856a0e00f884c53bc9b49ec6b545172f5e7fa57d00802dc15",
+      "size_bytes": 594264,
+      "verification_source": "current worktree"
+    },
+    "r2_failure": {
+      "path": "benchmarks/m6c/diagnostics/gate_a_failure_frame_0000000001.json",
+      "sha256": "fd319dfcb13da570c62d83b4475531bbbd735845808225ebffee4afe03f1cea4",
+      "size_bytes": 5662,
+      "verification_source": "current worktree"
+    },
+    "r3_feasibility": {
+      "path": "benchmarks/m6c/diagnostics/r3_projected_reference_feasibility.json",
+      "sha256": "b3d2503ed513d258fe2526c162e8e53a51df509a38c6a258a248fcbe29be6b4b",
+      "size_bytes": 19377,
+      "verification_source": "current worktree"
+    }
+  },
+  "status": "DESCRIPTIVE_ONLY_NOT_A_GATE"
+}

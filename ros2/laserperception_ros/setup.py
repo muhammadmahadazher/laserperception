@@ -11,11 +11,20 @@ setup(
         (f"share/{PACKAGE_NAME}", ["package.xml"]),
         (
             f"share/{PACKAGE_NAME}/launch",
-            ["launch/m3_demo.launch.py", "launch/m45b_raw_multisweep.launch.py"],
+            [
+                "launch/m3_demo.launch.py",
+                "launch/m45b_raw_multisweep.launch.py",
+                "launch/m6c_kitti_replay.launch.py",
+            ],
         ),
         (
             f"share/{PACKAGE_NAME}/config",
-            ["config/m3_ros2.yaml", "config/m3_demo.rviz", "config/m45b_multisweep.yaml"],
+            [
+                "config/m3_ros2.yaml",
+                "config/m3_demo.rviz",
+                "config/m45b_multisweep.yaml",
+                "config/m6c_kitti_ros_exactness.yaml",
+            ],
         ),
         (
             f"share/{PACKAGE_NAME}/config/detection",
@@ -36,6 +45,7 @@ setup(
     entry_points={
         "console_scripts": [
             "laserperception_detector = laserperception_ros.detector_node:main",
+            "laserperception_kitti_raw_replay = laserperception_ros.kitti_raw_replay_node:main",
             "laserperception_multisweep_builder = laserperception_ros.multisweep_node:main",
             "laserperception_nuscenes_raw_replay = laserperception_ros.raw_replay_node:main",
             "laserperception_replay = laserperception_ros.replay_node:main",
