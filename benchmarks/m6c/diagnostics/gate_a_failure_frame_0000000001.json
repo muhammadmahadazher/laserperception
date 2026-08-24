@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "milestone": "M6c",
+  "status": "FAILED_GATE_A_M6A_ROS_INPUT_EXACTNESS",
+  "measurement_commit": "0a8419978d265571b51f943ffc797b5fcc78c4ca",
+  "implementation_commit": "3c4c76d9fbf9ff8787cee9fb8fa0e7dc1e72de18",
+  "base_main_commit": "ebbbc0bbc4423e3be476abcd1165f75a136fa54c",
+  "recorded_at_utc_offset": "2026-08-24T13:42:52.762897+05:00",
+  "protocol": {
+    "path": "docs/m6/M6C_PROTOCOL.md",
+    "revision": "R2",
+    "commit": "0a8419978d265571b51f943ffc797b5fcc78c4ca"
+  },
+  "source_evidence": {
+    "m6a": {
+      "path": "benchmarks/m6a/results/kitti_raw_offline_reconstruction.json",
+      "sha256": "a62da9808079994d971c4d47bbdf04f2c50d44ddcfd0c7958f7534512552155b"
+    },
+    "m6b_input_ledger": {
+      "path": "benchmarks/m6b/diagnostics/pre_inference_input_ledger.json",
+      "sha256": "2413224808b0140856a0e00f884c53bc9b49ec6b545172f5e7fa57d00802dc15"
+    }
+  },
+  "environment": {
+    "os_boundary": "WSL2 on Windows",
+    "ros_distro": "Humble",
+    "rmw_implementation": "rmw_fastrtps_cpp",
+    "python": "3.10",
+    "detector_initialized": false,
+    "gpu_used": false
+  },
+  "pre_output_chronology": [
+    {
+      "protocol_commit": "ddfd9f0eb6b8f82d66078bd6bff15d9f9769dbc8",
+      "status": "stopped_before_publication",
+      "reason": "ROS rejected a harness topic token beginning with a numeric drive suffix"
+    },
+    {
+      "protocol_commit": "05f1ceb88993a596bd16c2fc4aa01629dd01fd60",
+      "status": "stopped_before_publication",
+      "reason": "the replay helper imposed 1e-10 on official calibration serialized at an approximately 8.49e-8 orthonormality residual"
+    }
+  ],
+  "gate_a": {
+    "required_conditions": 24,
+    "pass": 1,
+    "fail": 1,
+    "pending_after_fail_closed_stop": 22,
+    "frame_0000000000": {
+      "history_depth": 0,
+      "status": "PASS",
+      "expected_sha256": "68e5350355a3a284fdc8477a9e6222fd48d6f3eeada07d5bac5e20adcf3dac23",
+      "observed_sha256": "68e5350355a3a284fdc8477a9e6222fd48d6f3eeada07d5bac5e20adcf3dac23"
+    },
+    "first_failure": {
+      "drive": "2011_09_26_drive_0001",
+      "frame": "0000000001",
+      "condition": "H10",
+      "history_depth": 1,
+      "timestamp_nanoseconds": 1317042146054281661,
+      "expected_sha256": "4088c7ca546aa4b9a00f485153d4a00fd7ed92cde1e7c70f3a24bb6ab883bf7e",
+      "observed_sha256": "5bd1d66a1cfe553ae91493b7eb48f36233afe0947f8ab096576f40d2557f16f7",
+      "point_count": {
+        "expected": 237342,
+        "observed": 237342,
+        "exact": true
+      },
+      "shape": {
+        "expected": [237342, 4],
+        "observed": [237342, 4],
+        "exact": true
+      },
+      "dtype": {
+        "expected": "float32",
+        "observed": "float32",
+        "exact": true
+      },
+      "timestamp_exact": true,
+      "history_depth_exact": true,
+      "frame_id": "kitti_model_aligned_lidar",
+      "byte_exact": false
+    }
+  },
+  "first_differing_boundary": {
+    "boundary": "historical-sweep transform after ROS unit-quaternion TF representation",
+    "current_rows_exact": true,
+    "time_lag_column_exact": true,
+    "frozen_expected_transform_sha256": "c0c66df4237968a1c0ced2f3bc260d01158e97ef5a5e4bb359efaace9369e733",
+    "observed_ros_transform_sha256": "a57ade3532cca9ff0e6a3eb8998a5ba57c882482f10f97d0fc6112abd5336f9e",
+    "differing_transform_float32_values": 6,
+    "maximum_transform_absolute_difference": 1.1920928955078125e-7,
+    "frozen_expected_transform": [
+      [0.9999971389770508, 0.0022745956666767597, 0.0007231245399452746, -0.008673292584717274],
+      [-0.002273820573464036, 0.9999968409538269, -0.0010710501810535789, 1.440872311592102],
+      [-0.0007255583768710494, 0.001069402671419084, 0.9999991655349731, 0.01827140524983406],
+      [0.0, 0.0, 0.0, 1.0]
+    ],
+    "observed_ros_transform": [
+      [0.9999971389770508, 0.0022745956666767597, 0.0007231245399452746, -0.008673368953168392],
+      [-0.002273820573464036, 0.9999968409538269, -0.001071050064638257, 1.4408724308013916],
+      [-0.0007255584932863712, 0.001069402787834406, 0.9999991655349731, 0.01827140897512436],
+      [0.0, 0.0, 0.0, 1.0]
+    ],
+    "model_ready_difference": {
+      "differing_rows": 64629,
+      "differing_float32_values": 77354,
+      "first_difference": {
+        "row": 118823,
+        "column": 2,
+        "field": "z",
+        "expected": 1.8668029308319092,
+        "observed": 1.8668030500411987,
+        "absolute_difference": 1.1920928955078125e-7
+      },
+      "maximum_absolute_difference_by_xyzt": [
+        1.9073486328125e-6,
+        1.9073486328125e-6,
+        2.384185791015625e-7,
+        0.0
+      ]
+    }
+  },
+  "platform_serialization_context": {
+    "windows_direct_KittiRawSequence_frame_1_sha256": "4088c7ca546aa4b9a00f485153d4a00fd7ed92cde1e7c70f3a24bb6ab883bf7e",
+    "wsl_direct_KittiRawSequence_frame_1_sha256": "7da7dfe8a080443c25e49458af8887f122d1acfdc498305c09bef2a66ebb5139",
+    "wsl_ros_frame_1_sha256": "5bd1d66a1cfe553ae91493b7eb48f36233afe0947f8ab096576f40d2557f16f7",
+    "interpretation": "M6b froze float32 transforms to remove platform-dependent inverse/composition serialization. The real ROS TF boundary additionally represents rotations as unit quaternions. The exact frozen transform is therefore not reproduced by the OXTS-derived ROS TF path at the first historical frame."
+  },
+  "downstream_stop": {
+    "gate_b_started": false,
+    "gate_b_pass": 0,
+    "gate_b_pending": 856,
+    "detector_sentinel_gate_started": false,
+    "detector_inference_performed": false,
+    "engine_initialized": false,
+    "performance_campaign_performed": false
+  },
+  "scientific_decision": "M6c NOT READY — M6A ROS INPUT EXACTNESS FAILED"
+}
