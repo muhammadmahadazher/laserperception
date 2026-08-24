@@ -202,7 +202,7 @@ def _capture_live_condition(
     history_depth: int,
     timeout_sec: float,
 ) -> tuple[PointCloud2, tuple[SweepTransform, ...], dict[str, int]]:
-    suffix = f"{drive[-4:]}_{current_index}_{history_depth}"
+    suffix = f"drive_{drive[-4:]}_{current_index}_{history_depth}"
     raw_topic = f"/laserperception/m6c/r3_feasibility/{suffix}/raw"
     model_topic = f"/laserperception/m6c/r3_feasibility/{suffix}/model_ready"
     start_index = current_index - history_depth
