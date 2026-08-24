@@ -295,6 +295,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--engine", type=Path, required=True)
+    parser.add_argument(
+        "--sentinels",
+        type=Path,
+        default=_root() / "benchmarks/m6c/preregistration/detector_sentinels.json",
+    )
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--full-result", type=Path, required=True)
     parser.add_argument("--diagnostic-commit", required=True)
@@ -306,8 +311,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     _require_identity(args.diagnostic_commit)
-    root = _root()
-    sentinel_path = root / "benchmarks/m6c/preregistration/detector_sentinels.json"
+    sentinel_path = args.sentinels.expanduser().resolve()
     full_ledger_path = args.full_ledger.expanduser().resolve()
     full_result_path = args.full_result.expanduser().resolve()
     if sha256_file(sentinel_path) != SENTINEL_SHA256:
