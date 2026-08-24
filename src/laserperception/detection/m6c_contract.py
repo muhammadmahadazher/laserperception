@@ -154,3 +154,157 @@ class M6cInputProgress:
             encoding="utf-8",
         )
         temporary.replace(self.path)
+
+
+@dataclass(frozen=True, slots=True)
+class M6cR3ProgressIdentity:
+    """Frozen identities binding every resumable final-R3 live comparison."""
+
+    protocol_commit: str
+    implementation_commit: str
+    projected_manifest_sha256: str
+
+    def to_dict(self) -> dict[str, str]:
+        """Return the stable JSON representation."""
+
+        return {
+            "protocol_commit": self.protocol_commit,
+            "implementation_commit": self.implementation_commit,
+            "projected_manifest_sha256": self.projected_manifest_sha256,
+        }
+
+
+class M6cR3InputProgress:
+    """Atomic fail-closed ledger for the 860 unique projected-reference conditions."""
+
+    def __init__(
+        self,
+        path: str | Path,
+        identity: M6cR3ProgressIdentity,
+        condition_keys: Sequence[str],
+    ) -> None:
+        self.path = Path(path)
+        self.identity = identity
+        keys = tuple(condition_keys)
+        if not keys or len(keys) != len(set(keys)):
+            raise ValueError("M6c R3 progress condition keys must be non-empty and unique")
+        self._keys = keys
+        self.record = self._load_or_initialize()
+
+    def passed(
+        self,
+        key: str,
+        *,
+        expected_sha256: str,
+        expected_point_count: int,
+        expected_history_depth: int,
+        expected_timestamp_nanoseconds: int,
+    ) -> bool:
+        """Return whether one condition passed under every identical frozen identity."""
+
+        condition = self._condition(key)
+        return condition.get("status") == "PASS" and all(
+            (
+                condition.get("expected_sha256") == expected_sha256,
+                condition.get("observed_sha256") == expected_sha256,
+                condition.get("expected_point_count") == expected_point_count,
+                condition.get("observed_point_count") == expected_point_count,
+                condition.get("expected_history_depth") == expected_history_depth,
+                condition.get("observed_history_depth") == expected_history_depth,
+                condition.get("expected_timestamp_nanoseconds") == expected_timestamp_nanoseconds,
+                condition.get("observed_timestamp_nanoseconds") == expected_timestamp_nanoseconds,
+            )
+        )
+
+    def mark(
+        self,
+        key: str,
+        *,
+        status: str,
+        expected_sha256: str,
+        observed_sha256: str,
+        expected_point_count: int,
+        observed_point_count: int,
+        expected_history_depth: int,
+        observed_history_depth: int,
+        expected_timestamp_nanoseconds: int,
+        observed_timestamp_nanoseconds: int,
+        elapsed_seconds: float,
+    ) -> None:
+        """Atomically record one comparison before continuing."""
+
+        if status not in {"PASS", "FAIL"}:
+            raise ValueError("M6c R3 progress status must be PASS or FAIL")
+        self._condition(key)
+        conditions = self.record["conditions"]
+        assert isinstance(conditions, dict)
+        conditions[key] = {
+            "status": status,
+            "expected_sha256": expected_sha256,
+            "observed_sha256": observed_sha256,
+            "expected_point_count": expected_point_count,
+            "observed_point_count": observed_point_count,
+            "expected_history_depth": expected_history_depth,
+            "observed_history_depth": observed_history_depth,
+            "expected_timestamp_nanoseconds": expected_timestamp_nanoseconds,
+            "observed_timestamp_nanoseconds": observed_timestamp_nanoseconds,
+            "elapsed_seconds": elapsed_seconds,
+            "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        self._write()
+
+    def totals(self) -> dict[str, int]:
+        """Return current PASS/FAIL/PENDING counts."""
+
+        conditions = self.record["conditions"]
+        assert isinstance(conditions, Mapping)
+        statuses = [str(value["status"]) for value in conditions.values()]
+        return {name.lower(): statuses.count(name) for name in ("PASS", "FAIL", "PENDING")}
+
+    def conditions(self) -> Mapping[str, object]:
+        """Return the current condition records for compact evidence generation."""
+
+        conditions = self.record["conditions"]
+        assert isinstance(conditions, Mapping)
+        return conditions
+
+    def _condition(self, key: str) -> dict[str, object]:
+        conditions = self.record["conditions"]
+        assert isinstance(conditions, dict)
+        if key not in conditions:
+            raise KeyError(f"condition is outside the frozen M6c R3 corpus: {key}")
+        value = conditions[key]
+        if not isinstance(value, dict):
+            raise RuntimeError("M6c R3 progress condition record is malformed")
+        return value
+
+    def _load_or_initialize(self) -> dict[str, object]:
+        expected_identity = self.identity.to_dict()
+        if self.path.exists():
+            value = json.loads(self.path.read_text(encoding="utf-8"))
+            if value.get("identity") != expected_identity:
+                raise RuntimeError("M6c R3 progress identity differs from the frozen run")
+            conditions = value.get("conditions")
+            if not isinstance(conditions, Mapping) or set(conditions) != set(self._keys):
+                raise RuntimeError("M6c R3 progress condition set differs from the frozen corpus")
+            return dict(value)
+        record: dict[str, object] = {
+            "schema_version": 1,
+            "identity": expected_identity,
+            "conditions": {key: {"status": "PENDING"} for key in self._keys},
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        self.record = record
+        self._write()
+        return record
+
+    def _write(self) -> None:
+        self.record["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+        self.record["totals"] = self.totals()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.path.with_suffix(self.path.suffix + ".tmp")
+        temporary.write_text(
+            json.dumps(self.record, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(self.path)

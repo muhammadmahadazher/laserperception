@@ -24,6 +24,8 @@ from laserperception.detection.live_multisweep import (
 from laserperception.detection.m6c_contract import (
     M6cInputProgress,
     M6cProgressIdentity,
+    M6cR3InputProgress,
+    M6cR3ProgressIdentity,
     require_file_sha256,
 )
 from laserperception.detection.ros2_contract import TimeStamp
@@ -145,6 +147,43 @@ def test_m6c_progress_resumes_only_under_identical_frozen_identity(tmp_path: Pat
     changed = M6cProgressIdentity("f" * 40, "b" * 40, "c" * 64, "d" * 64)
     with pytest.raises(RuntimeError, match="identity differs"):
         M6cInputProgress(path, changed, ["drive/frame|H10"])
+
+
+def test_m6c_r3_progress_resumes_only_with_identical_expected_condition(tmp_path: Path) -> None:
+    identity = M6cR3ProgressIdentity("a" * 40, "b" * 40, "c" * 64)
+    path = tmp_path / "r3-progress.json"
+    progress = M6cR3InputProgress(path, identity, ["drive/frame|H10"])
+    progress.mark(
+        "drive/frame|H10",
+        status="PASS",
+        expected_sha256="d" * 64,
+        observed_sha256="d" * 64,
+        expected_point_count=100,
+        observed_point_count=100,
+        expected_history_depth=10,
+        observed_history_depth=10,
+        expected_timestamp_nanoseconds=123,
+        observed_timestamp_nanoseconds=123,
+        elapsed_seconds=0.5,
+    )
+    resumed = M6cR3InputProgress(path, identity, ["drive/frame|H10"])
+    assert resumed.passed(
+        "drive/frame|H10",
+        expected_sha256="d" * 64,
+        expected_point_count=100,
+        expected_history_depth=10,
+        expected_timestamp_nanoseconds=123,
+    )
+    assert not resumed.passed(
+        "drive/frame|H10",
+        expected_sha256="e" * 64,
+        expected_point_count=100,
+        expected_history_depth=10,
+        expected_timestamp_nanoseconds=123,
+    )
+    changed_identity = M6cR3ProgressIdentity("a" * 40, "b" * 40, "e" * 64)
+    with pytest.raises(RuntimeError, match="identity differs"):
+        M6cR3InputProgress(path, changed_identity, ["drive/frame|H10"])
 
 
 def test_pose_helper_rejects_improper_rotation() -> None:
