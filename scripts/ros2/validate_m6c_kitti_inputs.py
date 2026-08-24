@@ -57,17 +57,30 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
+def _git_is_ancestor(ancestor: str, descendant: str) -> bool:
+    return (
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+            cwd=_root(),
+            check=False,
+            capture_output=True,
+        ).returncode
+        == 0
+    )
+
+
 def _require_measurement_identity(protocol_commit: str, implementation_commit: str) -> None:
     if _git("rev-parse", "HEAD") != protocol_commit:
         raise RuntimeError("M6c input gate must run at the exact protocol commit")
     if _git("status", "--porcelain", "--untracked-files=no"):
         raise RuntimeError("M6c input gate requires a clean tracked worktree")
-    if not _git("merge-base", "--is-ancestor", BASE_MAIN_SHA, protocol_commit):
+    if not _git_is_ancestor(BASE_MAIN_SHA, protocol_commit):
         raise RuntimeError("M6c protocol commit does not descend from the frozen base")
-    if not _git("merge-base", "--is-ancestor", implementation_commit, protocol_commit):
+    if not _git_is_ancestor(implementation_commit, protocol_commit):
         raise RuntimeError("M6c protocol does not descend from the frozen implementation")
     protocol_path = _root() / "docs/m6/M6C_PROTOCOL.md"
-    if _git("log", "-1", "--format=%H", "--", str(protocol_path)) != protocol_commit:
+    protocol_relative = protocol_path.relative_to(_root()).as_posix()
+    if _git("log", "-1", "--format=%H", "--", protocol_relative) != protocol_commit:
         raise RuntimeError("M6c protocol file was not frozen by the claimed protocol commit")
 
 
