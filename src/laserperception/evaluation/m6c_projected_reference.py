@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 import numpy as np
@@ -13,6 +14,7 @@ from laserperception.detection.multisweep import (
     LidarPose,
     MultiSweepBuilder,
     MultiSweepBuilderConfig,
+    RawSweep,
     SweepTransform,
 )
 from laserperception.detection.ros2_contract import ModelReadyPointCloud
@@ -107,18 +109,52 @@ def build_projected_reference(
         raise TypeError("history_depth must be an integer")
     if history_depth <= 0:
         raise ValueError("history_depth must be positive")
-    current = sequence.frame(current_index).to_raw_sweep()
-    current_pose = sequence.lidar_pose(current_index)
     first_index = max(-1, current_index - history_depth - 1)
     historical_indices = tuple(range(current_index - 1, first_index, -1))
+    required_indices = (current_index, *historical_indices)
+    sweeps = {index: sequence.frame(index).to_raw_sweep() for index in required_indices}
+    poses = {index: sequence.lidar_pose(index) for index in required_indices}
+    return build_projected_reference_from_sources(
+        current_index=current_index,
+        history_depth=history_depth,
+        sweeps=sweeps,
+        poses=poses,
+    )
+
+
+def build_projected_reference_from_sources(
+    *,
+    current_index: int,
+    history_depth: int,
+    sweeps: Mapping[int, RawSweep],
+    poses: Mapping[int, LidarPose],
+) -> ProjectedReferenceResult:
+    """Build a projected reference from preloaded raw sweeps and accepted poses."""
+
+    if isinstance(history_depth, bool) or not isinstance(history_depth, int):
+        raise TypeError("history_depth must be an integer")
+    if history_depth <= 0:
+        raise ValueError("history_depth must be positive")
+    first_index = max(-1, current_index - history_depth - 1)
+    historical_indices = tuple(range(current_index - 1, first_index, -1))
+    required_indices = (current_index, *historical_indices)
+    missing_sweeps = [index for index in required_indices if index not in sweeps]
+    missing_poses = [index for index in required_indices if index not in poses]
+    if missing_sweeps or missing_poses:
+        raise KeyError(
+            "projected-reference sources are incomplete: "
+            f"missing sweeps={missing_sweeps}, missing poses={missing_poses}"
+        )
+    current = sweeps[current_index]
+    current_pose = poses[current_index]
     transforms: list[SweepTransform] = []
     historical: list[HistoricalSweep] = []
     for index in historical_indices:
-        sweep = sequence.frame(index).to_raw_sweep()
+        sweep = sweeps[index]
         transform = projected_relative_transform(
             source_id=sweep.source_id,
             target_id=current.source_id,
-            historical_pose=sequence.lidar_pose(index),
+            historical_pose=poses[index],
             current_pose=current_pose,
         )
         transforms.append(transform)

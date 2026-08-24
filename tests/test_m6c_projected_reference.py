@@ -3,8 +3,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from laserperception.detection.multisweep import LidarPose
+from laserperception.detection.multisweep import LidarPose, RawSweep
 from laserperception.evaluation.m6c_projected_reference import (
+    build_projected_reference_from_sources,
     projected_relative_transform,
     projected_world_pose,
 )
@@ -63,3 +64,43 @@ def test_projected_reference_history_depth_is_fail_closed(history_depth: object)
 
     with pytest.raises((TypeError, ValueError)):
         build_projected_reference(None, current_index=10, history_depth=history_depth)  # type: ignore[arg-type]
+
+
+def test_projected_reference_accepts_preloaded_sources_without_changing_order() -> None:
+    sweeps = {
+        index: RawSweep(
+            np.array([[float(index), 1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
+            timestamp_microseconds=1_000_000 + index * 100_000,
+            source_id=f"frame-{index}",
+        )
+        for index in range(3)
+    }
+    poses = {index: _pose(np.eye(3), (float(index), 0.0, 0.0)) for index in range(3)}
+    result = build_projected_reference_from_sources(
+        current_index=2,
+        history_depth=10,
+        sweeps=sweeps,
+        poses=poses,
+    )
+    assert result.historical_indices == (1, 0)
+    assert [transform.source_id for transform in result.transforms] == ["frame-1", "frame-0"]
+    assert result.point_cloud.points_xyzt.shape == (3, 4)
+    np.testing.assert_array_equal(
+        result.point_cloud.points_xyzt[:, 3],
+        np.array([0.0, 0.1, 0.2], dtype=np.float32),
+    )
+
+
+def test_projected_reference_preloaded_sources_fail_closed_when_incomplete() -> None:
+    sweep = RawSweep(
+        np.array([[0.0, 1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
+        timestamp_microseconds=1_000_000,
+        source_id="frame-0",
+    )
+    with pytest.raises(KeyError, match="sources are incomplete"):
+        build_projected_reference_from_sources(
+            current_index=1,
+            history_depth=1,
+            sweeps={0: sweep},
+            poses={0: _pose(np.eye(3), (0.0, 0.0, 0.0))},
+        )

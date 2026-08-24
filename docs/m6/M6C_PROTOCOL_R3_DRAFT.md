@@ -74,12 +74,29 @@ KITTI Raw
   -> model-ready PointCloud2
 ```
 
+| Component | Projected offline reference | Live ROS path | Relationship |
+|---|---|---|---|
+| KITTI Raw decoding | accepted `KittiRawSequence` semantics | same accepted source decoding and replay | shared source semantics |
+| Absolute KITTI poses | accepted OXTS/calibration poses | same accepted poses | shared |
+| Matrix → unit quaternion definition | frozen conversion | frozen conversion used for TF publication | shared representation boundary |
+| Historical relative transform composition | direct offline matrix composition after projection | `lookup_transform_full` through the fixed frame | independent computation |
+| Raw point transport | direct `RawSweep` input | PointCloud2 serialization, transport, and decoding | independent live boundary |
+| History selection | offline requested historical set | `LiveSweepHistory` in the ROS node | independent |
+| Builder mathematics | existing `MultiSweepBuilder` contract | existing `MultiSweepBuilder` used by the live node | shared arithmetic |
+| Model-ready transport | direct in-memory reference | ROS PointCloud2 publication and decoding | independent live boundary |
+
 Both paths share accepted KITTI decoding and source poses, the frozen matrix-to-unit-quaternion
 definition, and the `MultiSweepBuilder` mathematical contract. The projected reference does not
 obtain transforms from tf2, `LaserPerceptionMultiSweepNode`, or messages produced by the live
 path. The live builder node consumes only published PointCloud2 bytes and tf2. The comparison
 therefore covers ROS serialization, timestamps, TF transport, cross-time fixed-frame composition,
 history selection, and live builder integration.
+
+Gate 1 would validate PointCloud2 transport, timestamp handling, TF publication and transport,
+time-aware fixed-frame composition, live history selection, ROS builder orchestration, and
+model-ready PointCloud2 serialization. It would not independently revalidate official KITTI pose
+derivation or the internal mathematical correctness of `MultiSweepBuilder`; those claims are
+already covered by earlier milestones.
 
 ## Bounded feasibility result
 
@@ -158,6 +175,16 @@ Reuse is proposed because these preregistered thresholds already define LaserPer
 accepted deployment semantic equivalence, predate M6c and the observed frame-10 301-versus-302
 diagnostic, and avoid inventing post-hoc M6c tolerances. R3 must not change a threshold, count
 guard, confidence boundary, matcher, sample, or class.
+
+Parity-v2 was originally accepted for rewritten/native FP32 versus TensorRT FP16 comparison on
+identical model-ready inputs. R3 would apply the same unchanged numerical envelope to a different
+source of variation: detector outputs caused by the ROS-representable projected input rather than
+FP16 deployment arithmetic alone. The thresholds are inherited as LaserPerception's pre-existing
+semantic deployment standard; they were not statistically derived for quaternion-projection input
+noise. A Gate 2 pass would mean only that the representation-induced detector change remained
+inside that inherited envelope. It would not establish that this perturbation is experimentally
+equivalent to the original FP32-versus-FP16 comparison. Reuse remains preferable to inventing an
+M6c tolerance after observing M6c outcomes.
 
 The inspected parity-v2 contract is `configs/detection/m2_parity_v2.yaml` at SHA256
 `91e7cde19076c6452d9ff8e0fefc893a6d429622ed30c2da88127d29d4418df0`. Its Stage 1 evaluator,
