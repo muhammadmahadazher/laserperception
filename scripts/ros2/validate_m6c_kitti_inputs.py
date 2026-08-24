@@ -209,7 +209,7 @@ def _run_pass(
     depth = CONDITION_DEPTHS[condition]
     start_frame = max(0, min(targets) - depth)
     end_frame = max(targets)
-    suffix = f"{drive[-4:]}_{condition.lower()}"
+    suffix = f"drive_{drive[-4:]}_{condition.lower()}"
     raw_topic = f"/laserperception/m6c/{suffix}/raw"
     model_topic = f"/laserperception/m6c/{suffix}/model_ready"
     replay = KittiRawReplayNode(
