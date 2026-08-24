@@ -7,12 +7,14 @@ modifying the repository. User instructions take precedence when they explicitly
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
 M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
-is in progress. M6a is complete under prospective Protocol R2: the original Tier-A failure remains
+is complete. M6a is complete under prospective Protocol R2: the original Tier-A failure remains
 failed, R1 diagnosed its data-product/timing cause, and the new canonical offline oracle passed
 without relaxing that historical gate. M6b is complete under owner-approved Protocol R2: preserve
 the original 30k-engine failure, the prospective 40k remediation, and the frozen 428-frame H10/H5
-cross-domain characterization. M6c is planned but not started and requires separate owner
-authorization. No technical submilestone is currently active. M5 remains conditional and inactive.
+cross-domain characterization. M6c is complete with a positive final R3 projected-reference ROS
+validation result; preserve the original R2 failure and D1 diagnosis. No technical submilestone is
+currently active. M5 remains conditional and inactive. Any next milestone requires explicit owner
+authorization.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -47,23 +49,24 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 - M4.6: v0.2.0 release engineering for the accepted M4.5 capability — complete.
 - M5: conditional physical Jetson measurements only if target hardware is actually available and
   the owner explicitly activates the milestone; currently inactive.
-- M6: cross-domain validation using official KITTI Raw data — in progress.
+- M6: cross-domain validation using official KITTI Raw data — complete.
 - M6a: KITTI Raw discovery, dataset contract, exact Raw-devkit pose/calibration verification,
   model-frame alignment, and ROS-independent reconstruction oracle — complete under prospective
   Protocol R2. Preserve the original Tier-A FAIL and the post-failure R1 diagnosis.
 - M6b: offline frozen-detector execution, Raw-tracklet domain-shift characterization, history-10
   versus history-5 comparison, and deterministic visualization — complete under owner-approved
   Protocol R2.
-- M6c: KITTI Raw ROS replay, time-aware tf2, live reconstruction exactness, and ROS detector-path
-  verification — planned; not started.
+- M6c: KITTI Raw ROS replay, time-aware tf2, projected-reference live reconstruction exactness,
+  unchanged detector semantic-envelope verification, and ROS output-contract validation — complete
+  with a positive final R3 result. Preserve the R2 failure and D1 diagnosis.
 
 Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. M6b is closed under
-its frozen Protocol R2 and does not authorize follow-on tuning. M6c requires separate explicit
-owner authorization. M6a did not initialize or run the detector on KITTI, change the frozen
-runtime, implement ROS replay, or begin any M6b work; its canonical output is the offline exactness
-oracle used by M6b and a future M6c.
+optimization, or unrelated features unless the owner explicitly changes scope. M6 is closed and
+does not authorize follow-on tuning, R4, or another technical milestone. M6a did not initialize or
+run the detector on KITTI, change the frozen runtime, or implement ROS replay; its canonical output
+is the offline exactness oracle used by M6b. M6c's same-platform projected references are a distinct
+ROS-representable product and must not be described as the M6a oracle.
 
 ## Detection and deployment architecture
 

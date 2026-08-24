@@ -1,5 +1,8 @@
 # M6c KITTI Raw ROS exactness result
 
+> **Preserved historical result:** R2 remains a failed protocol. The final M6c outcome is
+> documented in [M6C_RESULTS_R3.md](M6C_RESULTS_R3.md).
+
 Status: **M6c NOT READY — M6A ROS INPUT EXACTNESS FAILED**
 
 M6c stopped at Gate A under prospective Protocol R2, commit

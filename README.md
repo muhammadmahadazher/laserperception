@@ -37,7 +37,10 @@ the [multi-sweep evidence](docs/MULTISWEEP.md).
 **Cross-domain KITTI Raw study:** the frozen detector's Car recall changed from 0.242 under H10 to
 0.727 under H5 without fine-tuning. H10/H5 is a compound temporal-and-density ablation, and the
 preregistered 40,000-voxel-cap hypothesis was not supported as the primary corpus-wide explanation.
-[Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICAL_NOTE.md).
+Final ROS integration reproduced 860/860 same-platform projected references exactly and passed the
+unchanged detector semantic envelope on ten frozen sentinels; the original R2 byte-exactness failure
+remains preserved. [Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICAL_NOTE.md) or the
+[final M6c result](docs/m6/M6C_RESULTS_R3.md).
 
 ## What v0.2.0 does—and what was measured
 

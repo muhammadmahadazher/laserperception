@@ -1,12 +1,14 @@
 # Roadmap
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
-M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is in
-progress. M6a is complete under prospective Protocol R2; the original Tier-A failure remains
+M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is
+complete. M6a is complete under prospective Protocol R2; the original Tier-A failure remains
 preserved as a failure. M6b is complete under owner-approved Protocol R2 after structural 40k
 remediation, the non-evaluation H5 profile-gap parity gate, and the full frozen offline
-characterization. M6c is planned but not started. No technical submilestone is currently active,
-and M5 remains conditional and inactive.
+characterization. M6c is complete with a positive final R3 projected-reference ROS validation;
+the original R2 failure and D1 diagnosis remain preserved. No technical submilestone is currently
+active, M5 remains conditional and inactive, and any next milestone requires explicit owner
+authorization.
 
 ## Completed foundations
 
@@ -58,7 +60,7 @@ M4.6 did not reopen runtime implementation, correctness protocols, or performanc
 later milestone activates automatically; any next technical work requires explicit owner
 authorization.
 
-## M6 — in progress; M6b complete under Protocol R2
+## M6 — complete
 
 - [x] **M6a — complete under Protocol R2:** authoritative KITTI Raw discovery, dataset contract,
   direct official Raw-devkit pose/calibration verification, model-frame alignment, exact raw
@@ -68,9 +70,11 @@ authorization.
   compound analysis, capacity diagnostics, and deterministic offline visualization. The original
   30k-engine failure remains failed; the prospective structural 40k engine passed nuScenes,
   non-evaluation KITTI, profile-gap, repeatability, and full-corpus execution gates.
-- [ ] **M6c — planned / not started:** KITTI Raw PointCloud2 replay, time-aware tf2, live
-  reconstruction exactness against M6a/M6b inputs, and ROS detector-path verification. M6c awaits
-  separate explicit owner authorization.
+- [x] **M6c — complete; positive final R3 result:** KITTI Raw PointCloud2 replay, time-aware tf2,
+  24/24 Gate 1A and 856/856 Gate 1B projected-reference exactness (860/860 unique live conditions),
+  unchanged parity-v2 Stage 1 PASS on ten frozen detector sentinels, and 10/10 exact
+  `Detection3DArray` conversions. R2 remains a preserved original-reference byte-exactness failure;
+  D1 remains its post-failure diagnosis.
 
 At measurement commit `ec9e341056807d5549353c8ef362fd109b25f2f2`, 271 mapped frames differed
 from the official odometry oracle by as much as 0.0884767 m translation and 0.000416629 rad
@@ -87,9 +91,10 @@ at `1ab832df89109546abedc9f4e7f21c16c4cd0dca` passed 271/271 exact pose-oracle c
 repeats each. See `docs/m6/M6A_RESULTS_R2.md`.
 
 M6a remains limited to engineering interoperability. It did not initialize or run the detector on
-KITTI, inspect predictions, or implement ROS replay. M6b then completed its separately authorized
-offline evaluation under frozen Protocol R2 without target-domain tuning. No later M6 work starts
-automatically; M6c does not start without separate owner authorization.
+KITTI, inspect predictions, or implement ROS replay. M6b completed its separately authorized
+offline evaluation under frozen Protocol R2 without target-domain tuning. M6c then completed its
+separately authorized integration-correctness cycle without tuning or performance measurement.
+M6 is closed; no R4 or later technical work starts automatically.
 
 ## M5 — conditional physical Jetson measurement
 
