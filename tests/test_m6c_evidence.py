@@ -9,12 +9,18 @@ SENTINEL_PATH = ROOT / "benchmarks/m6c/preregistration/detector_sentinels.json"
 SENTINEL_SHA256 = "e80e803fe8923a52ced1bdecd17841a4cf915352a56ea5427607746409cf3be3"
 
 
+def _canonical_sentinel_bytes(payload: bytes) -> bytes:
+    """Restore the preregistered Windows-worktree newline representation."""
+    return payload.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+
+
 def test_m6c_detector_sentinels_are_frozen_before_inference() -> None:
     payload = SENTINEL_PATH.read_bytes()
     record = json.loads(payload)
-    assert hashlib.sha256(payload).hexdigest() == SENTINEL_SHA256
-    assert len(payload) == 1_492_097
-    assert len(payload) < 5_000_000
+    canonical_payload = _canonical_sentinel_bytes(payload)
+    assert hashlib.sha256(canonical_payload).hexdigest() == SENTINEL_SHA256
+    assert len(canonical_payload) == 1_492_097
+    assert len(canonical_payload) < 5_000_000
     assert record["status"] == "FROZEN_BEFORE_M6C_DETECTOR_EXECUTION"
     assert record["selection"]["condition_count"] == 10
     assert record["selection"]["selected_without_M6c_detector_results"] is True

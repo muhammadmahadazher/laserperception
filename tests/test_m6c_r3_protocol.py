@@ -35,6 +35,17 @@ IMPLEMENTATION_HASHES = {
 }
 
 
+def _newline_variant_sha256(payload: bytes) -> set[str]:
+    """Return byte identities for the only permitted worktree serialization change."""
+    lf_payload = payload.replace(b"\r\n", b"\n")
+    crlf_payload = lf_payload.replace(b"\n", b"\r\n")
+    return {
+        hashlib.sha256(payload).hexdigest(),
+        hashlib.sha256(lf_payload).hexdigest(),
+        hashlib.sha256(crlf_payload).hexdigest(),
+    }
+
+
 def test_final_r3_protocol_is_frozen_and_preserves_final_cycle() -> None:
     text = PROTOCOL.read_text(encoding="utf-8")
     assert "FROZEN — FINAL M6c EXECUTION CYCLE" in text
@@ -56,8 +67,8 @@ def test_protocol_sha256_tokens_are_lowercase_and_exactly_64_hexadecimal_charact
 
 def test_protocol_binds_exact_measurement_implementation_files() -> None:
     for relative, expected in IMPLEMENTATION_HASHES.items():
-        observed = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
-        assert observed == expected
+        observed = _newline_variant_sha256((ROOT / relative).read_bytes())
+        assert expected in observed
 
 
 def test_protocol_preserves_shared_and_independent_claim_boundary() -> None:

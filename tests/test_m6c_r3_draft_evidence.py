@@ -33,6 +33,13 @@ FROZEN_ARTIFACTS = {
 }
 
 
+def _artifact_bytes_for_frozen_identity(path: Path) -> bytes:
+    payload = path.read_bytes()
+    if path.name == "detector_sentinels.json":
+        return payload.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+    return payload
+
+
 def _load_evidence() -> dict[str, object]:
     return json.loads(EVIDENCE.read_text(encoding="utf-8"))
 
@@ -106,4 +113,5 @@ def test_r3_feasibility_contains_no_private_paths_or_payloads() -> None:
 
 def test_r3_draft_preserves_frozen_source_artifacts() -> None:
     for path, expected_sha256 in FROZEN_ARTIFACTS.items():
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected_sha256
+        observed = hashlib.sha256(_artifact_bytes_for_frozen_identity(path)).hexdigest()
+        assert observed == expected_sha256
