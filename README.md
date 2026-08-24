@@ -40,7 +40,9 @@ preregistered 40,000-voxel-cap hypothesis was not supported as the primary corpu
 Final ROS integration reproduced 860/860 same-platform projected references exactly and passed the
 unchanged detector semantic envelope on ten frozen sentinels; the original R2 byte-exactness failure
 remains preserved. [Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICAL_NOTE.md) or the
-[final M6c result](docs/m6/M6C_RESULTS_R3.md).
+[final M6c result](docs/m6/M6C_RESULTS_R3.md). The
+[M6 documentation index](docs/m6/README.md) maps the complete failure, diagnosis, protocol, and
+result chronology.
 
 ## What v0.2.0 does—and what was measured
 
