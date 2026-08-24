@@ -1,10 +1,15 @@
 # M6c protocol — KITTI Raw ROS replay exactness
 
-Status: prospective Revision R1, frozen before accepted KITTI ROS output  
-Protocol date: 2026-08-24  
-Frozen base `main`: `ebbbc0bbc4423e3be476abcd1165f75a136fa54c`  
-Original implementation commit: `0b74d048423e78ad349c35a55cdc8a9cc082eb8b`  
-Revision R1 implementation commit: `d74aca083f708ee98f50e08b5a5cf8171ace1397`  
+Status: prospective Revision R1, frozen before accepted KITTI ROS output
+
+Protocol date: 2026-08-24
+
+Frozen base `main`: `ebbbc0bbc4423e3be476abcd1165f75a136fa54c`
+
+Original implementation commit: `0b74d048423e78ad349c35a55cdc8a9cc082eb8b`
+
+Revision R1 implementation commit: `d74aca083f708ee98f50e08b5a5cf8171ace1397`
+
 Protocol commit: the commit that freezes this latest revision; measurement tools require that exact
 commit as `HEAD`.
 
