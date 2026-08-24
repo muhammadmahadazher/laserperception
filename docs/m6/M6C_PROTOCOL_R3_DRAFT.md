@@ -162,6 +162,24 @@ voxel-coordinate change, attributing the shift to platform arithmetic plus unit-
 projection. This is descriptive only. Projected references are not required to equal original
 M6a/M6b bytes, and their identities do not modify those frozen artifacts.
 
+The complete offline preregistration at implementation commit
+`3b39e2b3d47d39d57f21c75e87fb8122e31cd058` generated 860 unique projected identities before
+any canonical live R3 output. The manifest SHA256 is
+`c06cddc6884fef87de99d1c68ec2b5c1f1945f7f9e5ecae6fcb3e4275dd952a2`; the descriptive
+characterization SHA256 is
+`3b4c04e4347af6d2d3640147b17be5152f90317c7943ca5a6132826e044d14f8`.
+
+| Population | Compared | SHA identical / different | Point count identical / different | Signed point delta min / max | Max absolute delta | Original / projected points |
+|---|---:|---:|---:|---:|---:|---:|
+| H10 | 428 | 0 / 428 | 428 / 0 | 0 / 0 | 0 | 569,520,061 / 569,520,061 |
+| H5 | 428 | 0 / 428 | 428 / 0 | 0 / 0 | 0 | 310,967,933 / 310,967,933 |
+| Total | 856 | 0 / 856 | 856 / 0 | 0 / 0 | 0 | 880,487,994 / 880,487,994 |
+
+Every original/projected model-ready SHA differed, while all point counts were identical. There
+was therefore no nonzero point-count delta and its conditional median is not applicable. This
+describes the full 856-condition M6b population; it is not an acceptance gate. Gate 1 continues to
+compare live ROS only with the projected reference.
+
 ## Proposed Gate 2 — unchanged parity-v2 detector envelope
 
 Only after each detector condition passes Gate 1 would its projected/live detector result be
