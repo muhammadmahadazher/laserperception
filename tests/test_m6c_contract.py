@@ -15,6 +15,7 @@ from laserperception.datasets.kitti_raw import (
 from laserperception.datasets.kitti_ros_replay import (
     kitti_ros_replay_acquisition,
     model_lidar_pose_to_world_transform,
+    rotation_matrix_to_quaternion_xyzw,
 )
 from laserperception.detection.live_multisweep import (
     LiveSweepHistory,
@@ -152,3 +153,9 @@ def test_pose_helper_rejects_improper_rotation() -> None:
     object.__setattr__(pose, "ego_to_global_rotation", np.diag([1.0, 1.0, -1.0]))
     with pytest.raises(ValueError, match="determinant"):
         model_lidar_pose_to_world_transform(pose)
+
+
+def test_pose_helper_accepts_official_calibration_serialization_residual() -> None:
+    approximate = np.diag([1.0 + 4e-8, 1.0, 1.0])
+    quaternion = rotation_matrix_to_quaternion_xyzw(approximate)
+    assert sum(value * value for value in quaternion) == pytest.approx(1.0, abs=1e-15)

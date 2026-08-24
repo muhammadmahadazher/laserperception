@@ -10,6 +10,8 @@ import numpy as np
 from laserperception.datasets.kitti_raw import KittiRawSequence
 from laserperception.detection.multisweep import LidarPose
 
+KITTI_POSE_ROTATION_ATOL = 1e-6
+
 
 @dataclass(frozen=True, slots=True)
 class KittiRosReplayAcquisition:
@@ -90,9 +92,19 @@ def rotation_matrix_to_quaternion_xyzw(
     matrix = np.asarray(rotation, dtype=np.float64)
     if matrix.shape != (3, 3) or not np.isfinite(matrix).all():
         raise ValueError("rotation must be a finite 3x3 matrix")
-    if not np.allclose(matrix.T @ matrix, np.eye(3), atol=1e-10, rtol=0.0):
+    if not np.allclose(
+        matrix.T @ matrix,
+        np.eye(3),
+        atol=KITTI_POSE_ROTATION_ATOL,
+        rtol=0.0,
+    ):
         raise ValueError("rotation must be orthonormal")
-    if not np.isclose(np.linalg.det(matrix), 1.0, atol=1e-10, rtol=0.0):
+    if not np.isclose(
+        np.linalg.det(matrix),
+        1.0,
+        atol=KITTI_POSE_ROTATION_ATOL,
+        rtol=0.0,
+    ):
         raise ValueError("rotation determinant must equal +1")
 
     trace = float(np.trace(matrix))
