@@ -82,12 +82,13 @@ def test_optional_h5_was_eligible_and_exact() -> None:
     assert all(transform["complete_transform_exact"] for transform in h5["transforms"])
 
 
-def test_r3_draft_is_not_frozen_and_scope_remains_cpu_ros_only() -> None:
+def test_r3_feasibility_predates_final_freeze_and_scope_remains_cpu_ros_only() -> None:
     record = _load_evidence()
     assert all(value is False for value in record["scope"].values())
     text = DRAFT.read_text(encoding="utf-8")
     assert "DRAFT — NOT FROZEN — OWNER REVIEW REQUIRED" in text
-    assert not (ROOT / "docs/m6/M6C_PROTOCOL_R3.md").exists()
+    protocol = (ROOT / "docs/m6/M6C_PROTOCOL_R3.md").read_text(encoding="utf-8")
+    assert "FROZEN — FINAL M6c EXECUTION CYCLE" in protocol
 
 
 def test_r3_feasibility_contains_no_private_paths_or_payloads() -> None:
