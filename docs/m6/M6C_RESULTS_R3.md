@@ -135,13 +135,14 @@ This was a conversion-contract check, not a demand for byte identity with frozen
 
 ## Byte-identity implementation note
 
-The protocol commit is the canonical preregistration identity. Gate 1 recorded the LF-materialized
-protocol file SHA frozen in its evidence. The sentinel and pre-existing parity evaluator identities
-retain their preregistered Windows CRLF byte forms. A clean execution worktree was materialized with
-the required line endings for those frozen byte checks. This altered no commit, program semantics,
-protocol threshold, input, or output. The redundant measurement-script worktree byte identity can
-differ between LF and CRLF materializations even though the exact measurement implementation commit
-is fixed. No source or protocol was changed after output observation.
+Line-ending materialization affected only redundant file-byte identity checks; it did not change
+any commit, source semantics, protocol threshold, input, or measured output. The protocol commit is
+the canonical preregistration identity. Gate 1 recorded the LF-materialized protocol file SHA frozen
+in its evidence. The sentinel and pre-existing parity evaluator identities retain their
+preregistered Windows CRLF byte forms. A clean execution worktree was materialized with the required
+line endings for those frozen byte checks. The redundant measurement-script worktree byte identity
+can differ between LF and CRLF materializations even though the exact measurement implementation
+commit is fixed. No source or protocol was changed after output observation.
 
 ## Claim boundary and closure
 
