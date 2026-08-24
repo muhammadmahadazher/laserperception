@@ -1,11 +1,25 @@
 # M6c protocol — KITTI Raw ROS replay exactness
 
-Status: preregistered before accepted KITTI ROS detector execution  
+Status: prospective Revision R1, frozen before accepted KITTI ROS output  
 Protocol date: 2026-08-24  
 Frozen base `main`: `ebbbc0bbc4423e3be476abcd1165f75a136fa54c`  
-Frozen implementation commit: `0b74d048423e78ad349c35a55cdc8a9cc082eb8b`  
-Protocol commit: the commit that first adds this file; measurement tools require that exact commit
-as `HEAD`.
+Original implementation commit: `0b74d048423e78ad349c35a55cdc8a9cc082eb8b`  
+Revision R1 implementation commit: `d74aca083f708ee98f50e08b5a5cf8171ace1397`  
+Protocol commit: the commit that freezes this latest revision; measurement tools require that exact
+commit as `HEAD`.
+
+## Preserved pre-output Revision R1 chronology
+
+The first harness invocation at original protocol commit
+`ddfd9f0eb6b8f82d66078bd6bff15d9f9769dbc8` stopped during ROS node construction. The generated
+topic token began with the numeric drive suffix (`0001_h10`), which ROS correctly rejected as an
+invalid topic name. No raw PointCloud2, model-ready output, or detector output was published, and no
+Gate A/B/C/D condition was evaluated or recorded.
+
+Revision R1 prospectively prefixes that orchestration-only topic token with `drive_`. It does not
+alter the replay bytes, timestamps, TF, builder configuration, corpus, source identities, detector,
+engine, or exactness criteria below. This failure remains recorded rather than being treated as a
+scientific gate result.
 
 ## Objective and boundary
 

@@ -38,6 +38,8 @@ def test_m6c_preregistration_contains_no_private_or_binary_payloads() -> None:
 def test_m6c_protocol_freezes_implementation_and_exact_gates() -> None:
     protocol = (ROOT / "docs/m6/M6C_PROTOCOL.md").read_text(encoding="utf-8")
     assert "0b74d048423e78ad349c35a55cdc8a9cc082eb8b" in protocol
+    assert "d74aca083f708ee98f50e08b5a5cf8171ace1397" in protocol
+    assert "No raw PointCloud2, model-ready output, or detector output was published" in protocol
     assert "24/24" in protocol
     assert "856/856" in protocol
     assert "10/10" in protocol
