@@ -110,14 +110,29 @@ def _verify_identity(implementation_commit: str) -> None:
         raise RuntimeError("projected-reference implementation does not descend from base main")
 
 
-def _verify_sources() -> dict[str, dict[str, object]]:
+def _verify_sources(
+    *, detector_sentinels_bytes: Path | None = None
+) -> dict[str, dict[str, object]]:
     verified: dict[str, dict[str, object]] = {}
     for name, (relative, expected) in SOURCE_IDENTITIES.items():
-        path = _root() / relative
+        path = (
+            detector_sentinels_bytes
+            if name == "detector_sentinels" and detector_sentinels_bytes is not None
+            else _root() / relative
+        )
         observed = sha256_file(path)
         if observed != expected:
             raise RuntimeError(f"frozen source identity mismatch: {name}")
-        verified[name] = {"path": relative, "sha256": observed, "size_bytes": path.stat().st_size}
+        verified[name] = {
+            "path": relative,
+            "sha256": observed,
+            "size_bytes": path.stat().st_size,
+            "verification_source": (
+                "external canonical tracked bytes"
+                if name == "detector_sentinels" and detector_sentinels_bytes is not None
+                else "current worktree"
+            ),
+        }
     return verified
 
 
@@ -308,6 +323,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--implementation-commit", required=True)
     parser.add_argument("--manifest-output", type=Path, required=True)
     parser.add_argument("--characterization-output", type=Path, required=True)
+    parser.add_argument("--detector-sentinels-bytes", type=Path)
     parser.add_argument("--ros-distro", default="Humble")
     parser.add_argument("--rmw-implementation", default="rmw_fastrtps_cpp")
     return parser
@@ -317,7 +333,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     _verify_identity(args.implementation_commit)
     root = _root()
-    source_artifacts = _verify_sources()
+    source_artifacts = _verify_sources(
+        detector_sentinels_bytes=(
+            args.detector_sentinels_bytes.expanduser().resolve()
+            if args.detector_sentinels_bytes is not None
+            else None
+        )
+    )
     m6a = _load(root / SOURCE_IDENTITIES["m6a"][0])
     m6b_ledger = _load(root / SOURCE_IDENTITIES["m6b_input_ledger"][0])
     plan, original_m6b = _condition_plan(m6a, m6b_ledger)
