@@ -64,6 +64,11 @@ The result does not invalidate M6a or M6b. Those remain accepted offline evidenc
 contracts. It shows that M6c has not established byte-exact equivalence between their frozen
 float32 transform products and the ROS unit-quaternion representation.
 
-No tolerance was adopted, no transform was tuned, no frozen source evidence changed, and no
-detector/model/ONNX/engine/threshold/performance work followed the failed gate. M6c remains not
-ready; M6 remains in progress and M5 remains conditional/inactive.
+No tolerance was adopted, no transform was tuned, no frozen source evidence changed, and the R2
+run performed no detector/model/ONNX/engine/threshold/performance work after the failed gate. M6c
+remains not ready; M6 remains in progress and M5 remains conditional/inactive.
+
+The separately preregistered
+[`post-failure diagnostic D1`](M6C_POST_FAILURE_DIAGNOSIS.md) isolates the platform,
+unit-quaternion, tf2, and storage boundaries and follows exactly one authorized frame downstream.
+It preserves this R2 failure and does not create a replacement success protocol.

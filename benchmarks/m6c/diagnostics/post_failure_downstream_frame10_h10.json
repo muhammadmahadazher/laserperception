@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "status": "DOWNSTREAM_DIAGNOSTIC_COMPLETE",
+  "diagnostic_only": true,
+  "r2_status": "FAILED",
+  "r2_protocol_commit": "0a8419978d265571b51f943ffc797b5fcc78c4ca",
+  "diagnostic_plan_commit": "6a00cdc8fc2fa950ca7f8a4bf4261fdeeefbc6d9",
+  "diagnostic_implementation_commit": "0da293d16a705c58e2d341b1d7379a0c93d6aabd",
+  "recorded_at_utc": "2026-08-24T11:14:32.102713+00:00",
+  "execution_chronology": {
+    "transform_ladder_explained_before_network": true,
+    "downstream_measurement_commit": "0da293d16a705c58e2d341b1d7379a0c93d6aabd",
+    "later_transform_only_audit_commit": "6b768af6a4e6f6de30c83eac462334ccc19e8826",
+    "later_network_execution": false
+  },
+  "condition": {"drive": "2011_09_26_drive_0001", "frame": "0000000010", "condition": "H10", "history_depth": 10},
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "numpy": "1.26.4",
+    "ros_distro": "Humble",
+    "rmw_implementation": "rmw_fastrtps_cpp",
+    "engine_sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f"
+  },
+  "source_evidence": {
+    "sentinel_sha256": "e80e803fe8923a52ced1bdecd17841a4cf915352a56ea5427607746409cf3be3",
+    "full_result_sha256": "87870b2aa0cc2a91d39331afc8154fdad0c8c796f1cabfb4f8530a3eb106de27",
+    "full_input_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa",
+    "sentinel_byte_staging_note": "The tracked manifest's frozen Windows-worktree CRLF bytes were supplied as a verified external argument; the first LF-normalized WSL checkout attempt stopped before runtime initialization and executed no network."
+  },
+  "canonical_control": {
+    "status": "PASS",
+    "checks": {"model_ready": true, "voxel_count": true, "voxel_hashes": true, "raw_output_hashes": true, "detection_frame_sha256": true, "detection_frame_payload": true},
+    "point_count": 1312220,
+    "voxel_count": 40000,
+    "model_ready_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a",
+    "voxel_hashes": {"coors": "3cbdf69da7037d35dcce207c1bb948a21a19957928fa6a5a782c20b1105e81b9", "num_points": "8dd660a9092b3bd075a1c930a42b5a8c1e96000a7e343a8692679fbd1b7df74a", "voxels": "ec282516ade006647d8b39b6aea63766d3cb2eeac3c587616eb7126deb41978b"},
+    "raw_output_hashes": {"cls_score": "cd065f7381305c14ffb1353d9c170a8be4a65d0227e0db8ce867731b006a7242", "bbox_pred": "f19ba02133b698bdac6a56408eb0a3378b199517d965e43ac4899e7c925ba678", "dir_cls_pred": "dd7a096abcc5591adeb59444304aa1430a66b23507c72b3c329fe2fa03dcd5ac"},
+    "detection_frame_sha256": "565cdd71123b78f2fd5b23456702c7ef0e6410d6f1195a36a0a02c1b4f47b132",
+    "detection_count": 301
+  },
+  "ros_variant": {
+    "model_ready": {
+      "exact": false,
+      "shape_exact": true,
+      "shape": [1312220, 4],
+      "expected_sha256": "5ff825de4c351961f62b416c11042d50bf5d78f2d363f842ce4b5d182456b18a",
+      "observed_sha256": "d96ceec739735bac578ae812108af98892d2939f9ce9821584ebdba31412d3e5",
+      "differing_elements": 1510648,
+      "nonzero_absolute_difference": {"median": 4.76837158203125e-07, "p95": 1.9073486328125e-06, "p99": 1.9073486328125e-06, "maximum": 7.62939453125e-06},
+      "ulp": {"median": 1.0, "p95": 8.0, "p99": 38.0, "maximum": 4947968.0}
+    },
+    "voxel_structure": {
+      "range_mask": {"exact": true, "expected_retained": 1312220, "observed_retained": 1312220, "points_changing_membership": 0},
+      "discrete_point_coordinates": {"exact": false, "points_changed": 6},
+      "candidate_pillars": {"expected_count": 41437, "observed_count": 41437, "key_set_exact": true, "keys_added": 0, "keys_removed": 0},
+      "retained_pillars": {"expected_count": 40000, "observed_count": 40000, "key_set_exact": true, "ordering_exact": true},
+      "retained_point_membership": {"exact": false, "ordering_exact": false},
+      "coors": {"exact": true},
+      "num_points": {"exact": false}
+    },
+    "exact_fast_outputs": {
+      "voxel_count": 40000,
+      "coors": {"exact": true, "expected_sha256": "3cbdf69da7037d35dcce207c1bb948a21a19957928fa6a5a782c20b1105e81b9", "observed_sha256": "3cbdf69da7037d35dcce207c1bb948a21a19957928fa6a5a782c20b1105e81b9"},
+      "num_points": {"exact": false, "expected_sha256": "8dd660a9092b3bd075a1c930a42b5a8c1e96000a7e343a8692679fbd1b7df74a", "observed_sha256": "7915ae9d603b9dd51d065dae51859045530d7732cd703a1206947cd70f0d3f0d"},
+      "voxel_feature_values": {"exact": false, "expected_sha256": "ec282516ade006647d8b39b6aea63766d3cb2eeac3c587616eb7126deb41978b", "observed_sha256": "a45a863b1ae5875330d40935300810bc28f0d7619bfcac4e3870b3ceadca20dc", "differing_elements": 829042, "nonzero_absolute_difference": {"median": 4.76837158203125e-07, "p95": 1.9073486328125e-06, "p99": 1.9073486328125e-06, "maximum": 2.134918212890625}, "ulp": {"median": 1.0, "p95": 9.0, "p99": 47.0, "maximum": 1074307713.0}}
+    },
+    "raw_tensorrt_outputs": {
+      "cls_score": {"exact": false, "expected_sha256": "cd065f7381305c14ffb1353d9c170a8be4a65d0227e0db8ce867731b006a7242", "observed_sha256": "f4aeabf571868f38842e115ba0a73e99aa425f60738bd696c658d6459f95a9ad", "differing_elements": 1369451, "nonzero_absolute_difference": {"median": 0.0078125, "p95": 0.015625, "p99": 0.0234375, "maximum": 0.09375}},
+      "bbox_pred": {"exact": false, "expected_sha256": "f19ba02133b698bdac6a56408eb0a3378b199517d965e43ac4899e7c925ba678", "observed_sha256": "6898c6c9668fd15dd3fd8d96a83d2938793a249ab58d5aac95a09f8b5a111db0", "differing_elements": 2587890, "nonzero_absolute_difference": {"median": 0.0001678466796875, "p95": 0.0015869140625, "p99": 0.00390625, "maximum": 0.068359375}},
+      "dir_cls_pred": {"exact": false, "expected_sha256": "dd7a096abcc5591adeb59444304aa1430a66b23507c72b3c329fe2fa03dcd5ac", "observed_sha256": "532a20157a3775bfba11f1f394e741ade2e6358bff5e80b30679dbabeffc89e7", "differing_elements": 692888, "nonzero_absolute_difference": {"median": 0.0009765625, "p95": 0.00439453125, "p99": 0.0078125, "maximum": 0.03369140625}}
+    },
+    "detection_frame": {"exact": false, "expected_sha256": "565cdd71123b78f2fd5b23456702c7ef0e6410d6f1195a36a0a02c1b4f47b132", "observed_sha256": "0d4fc1644b686cbfea169ee32226574e1f70bfb386a7547e495d51b91ad8561c", "expected_count": 301, "observed_count": 302, "field_delta_note": "Cardinality differs, so index-aligned class/score/center/dimensions/yaw/velocity deltas are not claimed."},
+    "detection_array": {"semantic_exact": false, "header_exact": true, "per_detection_headers_exact": true, "expected_count": 301, "observed_count": 302, "velocity_exposed": false}
+  },
+  "ros_builder_counters": {"raw_frames_received": 11, "valid_raw_frames": 11, "model_ready_outputs": 11, "history_depth": 10, "invalid_points_filtered": 0, "rejected_frames": 0, "tf_failures": 0, "history_resets": 0},
+  "ros_detector_counters": {"received": 1, "accepted": 1, "published": 1, "rejected": 0},
+  "scope": {
+    "authorized_detector_conditions": 1,
+    "detector_conditions_executed": 1,
+    "network_executions": 2,
+    "execution_note": "one frozen control plus one ROS variant for one condition",
+    "gate_b_started": false,
+    "remaining_sentinels_run": false,
+    "performance_campaign": false,
+    "r3_created": false
+  }
+}
