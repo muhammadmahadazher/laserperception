@@ -252,6 +252,37 @@ def _world_pose(
     return reconstructed, np.asarray(translation, dtype=np.float64), original_rotation
 
 
+def _direct_builder_matrix_float64(sequence: KittiRawSequence) -> np.ndarray:
+    """Expose the pre-cast arithmetic transcribed by ``SweepTransform.from_poses``."""
+
+    sweep_pose = sequence.lidar_pose(0)
+    current_pose = sequence.lidar_pose(FRAME_INDEX)
+    l2e_r_s_mat = sweep_pose.lidar_to_ego_rotation
+    e2g_r_s_mat = sweep_pose.ego_to_global_rotation
+    l2e_t_s = sweep_pose.lidar_to_ego_translation
+    e2g_t_s = sweep_pose.ego_to_global_translation
+    l2e_r_mat = current_pose.lidar_to_ego_rotation
+    e2g_r_mat = current_pose.ego_to_global_rotation
+    l2e_t = current_pose.lidar_to_ego_translation
+    e2g_t = current_pose.ego_to_global_translation
+
+    rotation = (l2e_r_s_mat.T @ e2g_r_s_mat.T) @ (
+        np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T
+    )
+    translation = (l2e_t_s @ e2g_r_s_mat.T + e2g_t_s) @ (
+        np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T
+    )
+    translation -= (
+        e2g_t @ (np.linalg.inv(e2g_r_mat).T @ np.linalg.inv(l2e_r_mat).T)
+        + l2e_t @ np.linalg.inv(l2e_r_mat).T
+    )
+    sensor2lidar_rotation = rotation.T
+    result = np.eye(4, dtype=np.float64)
+    result[:3, :3] = sensor2lidar_rotation.T
+    result[:3, 3:4] = -sensor2lidar_rotation.T @ translation.reshape(3, 1)
+    return result
+
+
 def _pre_range(
     sequence: KittiRawSequence,
     transform: np.ndarray,
@@ -304,6 +335,8 @@ def _float64_difference(first: np.ndarray, second: np.ndarray) -> dict[str, obje
 
 def _adjacent_record(
     name: str,
+    first_matrix_float64: np.ndarray,
+    second_matrix_float64: np.ndarray,
     first_matrix: np.ndarray,
     second_matrix: np.ndarray,
     first_points: np.ndarray,
@@ -312,6 +345,7 @@ def _adjacent_record(
     transform = compare_float32_arrays(first_matrix, second_matrix)
     return {
         "mechanism": name,
+        "transform_float64": _float64_difference(first_matrix_float64, second_matrix_float64),
         "transform_float32": transform,
         "rotation_only": compare_float32_arrays(first_matrix[:3, :3], second_matrix[:3, :3]),
         "translation_only": compare_float32_arrays(first_matrix[:3, 3], second_matrix[:3, 3]),
@@ -376,7 +410,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         sweep_pose=sequence.lidar_pose(0),
         current_pose=sequence.lidar_pose(FRAME_INDEX),
     )
-    t1 = t1_transform.lidar2sensor
+    t1_float64 = _direct_builder_matrix_float64(sequence)
+    t1 = t1_float64.astype(np.float32)
+    if not np.array_equal(t1, t1_transform.lidar2sensor):
+        raise RuntimeError("instrumented T1 pre-cast arithmetic differs from production storage")
 
     source_rotation, source_translation, source_original_rotation = _world_pose(sequence, 0)
     current_rotation, current_translation, current_original_rotation = _world_pose(
@@ -403,6 +440,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     t3 = t3_float64.astype(np.float32)
 
     stage_matrices = {"T0": t0, "T1": t1, "T2": t2, "T3": t3, "T4": t4}
+    stage_float64 = {
+        "T0": t0.astype(np.float64),
+        "T1": t1_float64,
+        "T2": t2_float64,
+        "T3": t3_float64,
+        "T4": t4.astype(np.float64),
+    }
     stage_points: dict[str, np.ndarray] = {}
     stage_pre_range: dict[str, np.ndarray] = {}
     stage_masks: dict[str, np.ndarray] = {}
@@ -433,6 +477,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     contributions = {
         label: _adjacent_record(
             label,
+            stage_float64[first],
+            stage_float64[second],
             stage_matrices[first],
             stage_matrices[second],
             stage_points[first],
@@ -440,11 +486,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         for label, first, second in pairs
     }
-    classifications = [
-        name.upper() + "_PRESENT"
-        for name, record in contributions.items()
-        if not bool(record["transform_float32"]["exact"])  # type: ignore[index]
-    ]
+    classifications: list[str] = []
+    if not bool(contributions["platform_arithmetic"]["transform_float32"]["exact"]):  # type: ignore[index]
+        classifications.append("PLATFORM_ARITHMETIC_PRESENT")
+    if not bool(
+        contributions["unit_quaternion_projection"]["transform_float32"]["exact"]  # type: ignore[index]
+    ):
+        classifications.append("UNIT_QUATERNION_PROJECTION_PRESENT")
+    if not bool(contributions["tf2"]["transform_float64"]["exact"]):  # type: ignore[index]
+        classifications.append("TF2_ADDITIONAL_DIVERGENCE_PRESENT_BELOW_FLOAT32")
+    if not bool(contributions["float32_storage"]["transform_float64"]["exact"]):  # type: ignore[index]
+        classifications.append("FLOAT32_STORAGE_ROUNDING_PRESENT")
     explained = array_sha256(t4) == OBSERVED_TRANSFORM_SHA256
     if not explained:
         classifications.append("UNRESOLVED_TRANSFORM_BOUNDARY")
@@ -484,8 +536,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         },
         "condition": {"drive": DRIVE, "frame": "0000000001", "condition": "H10"},
         "stages": {
-            "T0": _stage("frozen Windows canonical", t0.astype(np.float64), t0),
-            "T1": _stage("WSL direct matrix", t1.astype(np.float64), t1),
+            "T0": _stage("frozen Windows canonical", stage_float64["T0"], t0),
+            "T1": _stage("WSL direct matrix", t1_float64, t1),
             "T2": _stage("WSL unit-quaternion composition", t2_float64, t2),
             "T3": _stage("real tf2 relative transform", t3_float64, t3),
             "T4": _stage("final builder storage", t4.astype(np.float64), t4),
