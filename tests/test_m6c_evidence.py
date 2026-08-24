@@ -39,6 +39,8 @@ def test_m6c_protocol_freezes_implementation_and_exact_gates() -> None:
     protocol = (ROOT / "docs/m6/M6C_PROTOCOL.md").read_text(encoding="utf-8")
     assert "0b74d048423e78ad349c35a55cdc8a9cc082eb8b" in protocol
     assert "d74aca083f708ee98f50e08b5a5cf8171ace1397" in protocol
+    assert "3c4c76d9fbf9ff8787cee9fb8fa0e7dc1e72de18" in protocol
+    assert "8.491793e-8" in protocol
     assert "No raw PointCloud2, model-ready output, or detector output was published" in protocol
     assert "24/24" in protocol
     assert "856/856" in protocol
