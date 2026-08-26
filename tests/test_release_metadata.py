@@ -20,7 +20,7 @@ def test_v0_3_release_metadata_is_consistent() -> None:
 
     citation = _text("CITATION.cff")
     assert "version: 0.3.0" in citation
-    assert "date-released:" not in citation
+    assert "date-released: 2026-08-26" in citation
     assert "time-aware raw PointCloud2 multi-sweep ingestion" in citation
     assert "semantic segmentation" not in citation.lower()
     assert "No software release" + " exists yet" not in citation
@@ -31,7 +31,7 @@ def test_v0_3_release_metadata_is_consistent() -> None:
 
     changelog = _text("CHANGELOG.md")
     assert "## [Unreleased]" in changelog
-    unreleased, current_release = changelog.split("## [0.3.0] - Release date pending", maxsplit=1)
+    unreleased, current_release = changelog.split("## [0.3.0] - 2026-08-26", maxsplit=1)
     assert "M6" not in unreleased
     assert "856 frozen H10/H5 conditions" in current_release
     assert "## [0.2.0] - 2026-08-20" in current_release
@@ -39,7 +39,8 @@ def test_v0_3_release_metadata_is_consistent() -> None:
     release_notes = _text("docs/releases/v0.3.0.md")
     quickstart = _text("docs/QUICKSTART_V0_2.md")
     assert "LaserPerception v0.3.0 release notes" in release_notes
-    assert "release-preparation candidate, not yet released" in release_notes
+    assert "Release date: 2026-08-26" in release_notes
+    assert "SOURCE_DATE_EPOCH=1787702400" in release_notes
     assert "860/860 exact" in release_notes
     assert "LaserPerception v0.2.0 quickstart" in quickstart
     assert "LaserPerception v0.2.0 release notes" in _text("docs/releases/v0.2.0.md")

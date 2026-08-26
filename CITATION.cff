@@ -5,6 +5,7 @@ message: >-
 type: software
 title: LaserPerception
 version: 0.3.0
+date-released: 2026-08-26
 authors:
   - given-names: Mahad
     family-names: Azher

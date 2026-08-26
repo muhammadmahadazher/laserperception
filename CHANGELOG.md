@@ -5,7 +5,7 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
-## [0.3.0] - Release date pending
+## [0.3.0] - 2026-08-26
 
 ### Added
 

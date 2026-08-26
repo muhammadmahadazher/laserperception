@@ -27,8 +27,7 @@ system.
    activates the milestone; currently inactive.
 9. M6: KITTI Raw offline reconstruction, frozen-detector characterization, and projected-reference
    ROS validation — complete.
-10. v0.3.0: release preparation for the completed M6 state — active and release-only; no tag or
-    public release exists yet.
+10. v0.3.0: release engineering for the completed M6 state — complete.
 
 Training, additional detectors, INT8, tracking, camera fusion, custom CUDA, localization, sensor
 calibration automation, and ROS/DDS optimization are not part of v0.3.0. No M7 or other technical
