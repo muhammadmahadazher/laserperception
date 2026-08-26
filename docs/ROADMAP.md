@@ -2,11 +2,12 @@
 
 Progress is evidence-gated. Dates and capabilities are not promised before prerequisites pass.
 M0 through M4.6 are complete and v0.2.0 is released. M6 — Cross-Domain Validation: KITTI Raw is
-complete. M6a is complete under prospective Protocol R2; the original Tier-A failure remains
-preserved as a failure. M6b is complete under owner-approved Protocol R2 after structural 40k
-remediation, the non-evaluation H5 profile-gap parity gate, and the full frozen offline
-characterization. M6c is complete with a positive final R3 projected-reference ROS validation;
-the original R2 failure and D1 diagnosis remain preserved. No technical submilestone is currently
+complete. v0.3.0 is being prepared as the release boundary for the completed M6 work; it is not
+yet tagged or published. M6a is complete under prospective Protocol R2; the original Tier-A failure
+remains preserved as a failure. M6b is complete under owner-approved Protocol R2 after structural
+40k remediation, the non-evaluation H5 profile-gap parity gate, and the full frozen offline
+characterization. M6c is complete with a positive final R3 projected-reference ROS validation; the
+original R2 failure and D1 diagnosis remain preserved. No technical submilestone is currently
 active, M5 remains conditional and inactive, and any next milestone requires explicit owner
 authorization.
 
@@ -95,6 +96,12 @@ KITTI, inspect predictions, or implement ROS replay. M6b completed its separatel
 offline evaluation under frozen Protocol R2 without target-domain tuning. M6c then completed its
 separately authorized integration-correctness cycle without tuning or performance measurement.
 M6 is closed; no R4 or later technical work starts automatically.
+
+## v0.3.0 release boundary — preparation
+
+v0.3.0 packages the completed M6 repository state, documentation, and reviewed evidence. Release
+preparation does not reopen M6, start M7, or authorize another experiment. The tag and public
+release remain pending owner review of the release-preparation pull request.
 
 ## M5 — conditional physical Jetson measurement
 

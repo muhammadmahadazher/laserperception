@@ -5,30 +5,47 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+## [0.3.0] - Release date pending
+
 ### Added
 
-- A CPU-only KITTI Raw dataset contract, exact Raw-devkit pose oracle, frozen KITTI-to-model basis,
-  and deterministic 24-frame offline multi-sweep reconstruction hashes for future ROS validation.
-- A distinct, local-only TensorRT FP16 candidate built from the byte-identical M2 ONNX with the
-  structural 40,000-voxel maximum profile, plus sanitized build, parity, and repeatability evidence.
-- The owner-approved M6b Protocol R2 frozen-detector characterization across 428 paired KITTI Raw
-  frames under H10 and H5, with Raw-tracklet metrics, capacity diagnostics, and real offline
-  visualizations.
+- Official KITTI Raw decoding, Raw-devkit pose/calibration handling, a frozen KITTI-to-model basis,
+  deterministic offline multi-sweep reconstruction, and ROS replay/integration tooling.
+- Frozen-detector cross-domain characterization across 428 current KITTI Raw frames and 856 paired
+  H10/H5 conditions, with Raw-tracklet metrics, capacity diagnostics, and real visualizations.
+- A complete M6 documentation index and technical note connecting the failed gates, diagnoses,
+  prospective protocols, accepted evidence, and final claim boundaries.
 
-### Scientific chronology
+### Changed
 
-- The original M6a odometry-equality gate remains FAIL. R1 diagnosed the cause as distinct official
-  data/timing products. Prospective Protocol R2 then passed 271/271 exact adapter comparisons and a
-  separate 108/108 canonical-drive transfer check without relaxing the original gate. No KITTI
-  detector, TensorRT, ROS, training, tuning, or performance work occurred.
-- The original M6b run remains failed after the historical 30k engine rejected valid 40k
-  `exact_fast` input before network execution, producing zero evaluation predictions. Prospective
-  M6b-R1 validated one 40k candidate on frozen nuScenes and non-evaluation KITTI inputs; a final H5
-  profile-gap parity gate then passed before Protocol R2 was committed and any evaluation output
-  existed.
-- Protocol R2 completed 856/856 frozen H10/H5 conditions. At score 0.25 and oriented BEV IoU 0.50,
-  H10 Car/Pedestrian recall was 0.242/0.553 and H5 was 0.727/0.677. H10 versus H5 remains a compound
-  temporal-and-density history ablation; no tuning or isolated causal claim followed.
+- Widened the M6 TensorRT structural input profile from the historical 30,000-voxel maximum to the
+  upstream preprocessing contract's 40,000 maximum without changing the ONNX, model, precision,
+  thresholds, voxel geometry, or postprocessing. This is not a latency or performance claim.
+- Prepared Python, ROS, citation, changelog, roadmap, and release-facing metadata for v0.3.0.
+
+### Validation / Evidence
+
+- M6a prospective Protocol R2 passed 271/271 exact Raw-devkit pose comparisons, a separate 108/108
+  canonical-drive transfer check, exact decoding, and 24/24 deterministic offline reconstructions.
+- M6b completed all 856 frozen H10/H5 conditions. At score 0.25 and oriented BEV IoU 0.50, H10
+  Car/Pedestrian recall was 0.242/0.553 and H5 was 0.727/0.677. This is a compound history ablation;
+  temporal span alone was not isolated as the cause.
+- M6c final R3 validation passed 24/24 Gate 1A, 856/856 Gate 1B, and 860/860 unique projected live
+  conditions byte-for-byte. The detector envelope retained 113/113 detections, 81/81
+  high-confidence coverage, 81/81 passes for every continuous metric, zero class mismatches, zero
+  continuous outliers, and 10/10 exact `Detection3DArray` conversions.
+
+### Preserved failures / limitations
+
+- The initial M6a odometry-equality gate remains FAIL; R1 diagnosed distinct official timing/data
+  products before prospective R2 was frozen. The original M6b run remains a structural stop because
+  the 30k engine rejected valid input before network execution.
+- M6c R2 remains failed at the original-M6a byte boundary. D1 identified the unit-quaternion/SO(3)
+  representation boundary, and prospective R3 used same-platform projected references without
+  weakening R2 or adopting a tolerance.
+- The detector remains the unchanged official pretrained nuScenes PointPillars checkpoint. No
+  training or fine-tuning, official KITTI benchmark AP, physical-LiDAR validation, real-time ROS
+  measurement, production-readiness claim, or safety certification was added.
 
 ## [0.2.0] - 2026-08-20
 

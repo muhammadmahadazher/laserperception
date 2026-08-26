@@ -22,12 +22,17 @@ system.
 5. M4: v0.1.0 release engineering — complete.
 6. M4.5: offline and live raw-sweep reconstruction, time-aware TF, and exact detector-chain
    evidence — complete.
-7. M4.6: v0.2.0 release engineering for the accepted M4.5 capability — active and release-only.
+7. M4.6: v0.2.0 release engineering for the accepted M4.5 capability — complete.
 8. M5: conditional physical Jetson measurements only if hardware is available and the owner
    activates the milestone; currently inactive.
+9. M6: KITTI Raw offline reconstruction, frozen-detector characterization, and projected-reference
+   ROS validation — complete.
+10. v0.3.0: release preparation for the completed M6 state — active and release-only; no tag or
+    public release exists yet.
 
 Training, additional detectors, INT8, tracking, camera fusion, custom CUDA, localization, sensor
-calibration automation, and ROS/DDS optimization are not part of v0.2.0.
+calibration automation, and ROS/DDS optimization are not part of v0.3.0. No M7 or other technical
+submilestone is active.
 
 ## Parked semantic-transfer research
 
