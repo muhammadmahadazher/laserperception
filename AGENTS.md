@@ -7,14 +7,15 @@ modifying the repository. User instructions take precedence when they explicitly
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
 M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
-is complete. M6a is complete under prospective Protocol R2: the original Tier-A failure remains
-failed, R1 diagnosed its data-product/timing cause, and the new canonical offline oracle passed
-without relaxing that historical gate. M6b is complete under owner-approved Protocol R2: preserve
-the original 30k-engine failure, the prospective 40k remediation, and the frozen 428-frame H10/H5
-cross-domain characterization. M6c is complete with a positive final R3 projected-reference ROS
-validation result; preserve the original R2 failure and D1 diagnosis. No technical submilestone is
-currently active. M5 remains conditional and inactive. Any next milestone requires explicit owner
-authorization.
+is complete and v0.3.0 is its release boundary. M6a is complete under prospective Protocol R2: the
+original Tier-A failure remains failed, R1 diagnosed its data-product/timing cause, and the new
+canonical offline oracle passed without relaxing that historical gate. M6b is complete under
+owner-approved Protocol R2: preserve the original 30k-engine failure, the prospective 40k
+remediation, and the frozen
+428-frame H10/H5 cross-domain characterization. M6c is complete with a positive final R3
+projected-reference ROS validation result; preserve the original R2 failure and D1 diagnosis.
+No technical submilestone is currently active. M5 remains conditional and inactive. Any next
+milestone requires explicit owner authorization.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a

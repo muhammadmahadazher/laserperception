@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "laserperception"
-version = "0.2.0"
+version = "0.3.0"
 description = "Reproducible 3D LiDAR detection, raw ROS 2 ingestion, and TensorRT deployment."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -76,6 +76,8 @@ include = [
   "/NOTICE",
   "/THIRD_PARTY_NOTICES.md",
 ]
+# The release note records this sdist's SHA256, so including it would create a circular identity.
+exclude = ["/docs/releases/v0.3.0.md"]
 
 [tool.ruff]
 target-version = "py310"

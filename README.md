@@ -4,11 +4,11 @@
 > reconstruction, TensorRT FP16, and exact deterministic voxelization.
 
 [![CI](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.2.0-4c1.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.0-4c1.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-LaserPerception v0.2.0 is an open-source research toolkit that runs one frozen, official pretrained
+LaserPerception v0.3.0 is an open-source research toolkit that runs one frozen, official pretrained
 PointPillars detector on nuScenes, deploys its network through TensorRT FP16, preserves deterministic
 voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble. It can
 accept either model-ready temporal input or compatible raw single-sweep XYZ `PointCloud2` plus a
@@ -25,7 +25,7 @@ and 20 Hz were not sustained. M4.5 raw ingestion was correctness/integration wor
 throughput claim.
 
 [Run the v0.2 detection/ROS quickstart](docs/QUICKSTART_V0_2.md) ·
-[Read the v0.2.0 release notes](docs/releases/v0.2.0.md) ·
+[Read the v0.3.0 release notes](docs/releases/v0.3.0.md) ·
 [Inspect the benchmark evidence](docs/BENCHMARKS.md)
 
 **New raw ingestion path:** compatible scalar float32 XYZ `PointCloud2` plus time-aware tf2 feeds a
@@ -44,7 +44,7 @@ remains preserved. [Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICA
 [M6 documentation index](docs/m6/README.md) maps the complete failure, diagnosis, protocol, and
 result chronology.
 
-## What v0.2.0 does—and what was measured
+## What v0.3.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |
 |---|---|---|
@@ -52,6 +52,7 @@ result chronology.
 | Deterministic voxelization | `exact_fast` preserves pinned official deterministic retained-point semantics | 81/81 validation samples bit-exact; frozen raw/final detector outputs exact; W1 hard layer 238.910 → 1.758 ms (≈136×, hard layer only) |
 | ROS 2 integration | Model-ready multi-sweep `PointCloud2` → `Detection3DArray` plus RViz/Foxglove markers | Historical model-ready W1 sustained 10 Hz cleanly; 15 Hz and 20 Hz were not sustained |
 | Raw multi-sweep ingestion | Compatible float32 XYZ `PointCloud2` + time-aware TF → bounded history → same model-ready detector | M4.5a 81/81 inputs exact; M4.5b complete raw ROS detector chain exact on 20/20 frozen samples; no new rate campaign |
+| KITTI Raw cross-domain validation | Official Raw decoding/reconstruction, frozen-detector characterization, and projected-reference ROS replay | M6a accepted offline route exact; M6b completed 856 H10/H5 conditions; M6c reproduced 860/860 projected live conditions exactly |
 
 The accepted M3B-V2 direct W1 live diagnostic changed from about 333 ms to 43.168 ms. The ~43 ms
 figure is **direct runtime evidence, not ROS callback or loopback latency**. The ≈136× ratio applies
@@ -206,12 +207,13 @@ M1-style reproduction that differed from the archived M1 result, and decreasing 
 15/20 Hz offered-rate overload. Causes were not isolated. See the separate
 [historical v0.1 known issues](docs/releases/v0.1.0.md#known-issues).
 
-v0.2.0 supports the model-ready interface and compatible raw PointCloud2 plus valid time-aware TF.
+v0.3.0 supports the model-ready interface and compatible raw PointCloud2 plus valid time-aware TF,
+and adds the completed KITTI Raw M6 validation and replay tooling.
 It does not prove arbitrary sensor calibration, localization, odometry, intra-scan deskew,
 physical-LiDAR accuracy, or plug-and-play support for any LiDAR. Training, tracking, camera fusion,
 a second detector, INT8, and Jetson measurements remain absent. LaserPerception is research/demo
 software, not a safety-certified perception system. See the
-[v0.2.0 limitations](docs/releases/v0.2.0.md#limitations).
+[v0.3.0 limitations](docs/releases/v0.3.0.md#limitations).
 
 ## Repository map
 
@@ -238,7 +240,7 @@ certified component for operation around people or vehicles.
 
 Original LaserPerception code is [Apache-2.0](LICENSE). That license does not relicense nuScenes,
 external weights, TensorRT engines, ROS/OpenMMLab/NVIDIA components, datasets, or papers. See
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.2.0 and, where
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.3.0 and, where
 reproducibility matters, the exact commit; no DOI is claimed. Citation metadata is in
 [CITATION.cff](CITATION.cff).
 
