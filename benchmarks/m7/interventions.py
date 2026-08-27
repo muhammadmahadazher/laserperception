@@ -295,7 +295,7 @@ def construct_c(
     a = canonical_model_ready(a_points)
     e = canonical_model_ready(e_points)
     canonical_a_provenance(a_provenance, len(a))
-    a_provenance.validate_lags(a, expected_ranks=tuple(range(11)))
+    a_provenance.validate_chronology(a, expected_ranks=tuple(range(11)))
     e_provenance.validate_lags(e, expected_ranks=tuple(range(6)))
     n0 = int(np.sum(a_provenance.history_rank == 0))
     source_counts = tuple(int(np.sum(a_provenance.history_rank == rank)) for rank in range(1, 11))
@@ -367,7 +367,7 @@ def construct_f(a_points: np.ndarray, a_provenance: SweepProvenance) -> Interven
 
     a = canonical_model_ready(a_points)
     canonical_a_provenance(a_provenance, len(a))
-    a_provenance.validate_lags(a, expected_ranks=tuple(range(11)))
+    a_provenance.validate_chronology(a, expected_ranks=tuple(range(11)))
     selected_ranks = (0, *F_HISTORY_RANKS)
     positions = np.flatnonzero(np.isin(a_provenance.history_rank, selected_ranks))
     if not all(np.any(a_provenance.history_rank[positions] == rank) for rank in selected_ranks):

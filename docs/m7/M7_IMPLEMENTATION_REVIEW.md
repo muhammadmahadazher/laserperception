@@ -25,13 +25,13 @@ It did not change seed material, hashing, SplitMix64, quotas, arms, thresholds, 
 | Frozen responsibility | Implementation |
 |---|---|
 | Protocol constants, A–F identities, corpus and B/C/D/F order | `benchmarks/m7/protocol.py` |
-| Canonical float32/uint64 bytes, JSON hashes, external-asset checks, row provenance | `benchmarks/m7/provenance.py` |
+| Canonical float32/uint64 bytes, JSON hashes, external-asset checks, row/source/timestamp provenance | `benchmarks/m7/provenance.py` |
 | Pure B/C/D/F transformations, integer quotas, SHA256 seed and SplitMix64 | `benchmarks/m7/interventions.py` |
 | Existing exact-fast pillar audit and B/A, C, D/C, F/A stop gates | `benchmarks/m7/structural_validation.py` |
-| Frozen M6 paired-set parser and deterministic future input-ledger writer | `benchmarks/m7/evidence.py` |
+| Frozen M6 paired-set parser, strict authorized-ledger loader, and deterministic future input-ledger writer | `benchmarks/m7/evidence.py` |
 | Authorization barrier, repeatability, checkpoints, ordering and metrics | `benchmarks/m7/execution.py` |
-| Detector-free future input-only orchestration | `benchmarks/m7/prepare_inputs.py` |
-| Authorization-first future measurement boundary | `benchmarks/m7/run_measurement.py` |
+| Canonical M6-derived source adapter and detector-free future input-only orchestration | `benchmarks/m7/prepare_inputs.py` |
+| Authorization-first, ledger-bound canonical corpus runner | `benchmarks/m7/run_measurement.py` |
 
 The primary matcher delegates to the unchanged `laserperception.evaluation.kitti_m6b.match_detections`
 implementation with score 0.25 and oriented-BEV IoU 0.50. Pillar structure delegates to the existing
@@ -44,10 +44,14 @@ GT conversion, FOV, neighbour-ignore, matching, or voxelization semantics.
   `(N, 4)` and `x, y, z, time_lag` order before hashing.
 - Selected global A row identities are C-contiguous little-endian uint64.
 - Seed text is encoded as UTF-8 without a terminator.
-- Sweep provenance explicitly carries current/history rank, source sweep ID, zero-based ordinal in
-  the range-filtered source sweep, and zero-based global A row index.
+- Sweep provenance explicitly carries current/history rank, source sweep ID, source frame index,
+  exact source timestamp text/nanoseconds/microseconds, float32 lag bits, zero-based ordinal in the
+  range-filtered source sweep, and zero-based global A row index.
 - Current lag must have the exact positive-zero `0x00000000` bits. Historical lag must be nonzero,
-  and A must expose current plus ranks 1–10 in nearest-to-oldest order.
+  strictly positive under the frozen KITTI/M6 convention, and A must expose current plus ranks
+  1–10 in nearest-to-oldest order. Source timestamps must become strictly older and absolute lag
+  must strictly increase with rank. The lag bits must equal the unchanged M6 microsecond-to-second
+  subtraction followed by the existing float32 write-back.
 - Noncontiguous views and non-native-endian float32 inputs normalize to the same canonical bytes;
   malformed routes fail closed.
 
@@ -138,19 +142,29 @@ B/D scale provenance, C/D quota/seed provenance, F ranks, and runtime versions. 
 canonical and atomic. Duplicate, missing, malformed, noncanonical, shortened, or reordered
 conditions are rejected.
 
-`prepare_input_freeze` streams exactly 428 source frames and constructs exactly 1,712 B/C/D/F
-conditions. It verifies the published full-asset hashes, corpus and ordered A/E commitments, every
-per-frame source hash, and canonical order. The module imports neither TensorRT nor MMDeploy and has
-no detector factory. It was implemented but not run on KITTI.
+`prepare_input_freeze` accepts only the KITTI date root, frozen evidence paths, implementation
+identity, and output path. It no longer accepts arbitrary `FrameSources`, A/E arrays, or caller
+provenance. `CanonicalM7SourceAdapter` reconstructs exactly 428 source frames and 1,712 B/C/D/F
+conditions through the authoritative M6 path: `KittiRawSequence.frame`/`lidar_pose`/timestamps,
+`reconstruct_from_frozen_transforms`, `MultiSweepBuilder`, and `MultiSweepBuilderConfig`. The
+published per-frame frozen transforms, selected indices, time-lag supports, point counts, and H10/H5
+model-ready SHA256 values remain mandatory. Per-row provenance is then derived mechanically from
+the exact reconstructed lag bits and the same nearest-to-oldest source acquisitions; it is never
+accepted from the caller. The module imports neither TensorRT nor MMDeploy and has no detector
+factory. It was implemented but not run on KITTI.
 
 ## Inference authorization and detector safety
 
 The future runner requires an owner-created authorization object binding protocol commit,
 implementation commit, input-ledger SHA256, engine, checkpoint, ONNX, evaluator, and an exact true
-authorization boolean. It then hashes the actual external files and verifies the evaluator identity.
-Only after both checks pass can the injected detector factory be called. Tests prove missing, false,
-or mismatched authorization and mismatched artifact files stop before the factory invocation. No
-authorization artifact was created here.
+authorization boolean. It hashes and strictly parses the complete 1,712-condition ledger before
+runtime verification or detector construction, establishes the canonical source-adapter
+prerequisites, and only then reaches the injected detector factory. Immediately before every fixed
+`detector.infer(points, condition_id=...)` call it compares regenerated condition/source/selection/
+provenance fields with the authorized record and recomputes the SHA256 from the same read-only array
+object passed to the detector. There is no public arbitrary `execute(detector)` callback on the
+canonical path. Tests prove authorization, ledger, artifact, provenance, and actual-input mismatches
+stop before detector invocation. No authorization artifact was created here.
 
 ## Repeatability and checkpoint/resume
 
@@ -165,13 +179,40 @@ preserves canonical order, refuses malformed or duplicate completed conditions, 
 completed record. The canonical constructor refuses any corpus other than all 1,712 conditions;
 synthetic unit tests use an explicitly private fixture-only path.
 
+The integrated runner performs five sentinels × B/C/D/F × ten exact repetitions first. Every repeat
+is rechecked against its authorized input hash. Only after all ten output identities agree is repeat
+1 saved as the canonical condition checkpoint; the ordinary corpus pass loads that checkpoint and
+therefore cannot make an eleventh sentinel call.
+
+## Independent boundary review and remediation
+
+Initial implementation candidate:
+`4021cd44c1b40afe6589df383c6ccbacc8d7241e`.
+
+Independent adversarial review found two blocking implementation-boundary gaps before any real M7
+input existed. First, `FrameSources` previously allowed caller-supplied A/E arrays and provenance,
+so matching A/E point hashes did not independently prove that rank/source labels came from the
+frozen M6 reconstruction lineage. Second, inference authorization bound the ledger file but did not
+mechanically bind each exact array entering the detector to that ledger's per-condition
+`model_ready_sha256`. Both gaps are closed by the canonical source adapter, strict ledger loader,
+rank/lag/timestamp chronology validation, C/F self-validation, and integrated corpus runner above.
+
+The regression statement is: **exact A bytes plus false rank labels must not pass M7**. Synthetic
+rank-1/rank-10 permutation tests now fail in both direct C and direct F construction. A separate
+one-float32-bit adversarial test proves that a ledger-authorized SHA plus different actual detector
+input stops with zero detector calls and no condition checkpoint. These remediations did not alter
+Arm B arithmetic, Arm C quotas/seeds/SplitMix64/selection, Arm D row reuse, Arm F ranks, metrics,
+thresholds, or scientific interpretation rules. The corrected implementation remains an owner-review
+candidate and is not yet frozen.
+
 ## Test scope and safety confirmation
 
 The new tests use tiny synthetic arrays, synthetic sweep provenance, mock detector hashes, temporary
 JSON files, and the already-published M6 full asset only for the permitted local parser validation.
-They cover canonical bytes, B arithmetic, C quotas and SplitMix64, D reuse, F selection, structural
-relations, paired parsing, ledger serialization, authorization/lazy initialization, repeatability,
-checkpoint/resume, canonical order, and metric arithmetic.
+They cover canonical bytes, B arithmetic, C quotas and SplitMix64, D reuse, F selection, false-rank
+and false-timestamp rejection, structural relations, paired parsing, strict ledger serialization,
+authorization/lazy initialization, exact pre-network input binding, repeatability, checkpoint/resume,
+canonical order, and metric arithmetic.
 
 No real B, C, D, or F model-ready input was generated. No M7 input ledger, paired-set
 preregistration, repeatability record, detector output, or result file was created. TensorRT was not

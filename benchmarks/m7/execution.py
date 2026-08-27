@@ -19,12 +19,10 @@ from benchmarks.m7.protocol import (
     ONNX_SHA256,
     PROTOCOL_FREEZE_COMMIT,
     REPEATABILITY_REPETITIONS,
-    SENTINEL_FRAMES,
-    Arm,
     ProtocolViolation,
     canonical_condition_ids,
 )
-from benchmarks.m7.provenance import atomic_write_json, canonical_json_sha256
+from benchmarks.m7.provenance import atomic_write_json, canonical_json_sha256, model_ready_sha256
 from laserperception.detection.types import Detection3D
 from laserperception.evaluation.kitti_m6b import M6bGroundTruthBox, MatchSummary, match_detections
 
@@ -77,11 +75,22 @@ class RuntimeArtifacts:
     onnx: Path
     evaluator_identity: str
 
-    def verify(self, expected: ExecutionIdentity) -> None:
-        """Hash every frozen file and evaluator identity before detector construction."""
+    def verify_input_ledger(self, expected: ExecutionIdentity) -> None:
+        """Verify the authorized ledger file before parsing or detector construction."""
+
+        if not self.input_ledger.is_file():
+            raise FileNotFoundError(f"M7 input ledger is missing: {self.input_ledger}")
+        actual = _sha256_file(self.input_ledger)
+        if actual != expected.input_ledger_sha256:
+            raise ProtocolViolation(
+                "M7 input ledger SHA256 mismatch: "
+                f"expected {expected.input_ledger_sha256}, found {actual}"
+            )
+
+    def verify_runtime(self, expected: ExecutionIdentity) -> None:
+        """Hash frozen detector artifacts after strict ledger validation."""
 
         for name, path, expected_sha256 in (
-            ("input ledger", self.input_ledger, expected.input_ledger_sha256),
             ("engine", self.engine, expected.engine_sha256),
             ("checkpoint", self.checkpoint, expected.checkpoint_sha256),
             ("ONNX", self.onnx, expected.onnx_sha256),
@@ -95,6 +104,12 @@ class RuntimeArtifacts:
                 )
         if self.evaluator_identity != expected.evaluator_identity:
             raise ProtocolViolation("M7 evaluator identity mismatch")
+
+    def verify(self, expected: ExecutionIdentity) -> None:
+        """Compatibility helper verifying ledger then remaining runtime artifacts."""
+
+        self.verify_input_ledger(expected)
+        self.verify_runtime(expected)
 
 
 def verify_inference_authorization(
@@ -125,17 +140,44 @@ def load_inference_authorization(
     return record
 
 
-def run_authorized(
+def _run_authorized_for_test(
     authorization: Mapping[str, object],
     expected: ExecutionIdentity,
     detector_factory: Callable[[], TDetector],
     execute: Callable[[TDetector], TResult],
 ) -> TResult:
-    """Verify authorization before the lazy detector factory is invoked."""
+    """Private unit-test helper; the canonical runner has no arbitrary execute callback."""
 
     verify_inference_authorization(authorization, expected)
     detector = detector_factory()
     return execute(detector)
+
+
+@dataclass(frozen=True, slots=True)
+class DetectorObservation:
+    """Fixed detector-return boundary consumed by the canonical corpus runner."""
+
+    raw_outputs: Mapping[str, np.ndarray]
+    detection_frame: Mapping[str, object]
+    payload: Mapping[str, object]
+
+    def hashes(self) -> ObservationHashes:
+        """Return frozen raw and DetectionFrame identities."""
+
+        return observation_hashes(self.raw_outputs, self.detection_frame)
+
+
+def require_actual_input(points: np.ndarray, expected_sha256: str) -> str:
+    """Hash the exact immutable array immediately before its detector invocation."""
+
+    if points.flags.writeable:
+        raise ProtocolViolation("M7 detector input must be read-only after regeneration")
+    actual = model_ready_sha256(points)
+    if actual != expected_sha256:
+        raise ProtocolViolation(
+            f"M7 actual detector input SHA256 mismatch: expected {expected_sha256}, found {actual}"
+        )
+    return actual
 
 
 @dataclass(frozen=True, slots=True)
@@ -202,22 +244,6 @@ def repeatability_condition(
                 f"M7 repeatability differs at repetition {index}: {', '.join(differing)}"
             )
     return canonical
-
-
-def run_repeatability_gate(
-    execute: Callable[[str, Arm], ObservationHashes],
-) -> dict[str, dict[str, str]]:
-    """Implement the frozen five-sentinel, four-arm, ten-repeat gate."""
-
-    result: dict[str, dict[str, str]] = {}
-    for frame_id in SENTINEL_FRAMES:
-        for arm in (Arm.B, Arm.C, Arm.D, Arm.F):
-            key = f"{frame_id}|{arm.value}"
-            canonical = repeatability_condition(
-                lambda frame=frame_id, value=arm: execute(frame, value)
-            )
-            result[key] = canonical.to_dict()
-    return result
 
 
 @dataclass(frozen=True, slots=True)

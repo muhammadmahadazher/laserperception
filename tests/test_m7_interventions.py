@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import inspect
+from dataclasses import replace
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
 from benchmarks.m7.interventions import (
+    LagScale,
+    _apply_lag_scale,
     allocate_quotas,
     construct_b,
     construct_c,
@@ -14,9 +20,19 @@ from benchmarks.m7.interventions import (
     select_lowest_ordinals,
     splitmix64_key,
 )
-from benchmarks.m7.prepare_inputs import FrameSources, prepare_frame_conditions
+from benchmarks.m7.prepare_inputs import (
+    CanonicalM7SourceAdapter,
+    FrameSources,
+    _prepare_frame_conditions_for_test,
+    prepare_input_freeze,
+)
 from benchmarks.m7.protocol import F_HISTORY_RANKS, ProtocolViolation
-from benchmarks.m7.provenance import SweepProvenance, model_ready_sha256, selected_rows_bytes
+from benchmarks.m7.provenance import (
+    RankSourceIdentity,
+    SweepProvenance,
+    model_ready_sha256,
+    selected_rows_bytes,
+)
 from benchmarks.m7.structural_validation import (
     PillarStructure,
     validate_b_against_a,
@@ -24,6 +40,8 @@ from benchmarks.m7.structural_validation import (
     validate_d_against_c,
     validate_f_against_a,
 )
+from laserperception.datasets.kitti_raw import KittiReconstructionResult, KittiTimestamp
+from laserperception.detection.ros2_contract import ModelReadyPointCloud
 
 
 def _fixture(
@@ -36,7 +54,7 @@ def _fixture(
     for rank in range(11):
         for ordinal in range(rows_per_rank):
             row = len(a_rows)
-            lag = 0.0 if rank == 0 else -0.1 * rank
+            lag = 0.0 if rank == 0 else 0.1 * rank
             a_rows.append([-45.0 + 0.5 * row, -20.0 + rank, 0.1 * ordinal, lag])
             a_ranks.append(rank)
             a_ids.append(f"sweep-{rank}")
@@ -48,18 +66,46 @@ def _fixture(
     for rank in range(6):
         for ordinal in range(rows_per_rank):
             row = len(e_rows)
-            lag = 0.0 if rank == 0 else -0.1 * rank
+            lag = 0.0 if rank == 0 else 0.1 * rank
             e_rows.append([-44.0 + 0.5 * row, 10.0 + rank, 0.2 * ordinal, lag])
             e_ranks.append(rank)
             e_ids.append(f"e-sweep-{rank}")
             e_ordinals.append(ordinal)
     a = np.asarray(a_rows, dtype=np.float32)
     e = np.asarray(e_rows, dtype=np.float32)
+
+    def rank_sources(prefix: str, depth: int) -> tuple[RankSourceIdentity, ...]:
+        current_microseconds = 1_000_000
+        result = []
+        for rank in range(depth + 1):
+            timestamp_microseconds = current_microseconds - rank * 100_000
+            lag = np.float32(current_microseconds / 1_000_000 - timestamp_microseconds / 1_000_000)
+            result.append(
+                RankSourceIdentity(
+                    history_rank=rank,
+                    source_sweep_id=f"{prefix}{rank}",
+                    source_index=10 - rank,
+                    timestamp_text=f"synthetic-{timestamp_microseconds}",
+                    timestamp_nanoseconds=timestamp_microseconds * 1_000,
+                    timestamp_microseconds=timestamp_microseconds,
+                    lag_float32_bits=int(np.asarray([lag], dtype="<f4").view("<u4")[0]),
+                )
+            )
+        return tuple(result)
+
     a_provenance = SweepProvenance(
-        np.asarray(a_ranks), tuple(a_ids), np.asarray(a_ordinals), np.arange(len(a))
+        np.asarray(a_ranks),
+        tuple(a_ids),
+        np.asarray(a_ordinals),
+        np.arange(len(a)),
+        rank_sources("sweep-", 10),
     )
     e_provenance = SweepProvenance(
-        np.asarray(e_ranks), tuple(e_ids), np.asarray(e_ordinals), np.arange(len(e))
+        np.asarray(e_ranks),
+        tuple(e_ids),
+        np.asarray(e_ordinals),
+        np.arange(len(e)),
+        rank_sources("e-sweep-", 5),
     )
     return a, e, a_provenance, e_provenance
 
@@ -85,20 +131,20 @@ def test_arm_b_known_float32_bits_and_exact_binary64_scale() -> None:
     assert scale.scale_bits == 0x3FE0000000000000
     assert b.points[:, 3].view(np.uint32).tolist() == [
         0x00000000,
-        0xBD4CCCCD,
-        0xBDCCCCCD,
-        0xBE19999A,
-        0xBE4CCCCD,
-        0xBE800000,
-        0xBE99999A,
-        0xBEB33333,
-        0xBECCCCCD,
-        0xBEE66666,
-        0xBF000000,
+        0x3D4CCCCD,
+        0x3DCCCCCD,
+        0x3E19999A,
+        0x3E4CCCCD,
+        0x3E800000,
+        0x3E99999A,
+        0x3EB33333,
+        0x3ECCCCCD,
+        0x3EE66666,
+        0x3F000000,
     ]
     assert np.array_equal(b.points[:, :3].view(np.uint32), a[:, :3].view(np.uint32))
     assert not np.signbit(b.points[0, 3])
-    assert np.all(np.signbit(b.points[1:, 3]))
+    assert not np.any(np.signbit(b.points[1:, 3]))
 
 
 @pytest.mark.parametrize("bad_value", [np.nan, np.inf, -np.inf])
@@ -126,14 +172,23 @@ def test_arm_b_rejects_zero_t10_t5_unexpected_support_and_cast_collapse() -> Non
         a_provenance.source_sweep_id[:-1],
         a_provenance.within_sweep_ordinal[:-1],
         a_provenance.global_a_row_index[:-1],
+        a_provenance.rank_sources[:-1],
     )
     with pytest.raises(ProtocolViolation, match="original row positions"):
         construct_b(a, e, short_provenance, e_provenance)
 
-    tiny_e = e.copy()
-    tiny_e[1:, 3] = -np.arange(1, 6, dtype=np.float32) * np.nextafter(np.float32(0), np.float32(1))
+    tiny_scale = float(np.finfo(np.float64).tiny)
+    scale = LagScale(
+        t10_f32=1.0,
+        t5_f32=1.0,
+        t10_f32_bits=0x3F800000,
+        t5_f32_bits=0x3F800000,
+        scale=tiny_scale,
+        scale_bits=1,
+        scale_hex=tiny_scale.hex(),
+    )
     with pytest.raises(ProtocolViolation, match="collapsed"):
-        construct_b(a, tiny_e, a_provenance, e_provenance)
+        _apply_lag_scale(a, a_provenance, scale)
 
 
 def test_integer_largest_remainder_edges_and_rank_tie_break() -> None:
@@ -224,12 +279,14 @@ def test_provenance_rejects_duplicate_and_out_of_range_global_rows() -> None:
             a_provenance.source_sweep_id,
             a_provenance.within_sweep_ordinal,
             np.zeros(len(a), dtype=np.uint64),
+            a_provenance.rank_sources,
         )
     bad = SweepProvenance(
         a_provenance.history_rank,
         a_provenance.source_sweep_id,
         a_provenance.within_sweep_ordinal,
         np.arange(1, len(a) + 1),
+        a_provenance.rank_sources,
     )
     with pytest.raises(ProtocolViolation, match="original row positions"):
         construct_c(
@@ -286,7 +343,7 @@ def test_input_only_frame_orchestration_emits_b_c_d_f_records_without_detector()
         expected_e_sha256=model_ready_sha256(e),
     )
 
-    records = prepare_frame_conditions(source, implementation_commit="1" * 40)
+    records = _prepare_frame_conditions_for_test(source, implementation_commit="1" * 40)
 
     assert [record["arm"] for record in records] == [
         "H10_LAG_COMPRESSED",
@@ -297,3 +354,110 @@ def test_input_only_frame_orchestration_emits_b_c_d_f_records_without_detector()
     assert records[1]["point_count"] == len(e)
     assert records[2]["selected_row_sha256"] == records[1]["selected_row_sha256"]
     assert records[3]["f_history_ranks"] == [2, 4, 6, 8, 10]
+
+
+def test_exact_a_bytes_with_false_rank_labels_are_rejected_by_c_and_f() -> None:
+    a, e, a_provenance, e_provenance = _fixture()
+    swapped = {1: 10, 10: 1}
+    false_ranks = np.asarray(
+        [swapped.get(int(rank), int(rank)) for rank in a_provenance.history_rank]
+    )
+    false_ids = tuple(a_provenance.rank_sources[int(rank)].source_sweep_id for rank in false_ranks)
+    false_provenance = SweepProvenance(
+        false_ranks,
+        false_ids,
+        a_provenance.within_sweep_ordinal,
+        a_provenance.global_a_row_index,
+        a_provenance.rank_sources,
+    )
+
+    assert model_ready_sha256(a) == model_ready_sha256(a.copy())
+    with pytest.raises(ProtocolViolation, match="frozen lag bits"):
+        construct_c(
+            a,
+            e,
+            false_provenance,
+            e_provenance,
+            drive_id="2011_09_26_drive_0001",
+            frame_index=10,
+        )
+    with pytest.raises(ProtocolViolation, match="frozen lag bits"):
+        construct_f(a, false_provenance)
+
+
+def test_incorrect_lag_and_source_timestamp_chronology_are_rejected() -> None:
+    a, _, a_provenance, _ = _fixture()
+    wrong_lags = a.copy()
+    first = np.flatnonzero(a_provenance.history_rank == 1)
+    oldest = np.flatnonzero(a_provenance.history_rank == 10)
+    wrong_lags[first, 3], wrong_lags[oldest, 3] = (
+        a[oldest, 3].copy(),
+        a[first, 3].copy(),
+    )
+    with pytest.raises(ProtocolViolation, match="frozen lag bits"):
+        construct_f(wrong_lags, a_provenance)
+
+    sources = list(a_provenance.rank_sources)
+    sources[1] = replace(
+        sources[1],
+        timestamp_text=sources[2].timestamp_text,
+        timestamp_nanoseconds=sources[2].timestamp_nanoseconds,
+        timestamp_microseconds=sources[2].timestamp_microseconds,
+    )
+    false_timestamp = SweepProvenance(
+        a_provenance.history_rank,
+        a_provenance.source_sweep_id,
+        a_provenance.within_sweep_ordinal,
+        a_provenance.global_a_row_index,
+        tuple(sources),
+    )
+    with pytest.raises(ProtocolViolation, match="timestamp"):
+        construct_f(a, false_timestamp)
+
+
+def test_canonical_input_freeze_has_no_caller_sources_or_provenance_parameter() -> None:
+    parameters = inspect.signature(prepare_input_freeze).parameters
+    assert tuple(parameters) == ("prerequisites", "dataset_root", "output_path")
+    assert "sources" not in parameters
+    assert "provenance" not in parameters
+
+
+def test_canonical_adapter_derives_exact_row_and_timestamp_provenance() -> None:
+    base_nanoseconds = 1_000_000_000_000
+    timestamps = tuple(
+        KittiTimestamp(f"synthetic-{index}", base_nanoseconds + index * 100_000_000)
+        for index in range(11)
+    )
+
+    class Sequence:
+        def __init__(self) -> None:
+            self.timestamps = timestamps
+
+        def frame(self, index: int) -> SimpleNamespace:
+            return SimpleNamespace(source_id=f"drive_sync/{index:010d}")
+
+    current = timestamps[10]
+    rows = []
+    for rank, source_index in enumerate(range(10, -1, -1)):
+        source = timestamps[source_index]
+        lag = np.float32(current.microseconds / 1_000_000 - source.microseconds / 1_000_000)
+        rows.extend([float(rank), float(ordinal), 0.0, float(lag)] for ordinal in range(2))
+    points = np.asarray(rows, dtype=np.float32)
+    reconstruction = KittiReconstructionResult(
+        current_index=10,
+        selected_indices=tuple(range(10, -1, -1)),
+        source_counts=(2,) * 11,
+        point_cloud=ModelReadyPointCloud(points),
+    )
+
+    provenance = CanonicalM7SourceAdapter._derive_provenance(  # noqa: SLF001
+        Sequence(),  # type: ignore[arg-type]
+        reconstruction,
+        history_depth=10,
+    )
+
+    assert provenance.global_a_row_index.tolist() == list(range(22))
+    assert provenance.within_sweep_ordinal.tolist() == [0, 1] * 11
+    assert [source.source_index for source in provenance.rank_sources] == list(range(10, -1, -1))
+    assert provenance.rank_sources[10].timestamp_text == "synthetic-0"
+    assert provenance.rank_sources[10].lag_float32_bits == int(points[-1, 3:].view("<u4")[0])
