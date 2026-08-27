@@ -1,10 +1,16 @@
-# M7 implementation candidate review
+# M7 implementation freeze review
 
-Status: **IMPLEMENTATION CANDIDATE FOR OWNER REVIEW.**
-**NO REAL M7 INPUT OR DETECTOR OUTPUT GENERATED.**
+Status: **M7 IMPLEMENTATION OWNER-APPROVED AND FROZEN.**
+**CANONICAL IMPLEMENTATION COMMIT:**
+`c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2`
 
-This document describes a CPU-only implementation candidate for the frozen protocol. It records no
-M7 scientific result and authorizes neither real B/C/D/F input construction nor detector inference.
+**NO M7 DETECTOR OUTPUT EXISTS.**
+**INPUT-ONLY GENERATION IS AUTHORIZED.**
+**DETECTOR INFERENCE IS NOT AUTHORIZED.**
+
+This document describes the owner-approved CPU-only implementation for the frozen protocol. It
+records no M7 detector result, authorizes real B/C/D/F input construction only, and does not
+authorize detector inference.
 
 ## Identities and chronology
 
@@ -14,8 +20,12 @@ M7 scientific result and authorizes neither real B/C/D/F input construction nor 
   `7700216c234c0c4bf908dba6ab5a7106e730a627`
 - Post-freeze editorial consistency commit:
   `ac86412e504fc2ddf5ce4b549565a969aba56898`
-- Candidate implementation identity: the implementation commit containing this document, recorded
-  as the final head of the implementation PR. It is not frozen before owner review and merge.
+- Canonical implementation identity:
+  `c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2`
+- Accepted main merge commit:
+  `cc938136e11796932ba25821d291428ac481bed1`
+- PR #18 merged with a normal merge commit; the reviewed implementation commit remains the
+  scientific implementation identity, while the merge commit records its accepted integration.
 
 The editorial commit changed only the stale description of the already-approved C selection rule.
 It did not change seed material, hashing, SplitMix64, quotas, arms, thresholds, or metrics.
@@ -228,8 +238,8 @@ rank-1/rank-10 permutation tests now fail in both direct C and direct F construc
 one-float32-bit adversarial test proves that a ledger-authorized SHA plus different actual detector
 input stops with zero detector calls and no condition checkpoint. These remediations did not alter
 Arm B arithmetic, Arm C quotas/seeds/SplitMix64/selection, Arm D row reuse, Arm F ranks, metrics,
-thresholds, or scientific interpretation rules. The corrected implementation remains an owner-review
-candidate and is not yet frozen.
+thresholds, or scientific interpretation rules. The corrected implementation was owner-approved and
+frozen at `c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2` before any real M7 input generation.
 
 ## Test scope and safety confirmation
 
