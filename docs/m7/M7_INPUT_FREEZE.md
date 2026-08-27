@@ -70,6 +70,15 @@ The full canonical authorization input is one indivisible external ledger:
 - SHA256: `577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea`
 - Storage: external under the ignored local evidence area; not tracked because it exceeds 5 MiB
 
+The full ledger is the exact authorization input for this M7 measurement, but it is not an
+irreplaceable unique source artifact. Its contents are deterministically derived from the frozen
+protocol and implementation, the verified M6 evidence, and the same KITTI Raw corpus. A regenerated
+ledger could replace the current external copy only if it reproduced the exact frozen SHA256
+`577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea`. The 20/20 fresh-adapter
+sentinel replay demonstrates deterministic regeneration on the preregistered sentinel subset; it
+is not a second full-corpus reproduction proof. For this measurement, the exact ledger SHA remains
+load-bearing.
+
 The repository's `load_strict_input_ledger` accepted the exact file, enforcing its schema,
 protocol/implementation identities, unique complete 1,712-condition corpus, B/C/D/F-only arm set,
 and canonical order. A future owner authorization must bind this exact full-ledger SHA; the compact
