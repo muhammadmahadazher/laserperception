@@ -286,8 +286,8 @@ For every C condition require:
 - all ten historical supports represented unless their preregistered quota is zero;
 - native A lag values and native A physical temporal extent for retained rows.
 
-The selection rule is a draft proposal until owner approval. M7 permits no second seed, seed sweep,
-or result-informed alternative.
+The selection rule is owner-approved and frozen by this protocol. M7 permits no second seed, seed
+sweep, or result-informed alternative.
 
 ## Arm D: combined intervention
 
