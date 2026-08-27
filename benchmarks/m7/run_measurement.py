@@ -5,10 +5,14 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol, TypeVar
+from typing import Protocol
 
 import numpy as np
 
+from benchmarks.m7.detector import (
+    build_canonical_m7_detector,
+    require_detector_runtime_identity,
+)
 from benchmarks.m7.evidence import StrictInputLedger, load_strict_input_ledger
 from benchmarks.m7.execution import (
     CheckpointIdentity,
@@ -36,8 +40,6 @@ from benchmarks.m7.protocol import (
     canonical_condition_ids,
 )
 from benchmarks.m7.provenance import atomic_write_json, verify_external_asset
-
-TDetector = TypeVar("TDetector", bound="M7Detector")
 
 
 class M7Detector(Protocol):
@@ -259,9 +261,35 @@ def run_measurement(
     m6b_result_asset: str | Path,
     checkpoint_root: str | Path,
     output_root: str | Path,
-    detector_factory: Callable[[], TDetector],
 ) -> CorpusRunSummary:
-    """Run the complete authorized corpus; no arbitrary execute callback is accepted."""
+    """Run the authorized corpus using only the canonical artifact-bound M6b detector."""
+
+    return _run_measurement_internal(
+        authorization_path,
+        expected,
+        artifacts,
+        dataset_root=dataset_root,
+        m6b_input_asset=m6b_input_asset,
+        m6b_result_asset=m6b_result_asset,
+        checkpoint_root=checkpoint_root,
+        output_root=output_root,
+        _detector_builder=build_canonical_m7_detector,
+    )
+
+
+def _run_measurement_internal(
+    authorization_path: str | Path,
+    expected: ExecutionIdentity,
+    artifacts: RuntimeArtifacts,
+    *,
+    dataset_root: str | Path,
+    m6b_input_asset: str | Path,
+    m6b_result_asset: str | Path,
+    checkpoint_root: str | Path,
+    output_root: str | Path,
+    _detector_builder: Callable[[RuntimeArtifacts, ExecutionIdentity], M7Detector],
+) -> CorpusRunSummary:
+    """Private CPU-test seam; public execution always supplies the canonical builder."""
 
     load_inference_authorization(authorization_path, expected)
     artifacts.verify_input_ledger(expected)
@@ -276,6 +304,8 @@ def run_measurement(
         expected_sha256=M6B_RESULT_FULL_SHA256,
     )
     source_adapter = CanonicalM7SourceAdapter(dataset_root, m6b_input_asset)
+    detector = _detector_builder(artifacts, expected)
+    require_detector_runtime_identity(detector, artifacts, expected)
     checkpoint_store = M7CheckpointStore(
         checkpoint_root,
         CheckpointIdentity(
@@ -288,7 +318,6 @@ def run_measurement(
             protocol_commit=expected.protocol_commit,
         ),
     )
-    detector = detector_factory()
     runner = M7CorpusRunner(
         ledger=ledger,
         source_adapter=source_adapter,

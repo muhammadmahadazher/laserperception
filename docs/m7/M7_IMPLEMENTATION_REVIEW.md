@@ -31,6 +31,7 @@ It did not change seed material, hashing, SplitMix64, quotas, arms, thresholds, 
 | Frozen M6 paired-set parser, strict authorized-ledger loader, and deterministic future input-ledger writer | `benchmarks/m7/evidence.py` |
 | Authorization barrier, repeatability, checkpoints, ordering and metrics | `benchmarks/m7/execution.py` |
 | Canonical M6-derived source adapter and detector-free future input-only orchestration | `benchmarks/m7/prepare_inputs.py` |
+| Artifact-bound canonical M6b detector adapter | `benchmarks/m7/detector.py` |
 | Authorization-first, ledger-bound canonical corpus runner | `benchmarks/m7/run_measurement.py` |
 
 The primary matcher delegates to the unchanged `laserperception.evaluation.kitti_m6b.match_detections`
@@ -159,12 +160,37 @@ The future runner requires an owner-created authorization object binding protoco
 implementation commit, input-ledger SHA256, engine, checkpoint, ONNX, evaluator, and an exact true
 authorization boolean. It hashes and strictly parses the complete 1,712-condition ledger before
 runtime verification or detector construction, establishes the canonical source-adapter
-prerequisites, and only then reaches the injected detector factory. Immediately before every fixed
-`detector.infer(points, condition_id=...)` call it compares regenerated condition/source/selection/
-provenance fields with the authorized record and recomputes the SHA256 from the same read-only array
-object passed to the detector. There is no public arbitrary `execute(detector)` callback on the
-canonical path. Tests prove authorization, ledger, artifact, provenance, and actual-input mismatches
-stop before detector invocation. No authorization artifact was created here.
+prerequisites, and only then internally constructs the artifact-bound canonical detector.
+Immediately before every fixed `detector.infer(points, condition_id=...)` call it compares
+regenerated condition/source/selection/provenance fields with the authorized record and recomputes
+the SHA256 from the same read-only array object passed to the detector. The unchanged accepted
+`M2Backend.prepare_model_ready_points` boundary then necessarily copies those values into its
+validated model-ready wrapper and PyTorch tensor. There is no public arbitrary detector factory or
+`execute(detector)` callback on the canonical path. Tests prove authorization, ledger, artifact,
+runtime identity, provenance, and actual-input mismatches stop before detector invocation. No
+authorization artifact was created here.
+
+## Final detector-runtime binding review
+
+Initial candidate:
+`4021cd44c1b40afe6589df383c6ccbacc8d7241e`.
+
+First boundary correction:
+`d4664f4ddd72305ec90aa5b7ccddf3075f94bfd5`.
+
+Final owner source review found that the corrected runner bound exact authorized input bytes to
+`detector.infer`, but detector construction itself remained caller-injectable. This was fixed before
+input generation, ledger freeze, TensorRT initialization, or detector inference. The canonical
+public path now internally constructs the unchanged frozen M6b detector runtime from the verified
+engine and checkpoint paths, while retaining the frozen ONNX as verified provenance because that
+runtime does not consume it directly. It reuses `M2Backend`, `exact_fast`, cuda:0, the frozen
+MMDetection3D/MMDeploy configs, the TensorRT raw-output assertions, the unchanged MMDeploy
+`VoxelDetectionModel.postprocess`, and `DetectionFrame` conversion with full provenance.
+
+The adapter publishes a sanitized, read-only runtime identity, while retaining the exact verified
+external paths privately for mechanical checkpoint and engine binding. A private CPU-test seam can
+substitute a mock only inside the internal bootstrap; the public `run_measurement` signature has no
+detector selection parameter. No scientific arithmetic changed.
 
 ## Repeatability and checkpoint/resume
 
@@ -212,7 +238,7 @@ JSON files, and the already-published M6 full asset only for the permitted local
 They cover canonical bytes, B arithmetic, C quotas and SplitMix64, D reuse, F selection, false-rank
 and false-timestamp rejection, structural relations, paired parsing, strict ledger serialization,
 authorization/lazy initialization, exact pre-network input binding, repeatability, checkpoint/resume,
-canonical order, and metric arithmetic.
+canonical order, artifact-to-runtime path binding, wrong-runtime rejection, and metric arithmetic.
 
 No real B, C, D, or F model-ready input was generated. No M7 input ledger, paired-set
 preregistration, repeatability record, detector output, or result file was created. TensorRT was not

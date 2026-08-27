@@ -67,7 +67,7 @@ class ExecutionIdentity:
 
 @dataclass(frozen=True, slots=True)
 class RuntimeArtifacts:
-    """External artifact paths verified before the lazy detector factory is reachable."""
+    """External artifact paths verified before canonical detector construction is reachable."""
 
     input_ledger: Path
     engine: Path
