@@ -29,6 +29,8 @@ from laserperception.evaluation.kitti_m6b import M6bGroundTruthBox, MatchSummary
 TDetector = TypeVar("TDetector")
 TResult = TypeVar("TResult")
 RAW_OUTPUT_NAMES = ("cls_score", "bbox_pred", "dir_cls_pred")
+FROZEN_M7_INPUT_LEDGER_BYTES = 3_163_158_937
+FROZEN_M7_INPUT_LEDGER_SHA256 = "577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea"
 
 
 def _sha256_file(path: Path) -> str:
@@ -45,6 +47,7 @@ class ExecutionIdentity:
 
     implementation_commit: str
     input_ledger_sha256: str
+    measurement_runtime_commit: str
     engine_sha256: str = ENGINE_SHA256
     checkpoint_sha256: str = CHECKPOINT_SHA256
     onnx_sha256: str = ONNX_SHA256
@@ -57,6 +60,7 @@ class ExecutionIdentity:
         return {
             "m7_protocol_commit": self.protocol_commit,
             "m7_implementation_commit": self.implementation_commit,
+            "m7_measurement_runtime_commit": self.measurement_runtime_commit,
             "m7_input_ledger_sha256": self.input_ledger_sha256,
             "engine_sha256": self.engine_sha256,
             "checkpoint_sha256": self.checkpoint_sha256,
@@ -80,6 +84,15 @@ class RuntimeArtifacts:
 
         if not self.input_ledger.is_file():
             raise FileNotFoundError(f"M7 input ledger is missing: {self.input_ledger}")
+        actual_bytes = self.input_ledger.stat().st_size
+        if (
+            expected.input_ledger_sha256 == FROZEN_M7_INPUT_LEDGER_SHA256
+            and actual_bytes != FROZEN_M7_INPUT_LEDGER_BYTES
+        ):
+            raise ProtocolViolation(
+                "M7 input ledger byte count mismatch: "
+                f"expected {FROZEN_M7_INPUT_LEDGER_BYTES}, found {actual_bytes}"
+            )
         actual = _sha256_file(self.input_ledger)
         if actual != expected.input_ledger_sha256:
             raise ProtocolViolation(
@@ -118,7 +131,10 @@ def verify_inference_authorization(
 ) -> None:
     """Hard-stop on missing or mismatched owner authorization before detector initialization."""
 
-    if authorization.get("schema_version") != "laserperception.m7.inference-authorization.v1":
+    expected_fields = {"schema_version", "authorized_for_inference", *expected.to_dict()}
+    if set(authorization) != expected_fields:
+        raise ProtocolViolation("M7 inference authorization schema fields differ")
+    if authorization.get("schema_version") != "laserperception.m7.inference-authorization.v2":
         raise ProtocolViolation("M7 inference authorization schema is missing or invalid")
     if authorization.get("authorized_for_inference") is not True:
         raise ProtocolViolation("M7 detector inference is not explicitly authorized")
@@ -252,6 +268,7 @@ class CheckpointIdentity:
 
     implementation_commit: str
     input_ledger_sha256: str
+    measurement_runtime_commit: str
     engine_sha256: str = ENGINE_SHA256
     checkpoint_sha256: str = CHECKPOINT_SHA256
     onnx_sha256: str = ONNX_SHA256
@@ -264,6 +281,7 @@ class CheckpointIdentity:
         return {
             "protocol_commit": self.protocol_commit,
             "implementation_commit": self.implementation_commit,
+            "measurement_runtime_commit": self.measurement_runtime_commit,
             "input_ledger_sha256": self.input_ledger_sha256,
             "engine_sha256": self.engine_sha256,
             "checkpoint_sha256": self.checkpoint_sha256,
@@ -306,7 +324,7 @@ class M7CheckpointStore:
 
     def _base_progress(self) -> dict[str, object]:
         return {
-            "schema_version": "laserperception.m7.progress.v1",
+            "schema_version": "laserperception.m7.progress.v2",
             "identity": self.identity.to_dict(),
             "condition_ids": list(self.condition_ids),
             "conditions": {condition: {"status": "PENDING"} for condition in self.condition_ids},
@@ -378,7 +396,7 @@ class M7CheckpointStore:
                 f"M7 completed condition cannot be rerun or overwritten: {condition}"
             )
         record: dict[str, object] = {
-            "schema_version": "laserperception.m7.checkpoint.v1",
+            "schema_version": "laserperception.m7.checkpoint.v2",
             "status": "COMPLETE",
             "identity": self.identity.to_dict(),
             "condition_id": condition,

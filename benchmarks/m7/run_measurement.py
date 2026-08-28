@@ -13,7 +13,12 @@ from benchmarks.m7.detector import (
     build_canonical_m7_detector,
     require_detector_runtime_identity,
 )
-from benchmarks.m7.evidence import StrictInputLedger, load_strict_input_ledger
+from benchmarks.m7.evidence import (
+    RuntimeBindingRecord,
+    StreamingStrictInputLedger,
+    StrictInputLedger,
+    load_strict_input_ledger,
+)
 from benchmarks.m7.execution import (
     CheckpointIdentity,
     DetectorObservation,
@@ -49,34 +54,6 @@ class M7Detector(Protocol):
         """Run the unchanged frozen detector on the provided exact model-ready input."""
 
 
-BOUND_RECORD_FIELDS = (
-    "condition_id",
-    "drive_id",
-    "frame_index",
-    "arm",
-    "generation_commit",
-    "source_a_sha256",
-    "source_e_sha256",
-    "point_count",
-    "xyz_sha256",
-    "model_ready_sha256",
-    "selected_row_sha256",
-    "lag_bit_patterns",
-    "lag_support_count",
-    "lag_span_seconds",
-    "sweep_ids",
-    "per_sweep_point_counts",
-    "provenance_schema",
-    "rank_source_identities",
-    "rank_to_lag_bit_pattern",
-    "pillar_structure",
-    "lag_scale_provenance",
-    "quota_provenance",
-    "seed_provenance",
-    "f_history_ranks",
-)
-
-
 @dataclass(frozen=True, slots=True)
 class CorpusRunSummary:
     """Bounded run bookkeeping; scientific aggregation remains separately frozen."""
@@ -104,7 +81,7 @@ class M7CorpusRunner:
     def __init__(
         self,
         *,
-        ledger: StrictInputLedger,
+        ledger: StrictInputLedger | StreamingStrictInputLedger,
         source_adapter: CanonicalM7SourceAdapter,
         detector: M7Detector,
         checkpoint_store: M7CheckpointStore,
@@ -132,17 +109,13 @@ class M7CorpusRunner:
     @staticmethod
     def _bind_record(
         generated: GeneratedCondition,
-        authorized: Mapping[str, object],
+        authorized: RuntimeBindingRecord,
     ) -> str:
-        for field in BOUND_RECORD_FIELDS:
-            if generated.record.get(field) != authorized.get(field):
-                raise ProtocolViolation(
-                    f"M7 regenerated condition differs from authorized ledger field: {field}"
-                )
-        expected_sha = authorized.get("model_ready_sha256")
-        if not isinstance(expected_sha, str):
-            raise ProtocolViolation("authorized M7 condition lacks model_ready_sha256")
-        return require_actual_input(generated.points, expected_sha)
+        if not authorized.matches(generated.record):
+            raise ProtocolViolation(
+                "M7 regenerated condition differs from the authorized runtime projection"
+            )
+        return require_actual_input(generated.points, authorized.model_ready_sha256)
 
     def _generated_condition(self, condition: str) -> GeneratedCondition:
         frame_id, arm = self._frame_and_arm(condition)
@@ -151,7 +124,7 @@ class M7CorpusRunner:
             frame_id,
             implementation_commit=self.implementation_commit,
         ).condition(arm)
-        authorized = self.ledger.condition(condition)
+        authorized = self.ledger.runtime_condition(condition)
         self._bind_record(generated, authorized)
         return generated
 
@@ -162,7 +135,7 @@ class M7CorpusRunner:
         *,
         repeatability: bool,
     ) -> DetectorObservation:
-        authorized = self.ledger.condition(condition)
+        authorized = self.ledger.runtime_condition(condition)
         self._bind_record(generated, authorized)
         observation = self.detector.infer(generated.points, condition_id=condition)
         self.inference_call_count += 1
@@ -174,8 +147,7 @@ class M7CorpusRunner:
         for frame_id in SENTINEL_FRAMES:
             for arm in (Arm.B, Arm.C, Arm.D, Arm.F):
                 condition = f"{frame_id}|{arm.value}"
-                expected_sha = self.ledger.condition(condition)["model_ready_sha256"]
-                assert isinstance(expected_sha, str)
+                expected_sha = self.ledger.runtime_condition(condition).model_ready_sha256
                 complete = self.checkpoint_store.load_complete(
                     condition,
                     expected_input_sha256=expected_sha,
@@ -226,8 +198,7 @@ class M7CorpusRunner:
 
         self._run_repeatability()
         for condition in canonical_condition_ids():
-            expected_sha = self.ledger.condition(condition)["model_ready_sha256"]
-            assert isinstance(expected_sha, str)
+            expected_sha = self.ledger.runtime_condition(condition).model_ready_sha256
             complete = self.checkpoint_store.load_complete(
                 condition,
                 expected_input_sha256=expected_sha,
@@ -311,6 +282,7 @@ def _run_measurement_internal(
         CheckpointIdentity(
             implementation_commit=expected.implementation_commit,
             input_ledger_sha256=expected.input_ledger_sha256,
+            measurement_runtime_commit=expected.measurement_runtime_commit,
             engine_sha256=expected.engine_sha256,
             checkpoint_sha256=expected.checkpoint_sha256,
             onnx_sha256=expected.onnx_sha256,

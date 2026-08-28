@@ -170,3 +170,12 @@ No `inference_authorization.json` or equivalent authorization exists. During thi
 
 The next step, if the owner approves these frozen inputs, is a separate explicit inference
 authorization task. Until then: **INFERENCE IS NOT AUTHORIZED.**
+
+## Measurement-runtime preflight amendment
+
+The first no-GPU inference preflight OOMed before authorization while the original whole-file JSON
+loader attempted to retain the complete 3.163 GB ledger object graph. The failure is preserved in
+[M7 inference preflight failure](M7_INFERENCE_PREFLIGHT_FAILURE.md). The ledger and every input-freeze
+identity above remain unchanged. A bounded-memory streaming loader is being reviewed separately as
+an execution-runtime amendment; it does not alter or replace this scientific input freeze. See the
+[measurement-runtime amendment](M7_MEASUREMENT_RUNTIME_AMENDMENT.md).
