@@ -78,9 +78,34 @@ Future progress and condition checkpoints use schema v2 and include
 `measurement_runtime_commit`. No M7 detector checkpoint currently exists, so no migration is
 needed.
 
+## Exact real-ledger preflights
+
+The exact runtime candidate `a9c047e4cab37edee62ba577d392dc47b1588a20` was tested twice in
+separate fresh Python processes against the unchanged frozen full ledger. Both runs used Python
+3.10.12 under WSL2 Linux and returned the complete compact index:
+
+| Run | Conditions | Wall clock (s) | Peak RSS (bytes) | Deep retained index (bytes) | Projection SHA256 |
+|---:|---:|---:|---:|---:|---|
+| 1 | 1,712 | 327.357896657 | 108,072,960 | 11,772,395 | `8ec32bcee88f2a624f5083e7f93cb06a216f73f1708492efc2730c0428a98533` |
+| 2 | 1,712 | 321.320522443 | 108,568,576 | 11,772,395 | `8ec32bcee88f2a624f5083e7f93cb06a216f73f1708492efc2730c0428a98533` |
+
+The first condition was
+`2011_09_26_drive_0001/0000000010|H10_LAG_COMPRESSED`; the last was
+`2011_09_26_drive_0091/0000000339|H10_ALTERNATE_FULL_SPAN`. Each process independently verified
+the 3,163,158,937-byte file and SHA256 before parsing. Projection SHA equality passed. Peak RSS is
+the exact Linux `resource.getrusage(RUSAGE_SELF).ru_maxrss` high-water value; retained index size is
+an approximate recursive `sys.getsizeof` total with object-ID deduplication.
+
+The compact tracked record is
+[m7_streaming_ledger_preflight.json](../../benchmarks/m7/preregistration/m7_streaming_ledger_preflight.json).
+The two complete 1,511-byte process records remain external with SHA256 values
+`fabdb48a88cb147b336d49f0893c81caa4d116a328e2234053329dcd526dcbe2` and
+`6f452f6ef4697465f3201a645bada28d3c03d16b5ec110ecd583985366c5b308`.
+
 ## Current execution barrier
 
-The two required exact real-ledger no-GPU streaming preflights are pending. Until both independently
-return 1,712 conditions with the same runtime-projection SHA, inference remains unauthorized.
-This task does not construct `CanonicalM7Detector` or `M2Backend`, initialize CUDA/TensorRT, call
-the detector, create a checkpoint, or observe an M7 result.
+The bounded-memory loader preflight passed, but inference remains unauthorized. This task did not
+construct `CanonicalM7Detector` or `M2Backend`, initialize CUDA/TensorRT, call the detector, create a
+checkpoint, or observe an M7 result. A later owner authorization must bind both the unchanged
+scientific implementation identity and the reviewed measurement-runtime commit through
+authorization schema v2.

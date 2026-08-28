@@ -1,0 +1,66 @@
+{
+  "schema_version": "laserperception.m7.streaming-ledger-preflight-record.v1",
+  "status": "PASS; NO INFERENCE AUTHORIZATION; NO DETECTOR OUTPUT",
+  "recorded_utc": "2026-08-28T06:40:13Z",
+  "input_freeze_merge_commit": "227f1604466d2ee22ccdcb1ad0067fd8f374ab3f",
+  "scientific_implementation_commit": "c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2",
+  "measurement_runtime_candidate_commit": "a9c047e4cab37edee62ba577d392dc47b1588a20",
+  "ledger": {
+    "logical_filename": "m7_input_ledger_full.json",
+    "bytes": 3163158937,
+    "sha256": "577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea",
+    "condition_count": 1712,
+    "first_condition_id": "2011_09_26_drive_0001/0000000010|H10_LAG_COMPRESSED",
+    "last_condition_id": "2011_09_26_drive_0091/0000000339|H10_ALTERNATE_FULL_SPAN"
+  },
+  "parser": {
+    "package": "ijson",
+    "version": "3.5.1",
+    "backend": "yajl2_c",
+    "numeric_mode": "use_float=False; Decimal normalized to Python float"
+  },
+  "environment": {
+    "python": "3.10.12",
+    "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35"
+  },
+  "runtime_projection_sha256": "8ec32bcee88f2a624f5083e7f93cb06a216f73f1708492efc2730c0428a98533",
+  "projection_sha_equality": true,
+  "retained_runtime_index_deep_size_bytes": 11772395,
+  "retained_runtime_index_size_method": "recursive sys.getsizeof with object-id deduplication",
+  "runs": [
+    {
+      "run_index": 1,
+      "status": "PASS",
+      "condition_count": 1712,
+      "wall_clock_seconds": 327.35789665699997,
+      "process_peak_rss_bytes": 108072960,
+      "runtime_projection_sha256": "8ec32bcee88f2a624f5083e7f93cb06a216f73f1708492efc2730c0428a98533",
+      "external_record": {
+        "logical_filename": "streaming_preflight_1.json",
+        "bytes": 1511,
+        "sha256": "fabdb48a88cb147b336d49f0893c81caa4d116a328e2234053329dcd526dcbe2"
+      }
+    },
+    {
+      "run_index": 2,
+      "status": "PASS",
+      "condition_count": 1712,
+      "wall_clock_seconds": 321.32052244299996,
+      "process_peak_rss_bytes": 108568576,
+      "runtime_projection_sha256": "8ec32bcee88f2a624f5083e7f93cb06a216f73f1708492efc2730c0428a98533",
+      "external_record": {
+        "logical_filename": "streaming_preflight_2.json",
+        "bytes": 1511,
+        "sha256": "6f452f6ef4697465f3201a645bada28d3c03d16b5ec110ecd583985366c5b308"
+      }
+    }
+  ],
+  "no_gpu_or_detector_modules_loaded": true,
+  "cuda_initialized": false,
+  "tensorrt_initialized": false,
+  "detector_constructed": false,
+  "inference_authorization_exists": false,
+  "detector_calls": 0,
+  "checkpoints_created": 0,
+  "m7_results_created": 0
+}
