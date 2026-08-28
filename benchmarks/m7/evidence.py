@@ -212,7 +212,32 @@ REQUIRED_CONDITION_FIELDS = frozenset(
     }
 )
 
-RUNTIME_BINDING_FIELDS = tuple(sorted(REQUIRED_CONDITION_FIELDS))
+RUNTIME_BINDING_FIELDS = (
+    "condition_id",
+    "drive_id",
+    "frame_index",
+    "arm",
+    "generation_commit",
+    "source_a_sha256",
+    "source_e_sha256",
+    "point_count",
+    "xyz_sha256",
+    "model_ready_sha256",
+    "selected_row_sha256",
+    "lag_bit_patterns",
+    "lag_support_count",
+    "lag_span_seconds",
+    "sweep_ids",
+    "per_sweep_point_counts",
+    "provenance_schema",
+    "rank_source_identities",
+    "rank_to_lag_bit_pattern",
+    "pillar_structure",
+    "lag_scale_provenance",
+    "quota_provenance",
+    "seed_provenance",
+    "f_history_ranks",
+)
 SEED_PROVENANCE_FIELDS = frozenset(
     {
         "history_rank",
@@ -446,6 +471,17 @@ def _validate_complete_condition_record(
         ):
             raise ProtocolViolation("M7 input-ledger condition lag bits are malformed")
         _lower_hex(condition_lag[2:], length=8, name="condition lag bits")
+    runtime_versions = raw_record.get("runtime_versions")
+    if (
+        not isinstance(runtime_versions, Mapping)
+        or set(runtime_versions) != {"python", "numpy"}
+        or any(
+            not isinstance(runtime_versions.get(name), str)
+            or not str(runtime_versions[name]).strip()
+            for name in ("python", "numpy")
+        )
+    ):
+        raise ProtocolViolation("M7 input-ledger runtime versions are malformed")
     arm = Arm(str(raw_record.get("arm")))
     if arm is Arm.F and ranks != [0, 2, 4, 6, 8, 10]:
         raise ProtocolViolation("M7 Arm-F rank-source identities differ")
@@ -454,7 +490,12 @@ def _validate_complete_condition_record(
 
 
 def runtime_binding_projection(record: Mapping[str, object]) -> dict[str, object]:
-    """Return the exact compact runtime binding after full archival-record validation."""
+    """Return the historical c989 scientific binding after archival validation.
+
+    ``runtime_versions`` remains required archival provenance but is intentionally not a
+    scientific equality field. Exact regenerated input bytes and all other historical bindings
+    remain authoritative across environments.
+    """
 
     if set(record) != REQUIRED_CONDITION_FIELDS:
         raise ProtocolViolation("M7 runtime projection source fields differ")

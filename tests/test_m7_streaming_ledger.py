@@ -11,6 +11,7 @@ import ijson.backends.yajl2_c as ijson_backend
 import pytest
 
 from benchmarks.m7.evidence import (
+    RUNTIME_BINDING_FIELDS,
     InputLedgerIdentity,
     RuntimeBindingRecord,
     build_input_ledger,
@@ -29,6 +30,32 @@ from benchmarks.m7.protocol import (
 from benchmarks.m7.provenance import canonical_json_bytes
 
 IMPLEMENTATION = "1" * 40
+HISTORICAL_C989_BOUND_FIELDS = (
+    "condition_id",
+    "drive_id",
+    "frame_index",
+    "arm",
+    "generation_commit",
+    "source_a_sha256",
+    "source_e_sha256",
+    "point_count",
+    "xyz_sha256",
+    "model_ready_sha256",
+    "selected_row_sha256",
+    "lag_bit_patterns",
+    "lag_support_count",
+    "lag_span_seconds",
+    "sweep_ids",
+    "per_sweep_point_counts",
+    "provenance_schema",
+    "rank_source_identities",
+    "rank_to_lag_bit_pattern",
+    "pillar_structure",
+    "lag_scale_provenance",
+    "quota_provenance",
+    "seed_provenance",
+    "f_history_ranks",
+)
 
 
 def _quota(selected_count: int, source_count: int) -> dict[str, object]:
@@ -237,6 +264,14 @@ def _bad_model_ready_sha(ledger: dict[str, object]) -> None:
     _condition_at(ledger, 0)["model_ready_sha256"] = "z" * 64
 
 
+def _runtime_versions_wrong_schema(ledger: dict[str, object]) -> None:
+    _condition_at(ledger, 0)["runtime_versions"] = {"python": "test"}
+
+
+def _runtime_versions_wrong_type(ledger: dict[str, object]) -> None:
+    _condition_at(ledger, 0)["runtime_versions"] = {"python": "test", "numpy": 1264}
+
+
 @pytest.mark.parametrize(
     "mutation",
     [
@@ -252,6 +287,8 @@ def _bad_model_ready_sha(ledger: dict[str, object]) -> None:
         _incorrect_sweep_counts,
         _bad_selected_row_sha,
         _bad_model_ready_sha,
+        _runtime_versions_wrong_schema,
+        _runtime_versions_wrong_type,
     ],
 )
 def test_whole_and_streaming_reject_same_bounded_malformed_fixtures(
@@ -337,6 +374,7 @@ def test_huge_selected_ordinals_validate_but_are_not_retained(
         (Arm.B, lambda value: value.__setitem__("xyz_sha256", "0" * 64)),
         (Arm.B, lambda value: value.__setitem__("model_ready_sha256", "0" * 64)),
         (Arm.B, lambda value: value.__setitem__("selected_row_sha256", "0" * 64)),
+        (Arm.B, lambda value: value["lag_bit_patterns"].__setitem__(0, "0x00000001")),
         (Arm.B, lambda value: value["rank_to_lag_bit_pattern"].__setitem__("0", "0x1")),
         (Arm.B, lambda value: value["rank_source_identities"][0].__setitem__("source_index", 8)),
         (Arm.B, lambda value: value["pillar_structure"].__setitem__("candidate_count", 4)),
@@ -354,6 +392,22 @@ def test_projection_rejects_changes_to_every_retained_binding(
     changed = copy.deepcopy(record)
     mutate(changed)
     assert not binding.matches(changed)
+
+
+def test_runtime_versions_are_archival_provenance_not_scientific_binding() -> None:
+    first = _condition(canonical_frame_ids()[0], Arm.B)
+    first["runtime_versions"] = {"python": "3.12.10", "numpy": "2.2.1"}
+    second = copy.deepcopy(first)
+    second["runtime_versions"] = {"python": "3.10.12", "numpy": "1.26.4"}
+
+    assert canonical_json_bytes(first) != canonical_json_bytes(second)
+    assert runtime_binding_projection(first) == runtime_binding_projection(second)
+    assert RuntimeBindingRecord.from_record(first) == RuntimeBindingRecord.from_record(second)
+
+
+def test_runtime_binding_fields_equal_historical_c989_contract() -> None:
+    assert RUNTIME_BINDING_FIELDS == HISTORICAL_C989_BOUND_FIELDS
+    assert set(RUNTIME_BINDING_FIELDS) == set(HISTORICAL_C989_BOUND_FIELDS)
 
 
 def test_selected_ordinal_residency_is_distinct_from_archival_authorization() -> None:
