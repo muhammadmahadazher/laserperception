@@ -47,8 +47,14 @@ The immutable runtime projection retains these top-level condition fields exactl
 `lag_bit_patterns`, `lag_scale_provenance`, `lag_span_seconds`, `lag_support_count`,
 `model_ready_sha256`, `per_sweep_point_counts`, `pillar_structure`, `point_count`,
 `provenance_schema`, `quota_provenance`, `rank_source_identities`,
-`rank_to_lag_bit_pattern`, `runtime_versions`, `seed_provenance`, `selected_row_sha256`,
+`rank_to_lag_bit_pattern`, `seed_provenance`, `selected_row_sha256`,
 `source_a_sha256`, `source_e_sha256`, `sweep_ids`, and `xyz_sha256`.
+
+`runtime_versions` remains a required, validated archival provenance field. After the first
+authorized session exposed the metadata-binding regression, the scientific equality projection was
+restored to the explicit historical `c989…` field set; see
+[M7 binding-gate failure R1](M7_BINDING_GATE_FAILURE_R1.md). Different recorded environments are
+permitted only when every frozen scientific binding and the exact model-ready bytes reproduce.
 
 For each C/D seed, the retained `seed_provenance` keeps `history_rank`, `seed_text_utf8`, `sha256`,
 `seed_uint64`, and `seed_uint64_hex`. The complete `selected_ordinals` lists remain in the frozen
