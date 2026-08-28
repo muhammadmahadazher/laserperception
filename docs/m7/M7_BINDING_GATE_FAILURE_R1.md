@@ -103,3 +103,27 @@ resident projection. Their exact row population remains bound by the archival le
 
 The failed authorization remains permanently bound to runtime `5d8cc816…` and must not be reused.
 A future measurement requires a new runtime identity and a new v2 authorization artifact.
+
+## Corrected-candidate preflights
+
+The corrected measurement-runtime candidate is
+`23792950e1e00bbe7e128b29b73f77c13776cac1`. Two fresh-process, no-GPU preflights each
+stream-hashed and validated the complete unchanged ledger, created a fresh
+`CanonicalM7SourceAdapter`, and regenerated the five frozen sentinels across arms B/C/D/F (20
+conditions per run). Both runs exactly matched the scientific projection plus each explicitly
+reported `selected_row_sha256`, `xyz_sha256`, `model_ready_sha256`, `lag_bit_patterns`, and
+`pillar_structure` value.
+
+| Run | Conditions | Wall clock (s) | Peak RSS (bytes) | External record | SHA256 |
+|---:|---:|---:|---:|---|---|
+| 1 | 20/20 exact | `356.951063453` | `556,957,696` | `sentinel_binding_preflight_1.json` (`11,297` bytes) | `8162c2867878fc34e555e8eec68f9784a4939f8035f62a2340cabc8cab8ab867` |
+| 2 | 20/20 exact | `355.473328778` | `548,306,944` | `sentinel_binding_preflight_2.json` (`11,292` bytes) | `3f8cdebe24c251b7c916807549779eedfc5a0e5e40809b73adf4f343288fecea` |
+
+Both full-ledger projections produced SHA256
+`efbde2858f0e9780b52cda3b6ae35d8e6d236a8b28b518af695de8a8343e1c92`, and both sets of
+per-condition comparison records were identical. The frozen archive recorded Python `3.12.10`
+and NumPy `2.2.1`; regeneration recorded Python `3.10.12` and NumPy `1.26.4`. These environment
+versions were reported separately and did not enter scientific equality.
+
+No detector was constructed, no detector call occurred, no CUDA or TensorRT initialization
+occurred, no inference authorization was created, and the frozen ledger was not regenerated.
