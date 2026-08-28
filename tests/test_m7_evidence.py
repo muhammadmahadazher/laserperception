@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -96,6 +97,36 @@ def _ledger_condition(frame_id: str, arm: Arm) -> dict[str, object]:
         }
         for rank in ranks
     ]
+    seed_provenance: object = None
+    quota_provenance: object = None
+    if arm in (Arm.C, Arm.D):
+        seeds = []
+        for rank in range(1, 11):
+            text = f"laserperception-m7-c-v1|{drive_id}|{int(frame_text):010d}|{rank}"
+            digest = hashlib.sha256(text.encode()).digest()
+            seed = int.from_bytes(digest[:8], byteorder="big", signed=False)
+            seeds.append(
+                {
+                    "history_rank": rank,
+                    "seed_text_utf8": text,
+                    "sha256": digest.hex(),
+                    "seed_uint64": seed,
+                    "seed_uint64_hex": f"0x{seed:016x}",
+                    "selected_ordinals": [],
+                }
+            )
+        seed_provenance = seeds
+        quota_provenance = {
+            "source_counts_by_rank_1_to_10": [1] * 10,
+            "h_target": 0,
+            "h_total": 10,
+            "products": [0] * 10,
+            "remainders": [0] * 10,
+            "initial_quotas": [0] * 10,
+            "incremented_ranks": [],
+            "final_quotas": [0] * 10,
+            "zero_quota_ranks": list(range(1, 11)),
+        }
     return {
         "condition_id": f"{frame_id}|{arm.value}",
         "drive_id": drive_id,
@@ -120,8 +151,8 @@ def _ledger_condition(frame_id: str, arm: Arm) -> dict[str, object]:
         },
         "pillar_structure": {"candidate_count": 3},
         "lag_scale_provenance": None,
-        "quota_provenance": None,
-        "seed_provenance": None,
+        "quota_provenance": quota_provenance,
+        "seed_provenance": seed_provenance,
         "f_history_ranks": [2, 4, 6, 8, 10] if arm is Arm.F else None,
         "runtime_versions": {"python": "test", "numpy": "test"},
     }

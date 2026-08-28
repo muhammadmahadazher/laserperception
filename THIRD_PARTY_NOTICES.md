@@ -10,6 +10,11 @@ The Python distribution declares NumPy and laspy, with lazrs as an optional LAZ 
 Matplotlib as an optional headless-visualization backend. These packages are installed from their
 upstream distributions and remain governed by their upstream license and notice files.
 
+The optional M7 measurement runtime uses
+[ijson 3.5.1](https://github.com/ICRAR/ijson) for bounded-memory JSON event parsing. Its installed
+package metadata declares the license expression `BSD-3-Clause AND ISC`. LaserPerception does not
+vendor ijson.
+
 ## M1 OpenMMLab and PyTorch environment
 
 M1 wraps installed copies of:

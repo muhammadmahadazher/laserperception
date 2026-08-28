@@ -31,6 +31,7 @@ from benchmarks.m7.detector import (
 )
 from benchmarks.m7.evidence import PairedSets, StrictInputLedger
 from benchmarks.m7.execution import (
+    FROZEN_M7_INPUT_LEDGER_SHA256,
     CheckpointIdentity,
     DetectorObservation,
     ExecutionIdentity,
@@ -45,6 +46,7 @@ from benchmarks.m7.execution import (
     observation_hashes,
     paired_recovery,
     repeatability_condition,
+    verify_inference_authorization,
 )
 from benchmarks.m7.prepare_inputs import GeneratedCondition, GeneratedFrame
 from benchmarks.m7.protocol import Arm, ProtocolViolation, canonical_condition_ids
@@ -62,7 +64,7 @@ from laserperception.evaluation.kitti_m6b import M6bGroundTruthBox
 
 def _authorization(identity: ExecutionIdentity, *, allowed: bool = True) -> dict[str, object]:
     return {
-        "schema_version": "laserperception.m7.inference-authorization.v1",
+        "schema_version": "laserperception.m7.inference-authorization.v2",
         **identity.to_dict(),
         "authorized_for_inference": allowed,
     }
@@ -180,7 +182,7 @@ def _detector_identity(
 
 
 def test_authorization_hard_stops_before_private_test_detector_builder() -> None:
-    expected = ExecutionIdentity("1" * 40, "2" * 64)
+    expected = ExecutionIdentity("1" * 40, "2" * 64, "3" * 40)
     calls = 0
 
     def factory() -> object:
@@ -207,6 +209,39 @@ def test_authorization_hard_stops_before_private_test_detector_builder() -> None
     assert calls == 1
 
 
+def test_authorization_v2_requires_measurement_runtime_identity() -> None:
+    expected = ExecutionIdentity("1" * 40, "2" * 64, "3" * 40)
+    authorization = _authorization(expected)
+    authorization["schema_version"] = "laserperception.m7.inference-authorization.v1"
+    with pytest.raises(ProtocolViolation, match="schema"):
+        verify_inference_authorization(authorization, expected)
+
+    authorization = _authorization(expected)
+    authorization["m7_measurement_runtime_commit"] = "4" * 40
+    with pytest.raises(ProtocolViolation, match="m7_measurement_runtime_commit"):
+        verify_inference_authorization(authorization, expected)
+
+
+def test_frozen_ledger_byte_count_is_checked_before_hash(tmp_path: Path) -> None:
+    ledger = tmp_path / "ledger.json"
+    ledger.write_bytes(b"not-the-frozen-ledger")
+    expected = ExecutionIdentity(
+        "1" * 40,
+        FROZEN_M7_INPUT_LEDGER_SHA256,
+        "3" * 40,
+    )
+    artifacts = RuntimeArtifacts(
+        input_ledger=ledger,
+        engine=tmp_path / "engine",
+        checkpoint=tmp_path / "checkpoint",
+        onnx=tmp_path / "onnx",
+        evaluator_identity=expected.evaluator_identity,
+    )
+
+    with pytest.raises(ProtocolViolation, match="byte count mismatch"):
+        artifacts.verify_input_ledger(expected)
+
+
 def test_measurement_gates_all_run_before_private_detector_builder(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -223,6 +258,7 @@ def test_measurement_gates_all_run_before_private_detector_builder(
     expected = ExecutionIdentity(
         "1" * 40,
         hashlib.sha256(b"{}").hexdigest(),
+        "3" * 40,
         engine_sha256=hashlib.sha256(b"engine").hexdigest(),
         checkpoint_sha256=hashlib.sha256(b"checkpoint").hexdigest(),
         onnx_sha256=hashlib.sha256(b"onnx").hexdigest(),
@@ -336,6 +372,7 @@ def test_private_detector_identity_mismatch_stops_before_corpus(
     expected = ExecutionIdentity(
         "1" * 40,
         hashlib.sha256(payloads["ledger"]).hexdigest(),
+        "3" * 40,
         engine_sha256=hashlib.sha256(payloads["engine"]).hexdigest(),
         checkpoint_sha256=hashlib.sha256(payloads["checkpoint"]).hexdigest(),
         onnx_sha256=hashlib.sha256(payloads["onnx"]).hexdigest(),
@@ -404,9 +441,9 @@ def test_canonical_detector_constructs_backend_from_verified_runtime_paths(
         engine=tmp_path / "verified.engine",
         checkpoint=tmp_path / "verified.pth",
         onnx=tmp_path / "verified.onnx",
-        evaluator_identity=ExecutionIdentity("1" * 40, "2" * 64).evaluator_identity,
+        evaluator_identity=ExecutionIdentity("1" * 40, "2" * 64, "3" * 40).evaluator_identity,
     )
-    expected = ExecutionIdentity("1" * 40, "2" * 64)
+    expected = ExecutionIdentity("1" * 40, "2" * 64, "3" * 40)
     model_root = tmp_path / "mmdetection3d-v1.4.0"
     deploy_root = tmp_path / "mmdeploy-v1.3.1"
     model_config = model_root / M6B_MODEL_CONFIG_RELATIVE
@@ -622,7 +659,7 @@ def test_atomic_checkpoint_resume_preserves_order_and_refuses_duplicate(tmp_path
         "2011_09_26_drive_0001/0000000010|H10_LAG_COMPRESSED",
         "2011_09_26_drive_0001/0000000010|H10_POINT_COUNT_MATCHED",
     )
-    identity = CheckpointIdentity("1" * 40, "2" * 64)
+    identity = CheckpointIdentity("1" * 40, "2" * 64, "3" * 40)
     store = M7CheckpointStore(
         tmp_path,
         identity,
@@ -647,7 +684,14 @@ def test_atomic_checkpoint_resume_preserves_order_and_refuses_duplicate(tmp_path
     with pytest.raises(ProtocolViolation, match="identity differs"):
         M7CheckpointStore(
             tmp_path,
-            CheckpointIdentity("9" * 40, "2" * 64),
+            CheckpointIdentity("9" * 40, "2" * 64, "3" * 40),
+            conditions,
+            _allow_synthetic_fixture=True,
+        )
+    with pytest.raises(ProtocolViolation, match="identity differs"):
+        M7CheckpointStore(
+            tmp_path,
+            CheckpointIdentity("1" * 40, "2" * 64, "4" * 40),
             conditions,
             _allow_synthetic_fixture=True,
         )
@@ -657,7 +701,7 @@ def test_atomic_checkpoint_resume_preserves_order_and_refuses_duplicate(tmp_path
 
 def test_checkpoint_rejects_malformed_payload_and_never_deletes(tmp_path: Path) -> None:
     condition = "2011_09_26_drive_0001/0000000010|H10_LAG_COMPRESSED"
-    identity = CheckpointIdentity("1" * 40, "2" * 64)
+    identity = CheckpointIdentity("1" * 40, "2" * 64, "3" * 40)
     store = M7CheckpointStore(tmp_path, identity, (condition,), _allow_synthetic_fixture=True)
     store.save_complete(condition, input_sha256="3" * 64, hashes=_hashes(), payload={})
     path = next((tmp_path / "conditions").rglob("*.json"))
@@ -683,7 +727,7 @@ def test_authorized_ledger_wrong_actual_input_stops_before_detector_or_checkpoin
     authorized = _condition_record(condition, model_ready_sha256(points_a))
     ledger = StrictInputLedger({}, tuple(authorized for _ in conditions))
     detector = _Detector()
-    store = M7CheckpointStore(tmp_path, CheckpointIdentity("1" * 40, "2" * 64))
+    store = M7CheckpointStore(tmp_path, CheckpointIdentity("1" * 40, "2" * 64, "3" * 40))
     runner = M7CorpusRunner(
         ledger=ledger,
         source_adapter=object(),  # type: ignore[arg-type]
@@ -726,7 +770,7 @@ def test_integrated_repeatability_reuses_repeat_one_without_eleventh_call(
 
     monkeypatch.setattr("benchmarks.m7.run_measurement.generate_canonical_frame", generate)
     detector = _Detector()
-    store = M7CheckpointStore(tmp_path, CheckpointIdentity("1" * 40, "2" * 64))
+    store = M7CheckpointStore(tmp_path, CheckpointIdentity("1" * 40, "2" * 64, "3" * 40))
     runner = M7CorpusRunner(
         ledger=ledger,
         source_adapter=object(),  # type: ignore[arg-type]
