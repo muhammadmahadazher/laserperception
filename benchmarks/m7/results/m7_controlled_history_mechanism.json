@@ -1,0 +1,177 @@
+{
+  "schema_version": "laserperception.m7.controlled-history-mechanism.interpretation-candidate.v1",
+  "status": "M7 SCIENTIFIC INTERPRETATION CANDIDATE — OWNER REVIEW REQUIRED. NOT YET FROZEN.",
+  "protocol_commit": "fd4a143621ffc0692206c100279a9edfd5572d35",
+  "raw_measurement_merge_commit": "72f78f740b084776f6fe52994581760ade8844dd",
+  "raw_artifacts": {
+    "primary_arm_table_sha256": "2539286bc4ddf05e0526e0301aeb93e295afa1d549140d2ef341edc6cb725f44",
+    "car_factorial_sha256": "f6e6f7a25759948be894d3419055064775ae168081acfc2c9ae77422052bbb06",
+    "secondary_characterization_sha256": "1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6",
+    "manifest_sha256": "21b1b93807c6e41a607f1c94bce182ca32fa995259298dc6e4c7392ee185598e"
+  },
+  "operating_point": {
+    "score_threshold": 0.25,
+    "primary_oriented_bev_iou_threshold": 0.5,
+    "car_eligible_gt": 66,
+    "pedestrian_eligible_gt": 396,
+    "precision_and_ap_scope": "annotation_conditioned_by_incomplete_KITTI_Raw_tracklets"
+  },
+  "car": {
+    "primary_conclusion": "Among the frozen M7 interventions, encoded lag magnitude is the dominant measured contributor to the observed H10-to-H5 Car degradation. B and D satisfy the preregistered substantial-explanation rule; C and F do not.",
+    "gate_definition": {
+      "g_car_minimum": 0.5,
+      "r_gain_minimum": 0.5,
+      "r_shared_minimum": 0.9375,
+      "all_three_required": true
+    },
+    "primary": {
+      "A": {"true_positives": 16, "recall": 0.24242424242424243},
+      "B": {"true_positives": 41, "recall": 0.6212121212121212},
+      "C": {"true_positives": 17, "recall": 0.25757575757575757},
+      "D": {"true_positives": 49, "recall": 0.7424242424242424},
+      "E": {"true_positives": 48, "recall": 0.7272727272727273},
+      "F": {"true_positives": 21, "recall": 0.3181818181818182}
+    },
+    "gate_results": {
+      "B": {
+        "g_car": 0.78125,
+        "r_gain": {"detected": 23, "eligible": 32, "rate": 0.71875},
+        "r_shared": {"detected": 16, "eligible": 16, "rate": 1.0},
+        "r_novel": {"detected": 2, "eligible": 18, "rate": 0.1111111111111111},
+        "all_three_pass": true
+      },
+      "C": {
+        "g_car": 0.03125,
+        "r_gain": {"detected": 2, "eligible": 32, "rate": 0.0625},
+        "r_shared": {"detected": 14, "eligible": 16, "rate": 0.875},
+        "r_novel": {"detected": 1, "eligible": 18, "rate": 0.05555555555555555},
+        "all_three_pass": false
+      },
+      "D": {
+        "g_car": 1.03125,
+        "r_gain": {"detected": 29, "eligible": 32, "rate": 0.90625},
+        "r_shared": {"detected": 16, "eligible": 16, "rate": 1.0},
+        "r_novel": {"detected": 4, "eligible": 18, "rate": 0.2222222222222222},
+        "all_three_pass": true
+      },
+      "F": {
+        "g_car": 0.15625,
+        "r_gain": {"detected": 7, "eligible": 32, "rate": 0.21875},
+        "r_shared": {"detected": 13, "eligible": 16, "rate": 0.8125},
+        "r_novel": {"detected": 1, "eligible": 18, "rate": 0.05555555555555555},
+        "all_three_pass": false
+      }
+    },
+    "descriptive_factorial": {
+      "L_encoded_lag": 0.4318181818181818,
+      "P_exact_total_point_count": 0.06818181818181818,
+      "I_interaction": 0.10606060606060608,
+      "causal_decomposition": false
+    },
+    "iou_thresholds": {
+      "0.30": {
+        "A": {"true_positives": 16, "recall": 0.24242424242424243},
+        "B": {"true_positives": 41, "recall": 0.6212121212121212},
+        "C": {"true_positives": 17, "recall": 0.25757575757575757},
+        "D": {"true_positives": 49, "recall": 0.7424242424242424},
+        "E": {"true_positives": 48, "recall": 0.7272727272727273},
+        "F": {"true_positives": 21, "recall": 0.3181818181818182}
+      },
+      "0.50": {
+        "A": {"true_positives": 16, "recall": 0.24242424242424243},
+        "B": {"true_positives": 41, "recall": 0.6212121212121212},
+        "C": {"true_positives": 17, "recall": 0.25757575757575757},
+        "D": {"true_positives": 49, "recall": 0.7424242424242424},
+        "E": {"true_positives": 48, "recall": 0.7272727272727273},
+        "F": {"true_positives": 21, "recall": 0.3181818181818182}
+      },
+      "0.70": {
+        "A": {"true_positives": 16, "recall": 0.24242424242424243},
+        "B": {"true_positives": 38, "recall": 0.5757575757575758},
+        "C": {"true_positives": 17, "recall": 0.25757575757575757},
+        "D": {"true_positives": 40, "recall": 0.6060606060606061},
+        "E": {"true_positives": 44, "recall": 0.6666666666666666},
+        "F": {"true_positives": 20, "recall": 0.30303030303030304}
+      }
+    },
+    "range_slices_primary_iou": {
+      "range_m": [[0.0, 20.0], [20.0, 35.0], [35.0, 50.0]],
+      "A": [{"true_positives": 12, "eligible_gt": 27, "recall": 0.4444444444444444}, {"true_positives": 4, "eligible_gt": 30, "recall": 0.13333333333333333}, {"true_positives": 0, "eligible_gt": 6, "recall": 0.0}],
+      "B": [{"true_positives": 27, "eligible_gt": 27, "recall": 1.0}, {"true_positives": 14, "eligible_gt": 30, "recall": 0.4666666666666667}, {"true_positives": 0, "eligible_gt": 6, "recall": 0.0}],
+      "C": [{"true_positives": 10, "eligible_gt": 27, "recall": 0.37037037037037035}, {"true_positives": 6, "eligible_gt": 30, "recall": 0.2}, {"true_positives": 1, "eligible_gt": 6, "recall": 0.16666666666666666}],
+      "D": [{"true_positives": 27, "eligible_gt": 27, "recall": 1.0}, {"true_positives": 19, "eligible_gt": 30, "recall": 0.6333333333333333}, {"true_positives": 3, "eligible_gt": 6, "recall": 0.5}],
+      "E": [{"true_positives": 27, "eligible_gt": 27, "recall": 1.0}, {"true_positives": 17, "eligible_gt": 30, "recall": 0.5666666666666667}, {"true_positives": 4, "eligible_gt": 6, "recall": 0.6666666666666666}],
+      "F": [{"true_positives": 11, "eligible_gt": 27, "recall": 0.4074074074074074}, {"true_positives": 10, "eligible_gt": 30, "recall": 0.3333333333333333}, {"true_positives": 0, "eligible_gt": 6, "recall": 0.0}]
+    },
+    "d_vs_e_qualification": {
+      "primary_iou_0_50_true_positives": {"D": 49, "E": 48},
+      "strict_iou_0_70_true_positives": {"D": 40, "E": 44},
+      "average_precision": {"D": 0.24156804593627326, "E": 0.24238010484142314},
+      "conclusion": "D slightly exceeds E only at the frozen primary Car recall operating point and does not dominate E under stricter localization, AP, or Pedestrian recall."
+    }
+  },
+  "pedestrian": {
+    "primary": {
+      "A": {"true_positives": 219, "recall": 0.553030303030303},
+      "B": {"true_positives": 199, "recall": 0.5025252525252525},
+      "C": {"true_positives": 224, "recall": 0.5656565656565656},
+      "D": {"true_positives": 212, "recall": 0.5353535353535354},
+      "E": {"true_positives": 268, "recall": 0.6767676767676768},
+      "F": {"true_positives": 236, "recall": 0.5959595959595959}
+    },
+    "iou_thresholds": {
+      "0.30": {
+        "A": {"true_positives": 280, "recall": 0.7070707070707071},
+        "B": {"true_positives": 276, "recall": 0.696969696969697},
+        "C": {"true_positives": 276, "recall": 0.696969696969697},
+        "D": {"true_positives": 279, "recall": 0.7045454545454546},
+        "E": {"true_positives": 316, "recall": 0.797979797979798},
+        "F": {"true_positives": 288, "recall": 0.7272727272727273}
+      },
+      "0.50": {
+        "A": {"true_positives": 219, "recall": 0.553030303030303},
+        "B": {"true_positives": 199, "recall": 0.5025252525252525},
+        "C": {"true_positives": 224, "recall": 0.5656565656565656},
+        "D": {"true_positives": 212, "recall": 0.5353535353535354},
+        "E": {"true_positives": 268, "recall": 0.6767676767676768},
+        "F": {"true_positives": 236, "recall": 0.5959595959595959}
+      },
+      "0.70": {
+        "A": {"true_positives": 54, "recall": 0.13636363636363635},
+        "B": {"true_positives": 42, "recall": 0.10606060606060606},
+        "C": {"true_positives": 59, "recall": 0.14898989898989898},
+        "D": {"true_positives": 48, "recall": 0.12121212121212122},
+        "E": {"true_positives": 76, "recall": 0.1919191919191919},
+        "F": {"true_positives": 46, "recall": 0.11616161616161616}
+      }
+    },
+    "descriptive_factorial": {
+      "L_encoded_lag": -0.04040404040404039,
+      "P_exact_total_point_count": 0.022727272727272763,
+      "I_interaction": 0.02020202020202022,
+      "descriptive_only": true
+    },
+    "class_dependence": "Lag compression reduces Pedestrian TP under both point-population settings: A-to-B by 20 and C-to-D by 12, opposite the Car direction. E has higher Pedestrian recall than every M7 intervention."
+  },
+  "f_context": "F is a natural, unthinned, long-span comparator at matched history-sweep count. F/E does not isolate physical span and F/B is not a single-factor comparison.",
+  "claim_boundaries": [
+    "Encoded lag is not established as the sole cause.",
+    "Physical history span and point population are not established as irrelevant.",
+    "The factorial contrasts are descriptive and not a population causal decomposition.",
+    "The result is not established beyond this detector, dataset, and configuration.",
+    "Lag compression is not authorized as a production default.",
+    "No Pedestrian pass/fail gate exists.",
+    "M7 is not an official KITTI benchmark.",
+    "D does not universally outperform E.",
+    "No production policy has been validated."
+  ],
+  "future_work": {
+    "status": "separate_preregistration_required",
+    "deployment_time_lag_policy_blockers": [
+      "Pedestrian reversal under both point-population settings (A-to-B and C-to-D).",
+      "Absence of far-range Car recovery under lag compression alone (B remains 0/6, equal to A)."
+    ],
+    "m8_protocol_created": false,
+    "production_behavior_changed": false
+  }
+}
