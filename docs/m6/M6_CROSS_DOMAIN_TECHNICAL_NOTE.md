@@ -12,7 +12,10 @@ strong sensitivity to accumulated-history configuration but does not isolate tem
 `time_lag`, point density, pillar population, or another individual cause. The 40,000-voxel cap was
 not supported as the primary explanation for the corpus-wide H10 deficit. A final ROS integration
 cycle then reproduced 860/860 same-platform projected model-ready references exactly and passed the
-unchanged detector semantic envelope on ten frozen sentinels.
+unchanged detector semantic envelope on ten frozen sentinels. The later frozen M7 controlled-history
+study found that encoded lag compression substantially explained the Car improvement under its
+preregistered rule, exact total-point-count matching alone did not, and the effect was
+class-dependent.
 
 ## Scope and claim boundary
 
@@ -179,6 +182,135 @@ controlled experiment. It is not the established cause here: shortening history 
 changed accumulated point density, occupied pillars, occlusion/aggregation patterns, and the
 distribution of time values.
 
+At the close of M6 this remained an open mechanistic question. M7 later addressed it prospectively;
+see the controlled follow-up below.
+
+## M7 follow-up: controlled history-mechanism study
+
+M6 alone did not isolate the mechanism. The later frozen M7 controlled-history study prospectively
+tested encoded lag magnitude and exact total-point-count interventions against the same frozen
+detector. Its question was narrow: which measurable components of the H10 input contract explain
+the H5 Car improvement?
+
+The [frozen M7 protocol](../m7/M7_PROTOCOL.md) defined six conditions:
+
+| Arm | Frozen condition |
+|---|---|
+| A — H10 native | Frozen H10 baseline. |
+| B — H10 lag-compressed | Exact A points, rows, XYZ, sweep membership, and order; only encoded `time_lag` magnitude changed. |
+| C — H10 exact-total-point-count matched | All current A points plus a deterministic historical subset; exact total point count matched E while native A lag remained. |
+| D — point-count matched plus lag-compressed | Exact C rows with the B lag mapping. |
+| E — H5 native | Frozen H5 comparator. |
+| F — alternate full-span six-support | Natural, unthinned, long-span comparator at matched history-sweep count. |
+
+### Encoded lag is the dominant measured Car contributor among the tested interventions
+
+The frozen primary operating point was score `>= 0.25` and oriented BEV IoU `>= 0.50`, with 66
+eligible Car GT. The preregistered substantial-explanation rule required all of `G_car >= 0.50`,
+`R_gain >= 0.50`, and `R_shared >= 15/16`.
+
+| Arm | TP | Recall | G_car | R_gain | R_shared | Frozen gate |
+|---|---:|---:|---:|---:|---:|---|
+| A | 16 | 0.2424 | — | — | — | Baseline |
+| B | 41 | 0.6212 | 0.78125 | 23/32 | 16/16 | **PASS** |
+| C | 17 | 0.2576 | 0.03125 | 2/32 | 14/16 | **FAIL** |
+| D | 49 | 0.7424 | 1.03125 | 29/32 | 16/16 | **PASS** |
+| E | 48 | 0.7273 | — | — | — | Comparator |
+| F | 21 | 0.3182 | 0.15625 | 7/32 | 13/16 | **FAIL** |
+
+Among the frozen M7 interventions, encoded lag magnitude is the dominant measured contributor to
+the observed H10→H5 Car degradation. B and D satisfy the frozen “substantially explains the H10→H5
+Car improvement” rule; C and F do not. Lag compression alone passes the preregistered
+substantial-explanation rule, while exact total-point-count matching alone does not.
+
+The descriptive Car-recall factorial contrasts were `L = 0.4318181818` for encoded lag,
+`P = 0.0681818182` for exact total point count, and `I = 0.1060606061` for their interaction. The
+encoded-lag contrast is much larger on the measured Car-recall scale. These values are descriptive
+mechanistic contrasts, not percentages of causal responsibility or a population causal
+decomposition.
+
+### D does not generally outperform the native H5 comparator
+
+| Car comparison | D | E |
+|---|---:|---:|
+| Primary IoU 0.50 TP | 49 | 48 |
+| Strict IoU 0.70 TP | 40 | 44 |
+| Annotation-conditioned AP | 0.2415680459 | 0.2423801048 |
+
+D slightly exceeds E only at the frozen primary Car recall operating point. E preserves more Car
+matches under the stricter IoU 0.70 criterion and has slightly higher annotation-conditioned AP.
+
+### The lag-only Car gain is range-dependent in this corpus
+
+Primary-IoU Car matches are shown as `TP/eligible GT`; the denominator remains visible because the
+far-range slice contains only six eligible poses.
+
+| Arm | 0–20 m | 20–35 m | 35–50 m |
+|---|---:|---:|---:|
+| A | 12/27 | 4/30 | 0/6 |
+| B | 27/27 | 14/30 | 0/6 |
+| C | 10/27 | 6/30 | 1/6 |
+| D | 27/27 | 19/30 | 3/6 |
+| E | 27/27 | 17/30 | 4/6 |
+| F | 11/27 | 10/30 | 0/6 |
+
+B's observed gain over A is concentrated in the near- and mid-range slices in this corpus. B
+remains 0/6 at 35–50 m, equal to A. This small far-range slice is descriptive and does not
+establish a universal range law.
+
+### Pedestrian direction reverses under lag compression
+
+| Arm | Pedestrian TP/396 | Recall |
+|---|---:|---:|
+| A | 219 | 0.5530 |
+| B | 199 | 0.5025 |
+| C | 224 | 0.5657 |
+| D | 212 | 0.5354 |
+| E | 268 | 0.6768 |
+| F | 236 | 0.5960 |
+
+Lag compression reduced Pedestrian TP by 20 from A to B and by 12 from C to D. The descriptive
+Pedestrian-recall contrasts were `L = -0.0404040404`, `P = +0.0227272727`, and
+`I = +0.0202020202`. No Pedestrian gate exists. The encoded-lag intervention is class-dependent and
+is not validated as a blanket deployment policy.
+
+### Claim boundaries remain narrower than the observed Car result
+
+C matches E's exact **total point count**; it is not generally or naturally density-matched to E.
+Exact total-point-count matching alone did not substantially explain the Car improvement, but M7
+does not establish that natural point-density effects are irrelevant. F is a natural, unthinned,
+long-span comparator at matched history-sweep count. It does not isolate physical temporal span,
+sweep count, or natural density, and neither F/E nor F/B is a single-factor comparison.
+
+M7 evaluates one frozen pretrained detector. It does not establish whether a model trained with
+broader or different encoded-lag exposure would exhibit the same sensitivity. Encoded lag is not
+established as the sole mechanism, and temporal span, sweep count, and natural density were not
+ruled out.
+
+KITTI Raw tracklets remain incomplete. Precision and AP are annotation-conditioned against
+available Raw tracklets; they are not official KITTI benchmark AP, a physical false-positive rate,
+or complete-world precision.
+
+### Why the controlled follow-up matters
+
+M6 exposed a compound cross-domain failure. M7 converted that open observation into a
+preregistered mechanism study without changing the pretrained detector. It demonstrated that one
+deployment-side encoded feature has a large class-specific effect without retraining, while also
+documenting where the intervention does not generalize. This is mechanism evidence, not a
+production solution.
+
+The M7 chronology also preserves three stopped or failed stages before accepted detector results:
+
+- the [original whole-ledger OOM preflight](../m7/M7_INFERENCE_PREFLIGHT_FAILURE.md);
+- the [R1 runtime metadata-binding regression and fail-closed zero-call measurement](../m7/M7_BINDING_GATE_FAILURE_R1.md);
+  and
+- the prospective [streaming runtime amendment](../m7/M7_MEASUREMENT_RUNTIME_AMENDMENT.md).
+
+These failures were retained and corrected prospectively. The accepted sources are the
+[M7 protocol](../m7/M7_PROTOCOL.md), [M7 raw measurement](../m7/M7_MEASUREMENT_RAW.md),
+[M7 frozen interpretation](../m7/M7_RESULTS.md), and
+[machine-readable interpretation](../../benchmarks/m7/results/m7_controlled_history_mechanism.json).
+
 ## Negative result: the 40,000 cap was not the primary H10 explanation
 
 H10 overflow occurred on 68/428 frames; H5 had no overflow. If the cap were the dominant
@@ -312,13 +444,15 @@ release assets, but this note does not publish them or create a release.
 6. **A sweep count is not a fixed physical time window.** Sensor rate changed H10's temporal span,
    while deterministic first-touch ordering affected which pillar support survived the hard cap.
 
-## Future controlled experiments—not performed here
+## M6-era future controlled experiments—not performed in M6
 
-Two prospective studies could isolate the leading hypotheses. One could hold H10 geometry and
-point/pillar population fixed while changing only the encoded `time_lag` values. Another could
-preserve H10 temporal timestamps while subsampling or otherwise controlling density to match H5's
-point and pillar population. Either experiment would need its own preregistered protocol and frozen
-corpus. M6 did not run either study and does not choose a production history setting.
+At the close of M6, two prospective studies could isolate the leading hypotheses. One could hold
+H10 geometry and point/pillar population fixed while changing only the encoded `time_lag` values.
+Another could preserve H10 temporal timestamps while subsampling or otherwise controlling density
+to match H5's point and pillar population. Either experiment required its own preregistered protocol
+and frozen corpus. M6 did not run either study and did not choose a production history setting. M7
+later carried the encoded-lag and exact-total-point-count questions forward under its separate
+frozen protocol, as documented in the controlled follow-up above.
 
 ## Final ROS integration: projected-reference exactness
 
@@ -373,3 +507,13 @@ not independently revalidate pose derivation or the internal builder arithmetic.
 platform-qualified WSL2/ROS software evidence. It does not claim original-M6a byte identity,
 physical-LiDAR validation, performance, or portability of the projected hashes. See the
 [frozen R3 protocol](M6C_PROTOCOL_R3.md) and [final result](M6C_RESULTS_R3.md).
+
+## Conclusion
+
+M6 established cross-domain sensitivity to accumulated-history configuration, but its compound
+H10/H5 comparison did not isolate the mechanism. The later frozen M7 study found encoded lag
+magnitude to be the dominant measured contributor among the tested interventions for Cars, while
+exact total-point-count matching alone failed the preregistered rule. The result remains bounded:
+the Pedestrian direction reverses, B does not recover the six-pose far-range Car slice, D does not
+dominate E at strict IoU or annotation-conditioned AP, and no universal deployment policy is
+validated.
