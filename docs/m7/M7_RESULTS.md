@@ -1,7 +1,6 @@
-# M7 controlled history-mechanism study — interpretation candidate
+# M7 controlled history-mechanism study — frozen interpretation
 
-**M7 SCIENTIFIC INTERPRETATION CANDIDATE — OWNER REVIEW REQUIRED.**
-**NOT YET FROZEN.**
+**M7 SCIENTIFIC INTERPRETATION — OWNER APPROVED AND FROZEN.**
 
 This document interprets the accepted preregistered M7 R2 measurement. It is separate from the
 [raw evidence record](M7_MEASUREMENT_RAW.md), which remains unchanged. No detector rerun, input
@@ -15,6 +14,9 @@ the observed H10-to-H5 Car degradation. Changing only encoded lag from A to B re
 all three preregistered substantial-explanation conditions. Exact total-point-count matching alone
 (C) failed those conditions. The combined lag-compressed and point-count-matched arm D also passed
 and produced the highest primary Car recall, slightly above E at IoU 0.50.
+
+The lag-only Car gain is also range-dependent in this corpus: B improves the 0–20 m and 20–35 m
+slices but remains 0/6 at 35–50 m, equal to A in that six-instance far-range slice.
 
 That conclusion is class- and criterion-dependent. E retained more Car matches than D at IoU 0.70,
 had slightly higher Car AP, and had substantially higher Pedestrian recall than every M7
@@ -169,9 +171,12 @@ the primary M7 outcome.
 M7 does not establish that encoded lag is the sole cause, physical history span has no role, point
 population has no role, or F isolates span. The factorial is not a population causal decomposition.
 The intervention is not shown to generalize beyond this detector, dataset, and configuration. M7
-does not authorize lag compression as a product default, create a Pedestrian acceptance gate,
-constitute an official KITTI benchmark, show that D universally outperforms H5, or validate a
-production policy.
+evaluates a frozen pretrained detector and does not establish whether a model trained with broader
+or different encoded-lag exposure would show the same sensitivity. C tests exact total point count
+rather than natural H5 density, and F does not isolate sweep count; M7 therefore does not establish
+that natural point-density effects or sweep-count effects are irrelevant. M7 does not authorize
+lag compression as a product default, create a Pedestrian acceptance gate, constitute an official
+KITTI benchmark, show that D universally outperforms H5, or validate a production policy.
 
 ## Future-work boundary
 
@@ -182,8 +187,8 @@ by two specific findings:
 1. the Pedestrian reversal under both point-population settings (A→B and C→D); and
 2. the absence of far-range Car recovery under lag compression alone (B remains 0/6, equal to A).
 
-This interpretation candidate does not create an M8 protocol, freeze a follow-up design,
-implement lag normalization, or change inference behavior.
+This frozen interpretation does not create an M8 protocol, freeze a follow-up design, implement
+lag normalization, or change inference behavior.
 
 ## Evidence identity
 
@@ -194,4 +199,4 @@ implement lag normalization, or change inference behavior.
 - Secondary characterization SHA256: `1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6`
 - Measurement manifest SHA256: `21b1b93807c6e41a607f1c94bce182ca32fa995259298dc6e4c7392ee185598e`
 
-**M7 SCIENTIFIC INTERPRETATION CANDIDATE — OWNER REVIEW REQUIRED. NOT YET FROZEN.**
+**M7 SCIENTIFIC INTERPRETATION — OWNER APPROVED AND FROZEN.**

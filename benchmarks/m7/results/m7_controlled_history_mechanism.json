@@ -1,6 +1,6 @@
 {
-  "schema_version": "laserperception.m7.controlled-history-mechanism.interpretation-candidate.v1",
-  "status": "M7 SCIENTIFIC INTERPRETATION CANDIDATE — OWNER REVIEW REQUIRED. NOT YET FROZEN.",
+  "schema_version": "laserperception.m7.controlled-history-mechanism.interpretation.v1",
+  "status": "M7 SCIENTIFIC INTERPRETATION — OWNER APPROVED AND FROZEN.",
   "protocol_commit": "fd4a143621ffc0692206c100279a9edfd5572d35",
   "raw_measurement_merge_commit": "72f78f740b084776f6fe52994581760ade8844dd",
   "raw_artifacts": {
@@ -159,6 +159,9 @@
     "Physical history span and point population are not established as irrelevant.",
     "The factorial contrasts are descriptive and not a population causal decomposition.",
     "The result is not established beyond this detector, dataset, and configuration.",
+    "M7 evaluates a frozen pretrained detector and does not establish whether a model trained with broader or different encoded-lag exposure would show the same sensitivity.",
+    "C tests exact total point count rather than natural H5 density; M7 does not establish that natural point-density effects are irrelevant.",
+    "F does not isolate sweep count; M7 does not establish that sweep-count effects are irrelevant.",
     "Lag compression is not authorized as a production default.",
     "No Pedestrian pass/fail gate exists.",
     "M7 is not an official KITTI benchmark.",
