@@ -12,6 +12,7 @@ Machine-readable records:
 
 - [raw arm table](../../benchmarks/m7/results/m7_raw_arm_table.json)
 - [factorial contrasts](../../benchmarks/m7/results/m7_raw_factorial_contrasts.json)
+- [secondary characterization](../../benchmarks/m7/results/m7_raw_secondary_characterization.json)
 - [measurement manifest](../../benchmarks/m7/results/m7_measurement_manifest.json)
 
 ## Complete-corpus and repeatability gates
@@ -73,6 +74,96 @@ The exact detected and missed pose identities are retained in the raw arm-table 
 | D | -0.142857 | 33/64 (0.515625) | 4/15 (0.266667) | 166/204 (0.813725) | 9/113 (0.079646) |
 | F | 0.346939 | 29/64 (0.453125) | 7/15 (0.466667) | 187/204 (0.916667) | 13/113 (0.115044) |
 
+## Preregistered secondary characterization
+
+The secondary metrics below were aggregated from the existing frozen DetectionFrames. **No
+detector rerun occurred.** Cells in the threshold and range tables show `TP/eligible GT (recall)`;
+precision and F1 for every threshold, plus every deterministic per-track continuity record, remain
+in the linked machine-readable secondary artifact.
+
+### IoU-threshold results
+
+| Car arm | IoU 0.30 | IoU 0.50 | IoU 0.70 |
+| --- | ---: | ---: | ---: |
+| A | 16/66 (0.2424242424) | 16/66 (0.2424242424) | 16/66 (0.2424242424) |
+| B | 41/66 (0.6212121212) | 41/66 (0.6212121212) | 38/66 (0.5757575758) |
+| C | 17/66 (0.2575757576) | 17/66 (0.2575757576) | 17/66 (0.2575757576) |
+| D | 49/66 (0.7424242424) | 49/66 (0.7424242424) | 40/66 (0.6060606061) |
+| E | 48/66 (0.7272727273) | 48/66 (0.7272727273) | 44/66 (0.6666666667) |
+| F | 21/66 (0.3181818182) | 21/66 (0.3181818182) | 20/66 (0.3030303030) |
+
+| Pedestrian arm | IoU 0.30 | IoU 0.50 | IoU 0.70 |
+| --- | ---: | ---: | ---: |
+| A | 280/396 (0.7070707071) | 219/396 (0.5530303030) | 54/396 (0.1363636364) |
+| B | 276/396 (0.6969696970) | 199/396 (0.5025252525) | 42/396 (0.1060606061) |
+| C | 276/396 (0.6969696970) | 224/396 (0.5656565657) | 59/396 (0.1489898990) |
+| D | 279/396 (0.7045454545) | 212/396 (0.5353535354) | 48/396 (0.1212121212) |
+| E | 316/396 (0.7979797980) | 268/396 (0.6767676768) | 76/396 (0.1919191919) |
+| F | 288/396 (0.7272727273) | 236/396 (0.5959595960) | 46/396 (0.1161616162) |
+
+### Primary-IoU range slices
+
+The frozen M6b intervals are `0 <= range < 20`, `20 <= range < 35`, and
+`35 <= range <= 50` metres.
+
+| Car arm | 0–20 m | 20–35 m | 35–50 m |
+| --- | ---: | ---: | ---: |
+| A | 12/27 (0.4444444444) | 4/30 (0.1333333333) | 0/6 (0.0000000000) |
+| B | 27/27 (1.0000000000) | 14/30 (0.4666666667) | 0/6 (0.0000000000) |
+| C | 10/27 (0.3703703704) | 6/30 (0.2000000000) | 1/6 (0.1666666667) |
+| D | 27/27 (1.0000000000) | 19/30 (0.6333333333) | 3/6 (0.5000000000) |
+| E | 27/27 (1.0000000000) | 17/30 (0.5666666667) | 4/6 (0.6666666667) |
+| F | 11/27 (0.4074074074) | 10/30 (0.3333333333) | 0/6 (0.0000000000) |
+
+| Pedestrian arm | 0–20 m | 20–35 m | 35–50 m |
+| --- | ---: | ---: | ---: |
+| A | 168/288 (0.5833333333) | 51/106 (0.4811320755) | 0/2 (0.0000000000) |
+| B | 146/288 (0.5069444444) | 52/106 (0.4905660377) | 1/2 (0.5000000000) |
+| C | 167/288 (0.5798611111) | 56/106 (0.5283018868) | 1/2 (0.5000000000) |
+| D | 152/288 (0.5277777778) | 60/106 (0.5660377358) | 0/2 (0.0000000000) |
+| E | 191/288 (0.6631944444) | 75/106 (0.7075471698) | 2/2 (1.0000000000) |
+| F | 180/288 (0.6250000000) | 56/106 (0.5283018868) | 0/2 (0.0000000000) |
+
+### Prediction population, FOV, and neighbour ignores
+
+`Total` is the all-class, all-score postprocessed DetectionFrame population. `Inside` and
+`outside` are class-specific score-`>= 0.25` counts; `ignore GT` and `ignored` use the frozen
+neighbour-ignore definitions at primary IoU 0.50.
+
+| Car arm | Total | Inside | Outside | Ignore GT | Ignored | Reasons |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| A | 124,559 | 166 | 661 | 19 | 6 | `ignored_van: 6` |
+| B | 120,379 | 302 | 921 | 19 | 7 | `ignored_van: 7` |
+| C | 127,647 | 174 | 677 | 19 | 5 | `ignored_van: 5` |
+| D | 121,390 | 316 | 921 | 19 | 7 | `ignored_van: 7` |
+| E | 123,934 | 317 | 944 | 19 | 8 | `ignored_van: 8` |
+| F | 128,942 | 174 | 670 | 19 | 5 | `ignored_van: 5` |
+
+| Pedestrian arm | Total | Inside | Outside | Ignore GT | Ignored | Reasons |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| A | 124,559 | 4,050 | 8,540 | 68 | 0 | — |
+| B | 120,379 | 4,174 | 7,769 | 68 | 0 | — |
+| C | 127,647 | 3,881 | 7,568 | 68 | 1 | `ignored_person_sitting: 1` |
+| D | 121,390 | 3,963 | 7,690 | 68 | 0 | — |
+| E | 123,934 | 4,136 | 7,610 | 68 | 0 | — |
+| F | 128,942 | 3,965 | 7,482 | 68 | 0 | — |
+
+Each arm has 11 Car and 41 Pedestrian track-continuity records. The canonical compact JSON for all
+312 records is 104,446 bytes with SHA256
+`5fe772495e1c7487a87b8971a6817103c236cb346528130125d4b637628b6993`.
+
+### Descriptive Pedestrian-recall factorial numbers
+
+F is excluded from these preregistered equations. No Pedestrian pass/fail gate exists.
+
+| Quantity | Value |
+| --- | ---: |
+| L | -0.0404040404 |
+| P | +0.0227272727 |
+| I | +0.0202020202 |
+
+These are continuous numerical descriptive contrasts only.
+
 ## Descriptive Car-recall factorial numbers
 
 F is excluded from these preregistered equations.
@@ -113,6 +204,7 @@ recorded `2,020,376,576` bytes process peak RSS and `280,403,456` bytes peak all
 memory. It completed without failure or restart.
 
 - Scientific implementation: `c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2`
+- Secondary aggregation implementation: `7d8ae2d399b443c08ecd8b83f63fae211a018455`
 - Corrected reviewed measurement runtime: `5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729`
 - Prospective R2 authorization/execution: `8a7e0128092e30c1b249f2dca4c2541f2792574a`
 - Frozen input ledger: `577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea`
@@ -131,5 +223,11 @@ byte-identical compact JSON:
 
 - arm table: `2539286bc4ddf05e0526e0301aeb93e295afa1d549140d2ef341edc6cb725f44`;
 - factorial contrasts: `f6e6f7a25759948be894d3419055064775ae168081acfc2c9ae77422052bbb06`.
+
+After owner review identified the missing preregistered secondary fields, two additional fresh
+processes derived the complete supplemental characterization from the same completed checkpoints.
+Both produced the same 123,291-byte secondary JSON, SHA256
+`1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6`. No detector rerun or new
+detector output was used.
 
 No scientific interpretation narrative is frozen in this record.

@@ -9,6 +9,23 @@
     "second_process": {
       "m7_raw_arm_table_sha256": "2539286bc4ddf05e0526e0301aeb93e295afa1d549140d2ef341edc6cb725f44",
       "m7_raw_factorial_contrasts_sha256": "f6e6f7a25759948be894d3419055064775ae168081acfc2c9ae77422052bbb06"
+    },
+    "secondary_characterization": {
+      "bytes": 123291,
+      "detector_rerun": false,
+      "filename": "m7_raw_secondary_characterization.json",
+      "fresh_process_exact_json_match": true,
+      "second_process_sha256": "1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6",
+      "sha256": "1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6",
+      "track_continuity": {
+        "canonical_json_bytes": 104446,
+        "canonical_json_sha256": "5fe772495e1c7487a87b8971a6817103c236cb346528130125d4b637628b6993",
+        "record_counts": {
+          "car": 66,
+          "pedestrian": 246,
+          "total": 312
+        }
+      }
     }
   },
   "authorization": {
@@ -81,6 +98,7 @@
     "measurement_runtime_commit": "5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729",
     "protocol_commit": "fd4a143621ffc0692206c100279a9edfd5572d35",
     "reviewed_correction_pr_head": "5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729",
+    "secondary_aggregation_implementation_commit": "7d8ae2d399b443c08ecd8b83f63fae211a018455",
     "scientific_implementation_commit": "c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2"
   },
   "input": {

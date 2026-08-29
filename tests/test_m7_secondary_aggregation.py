@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping
+from pathlib import Path
 
 import pytest
 
@@ -10,6 +13,8 @@ from benchmarks.m7.protocol import ProtocolViolation
 from laserperception.detection.types import Detection3D
 from laserperception.evaluation.kitti_m6b import M6bGroundTruthBox
 from laserperception.evaluation.m6b_metrics import RankedDisposition, count_metrics
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _detection(class_name: str, score: float) -> Detection3D:
@@ -196,3 +201,27 @@ def test_pedestrian_factorial_is_descriptive_and_has_no_gate_field() -> None:
         }
     )
     assert not any("gate" in str(key).lower() for key in result)
+
+
+def test_committed_secondary_result_matches_primary_and_manifest_exactly() -> None:
+    secondary_path = ROOT / "benchmarks/m7/results/m7_raw_secondary_characterization.json"
+    primary_path = ROOT / "benchmarks/m7/results/m7_raw_arm_table.json"
+    manifest_path = ROOT / "benchmarks/m7/results/m7_measurement_manifest.json"
+    result = json.loads(secondary_path.read_text(encoding="utf-8"))
+    primary = json.loads(primary_path.read_text(encoding="utf-8"))
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert result["detector_calls_added"] == 0
+    assert result["operating_points"]["oriented_bev_iou_thresholds"] == [0.3, 0.5, 0.7]
+    for class_name in ("car", "pedestrian"):
+        for arm_name in "ABCDEF":
+            record = result["arms"][class_name][arm_name]
+            assert list(record["thresholds"]) == ["0.30", "0.50", "0.70"]
+            secondary._validate_primary_consistency(record, primary["arms"][class_name][arm_name])
+
+    encoded = secondary_path.read_bytes()
+    supplemental = manifest["aggregation"]["secondary_characterization"]
+    assert supplemental["bytes"] == len(encoded) == 123_291
+    assert supplemental["sha256"] == hashlib.sha256(encoded).hexdigest()
+    assert supplemental["fresh_process_exact_json_match"] is True
+    assert "gate" not in json.dumps(result["pedestrian_recall_factorial"]).lower()
