@@ -1,0 +1,12 @@
+{
+  "schema_version": "laserperception.m7.inference-authorization.v2",
+  "authorized_for_inference": true,
+  "m7_protocol_commit": "fd4a143621ffc0692206c100279a9edfd5572d35",
+  "m7_implementation_commit": "c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2",
+  "m7_measurement_runtime_commit": "5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729",
+  "m7_input_ledger_sha256": "577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea",
+  "engine_sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+  "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+  "onnx_sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16",
+  "evaluator_identity": "m6b-r2-score-0.25-oriented-bev-iou-0.50"
+}

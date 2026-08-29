@@ -1,0 +1,149 @@
+{
+  "aggregation": {
+    "detector_rerun": false,
+    "first_process": {
+      "m7_raw_arm_table_sha256": "2539286bc4ddf05e0526e0301aeb93e295afa1d549140d2ef341edc6cb725f44",
+      "m7_raw_factorial_contrasts_sha256": "f6e6f7a25759948be894d3419055064775ae168081acfc2c9ae77422052bbb06"
+    },
+    "fresh_process_exact_json_match": true,
+    "second_process": {
+      "m7_raw_arm_table_sha256": "2539286bc4ddf05e0526e0301aeb93e295afa1d549140d2ef341edc6cb725f44",
+      "m7_raw_factorial_contrasts_sha256": "f6e6f7a25759948be894d3419055064775ae168081acfc2c9ae77422052bbb06"
+    },
+    "secondary_characterization": {
+      "bytes": 123291,
+      "detector_rerun": false,
+      "filename": "m7_raw_secondary_characterization.json",
+      "fresh_process_exact_json_match": true,
+      "second_process_sha256": "1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6",
+      "sha256": "1dcf152c000af820f008e5ccdc73549cebdb2297990ba8a960032a64c5c905c6",
+      "track_continuity": {
+        "canonical_json_bytes": 104446,
+        "canonical_json_sha256": "5fe772495e1c7487a87b8971a6817103c236cb346528130125d4b637628b6993",
+        "record_counts": {
+          "car": 66,
+          "pedestrian": 246,
+          "total": 312
+        }
+      }
+    }
+  },
+  "authorization": {
+    "commit": "8a7e0128092e30c1b249f2dca4c2541f2792574a",
+    "path": "benchmarks/m7/preregistration/m7_inference_authorization.json",
+    "sha256": "a4f0619794517b19de3563325ab92ff51e0968d5daf1dace593b4c5c29b74944",
+    "status": "NEW_PROSPECTIVE_R2_AUTHORIZATION"
+  },
+  "completed_conditions": {
+    "B": 428,
+    "C": 428,
+    "D": 428,
+    "F": 428,
+    "total": 1712
+  },
+  "external_evidence": [
+    {
+      "bytes": 46859349,
+      "filename": "m7_r2_checkpoint_evidence.tar.gz",
+      "sha256": "0e35af22f5f83751d09422861ade6aafd3f2f7cb8b483752377b1c38c119d466",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 411581,
+      "filename": "m7_r2_progress.json",
+      "sha256": "8522897c1c14a32f7b9f15912f426a5a417f4390c2d094729990b6ed3f57fd4f",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 173,
+      "filename": "m7_r2_run_summary.json",
+      "sha256": "4fe11a09a6a7621d8440c1b3323e90faceaa3fd21afffa38ab46be0af35f9690",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 1649,
+      "filename": "session_001.json",
+      "sha256": "6f06a599555a1a2868266ba0b39be35e80d5c354f55d8c054387d384184d5382",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 3478,
+      "filename": "session_001.log",
+      "sha256": "e44a7a5a2bd52c61a500d0e51f80cc2579dad66d00966ea3c199b2ae3a960ff2",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 7158,
+      "filename": "run_authorized_measurement_r2.py",
+      "sha256": "a61dbe072643050dab202ba1842061d5fcdfd4d5edfdd2a9946e92fe3b78baa0",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    },
+    {
+      "bytes": 11364,
+      "filename": "merged_main_no_gpu_preflight.json",
+      "sha256": "e56e87d1238dda2ab2fe71fdd61d3dc690ea06733700eda1f7417d977b68425c",
+      "storage": ".local/m7-measurement-r2/external_not_git_tracked"
+    }
+  ],
+  "frozen_artifacts": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "engine_sha256": "2e790b1cdbdc1b88c2aafdc81b5921ebee152edd8408158f88437ae4dd1f3e7f",
+    "onnx_sha256": "61ce22a8ca31498675c32576bfb94f0093d31dc95d2762f7254bf915a59ecc16"
+  },
+  "identities": {
+    "accepted_correction_merge_commit": "742d8ebeb3a1ac8f248dbdd0a0b4e0ffcc4f990b",
+    "aggregation_implementation_commit": "db1d58a10426b9b0aad7dab754196a4f9c1d58d8",
+    "code_correction_commit": "23792950e1e00bbe7e128b29b73f77c13776cac1",
+    "measurement_execution_commit": "8a7e0128092e30c1b249f2dca4c2541f2792574a",
+    "measurement_runtime_commit": "5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729",
+    "protocol_commit": "fd4a143621ffc0692206c100279a9edfd5572d35",
+    "reviewed_correction_pr_head": "5a8c02e8ba279ee44a8bb87eb2ec2984ca95e729",
+    "secondary_aggregation_implementation_commit": "7d8ae2d399b443c08ecd8b83f63fae211a018455",
+    "scientific_implementation_commit": "c989f7df5ca8c5ac8148c0ed3a2e91de48b754b2"
+  },
+  "input": {
+    "bytes": 3163158937,
+    "condition_count": 1712,
+    "full_ledger_sha256": "577a7ee3da5495611592ca3226a2adefd577fa54821bb859d25892d0cbcbb8ea",
+    "paired_gt_sha256": "0f4ecf564bff30913a0cb35b2043a9a5cd0c8fdb26b220c4cb12072e186f8ba5",
+    "projection_sha256": "efbde2858f0e9780b52cda3b6ae35d8e6d236a8b28b518af695de8a8343e1c92",
+    "regenerated": false
+  },
+  "interpretation_status": "SCIENTIFIC INTERPRETATION NOT YET FROZEN.",
+  "measurement": {
+    "canonical_sentinel_reuse_count": 20,
+    "ended_utc": "2026-08-28T17:43:48.955441+00:00",
+    "gpu_vram_peak_bytes": 280403456,
+    "inference_call_count": 1892,
+    "process_failure_or_restart": false,
+    "process_peak_rss_bytes": 2020376576,
+    "repeatability_call_count": 200,
+    "repeatability_groups": 20,
+    "repeatability_pass": true,
+    "r1_checkpoint_reuse_count": 0,
+    "session_count": 1,
+    "session_id": "session_001",
+    "started_utc": "2026-08-28T12:06:13.600987+00:00",
+    "status": "PASS",
+    "wall_clock_seconds": 13674.09046414
+  },
+  "no_gpu_preflight": {
+    "environment": {
+      "numpy": "1.26.4",
+      "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+      "python": "3.10.12"
+    },
+    "projection_sha256": "efbde2858f0e9780b52cda3b6ae35d8e6d236a8b28b518af695de8a8343e1c92",
+    "sentinel_conditions_passed": 20,
+    "sentinel_conditions_total": 20,
+    "status": "PASS",
+    "wall_clock_seconds": 358.665457872
+  },
+  "operating_point": {
+    "evaluator_identity": "m6b-r2-score-0.25-oriented-bev-iou-0.50",
+    "oriented_bev_iou_threshold": 0.5,
+    "score_threshold": 0.25
+  },
+  "schema_version": "laserperception.m7.measurement-manifest.v1",
+  "status": "M7 MEASUREMENT COMPLETE — RAW PREREGISTERED RESULTS ONLY."
+}
