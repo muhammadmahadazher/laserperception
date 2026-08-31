@@ -1,6 +1,7 @@
 """Framework-independent 3D detection results and geometry."""
 
 from laserperception.detection.geometry import bev_corners
+from laserperception.detection.m8_input import M8MultiSweepBuilder, M8PointCloud
 from laserperception.detection.multisweep import (
     HistoricalSweep,
     LidarPose,
@@ -16,6 +17,8 @@ __all__ = [
     "DetectionFrame",
     "HistoricalSweep",
     "LidarPose",
+    "M8MultiSweepBuilder",
+    "M8PointCloud",
     "MultiSweepBuilder",
     "MultiSweepBuilderConfig",
     "RawSweep",

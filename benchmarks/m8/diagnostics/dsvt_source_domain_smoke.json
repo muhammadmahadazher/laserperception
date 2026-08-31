@@ -1,0 +1,98 @@
+{
+  "identity": {
+    "architecture": "DSVT-Pillar with TransFusion head",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "class_mapping": {
+      "car": "car",
+      "pedestrian": "pedestrian"
+    },
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "coordinate_adapter": "openpcdet_lidar_box_direct",
+    "cuda": "11.8",
+    "device": "cuda:0",
+    "feature_contract": [
+      "x",
+      "y",
+      "z",
+      "intensity",
+      "time_lag"
+    ],
+    "spconv": "2.3.8",
+    "torch": "2.1.0+cu118",
+    "torch_scatter": "2.1.2+pt21cu118",
+    "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "input": {
+    "device_at_backend": "cuda:0",
+    "dtype": "float32",
+    "sha256": "5e435c2c25d68cd9994a974d8a3bdad0e7ce788586d5eb9f6eefedc8347eea34",
+    "shape": [
+      207998,
+      5
+    ]
+  },
+  "prediction": {
+    "boxes_finite": true,
+    "boxes_shape": [
+      132,
+      9
+    ],
+    "class_ids_valid": true,
+    "count": 132,
+    "score_max": 0.696984589099884,
+    "score_min": 0.0,
+    "scores_finite": true
+  },
+  "repeatability": {
+    "detection_frame_exact_10_of_10": false,
+    "detection_frame_unique_sha256": 10,
+    "first_differing_tensor": "pred_boxes",
+    "raw_tensors": {
+      "pred_boxes": {
+        "dtype": "float32",
+        "exact_10_of_10": false,
+        "maximum_absolute_difference": 0.011060565710067749,
+        "shape": [
+          132,
+          9
+        ],
+        "unique_sha256": 10
+      },
+      "pred_labels": {
+        "dtype": "int32",
+        "exact_10_of_10": true,
+        "maximum_absolute_difference": 0.0,
+        "shape": [
+          132
+        ],
+        "unique_sha256": 1
+      },
+      "pred_scores": {
+        "dtype": "float32",
+        "exact_10_of_10": false,
+        "maximum_absolute_difference": 0.0001267939805984497,
+        "shape": [
+          132
+        ],
+        "unique_sha256": 10
+      }
+    },
+    "repeats": 10
+  },
+  "resources": {
+    "host_max_rss_bytes": 1492934656,
+    "peak_cuda_allocated_bytes": 1454273536,
+    "peak_cuda_reserved_bytes": 1904214016,
+    "single_sample_wall_ms_engineering_context": {
+      "max": 140.5708709999658,
+      "mean": 133.39374009999005,
+      "median": 133.0301964999876,
+      "min": 130.65696899997192
+    }
+  },
+  "sample": "nuScenes v1.0-mini validation index 0",
+  "schema_version": "1.0",
+  "scientific_accuracy_measurement": false,
+  "source_domain_accuracy_rebenchmarked": false,
+  "status": "m8_phase1_source_domain_engineering_smoke_pass"
+}

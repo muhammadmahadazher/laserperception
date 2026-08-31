@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "status": "m8_phase1_engineering_candidate",
+  "architecture": "DSVT-Pillar with TransFusion head",
+  "upstream": {
+    "repository": "https://github.com/Haiyang-W/DSVT",
+    "commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061",
+    "package_version": "0.6.0+8cfc2a6",
+    "openpcdet_reference_repository": "https://github.com/open-mmlab/OpenPCDet",
+    "openpcdet_reference_commit": "233f849829b6ac19afb8af8837a0246890908755",
+    "openpcdet_reference_version": "0.6.0+233f849 (setup-derived; audit checkout not installed)",
+    "config_relative_path": "tools/cfgs/dsvt_models/dsvt_plain_1f_onestage_nusences.yaml",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "license": "Apache-2.0"
+  },
+  "checkpoint": {
+    "source_url": "https://drive.google.com/file/d/10d7c-uJxg5w4GN-JmRBQi4gQDwHiOHxP/view?usp=drive_link",
+    "filename": "DSVT_Nuscenes_val.pth",
+    "bytes": 28665215,
+    "sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "distributed": false
+  },
+  "runtime": {
+    "python": "3.10",
+    "torch": "2.1.0+cu118",
+    "cuda": "11.8",
+    "spconv": "2.3.8",
+    "torch_scatter": "2.1.2+pt21cu118",
+    "numpy": "1.23.5",
+    "tensorrt": "8.6.1",
+    "device": "cuda:0",
+    "batch_size": 1
+  },
+  "feature_contract": {
+    "columns": ["x", "y", "z", "intensity", "time_lag"],
+    "dtype": "float32",
+    "contiguous": true,
+    "point_order_policy": "preserve frozen source-row order; no random inference shuffle",
+    "timestamp_consumed": true,
+    "intensity_policy": "raw KITTI reflectance; no normalization",
+    "physical_corpus_range": [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0],
+    "candidate_range": [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+  },
+  "output_contract": {
+    "class_names": [
+      "car",
+      "truck",
+      "construction_vehicle",
+      "bus",
+      "trailer",
+      "barrier",
+      "motorcycle",
+      "bicycle",
+      "pedestrian",
+      "traffic_cone"
+    ],
+    "primary_m6_mapping": {"car": "car", "pedestrian": "pedestrian"},
+    "ignored_for_primary_m6": [
+      "truck",
+      "construction_vehicle",
+      "bus",
+      "trailer",
+      "barrier",
+      "motorcycle",
+      "bicycle",
+      "traffic_cone"
+    ],
+    "box_layout": ["x", "y", "z", "length", "width", "height", "yaw", "vx", "vy"],
+    "score_policy": "native scores; scientific score >= 0.25 is external",
+    "internal_score_threshold": 0.1
+  },
+  "environment": {
+    "upstream_root_variable": "LASERPERCEPTION_M8_DSVT_ROOT",
+    "checkpoint_variable": "LASERPERCEPTION_M8_DSVT_CHECKPOINT",
+    "source_data_variable": "LASERPERCEPTION_M8_NUSCENES_ROOT"
+  }
+}
