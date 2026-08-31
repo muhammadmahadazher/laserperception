@@ -1,0 +1,65 @@
+{
+  "accuracy_evaluation_performed": false,
+  "candidate_dynamic_pillars": 32774,
+  "candidate_range_dropped_points": 0,
+  "capacity_semantics": {
+    "configured_dynamic_pillar_cap": null,
+    "coordinate_order_vs_cpu_sorted_order_exact": true,
+    "cpu_analytic_pillar_count_noncanonical": 32774,
+    "cpu_vs_cuda_boundary_count_difference": 0,
+    "occupied_coordinate_set_vs_actual_dynpillar_vfe_exact": true,
+    "theoretical_xy_cells": 129600
+  },
+  "complete_model": {
+    "output_completed": true,
+    "output_count_only": 116,
+    "postprocess_completed": true,
+    "prediction_values_discarded_immediately": true
+  },
+  "condition_id": "2011_09_26_drive_0091/0000000069/H10",
+  "discarded_or_truncated_pillars": 0,
+  "ground_truth_loaded": false,
+  "historical_XYZT_projection_sha256": "d8980da4bc370f9c568057d640030d54e3e9181199ee2630b60ad0ce596c5024",
+  "input_full_feature_sha256": "9ceaf3a7c6b15e72482ea4e0f48594939e8c0ebb1794a7f2e82853860f3c327b",
+  "input_point_count": 1339216,
+  "prediction_values_serialized": false,
+  "resources_engineering_context_only": {
+    "host_peak_rss_bytes": 1547771904,
+    "peak_cuda_allocated_bytes": 2922352640,
+    "peak_cuda_reserved_bytes": 4418699264,
+    "wall_seconds": 1.8486622739999987
+  },
+  "retained_pillars": 32774,
+  "runtime_identity": {
+    "architecture": "DSVT-Pillar with TransFusion head",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "class_mapping": {
+      "car": "car",
+      "pedestrian": "pedestrian"
+    },
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "coordinate_adapter": "openpcdet_lidar_box_direct",
+    "cuda": "11.8",
+    "device": "cuda:0",
+    "feature_contract": [
+      "x",
+      "y",
+      "z",
+      "intensity",
+      "time_lag"
+    ],
+    "gpu": {
+      "driver": "610.88",
+      "memory_total_mib": "8188",
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+    },
+    "spconv": "2.3.8",
+    "torch": "2.1.0+cu118",
+    "torch_scatter": "2.1.2+pt21cu118",
+    "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "schema_version": "1.0",
+  "scientific_measurement": false,
+  "semantic_prediction_values_observed": false,
+  "status": "m8_phase1e_owner_review_h10_structural_smoke_pass"
+}

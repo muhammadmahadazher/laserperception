@@ -3,7 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from laserperception.detection.m8_input import M8MultiSweepBuilder, M8PointCloud
+from laserperception.detection.m8_input import (
+    M8MultiSweepBuilder,
+    M8PointCloud,
+    m8_elapsed_seconds,
+)
 from laserperception.detection.multisweep import (
     HistoricalSweep,
     MultiSweepBuilder,
@@ -76,3 +80,15 @@ def test_m8_point_cloud_rejects_wrong_feature_contract() -> None:
         M8PointCloud(np.ones((2, 5), dtype=np.float64))
     with pytest.raises(ValueError, match="shape"):
         M8PointCloud(np.ones((2, 4), dtype=np.float32))
+
+
+def test_timestamp_fixture_is_positive_float32_current_minus_history() -> None:
+    lag = m8_elapsed_seconds(2_000_000, 1_250_000)
+    current = m8_elapsed_seconds(2_000_000, 2_000_000)
+
+    assert lag.dtype == np.float32
+    assert lag == np.float32(0.75)
+    assert current == np.float32(0.0)
+    assert not np.signbit(current)
+    with pytest.raises(ValueError, match="must not be newer"):
+        m8_elapsed_seconds(1_000_000, 1_000_001)

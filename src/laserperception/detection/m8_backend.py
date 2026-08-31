@@ -22,6 +22,7 @@ from typing import Any, cast
 
 import numpy as np
 
+from laserperception.detection.m8_capacity import load_dsvt_capacity_contract
 from laserperception.detection.m8_input import M8_FEATURE_NAMES, M8PointCloud
 from laserperception.detection.types import Detection3D, DetectionFrame
 
@@ -135,6 +136,8 @@ class DsvtBackend:
         self.upstream_root = Path(upstream_root).resolve()
         self.checkpoint_path = Path(checkpoint_path).resolve()
         self.manifest = load_m8_candidate_manifest(self.manifest_path)
+        self.capacity_contract = load_dsvt_capacity_contract(self.manifest)
+        _validate_timestamp_contract(self.manifest)
         self._model: Any = None
         self._torch: Any = None
         self._cfg: Any = None
@@ -190,20 +193,7 @@ class DsvtBackend:
         )
 
     def _predict_arrays(self, points: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
-        point_range = np.array([-54.0, -54.0, -5.0, 54.0, 54.0, 3.0], dtype=np.float32)
-        inside = np.all(points[:, :3] >= point_range[:3], axis=1) & np.all(
-            points[:, :3] < point_range[3:], axis=1
-        )
-        selected = np.ascontiguousarray(points[inside])
-        dropped = int(points.shape[0] - selected.shape[0])
-        if selected.shape[0] == 0:
-            raise ValueError("candidate range removed every input point")
-        batch_column = np.zeros((selected.shape[0], 1), dtype=np.float32)
-        candidate_points = np.concatenate((batch_column, selected), axis=1)
-        tensor = self._torch.from_numpy(candidate_points).to(device="cuda:0")
-        if tensor.dtype != self._torch.float32 or tensor.device != self._torch.device("cuda:0"):
-            raise RuntimeError("DSVT input did not materialize as CUDA FP32 on device 0")
-        batch = {"batch_size": 1, "points": tensor, "frame_id": ["m8"]}
+        batch, dropped = self._prepare_batch(points)
         with self._torch.inference_mode():
             predictions, _ = self._model(batch)
             self._torch.cuda.synchronize(0)
@@ -218,6 +208,46 @@ class DsvtBackend:
             prediction["pred_labels"].detach().cpu().contiguous().numpy(),
             dropped,
         )
+
+    def run_structural_smoke(self, points: np.ndarray) -> tuple[int, int]:
+        """Run the model while retaining only output count and capacity status.
+
+        This engineering-only entry point deliberately does not transfer or
+        expose prediction values. It exists for owner-authorized structural
+        capacity checks, not scientific detector evaluation.
+        """
+
+        batch, dropped = self._prepare_batch(points)
+        with self._torch.inference_mode():
+            predictions, _ = self._model(batch)
+            self._torch.cuda.synchronize(0)
+        prediction = predictions[0]
+        expected = {"pred_boxes", "pred_scores", "pred_labels"}
+        if not expected.issubset(prediction):
+            raise RuntimeError("DSVT structural output contract is incomplete")
+        count = int(prediction["pred_boxes"].shape[0])
+        if prediction["pred_scores"].shape != (count,) or prediction["pred_labels"].shape != (
+            count,
+        ):
+            raise RuntimeError("DSVT structural output shapes are inconsistent")
+        del prediction, predictions
+        return count, dropped
+
+    def _prepare_batch(self, points: np.ndarray) -> tuple[dict[str, object], int]:
+        point_range = np.asarray(self.capacity_contract.point_cloud_range, dtype=np.float32)
+        inside = np.all(points[:, :3] >= point_range[:3], axis=1) & np.all(
+            points[:, :3] < point_range[3:], axis=1
+        )
+        selected = np.ascontiguousarray(points[inside])
+        dropped = int(points.shape[0] - selected.shape[0])
+        if selected.shape[0] == 0:
+            raise ValueError("candidate range removed every input point")
+        batch_column = np.zeros((selected.shape[0], 1), dtype=np.float32)
+        candidate_points = np.concatenate((batch_column, selected), axis=1)
+        tensor = self._torch.from_numpy(candidate_points).to(device="cuda:0")
+        if tensor.dtype != self._torch.float32 or tensor.device != self._torch.device("cuda:0"):
+            raise RuntimeError("DSVT input did not materialize as CUDA FP32 on device 0")
+        return {"batch_size": 1, "points": tensor, "frame_id": ["m8"]}, dropped
 
     def _initialize(self) -> None:
         if not (self.upstream_root / ".git").is_dir():
@@ -271,9 +301,11 @@ class DsvtBackend:
         dataset = SimpleNamespace(
             class_names=list(M8_CLASS_NAMES),
             point_feature_encoder=SimpleNamespace(num_point_features=5),
-            grid_size=np.array([360, 360, 1], dtype=np.int64),
-            point_cloud_range=np.array([-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]),
-            voxel_size=np.array([0.3, 0.3, 8.0]),
+            grid_size=np.asarray(self.capacity_contract.grid_size, dtype=np.int64),
+            point_cloud_range=np.asarray(
+                self.capacity_contract.point_cloud_range, dtype=np.float32
+            ),
+            voxel_size=np.asarray(self.capacity_contract.voxel_size, dtype=np.float32),
             depth_downsample_factor=None,
         )
         model = models_module.build_network(
@@ -333,6 +365,25 @@ def _required_integer(parent: Mapping[str, object], key: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ValueError(f"M8 manifest {key} must be an integer")
     return value
+
+
+def _validate_timestamp_contract(manifest: Mapping[str, object]) -> None:
+    timestamp = _required_mapping(manifest, "timestamp_semantics")
+    expected: dict[str, object] = {
+        "unit": "seconds",
+        "definition": "current_timestamp_seconds - historical_timestamp_seconds",
+        "current_value": 0.0,
+        "current_zero_sign": "positive",
+        "older_history_sign": "positive",
+        "reference_frame": "current/reference lidar acquisition",
+        "dtype": "float32",
+        "m6_m7_relation": (
+            "semantically aligned current-minus-historical elapsed-seconds convention"
+        ),
+    }
+    for key, value in expected.items():
+        if timestamp.get(key) != value:
+            raise ValueError(f"M8 manifest timestamp_semantics.{key} mismatch")
 
 
 @contextmanager

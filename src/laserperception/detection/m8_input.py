@@ -27,6 +27,20 @@ M8_HISTORICAL_PROJECTION = (0, 1, 2, 4)
 M8_POINT_CLOUD_RANGE = POINTPILLARS_POINT_CLOUD_RANGE
 
 
+def m8_elapsed_seconds(current_microseconds: int, historical_microseconds: int) -> np.float32:
+    """Return current-minus-historical elapsed seconds at the frozen float32 cast point."""
+
+    for name, value in (
+        ("current_microseconds", current_microseconds),
+        ("historical_microseconds", historical_microseconds),
+    ):
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise TypeError(f"{name} must be an integer")
+    if historical_microseconds > current_microseconds:
+        raise ValueError("historical timestamp must not be newer than the current timestamp")
+    return np.float32(current_microseconds / 1_000_000 - historical_microseconds / 1_000_000)
+
+
 @dataclass(frozen=True, slots=True)
 class M8PointCloud:
     """Contiguous float32 ``[x, y, z, intensity, time_lag]`` points."""
@@ -90,7 +104,9 @@ class M8MultiSweepBuilder:
             lidar2sensor = np.array(item.transform.lidar2sensor.tolist())
             points[:, :3] = points[:, :3] @ lidar2sensor[:3, :3]
             points[:, :3] -= lidar2sensor[:3, 3]
-            points[:, 4] = current.timestamp_seconds - item.sweep.timestamp_seconds
+            points[:, 4] = m8_elapsed_seconds(
+                current.timestamp_microseconds, item.sweep.timestamp_microseconds
+            )
             parts.append(points)
 
         concatenated = np.concatenate(parts, axis=0)

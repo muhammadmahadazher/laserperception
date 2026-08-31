@@ -46,6 +46,23 @@ def test_manifest_binds_candidate_artifacts_and_score_contract() -> None:
     assert checkpoint["bytes"] == 28_665_215
     assert output["internal_score_threshold"] <= M8_SCIENTIFIC_SCORE_THRESHOLD
     assert output["class_names"] == list(M8_CLASS_NAMES)
+    timestamp = manifest["timestamp_semantics"]
+    assert isinstance(timestamp, dict)
+    assert timestamp["unit"] == "seconds"
+    assert timestamp["definition"] == ("current_timestamp_seconds - historical_timestamp_seconds")
+    assert timestamp["current_value"] == 0.0
+    assert timestamp["current_zero_sign"] == "positive"
+    assert timestamp["older_history_sign"] == "positive"
+    assert timestamp["dtype"] == "float32"
+    capacity = manifest["structural_capacity_contract"]
+    deployment = manifest["deployment_boundary_capacity"]
+    assert isinstance(capacity, dict)
+    assert isinstance(deployment, dict)
+    assert capacity["coordinate_constant_dtype"].startswith("float32")
+    assert capacity["dynamic_pillar_count_cap"] is None
+    assert deployment["initial_engine_accepts_h10_shape"] is False
+    assert deployment["h10_observed_shapes"]["src"] == [32774, 128]
+    assert deployment["h10_engine_built_deserialized_executed"] is True
 
 
 def test_unsupported_environment_fails_before_optional_imports(

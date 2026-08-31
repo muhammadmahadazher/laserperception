@@ -5,13 +5,37 @@
 
 ## Decision
 
-DSVT-Pillar with the nuScenes TransFusion head is the immutable candidate for a future,
-owner-gated M8 Phase 1 scientific comparison. The candidate was selected on engineering
-feasibility before any KITTI detector output was observed. CenterPoint was the prospective
-fallback and was not exercised.
+DSVT-Pillar with the nuScenes TransFusion head remains the final P1-E candidate for a future,
+owner-gated M8 Phase 1 scientific comparison after passing the owner-review amendment below. The
+initial candidate was selected on engineering feasibility before any KITTI detector output was
+observed. CenterPoint was the prospective fallback and was not exercised.
 
 Status: **M8 PHASE 1 V2 CANDIDATE SELECTED ON ENGINEERING FEASIBILITY — SCIENTIFIC COMPARISON
 NOT YET AUTHORIZED.**
+
+## Owner-review structural-capacity amendment — 2026-08-31
+
+The original 1 hour 5 minute engineering decision above is preserved at commit
+`3644aa1e7872a394010fd13259b3f933806ce696`; it did **not** include the gates in this section. Before
+PR #25 merge, protocol freeze, or any scientific result, owner review changed the status to
+**provisionally selected pending owner-review amendment** and required a complete H10 capacity and
+temporal-contract audit. No KITTI scientific output existed when the amendment was introduced.
+
+The prospective amendment gates passed:
+
+- the selected upstream timestamp meaning is current-minus-historical elapsed seconds, with
+  positive float32 zero for the current sweep and positive seconds for older sweeps;
+- all 428 frozen H10 inputs were censused with the selected CUDA coordinate arithmetic, with
+  14,163 to 32,774 occupied pillars and no configured pillar cap or truncation;
+- the input-only highest-pillar selection completed one owner-authorized full PyTorch structural
+  smoke with 32,774/32,774 pillars retained and no shape, memory, sparse-grid, InputLayer, or
+  postprocess failure; prediction values were discarded and no GT or accuracy metric was used;
+- an external partial TensorRT engine profiled from the 3,687-pillar source shape through the
+  32,774-pillar H10 shape parsed, built, deserialized, and executed the H10 boundary successfully.
+
+DSVT therefore remains the final P1-E candidate. CenterPoint remains a substantial source-domain
+capability upgrade over the historical PointPillars baseline, so failure of this amended DSVT
+structural gate would not have justified extending or weakening the DSVT acceptance rules.
 
 ## Timebox record
 
