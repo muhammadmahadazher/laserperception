@@ -1,0 +1,85 @@
+{
+  "boundary": {
+    "end": "after four DSVT transformer blocks",
+    "excluded": [
+      "point input",
+      "DynPillarVFE",
+      "DSVT InputLayer",
+      "BEV scatter",
+      "2D backbone",
+      "TransFusion head",
+      "postprocess"
+    ],
+    "start": "after DynPillarVFE and DSVT InputLayer"
+  },
+  "builder_warnings_retained": [
+    "ONNX INT64 weights were cast to INT32 and out-of-range values were clamped",
+    "FP16 LayerNorm after self-attention may overflow",
+    "8 FP32 infinity weights converted to FP16 infinity",
+    "93 weights produced subnormal FP16 values"
+  ],
+  "d_model": 128,
+  "engine": {
+    "bytes": 3609988,
+    "committed": false,
+    "deserialized": true,
+    "fp16": true,
+    "logical_name": "dsvt_nuscenes_selected_boundary_fp16.engine",
+    "sha256": "75c0d26f1780c2c4998b7aad39e7f48e003a14dca78abdfe6775c11d8b890137",
+    "tensorrt": "8.6.1"
+  },
+  "input_shapes": {
+    "pos_embed_tensor": [
+      4,
+      2,
+      3687,
+      128
+    ],
+    "set_voxel_inds_tensor_shift_0": [
+      2,
+      92,
+      90
+    ],
+    "set_voxel_inds_tensor_shift_1": [
+      2,
+      90,
+      90
+    ],
+    "set_voxel_masks_tensor_shift_0": [
+      2,
+      92,
+      90
+    ],
+    "set_voxel_masks_tensor_shift_1": [
+      2,
+      90,
+      90
+    ],
+    "src": [
+      3687,
+      128
+    ]
+  },
+  "onnx": {
+    "bytes": 4516964,
+    "committed": false,
+    "logical_name": "dsvt_nuscenes_selected_boundary.onnx",
+    "sha256": "d84703555dd45291a2238e109afbd676b17038a60238ed4ca60b19a8fdec1b78"
+  },
+  "output_shape": [
+    3687,
+    128
+  ],
+  "reported_upstream_context_only": {
+    "full_deployed_dsvt_pillar_hz": 27.0,
+    "full_deployed_dsvt_pillar_ms": 37.0,
+    "laserperception_measurement": false,
+    "partial_boundary_excludes_input_layer": true,
+    "partial_boundary_ms_rtx3090": 13.8
+  },
+  "schema_version": "1.0",
+  "scientific_performance_measurement": false,
+  "selected_config": "dsvt_plain_1f_onestage_nusences.yaml",
+  "status": "m8_phase1_selected_config_partial_deployment_smoke_pass",
+  "upstream_scope": "faithful selected-config adaptation of official tools/deploy.py partial backbone3D boundary; not the separate DSVT-AI-TRT end-to-end implementation"
+}

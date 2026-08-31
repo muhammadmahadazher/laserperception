@@ -1,0 +1,127 @@
+{
+  "schema_version": "1.0",
+  "status": "m8_phase1e_owner_review_amended_candidate",
+  "architecture": "DSVT-Pillar with TransFusion head",
+  "upstream": {
+    "repository": "https://github.com/Haiyang-W/DSVT",
+    "commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061",
+    "package_version": "0.6.0+8cfc2a6",
+    "openpcdet_reference_repository": "https://github.com/open-mmlab/OpenPCDet",
+    "openpcdet_reference_commit": "233f849829b6ac19afb8af8837a0246890908755",
+    "openpcdet_reference_version": "0.6.0+233f849 (setup-derived; audit checkout not installed)",
+    "config_relative_path": "tools/cfgs/dsvt_models/dsvt_plain_1f_onestage_nusences.yaml",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "license": "Apache-2.0"
+  },
+  "checkpoint": {
+    "source_url": "https://drive.google.com/file/d/10d7c-uJxg5w4GN-JmRBQi4gQDwHiOHxP/view?usp=drive_link",
+    "filename": "DSVT_Nuscenes_val.pth",
+    "bytes": 28665215,
+    "sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "distributed": false
+  },
+  "runtime": {
+    "python": "3.10",
+    "torch": "2.1.0+cu118",
+    "cuda": "11.8",
+    "spconv": "2.3.8",
+    "torch_scatter": "2.1.2+pt21cu118",
+    "numpy": "1.23.5",
+    "tensorrt": "8.6.1",
+    "device": "cuda:0",
+    "batch_size": 1
+  },
+  "feature_contract": {
+    "columns": ["x", "y", "z", "intensity", "time_lag"],
+    "dtype": "float32",
+    "contiguous": true,
+    "point_order_policy": "preserve frozen source-row order; no random inference shuffle",
+    "timestamp_consumed": true,
+    "intensity_policy": "raw KITTI reflectance; no normalization; candidate channel was learned from nuScenes intensity",
+    "physical_corpus_range": [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0],
+    "candidate_range": [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+  },
+  "timestamp_semantics": {
+    "source_files": [
+      "pcdet/datasets/nuscenes/nuscenes_dataset.py",
+      "pcdet/datasets/nuscenes/nuscenes_utils.py"
+    ],
+    "unit": "seconds",
+    "definition": "current_timestamp_seconds - historical_timestamp_seconds",
+    "current_value": 0.0,
+    "current_zero_sign": "positive",
+    "older_history_sign": "positive",
+    "reference_frame": "current/reference lidar acquisition",
+    "dtype": "float32",
+    "cast_point": "concatenated temporal array is cast to the point dtype before feature concatenation",
+    "m6_m7_relation": "semantically aligned current-minus-historical elapsed-seconds convention"
+  },
+  "structural_capacity_contract": {
+    "coordinate_generator": "DynPillarVFE float32 CUDA floor XY to int32, range-mask XY, merge x*360+y, torch.unique",
+    "coordinate_constant_dtype": "float32, matching DatasetTemplate point_cloud_range and config-list voxel size",
+    "point_cloud_range": [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0],
+    "voxel_size": [0.3, 0.3, 8.0],
+    "grid_size": [360, 360, 1],
+    "theoretical_xy_cell_count": 129600,
+    "dynamic_pillar_count_cap": null,
+    "max_number_of_voxels_present": false,
+    "coordinate_dtype_before_unique": "int32",
+    "input_layer_coordinate_dtype": "int64",
+    "set_index_dtype": "int64",
+    "set_size": 90,
+    "block_count": 4,
+    "window_shape": [30, 30, 1],
+    "scatter_shape": [360, 360, 1],
+    "bev_shape": [360, 360]
+  },
+  "deployment_boundary_capacity": {
+    "boundary_start": "after DynPillarVFE and DSVT InputLayer",
+    "boundary_end": "after four DSVT transformer blocks",
+    "initial_source_shape": [3687, 128],
+    "initial_engine_profile": "source-shape-only",
+    "initial_engine_accepts_h10_shape": false,
+    "h10_observed_shapes": {
+      "src": [32774, 128],
+      "set_shift_0": [2, 412, 90],
+      "set_shift_1": [2, 418, 90],
+      "position_embeddings": [4, 2, 32774, 128]
+    },
+    "h10_external_profile": "min=source shapes, opt=max=highest-pillar H10 shapes",
+    "h10_engine_built_deserialized_executed": true,
+    "h10_engine_committed": false,
+    "evidence": "benchmarks/m8/diagnostics/dsvt_h10_deployment_smoke.json"
+  },
+  "output_contract": {
+    "class_names": [
+      "car",
+      "truck",
+      "construction_vehicle",
+      "bus",
+      "trailer",
+      "barrier",
+      "motorcycle",
+      "bicycle",
+      "pedestrian",
+      "traffic_cone"
+    ],
+    "primary_m6_mapping": {"car": "car", "pedestrian": "pedestrian"},
+    "ignored_for_primary_m6": [
+      "truck",
+      "construction_vehicle",
+      "bus",
+      "trailer",
+      "barrier",
+      "motorcycle",
+      "bicycle",
+      "traffic_cone"
+    ],
+    "box_layout": ["x", "y", "z", "length", "width", "height", "yaw", "vx", "vy"],
+    "score_policy": "native scores; scientific score >= 0.25 is external",
+    "internal_score_threshold": 0.1
+  },
+  "environment": {
+    "upstream_root_variable": "LASERPERCEPTION_M8_DSVT_ROOT",
+    "checkpoint_variable": "LASERPERCEPTION_M8_DSVT_CHECKPOINT",
+    "source_data_variable": "LASERPERCEPTION_M8_NUSCENES_ROOT"
+  }
+}

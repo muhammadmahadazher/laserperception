@@ -1,0 +1,28 @@
+{
+  "H10_exact_count": 428,
+  "H5_exact_count": 428,
+  "XYZT_projection_exact_count": 856,
+  "conditions_checked": 856,
+  "detector_inference_performed": false,
+  "existing_ledger": {
+    "bytes": 669345,
+    "path": "benchmarks/m8/diagnostics/m8_input_projection_ledger.json",
+    "rewritten": false,
+    "sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c"
+  },
+  "final_implementation_commit": "34ec084191cbe9ba457b5a4fcad68477f878d3bc",
+  "full_XYZIT_exact_count": 856,
+  "ground_truth_loaded": false,
+  "intensity_exact_count": 856,
+  "mismatch_count": 0,
+  "mismatch_ids": [],
+  "range_drop_exact_count": 856,
+  "result": "PASS",
+  "schema_version": "1.0",
+  "scientific_measurement": false,
+  "source_m6b_full_ledger": {
+    "logical_name": "pre_inference_input_ledger_full.json",
+    "sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa"
+  },
+  "status": "m8_phase1e_final_input_projection_revalidation_pass"
+}

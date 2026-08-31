@@ -80,6 +80,22 @@ repository. LaserPerception did not train it, does not claim ownership of it, an
 it. Users are responsible for reviewing the upstream software/model terms and the nuScenes dataset
 terms that apply to the pretrained artifact and its use.
 
+## M8 external DSVT engineering environment
+
+M8 Phase 1 engineering integrates, through lazy imports and an external environment, the official
+[DSVT repository](https://github.com/Haiyang-W/DSVT) at commit
+`8cfc2a6f23eed0b10aabcdc4768c60b184357061` (Apache-2.0). The repository is based on the OpenPCDet
+ecosystem; the separate reference audit used
+[OpenPCDet](https://github.com/open-mmlab/OpenPCDet) commit
+`233f849829b6ac19afb8af8837a0246890908755` (Apache-2.0). Optional runtime components include
+spconv, cumm, and torch-scatter under their respective upstream terms. No upstream source is
+vendored into the LaserPerception wheel.
+
+The official `DSVT_Nuscenes_val.pth` checkpoint is downloaded from the DSVT authors' linked model
+distribution to an ignored external directory and is not distributed by LaserPerception. Its
+recorded SHA256 is `a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb`.
+LaserPerception did not train it, does not claim ownership of it, and does not relicense it.
+
 ## Datasets and specifications
 
 nuScenes, SemanticKITTI, KITTI, DALES, CVGC, their papers, datasets, development kits, and model
