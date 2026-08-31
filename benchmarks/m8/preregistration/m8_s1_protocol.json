@@ -1,0 +1,180 @@
+{
+  "authorization": {
+    "explicit_inference_authorization_committed": false,
+    "ground_truth_relative_v2_measurement_authorized": false,
+    "owner_review_required": true,
+    "protocol_frozen": false,
+    "stage_r_authorized": false
+  },
+  "candidate": {
+    "architecture": "DSVT-Pillar with TransFusion head",
+    "candidate_manifest": {
+      "bytes": 4915,
+      "path": "configs/m8/dsvt_nuscenes_pillar.json",
+      "sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7"
+    },
+    "checkpoint": {
+      "bytes": 28665215,
+      "filename": "DSVT_Nuscenes_val.pth",
+      "sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb"
+    },
+    "official_config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "claim_boundaries": {
+    "comparison_type": "frozen detector-stack comparison under a common cross-domain physical corpus and evaluation protocol",
+    "deployment": {
+      "dsvt": "partial TensorRT boundary through four transformer blocks",
+      "pointpillars": "historical end-to-end TensorRT path demonstrated"
+    },
+    "intensity": {
+      "dsvt": "raw KITTI reflectance in a channel learned from nuScenes intensity",
+      "pointpillars": "not consumed"
+    },
+    "point_order_policy": "preserve frozen source-row order; no random test-time shuffle",
+    "shared_corpus_range": [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0],
+    "spatial_discretization": {
+      "dsvt": {
+        "grid_xy": [360, 360],
+        "pillar_xy_metres": [0.3, 0.3],
+        "supported_range": [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+      },
+      "pointpillars": {
+        "grid_xy": [400, 400],
+        "voxel_xy_metres": [0.25, 0.25],
+        "supported_range": [-50.0, -50.0, -5.0, 50.0, 50.0, 3.0]
+      }
+    }
+  },
+  "conditions": {
+    "primary": {
+      "A2": "DSVT H10 with raw KITTI reflectance",
+      "E2": "DSVT H5 with raw KITTI reflectance"
+    },
+    "secondary": {
+      "A2_zeroI": "DSVT H10 with candidate-consumed intensity exactly positive float32 zero",
+      "E2_zeroI": "DSVT H5 with candidate-consumed intensity exactly positive float32 zero"
+    }
+  },
+  "corpus": {
+    "H10_conditions": 428,
+    "H5_conditions": 428,
+    "ordered_frame_identity_sha256": "76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95",
+    "subsampling_allowed": false
+  },
+  "evaluator": {
+    "annotation_scope": "KITTI Raw reference-camera-0 tracklets; precision and AP are annotation-conditioned",
+    "class_mapping": {
+      "car": "car",
+      "pedestrian": "pedestrian"
+    },
+    "eligible_gt": {
+      "car": 66,
+      "pedestrian": 396
+    },
+    "iou_thresholds": [0.3, 0.5, 0.7],
+    "neighbour_ignore": {
+      "car": "Van",
+      "pedestrian": "Person (sitting)"
+    },
+    "primary_iou_threshold": 0.5,
+    "score_threshold": 0.25,
+    "source_identities": {
+      "benchmarks/m6b/run_characterization.py": "824b431bd8231db9afd7f7a2b943dd5b2877276113cd33a145997cea3b09cb91",
+      "configs/m6/kitti_m6b.yaml": "c6d839f2b0d62bc57c958a99b25dbb4a897e3063f080d0a3d6ea24bdde307620",
+      "src/laserperception/evaluation/kitti_m6b.py": "07e731462a0a805474da7449f95e82a9e8c105204c0e87459cc1ff946065abb8",
+      "src/laserperception/evaluation/m6b_metrics.py": "4ac80e80647aaf882798d91c20531c18c875b80253cc8d56f1c49ed67efa358b",
+      "src/laserperception/evaluation/m6b_pillars.py": "bbde774ce44c5bf0d0e3bc45d86c25d0b2a4632cf0f113d61fae636e785e8577"
+    }
+  },
+  "historical_baseline": {
+    "compact_result": {
+      "bytes": 111529,
+      "path": "benchmarks/m6b/results/kitti_raw_cross_domain_characterization.json",
+      "sha256": "b9d47120aabb38733d79f987f16277ebab626d2b7c13159c40c30a68b76c1d26"
+    },
+    "conditions": {
+      "A_PointPillars_H10": {
+        "car": {"FN": 50, "FP": 144, "TP": 16, "recall_fraction": "16/66"},
+        "pedestrian": {"FN": 177, "FP": 3831, "TP": 219, "recall_fraction": "219/396"}
+      },
+      "E_PointPillars_H5": {
+        "car": {"FN": 18, "FP": 261, "TP": 48, "recall_fraction": "48/66"},
+        "pedestrian": {"FN": 128, "FP": 3868, "TP": 268, "recall_fraction": "268/396"}
+      }
+    },
+    "measurement_identity": "9159682fadfc069eeb70e07acb76dd0a929db98f",
+    "rerun_allowed": false
+  },
+  "input_binding": {
+    "accepted_ledger": {
+      "bytes": 669345,
+      "path": "benchmarks/m8/diagnostics/m8_input_projection_ledger.json",
+      "sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c"
+    },
+    "final_head_revalidation": {
+      "bytes": 966,
+      "path": "benchmarks/m8/diagnostics/m8_input_projection_revalidation.json",
+      "sha256": "71ac9418c29da5efd64f9eaeb03e859f85d6b1c56dc2fe47cef6563a9f960341"
+    },
+    "feature_columns": ["x", "y", "z", "intensity", "time_lag"],
+    "require_exact_856_condition_revalidation_before_inference": true
+  },
+  "phase1e": {
+    "canonical_engineering_commit": "77369c02e3486650cd06624cb796cf1efbc6e3d4",
+    "merge_commit": "8fcf71f527104e439a59bb8cc2376ec332fa5841"
+  },
+  "primary_reporting": {
+    "baseline_deltas": [
+      "recall(A2)-recall(PointPillars_H10)",
+      "recall(E2)-recall(PointPillars_H5)",
+      "recall(E2)-recall(A2)"
+    ],
+    "classes": ["car", "pedestrian"],
+    "metrics": ["TP", "FP", "FN", "recall", "annotation_conditioned_precision", "F1", "annotation_conditioned_AP"],
+    "phase1_pass_fail_threshold": null
+  },
+  "result_state": {
+    "B2_C2_D2_F2_inference_calls": 0,
+    "ground_truth_relative_v2_results": 0,
+    "intensity_zero_inference_calls": 0,
+    "primary_A2_E2_accuracy_inference_calls": 0,
+    "stage_r_calls": 0
+  },
+  "schema_version": "1.0",
+  "secondary_reporting": {
+    "distance_bands_metres": [[0, 20], [20, 35], [35, 50]],
+    "measures": [
+      "TP_and_matched_GT_at_IoU_0.30_0.50_0.70",
+      "distance_stratified_recall",
+      "per_track_detected_frame_continuity",
+      "prediction_population",
+      "outside_annotation_FOV_counts",
+      "neighbour_ignore_behavior"
+    ]
+  },
+  "stage_r": {
+    "branch_R": {
+      "condition": "any required primary discrete quantity differs for either class on any sentinel",
+      "primary_complete_passes": 3,
+      "report": ["pass_1", "pass_2", "pass_3", "median", "minimum", "maximum"],
+      "sentinel_reuse": "repeats 1, 2, and 3 become pass 1, 2, and 3"
+    },
+    "branch_S": {
+      "condition": "all 10 repeats have identical TP, FP, FN, ignored-prediction count, and matched-GT identity set for both classes on all 10 conditions at score 0.25 and IoU 0.50",
+      "primary_complete_passes": 1,
+      "sentinel_reuse": "repeat 1 is the canonical corpus result"
+    },
+    "calls": 100,
+    "conditions": 10,
+    "repeats_per_condition": 10,
+    "sentinel_frames": [
+      "2011_09_26_drive_0001/0000000010",
+      "2011_09_26_drive_0001/0000000011",
+      "2011_09_26_drive_0001/0000000015",
+      "2011_09_26_drive_0001/0000000083",
+      "2011_09_26_drive_0091/0000000010"
+    ]
+  },
+  "status": "M8 P1-S1 SCIENTIFIC PROTOCOL DRAFT — OWNER REVIEW REQUIRED — NO GT-RELATIVE V2 RESULT EXISTS"
+}
