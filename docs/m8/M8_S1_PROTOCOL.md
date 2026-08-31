@@ -125,7 +125,8 @@ population used by M6b; it is not official KITTI benchmark AP.
 
 ## Primary reporting
 
-For A2 and E2, report separately for Car and Pedestrian:
+Execute exactly three complete primary corpus passes. For A2 and E2, report separately for Car and
+Pedestrian for pass 1, pass 2, pass 3, their median, minimum, and maximum:
 
 - TP, FP, FN;
 - recall;
@@ -133,13 +134,33 @@ For A2 and E2, report separately for Car and Pedestrian:
 - F1;
 - annotation-conditioned AP.
 
-Report the following frozen-baseline deltas without treating them as causal architecture effects:
+TP, FN, recall, and the preregistered recall contrasts are the primary GT-linked quantities. FP is
+also reported at the frozen operating point. Because Raw tracklets are incomplete,
+annotation-conditioned precision, F1, and AP remain important descriptive quantities rather than
+physical whole-world false-positive performance or official KITTI benchmark precision/AP.
+
+Within a pass, A2 and E2 are produced by the same initialized runtime realization. Preserve this
+pairing and compute the history contrast before summarizing passes. For class `c` and pass `i`:
 
 ```text
-delta_H10_class       = recall(V2_H10_class) - recall(PointPillars_H10_class)
-delta_H5_class        = recall(V2_H5_class)  - recall(PointPillars_H5_class)
-delta_history_v2_class = recall(V2_H5_class) - recall(V2_H10_class)
+history_delta_i[c] = recall(E2_i, c) - recall(A2_i, c)
+
+median_history_delta[c] = median(history_delta_1[c],
+                                 history_delta_2[c],
+                                 history_delta_3[c])
+minimum_history_delta[c] = min(history_delta_1[c], history_delta_2[c], history_delta_3[c])
+maximum_history_delta[c] = max(history_delta_1[c], history_delta_2[c], history_delta_3[c])
+
+delta_H10_i[c] = recall(A2_i, c) - frozen_PointPillars_H10_recall(c)
+delta_H5_i[c]  = recall(E2_i, c) - frozen_PointPillars_H5_recall(c)
 ```
+
+Report all three history and historical-baseline deltas before median/minimum/maximum summaries.
+Do not substitute `median(E2 recall) - median(A2 recall)` for the paired history contrast. Apply
+the same within-pass construction to other mathematically meaningful H10-versus-H5 quantities,
+including `TP(E2_i,c) - TP(A2_i,c)` if TP contrast is reported. PointPillars is one frozen
+historical realization, not process-paired with DSVT; each V2 pass is compared with that fixed
+baseline separately.
 
 No numerical Phase-1 success threshold or model-selection rule is introduced.
 
@@ -154,65 +175,85 @@ and 0.70. Also report, using the exact M6b definitions:
 - outside-annotation-FOV counts;
 - neighbour-ignore counts and behavior.
 
-These outcomes are descriptive and inherit the Raw-tracklet annotation limitations.
+These outcomes are descriptive and inherit the Raw-tracklet annotation limitations. Every reported
+aggregate retains pass 1, pass 2, pass 3, median, minimum, and maximum.
 
-## Stage R — GT-relative repeatability before corpus measurement
+## Fixed three-pass replication
 
-No Stage R call may occur while this document is a draft. Stage R must run before the full A2/E2
-corpus only after the protocol is owner-approved and frozen, the measurement implementation and
-resume design are reviewed, exact artifacts are bound, and explicit inference authorization is
-committed.
+The complete-corpus pass count is frozen before Stage R results exist. Stage R does not select
+between one and three passes: sentinel stability cannot establish stability over the remaining
+corpus, the candidate already has non-byte-exact box/score/DetectionFrame engineering outputs,
+and annotation-conditioned AP is globally ranked over a complete prediction population.
 
-### Sentinel set and call count
+Execute exactly three complete primary passes. Each contains all 428 H10 and 428 H5 conditions,
+for 856 accepted conditions per pass and 2,568 accepted primary calls. Aggregate passes
+independently; do not average boxes, combine detections, form consensus predictions, or select a
+favourable pass.
 
-Use exactly these five frozen frames:
+## Stage R — independent GT-relative repeatability characterization
+
+No Stage R call may occur while this document is a draft. Stage R runs before the complete corpus
+only after owner freeze, implementation/resume review, exact artifact binding, owner approval, and
+a committed inference authorization. It characterizes local discrete repeatability and
+cross-process variation, validates repeatability instrumentation, tests whether engineering
+nondeterminism reaches evaluator outcomes, and preserves continuity with the M7 sentinel design.
+It does not determine corpus-pass count, and its outputs are never reused in a corpus pass.
+
+Observed Stage R variation does not by itself cancel S1. A contract failure, artifact mismatch,
+corrupted evaluator, invalid detector output, or other structural defect remains fail-closed.
+
+### Prospective GT-only sentinel audit
+
+The five historical frames were audited using only the frozen KITTI Raw tracklet annotations,
+reference-camera eligibility, neighbour-ignore roles, and model-frame range definitions. No
+detector prediction was loaded and no DSVT or PointPillars inference occurred. Range entries below
+are `0–20 / 20–35 / 35–50 m` eligible-target counts.
+
+| Frame | Eligible Car | Eligible Pedestrian | Car ignore | Pedestrian ignore | Car range counts | Pedestrian range counts |
+|---|---:|---:|---:|---:|---|---|
+| `2011_09_26_drive_0001/0000000010` | 1 | 0 | 0 | 0 | `0 / 0 / 1` | `0 / 0 / 0` |
+| `2011_09_26_drive_0001/0000000011` | 4 | 0 | 0 | 0 | `2 / 2 / 0` | `0 / 0 / 0` |
+| `2011_09_26_drive_0001/0000000015` | 3 | 0 | 0 | 0 | `1 / 2 / 0` | `0 / 0 / 0` |
+| `2011_09_26_drive_0001/0000000083` | 0 | 0 | 0 | 0 | `0 / 0 / 0` | `0 / 0 / 0` |
+| `2011_09_26_drive_0091/0000000010` | 0 | 2 | 0 | 0 | `0 / 0 / 0` | `0 / 2 / 0` |
+
+The historical set has three Car-bearing frames but only one Pedestrian-bearing frame. Applying the
+prospective rule to the exact 428-frame order appends the first unused frame that improves a
+deficient class, stopping as soon as both classes reach three GT-bearing frames:
+
+1. corpus ordinal 100, `2011_09_26_drive_0091/0000000011`: one eligible Pedestrian at 20–35 m;
+2. corpus ordinal 101, `2011_09_26_drive_0091/0000000012`: three eligible Pedestrians at 20–35 m.
+
+Neither added frame has eligible Car or a primary-class neighbour-ignore box. The final frozen
+sentinel order is therefore:
 
 1. `2011_09_26_drive_0001/0000000010`
 2. `2011_09_26_drive_0001/0000000011`
 3. `2011_09_26_drive_0001/0000000015`
 4. `2011_09_26_drive_0001/0000000083`
 5. `2011_09_26_drive_0091/0000000010`
+6. `2011_09_26_drive_0091/0000000011`
+7. `2011_09_26_drive_0091/0000000012`
 
-Run both H10 and H5 for every frame: ten sentinel conditions. Repeat each condition exactly ten
-times, for exactly 100 Stage R calls. Do not perform an eleventh repeat.
+This gives exactly three distinct Car-bearing and three distinct Pedestrian-bearing frames. The
+floor provides minimal scene diversity, not statistical representativeness. Audit inputs are bound
+by tracklet SHAs `34f0672dee9dc94535893e653b4a66e6ddf534a09d2533bac4e62965935a91b8`
+and `3d363ee40129e51aaf44764b9637bc7e946b6e3ec628784adcdedd395505feab`, camera-calibration SHA
+`edc1eae281cb95e41798a98dcc545521449527145477ff852dbf3a4ec48c643c`, and Velodyne-calibration
+SHA `9dc0c3e92dfceceb9500caa2c9488261a52640e43c3f7c3045ca1ed7927e7266`.
 
-### Recorded evidence per repetition
+### Fresh-process design and recorded evidence
 
-For Car and Pedestrian at score `>= 0.25` and primary IoU `>= 0.50`, preserve enough evidence to
-compare:
+Run exactly ten fresh Stage R processes. Each process starts clean, verifies frozen runtime and
+artifact identities, initializes DSVT once, executes the seven sentinels once each in final order
+with H10 then H5, records evidence, and exits. This is 14 conditions per process and exactly 140
+accepted Stage R calls. Do not run an eleventh process.
 
-- identities of predictions surviving the score threshold;
-- prediction count by primary class;
-- TP, FP, FN;
-- ignored-prediction count;
-- exact matched-GT identity set.
-
-At IoU 0.30 and 0.70, also record discrete TP and matched-GT identity information for secondary
-characterization. Raw-tensor maximum differences do not establish these discrete quantities. The
-engineering source-domain differences therefore neither pass nor fail Stage R in advance.
-
-### Branch S — discrete stability
-
-Branch S applies only if, for every one of the ten sentinel conditions and both primary classes,
-all ten repeats have exactly identical TP, FP, FN, ignored-prediction count, and matched-GT
-identity set at score `>= 0.25` and IoU `>= 0.50`.
-
-Under Branch S, execute the full primary V2 corpus once. Stage R repeat #1 is the canonical A2/E2
-result for each of the ten sentinel conditions and must not be rerun in the ordinary sweep. Reuse
-is scientifically sound under Branch S because the branch requires the discrete scientific
-outcomes to be identical across all ten repeats before reuse is selected.
-
-### Branch R — discrete instability
-
-If any required primary discrete quantity differs for either class on any sentinel, Branch R
-applies automatically. The difference must not be reinterpreted as negligible.
-
-Under Branch R, execute three complete independent primary V2 corpus passes. For each sentinel,
-Stage R repeats #1, #2, and #3 become its pass 1, pass 2, and pass 3 results; those combinations
-must not be rerun. Aggregate every pass independently and report pass 1, pass 2, pass 3, median,
-minimum, and maximum for all primary aggregate outcomes. Do not merge detections across passes or
-average boxes into synthetic predictions. The scientific report must identify discrete-level V2
-nondeterminism.
+For every process/frame/history/class at score `>= 0.25` and IoU `>= 0.50`, record thresholded
+prediction count, TP, FP, FN, ignored-prediction count, and exact matched-GT identity set. At IoU
+0.30 and 0.70 also retain TP and matched-GT identities. Preserve sufficient score-ranked
+postprocessed sentinel evidence to characterize mini-corpus ordering changes across processes. Do
+not require exact raw-float equality or infer full-corpus AP stability from Stage R.
 
 ## Secondary intensity-zero intervention
 
@@ -223,24 +264,42 @@ Rows, XYZ, time lag, model, checkpoint, source-row order, and evaluator remain i
 This secondary intervention characterizes sensitivity to the additional domain-shifted intensity
 channel. It may not select the candidate, replace A2/E2, modify the model, or tune intensity.
 
-Use the branch selected by primary Stage R; do not conduct a second adaptive repeatability test. If
-Branch S applies, run one complete zero-intensity corpus pass. If Branch R applies, run three
-complete zero-intensity corpus passes. No zero-intensity result exists at protocol-draft time.
+Execute exactly three complete zero-intensity passes, each containing 428 H10 then 428 H5
+conditions for 856 accepted calls and 2,568 accepted calls overall. Each pass is independent and
+reported as pass 1, pass 2, pass 3, median, minimum, and maximum. Do not merge detections across
+passes. These passes are separate processes from primary passes, so primary-versus-zero-intensity
+process-index pairs are not statistically paired; compare the three-pass distributions
+descriptively. The official five-feature A2/E2 contract remains primary.
 
-## Complete-call accounting and resume requirements
+## Canonical pass, order, failure, and accounting rules
 
-The future implementation must checkpoint atomically, resume without silently rerunning accepted
-conditions, retain the complete corpus, and report exact attempted, accepted, reused, and failed
-call counts.
+One complete canonical corpus pass is one fresh Python process that verifies identities,
+initializes the frozen candidate once, executes all 856 ordered conditions, and exits normally.
+Primary passes 1–3 use three different fresh processes; zero-intensity passes 1–3 use another three.
+No accepted pass may mix process outputs.
 
-| Branch | Stage R calls | Additional primary calls | Zero-intensity calls | Total detector calls | Canonical primary outputs |
-|---|---:|---:|---:|---:|---:|
-| S | 100 | 846 | 856 | 1,802 | 856 |
-| R | 100 | 2,538 | 2,568 | 5,206 | 2,568 across three passes |
+Every pass uses the frozen 428-frame order and executes `frame_1/H10`, `frame_1/H5`, then
+`frame_2/H10`, `frame_2/H5`, through `frame_428/H10`, `frame_428/H5`. Stage R uses its final
+seven-frame order with H10 then H5 in each fresh process. Results may not change this order.
 
-Branch S reuses ten Stage R repeat-#1 outputs. Branch R reuses 30 Stage R outputs: repeats #1–#3
-for ten sentinel conditions. The remaining Stage R repetitions are repeatability evidence only.
-The corpus may not be reduced because of runtime or session length.
+If a canonical process dies before all 856 conditions, preserve its checkpoint/log as failure
+evidence, mark the attempt incomplete, exclude its outputs from scientific aggregation, and restart
+the entire logical pass from condition 1 in a new process. Never splice an incomplete attempt into
+a replacement. Record attempt ID, logical pass ID, process identity, attempted calls, accepted
+canonical calls, failed calls, and failure reason. A technical call failure with no accepted output
+may be retried only under the later frozen implementation with full accounting.
+
+Expected accepted detector calls are fixed:
+
+| Experiment | Processes | Conditions per process | Accepted calls |
+|---|---:|---:|---:|
+| Primary A2/E2 | 3 | 856 | 2,568 |
+| Secondary A2_zeroI/E2_zeroI | 3 | 856 | 2,568 |
+| Stage R | 10 | 14 | 140 |
+| **Total** | **16** | — | **5,276** |
+
+Stage R outputs are not corpus outputs. Attempts may exceed 5,276 calls only when explicitly
+recorded technical failures yielded no accepted canonical output. The corpus may not be trimmed.
 
 ## Claim boundaries
 
@@ -282,8 +341,16 @@ The future measurement manifest must bind at minimum:
 - DSVT upstream commit, official config SHA, checkpoint SHA, and candidate-manifest SHA;
 - input-ledger and final-head-revalidation SHAs;
 - exact evaluator implementation identity;
-- verified PyTorch, CUDA, spconv, torch-scatter, NumPy, and device identities;
+- exact Python, PyTorch, CUDA runtime, NVIDIA driver, GPU name and available GPU UUID, spconv,
+  torch-scatter, NumPy, and device identities;
+- model eval/train state, inference/no-grad/inference-mode state, Python/NumPy/Torch CPU/Torch CUDA
+  seeds, TF32 settings, cuDNN benchmark and deterministic settings, Torch deterministic-algorithm
+  setting, and relevant CUDA/PyTorch environment variables;
 - class mapping, score contract, point-order policy, and intensity policy.
+
+The measurement must preserve accepted P1-E behavior; it must not enable a new deterministic
+algorithm merely to make S1 cleaner. Any runtime-policy difference from P1-E requires owner review
+before authorization.
 
 There may be no caller-selectable model factory. Protocol freeze alone does not authorize
 measurement. The mandatory chronology is:
@@ -293,8 +360,8 @@ measurement. The mandatory chronology is:
 3. all artifacts and runtime identities are bound fail-closed;
 4. owner approves the implementation;
 5. explicit inference authorization is committed **before** the first GT-relative V2 call;
-6. Stage R runs, selects Branch S or Branch R mechanically, and only then does the corresponding
-   complete-corpus execution proceed.
+6. independent Stage R runs as ten fresh processes, followed by the already-fixed three primary
+   and three zero-intensity complete-corpus processes.
 
 ## Output chronology
 
@@ -306,14 +373,21 @@ Measurement first produces raw results only, without scientific interpretation:
 - `benchmarks/m8/results/m8_s1_measurement_manifest.json`;
 - `docs/m8/M8_S1_MEASUREMENT_RAW.md`.
 
-Large detector/checkpoint evidence remains external and is recorded by filename, byte count, and
-SHA256. Owner review of the raw record precedes any separate interpretation act.
+The Stage R artifact retains the final sentinel set, GT-only audit identity, ten process identities,
+every condition outcome, and repeatability summaries. Primary and secondary raw artifacts retain
+three separate complete pass records; they are never collapsed to median-only evidence. Large
+detector/checkpoint evidence remains external and is recorded by filename, byte count, and SHA256.
+Owner review of the raw record precedes any separate interpretation act.
 
 ## S2 barrier and gap eligibility
 
-S1 must finish and freeze the A2/E2 paired outputs before S2 can be designed. S1 authorizes no
-B2/C2/D2/F2 inference. Only afterward may S2 define shared, E-only, A-only, and neither partitions
-or a normalized recovery statistic.
+S1 must finish and freeze the A2/E2 outputs before S2 can be designed. S1 authorizes no
+B2/C2/D2/F2 inference. Because S1 produces three complete A2/E2 realizations, future S2 must
+prospectively define how shared, E-only, A-only, and neither partitions are constructed for a
+numerically nondeterministic detector. It may use a single frozen realization or a preregistered
+multi-pass stability definition, but S1 selects neither. Pass 1, median predictions, union, and
+intersection must not be adopted automatically. S2 makes that decision after raw S1 evidence is
+frozen and before any B2/C2/D2/F2 output exists.
 
 Prospectively, if Car `TP_E2 <= TP_A2`, the positive H10-to-H5 phenomenon did not replicate and
 normalized recovery is undefined. If the gap is positive but too small under a future S2
