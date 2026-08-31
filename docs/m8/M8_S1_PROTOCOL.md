@@ -1,13 +1,15 @@
-# M8 P1-S1 frozen detector-stack comparison protocol — draft
+# M8 P1-S1 frozen detector-stack comparison protocol
 
-Status: **M8 P1-S1 SCIENTIFIC PROTOCOL DRAFT — OWNER REVIEW REQUIRED — NO
-GT-RELATIVE V2 RESULT EXISTS.**
+Status: **M8 P1-S1 SCIENTIFIC PROTOCOL — OWNER APPROVED AND FROZEN BEFORE ANY
+GT-RELATIVE V2 MEASUREMENT.**
 
-This document is a preregistration draft. It is not frozen, does not authorize inference, and
-contains no Stage R, A2, E2, or intensity-zero detector result. Owner approval and a committed
-protocol freeze are necessary but still insufficient to begin measurement: the implementation,
-resume behavior, artifact binding, and explicit inference authorization must be reviewed and
-committed afterward.
+**NO STAGE R DETECTOR OUTPUT EXISTS. NO A2/E2 GT-RELATIVE V2 RESULT EXISTS. NO ZERO-INTENSITY
+RESULT EXISTS. NO B2/C2/D2/F2 RESULT EXISTS.**
+
+The source reviewed draft commit is `def09021dd033b8dfbc0a413c58cba84fcc7a863`.
+Owner approval occurred before any scientific V2 detector measurement. This freeze does not
+authorize inference: the implementation, resume behavior, artifact binding, owner implementation
+approval, and explicit committed inference authorization remain mandatory before Stage R.
 
 The machine-readable companion is
 [`m8_s1_protocol.json`](../../benchmarks/m8/preregistration/m8_s1_protocol.json).
@@ -185,6 +187,12 @@ between one and three passes: sentinel stability cannot establish stability over
 corpus, the candidate already has non-byte-exact box/score/DetectionFrame engineering outputs,
 and annotation-conditioned AP is globally ranked over a complete prediction population.
 
+The three passes are repeated numerical/runtime realizations of the same frozen corpus. They
+characterize detector/runtime numerical reproducibility and observed run-to-run outcome spread.
+They are not independent dataset samples or population replicates, and three process executions do
+not support conventional confidence intervals or p-values. Median, minimum, and maximum summarize
+only the observed numerical-realization spread; no inferential statistics are introduced.
+
 Execute exactly three complete primary passes. Each contains all 428 H10 and 428 H5 conditions,
 for 856 accepted conditions per pass and 2,568 accepted primary calls. Aggregate passes
 independently; do not average boxes, combine detections, form consensus predictions, or select a
@@ -352,16 +360,26 @@ The measurement must preserve accepted P1-E behavior; it must not enable a new d
 algorithm merely to make S1 cleaner. Any runtime-policy difference from P1-E requires owner review
 before authorization.
 
+Before explicit inference authorization, the future implementation must report expected
+single-pass, Stage R, and full-campaign durations; measured model-initialization duration; and
+pass/session operational feasibility. A GT-blind engineering preflight may size runtime only if it
+loads no GT, calculates no accuracy, changes no frozen design, and discards semantic detector
+outputs. Runtime inconvenience does not authorize reducing the corpus, pass count, or secondary
+condition. If the campaign is operationally infeasible, stop before authorization and begin a new
+prospective protocol revision; never modify this protocol mid-campaign.
+
 There may be no caller-selectable model factory. Protocol freeze alone does not authorize
 measurement. The mandatory chronology is:
 
-1. owner reviews and freezes this protocol in a committed act;
-2. scientific measurement implementation and checkpoint/resume design are created and reviewed;
-3. all artifacts and runtime identities are bound fail-closed;
-4. owner approves the implementation;
-5. explicit inference authorization is committed **before** the first GT-relative V2 call;
-6. independent Stage R runs as ten fresh processes, followed by the already-fixed three primary
-   and three zero-intensity complete-corpus processes.
+1. this frozen protocol exists;
+2. the scientific measurement implementation is created;
+3. checkpoint/resume/process semantics are implemented;
+4. all artifacts and runtime identities are bound fail-closed;
+5. the implementation is reviewed;
+6. the owner explicitly approves inference;
+7. an inference-authorization act is committed **before** the first GT-relative V2 call;
+8. only then may independent Stage R begin, followed by the already-fixed three primary and three
+   zero-intensity complete-corpus processes.
 
 ## Output chronology
 

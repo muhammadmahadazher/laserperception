@@ -2,8 +2,8 @@
   "authorization": {
     "explicit_inference_authorization_committed": false,
     "ground_truth_relative_v2_measurement_authorized": false,
-    "owner_review_required": true,
-    "protocol_frozen": false,
+    "owner_review_required": false,
+    "protocol_frozen": true,
     "stage_r_authorized": false
   },
   "call_accounting": {
@@ -100,6 +100,11 @@
       "failure_reason"
     ]
   },
+  "freeze_provenance": {
+    "freeze_role": "scientific_protocol_freeze_before_measurement",
+    "owner_approval_preceded_all_scientific_v2_detector_measurement": true,
+    "source_reviewed_draft_commit": "def09021dd033b8dfbc0a413c58cba84fcc7a863"
+  },
   "historical_baseline": {
     "compact_result": {
       "bytes": 111529,
@@ -135,6 +140,12 @@
   },
   "measurement_design": {
     "adaptive_corpus_pass_count": false,
+    "three_pass_interpretation": {
+      "confidence_intervals_or_p_values_authorized": false,
+      "independent_dataset_samples": false,
+      "purpose": "detector/runtime numerical reproducibility and observed run-to-run outcome spread on the same frozen corpus",
+      "summaries": ["median", "minimum", "maximum"]
+    },
     "primary": {
       "conditions": {
         "A2": "DSVT H10 with raw KITTI reflectance",
@@ -220,13 +231,32 @@
     "point_order_policy",
     "model_config_checkpoint_identities"
   ],
+  "runtime_sizing_before_inference_authorization": {
+    "campaign_reduction_due_to_runtime_inconvenience_allowed": false,
+    "gt_blind_preflight_allowed": true,
+    "gt_blind_preflight_constraints": [
+      "load_no_GT",
+      "calculate_no_accuracy",
+      "modify_no_frozen_scientific_design",
+      "discard_semantic_detector_outputs",
+      "occur_before_explicit_scientific_authorization"
+    ],
+    "required_estimates": [
+      "expected_single_pass_duration",
+      "expected_stage_r_duration",
+      "expected_full_campaign_duration",
+      "measured_model_initialization_duration",
+      "pass_session_operational_feasibility"
+    ],
+    "stop_for_prospective_revision_if_operationally_infeasible": true
+  },
   "s2_barrier": {
     "B2_C2_D2_F2_authorized": false,
     "paired_set_policy_selected_by_s1": false,
     "prohibited_automatic_policies": ["pass_1", "median_predictions", "union", "intersection"],
     "required_future_decision": "prospectively define shared/E-only/A-only/neither for three numerical realizations after raw S1 evidence freezes"
   },
-  "schema_version": "1.1-draft",
+  "schema_version": "1.1",
   "secondary_reporting": {
     "distance_bands_metres": [[0, 20], [20, 35], [35, 50]],
     "measures": [
@@ -377,5 +407,5 @@
     "role": "independent local discrete repeatability and instrumentation characterization; never selects corpus-pass count",
     "stage_r_outputs_are_canonical_corpus_outputs": false
   },
-  "status": "M8 P1-S1 SCIENTIFIC PROTOCOL DRAFT — OWNER REVIEW REQUIRED — NO GT-RELATIVE V2 RESULT EXISTS"
+  "status": "M8 P1-S1 SCIENTIFIC PROTOCOL — OWNER APPROVED AND FROZEN BEFORE ANY GT-RELATIVE V2 MEASUREMENT"
 }
