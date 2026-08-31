@@ -57,6 +57,24 @@ stricter M6 physical range `(-50,-50,-5,50,50,3)`.
 - Gate: H10 428/428 exact; H5 428/428 exact.
 - Detector inference during this gate: none.
 
+### Final-head input replay
+
+The owner-review amendment did not touch only capacity code. Separately, it replaced the builder's
+inline `current.timestamp_seconds - historical.timestamp_seconds` expression with
+`m8_elapsed_seconds(current.timestamp_microseconds, historical.timestamp_microseconds)` to make
+the cast point explicit. `RawSweep.timestamp_seconds` is the integer microsecond timestamp divided
+by `1_000_000`; the historical builder subtracts those binary64 values before float32 write-back.
+The helper intentionally performs the same operations.
+
+At implementation commit `34ec084191cbe9ba457b5a4fcad68477f878d3bc`, a fresh replay
+reconstructed every accepted H10 and H5 condition and compared it with—not regenerated—the frozen
+ledger. H10 passed 428/428 and H5 passed 428/428. Full XYZIT, both frozen XYZT identities,
+raw/candidate-consumed intensity, point counts, and candidate-range drop counts passed 856/856,
+with zero mismatches. The accepted ledger remained 669,345 bytes with SHA256
+`474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c`. The compact additive
+record is
+[`m8_input_projection_revalidation.json`](../../benchmarks/m8/diagnostics/m8_input_projection_revalidation.json).
+
 ### Temporal semantics
 
 The selected DSVT source was audited at its frozen commit in
@@ -228,12 +246,58 @@ a **frozen detector-stack comparison under the same cross-domain corpus and eval
 the stacks differ in architecture, training recipe, checkpoint, framework, feature contract, and
 postprocessing. Frozen PointPillars results are reused, not rerun.
 
-One first-class feature-contract asymmetry must remain explicit: the historical PointPillars stack
-did not consume intensity, whereas DSVT consumes raw KITTI reflectance in a channel learned from
-nuScenes intensity. The future V2 primary condition remains the official five-feature contract. A
-secondary, unexecuted intensity-zero condition is reserved to characterize that asymmetry: same
-rows, XYZ, time lag, detector, and checkpoint, with candidate-consumed intensity exactly zero. It
-must not be used for candidate selection. No zero-intensity detector output has been generated.
+#### Frozen comparison claim boundaries
+
+The future S1 protocol must preserve these engineering asymmetries rather than present V2 versus
+PointPillars as a pure architecture-causal experiment:
+
+- **Spatial discretization.** The frozen historical PointPillars configuration records 0.25 m XY
+  voxels over `[-50,-50,-5,50,50,3]`, which yields a `400 x 400` XY grid. DSVT uses 0.3 m XY
+  pillars over `[-54,-54,-5,54,54,3]` and a `360 x 360` grid. Different occupied-pillar counts
+  therefore cannot be attributed only to detector architecture because the discretization itself
+  differs. The historical values were verified from
+  `configs/detection/m2_pointpillars_tensorrt.yaml` and the frozen M6 configuration.
+- **Point order.** The selected official DSVT config enables point shuffling for its test data
+  processor. LaserPerception prospectively bypasses that shuffle and preserves frozen source-row
+  order, a decision made before KITTI detector-quality outcomes existed. This remains a behavioral
+  difference from the official test data path. No shuffle-versus-preserved-order experiment has
+  been run, and the primary policy is unchanged.
+- **Range support.** DSVT supports `[-54,-54,-5,54,54,3]`, while the shared frozen M6/M8 corpus is
+  restricted to `[-50,-50,-5,50,50,3]`. The outer candidate-supported XY ring is therefore
+  unpopulated in this comparison. Zero candidate-range drops do not make the source training
+  distribution identical.
+- **Intensity.** Historical PointPillars did not consume intensity; DSVT consumes raw KITTI
+  reflectance in a channel learned from nuScenes intensity. The future V2 primary condition remains
+  the official five-feature contract. A secondary, unexecuted intensity-zero condition is reserved
+  to characterize this asymmetry: same rows, XYZ, time lag, detector, and checkpoint, with
+  candidate-consumed intensity exactly zero. It must not be used for candidate selection. No
+  zero-intensity detector output has been generated.
+- **Deployment completeness.** Historical PointPillars reached LaserPerception's frozen
+  end-to-end TensorRT deployment boundary. DSVT currently has only a verified **partial** TensorRT
+  route: after `DynPillarVFE` plus DSVT InputLayer through four DSVT transformer blocks. Raw point
+  handling, `DynPillarVFE`, DSVT InputLayer, BEV scatter, the 2D backbone, TransFusion head, and
+  postprocess remain outside that partial engine as applicable. The INT64 cast/clamp, FP16
+  LayerNorm, infinity-weight, and subnormal-weight warnings above remain unresolved fidelity
+  concerns. M8 Phase 1 therefore gains the selected modern detector capability while giving up the
+  historical stack's demonstrated end-to-end TensorRT completeness. This is an engineering
+  capability/deployment tradeoff, not an accuracy conclusion; DSVT must not be described as
+  end-to-end TensorRT deployed.
+
+#### Required future Stage R
+
+The source-domain engineering smoke found labels exact 10/10, while boxes, scores, and converted
+DetectionFrames were not byte-exact. Its cause was not isolated. Point shuffling is only one
+possible future contributor; even similar shuffled and preserved-order behavior would not prove
+CUDA scatter atomics—or any other kernel—to be the cause.
+
+Before the primary V2 KITTI comparison, the frozen S1 protocol **must** define a GT-relative
+repeatability stage, Stage R. Before any GT-relative V2 result is observed, Stage R must
+preregister sentinel condition identities, H10/H5 representation, class-coverage objective,
+repeat count, exact evaluator thresholds, repeatability statistics, a PASS/FAIL or branching rule,
+whether repeat #1 may be reused, and the canonical estimator if TP-level variation exists. The
+final Stage R design is intentionally not invented here. No GT-relative repeatability run is
+authorized until the owner approves and freezes S1; TP-level repeatability is scientific-tier,
+not engineering-tier.
 
 ### P1-S2 — DRAFT, SCIENTIFIC MEASUREMENT NOT AUTHORIZED
 

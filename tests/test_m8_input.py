@@ -92,3 +92,20 @@ def test_timestamp_fixture_is_positive_float32_current_minus_history() -> None:
     assert not np.signbit(current)
     with pytest.raises(ValueError, match="must not be newer"):
         m8_elapsed_seconds(1_000_000, 1_000_001)
+
+
+@pytest.mark.parametrize(
+    ("current", "historical"),
+    [
+        (1_000_000, 1_000_000),
+        (1_000_001, 1_000_000),
+        (1_750_001, 1_000_000),
+        (1_315_964_800_123_456, 1_315_964_799_987_654),
+    ],
+)
+def test_explicit_timestamp_helper_matches_historical_binary64_writeback(
+    current: int, historical: int
+) -> None:
+    historical_expression = np.float32(current / 1_000_000 - historical / 1_000_000)
+
+    assert m8_elapsed_seconds(current, historical).tobytes() == historical_expression.tobytes()

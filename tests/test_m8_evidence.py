@@ -11,6 +11,7 @@ DEPLOYMENT_SMOKE = ROOT / "benchmarks/m8/diagnostics/dsvt_deployment_smoke.json"
 H10_CENSUS = ROOT / "benchmarks/m8/diagnostics/m8_h10_capacity_census.json"
 H10_CAPACITY_SMOKE = ROOT / "benchmarks/m8/diagnostics/dsvt_h10_capacity_smoke.json"
 H10_DEPLOYMENT_SMOKE = ROOT / "benchmarks/m8/diagnostics/dsvt_h10_deployment_smoke.json"
+INPUT_REVALIDATION = ROOT / "benchmarks/m8/diagnostics/m8_input_projection_revalidation.json"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -161,4 +162,32 @@ def test_h10_partial_deployment_profile_executes_without_claiming_parity() -> No
         "finite": True,
         "output_shape": [32774, 128],
         "passed": True,
+    }
+
+
+def test_final_implementation_replays_every_accepted_input_exactly() -> None:
+    payload = _load(INPUT_REVALIDATION)
+
+    assert INPUT_REVALIDATION.stat().st_size == 966
+    assert _sha256(INPUT_REVALIDATION) == (
+        "71ac9418c29da5efd64f9eaeb03e859f85d6b1c56dc2fe47cef6563a9f960341"
+    )
+    assert payload["result"] == "PASS"
+    assert payload["final_implementation_commit"] == ("34ec084191cbe9ba457b5a4fcad68477f878d3bc")
+    assert payload["detector_inference_performed"] is False
+    assert payload["ground_truth_loaded"] is False
+    assert payload["conditions_checked"] == 856
+    assert payload["H10_exact_count"] == 428
+    assert payload["H5_exact_count"] == 428
+    assert payload["full_XYZIT_exact_count"] == 856
+    assert payload["XYZT_projection_exact_count"] == 856
+    assert payload["intensity_exact_count"] == 856
+    assert payload["range_drop_exact_count"] == 856
+    assert payload["mismatch_count"] == 0
+    assert payload["mismatch_ids"] == []
+    assert payload["existing_ledger"] == {
+        "bytes": 669345,
+        "path": "benchmarks/m8/diagnostics/m8_input_projection_ledger.json",
+        "rewritten": False,
+        "sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
     }
