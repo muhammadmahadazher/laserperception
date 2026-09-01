@@ -169,3 +169,34 @@ Classification: **OPERATIONALLY PLAUSIBLE**. Both fresh processes completed the 
 workload and the recorded peak CUDA reserve and host RSS stayed below the preflight's documented
 90% engineering capacity-review boundary. That boundary is operational only, not a scientific
 acceptance threshold; the frozen scientific protocol is unchanged.
+
+## Maximum-pillar runtime capacity review
+
+The original input-only sizing sample used representatives at quantiles 0.05 through 0.95, so it
+did not include the known corpus maximum. A final additive GT-blind review therefore exercised
+`2011_09_26_drive_0091/0000000069/H10` (1,339,216 points and 32,774 candidate pillars) after the
+same warmup pair and all 20 quantile calls. The selected quantile frames were replayed in frozen
+corpus order, H10 then H5, rather than pillar-rank order, so the allocator saw interleaved shapes.
+The maximum full inference completed in 0.578 seconds, retained all 32,774 pillars, and discarded
+its semantic output immediately.
+
+CUDA memory developed as follows:
+
+| Checkpoint | Current allocated | Current reserved | `mem_get_info` free |
+| --- | ---: | ---: | ---: |
+| Post-initialization | 28,558,848 B | 35,651,584 B | 7,405,043,712 B |
+| Post-warmup | 37,080,576 B | 4,328,521,728 B | 3,070,230,528 B |
+| Post-quantile replay | 37,080,576 B | 8,443,133,952 B | 0 B |
+| Post-maximum call | 37,080,576 B | 8,443,133,952 B | 0 B |
+
+Peak allocated memory during the maximum call was 2,922,354,688 bytes (34.04% of
+8,585,216,000 bytes). Peak reserved memory was 8,443,133,952 bytes (98.35%).
+`PYTORCH_CUDA_ALLOC_CONF` was unset. Peak process RSS was 1,772,445,696 bytes; the execution
+artifact retained the peak but not the simultaneous current `VmRSS`, so no current-RSS value is
+inferred after process exit.
+
+Classification: **OWNER MEMORY-MARGIN REVIEW REQUIRED**. The full call did not OOM or truncate
+pillars, but reserved memory exceeded the engineering-only 90% boundary. Reserved allocator cache
+is not active working-set allocation, so this is not called a scientific failure. It does prevent
+automatic merge under the owner-review rule. No ground truth or evaluator was loaded, no semantic
+prediction or prediction count was retained, and the frozen protocol remains unchanged.

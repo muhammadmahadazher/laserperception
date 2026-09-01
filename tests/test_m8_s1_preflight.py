@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CENSUS = ROOT / "benchmarks/m8/diagnostics/m8_h10_capacity_census.json"
 SIZING = ROOT / "benchmarks/m8/diagnostics/m8_s1_runtime_sizing.json"
 RUNTIME_MANIFEST = ROOT / "benchmarks/m8/preregistration/m8_s1_measurement_runtime.json"
+MAX_CAPACITY = ROOT / "benchmarks/m8/diagnostics/m8_s1_max_pillar_capacity.json"
 
 
 def _worker(index: int) -> dict[str, object]:
@@ -185,3 +186,41 @@ def test_tracked_preflight_is_gt_blind_and_manifest_bound() -> None:
     for worker in sizing["workers"]:
         for call in worker["measured_calls"]:
             assert prohibited.isdisjoint(call)
+
+
+def test_tracked_max_capacity_review_is_gt_blind_and_manifest_bound() -> None:
+    capacity_bytes = MAX_CAPACITY.read_bytes()
+    capacity = json.loads(capacity_bytes)
+    manifest = json.loads(RUNTIME_MANIFEST.read_text(encoding="utf-8"))
+    binding = manifest["capacity_review"]
+    assert binding["artifact_bytes"] == len(capacity_bytes)
+    assert binding["artifact_sha256"] == hashlib.sha256(capacity_bytes).hexdigest()
+    assert capacity["status"] == "OWNER MEMORY-MARGIN REVIEW REQUIRED"
+    assert capacity["measurement_runtime_head"] == binding["measurement_runtime_head"]
+    assert capacity["call_accounting"] == {
+        "engineering_calls_total": 23,
+        "maximum_condition_calls": 1,
+        "quantile_replay_calls": 20,
+        "scientific_calls": 0,
+        "warmup_calls": 2,
+    }
+    assert capacity["ground_truth_loaded"] is False
+    assert capacity["evaluator_loaded"] is False
+    assert capacity["semantic_output_retained"] is False
+    assert capacity["prediction_count_retained"] is False
+    assert capacity["input_selection"]["condition_id"] == MAX_PILLAR_CONDITION_ID
+    assert capacity["input_selection"]["candidate_dynamic_pillars"] == 32_774
+    assert capacity["input_selection"]["retained_pillars"] == 32_774
+    assert capacity["input_selection"]["discarded_or_truncated_pillars"] == 0
+    assert capacity["runtime_state"]["relevant_environment"]["PYTORCH_CUDA_ALLOC_CONF"] is None
+    executed = capacity["quantile_replay"]["executed_condition_order"]
+    assert len(executed) == 20
+    assert executed[::2] == [
+        f"{record['frame_id']}/H10" for record in capacity["quantile_replay"]["selected_frames"]
+    ]
+    assert executed[1::2] == [
+        f"{record['frame_id']}/H5" for record in capacity["quantile_replay"]["selected_frames"]
+    ]
+    prohibited = {"box", "boxes", "score", "scores", "label", "labels", "prediction_count"}
+    for call in capacity["quantile_replay"]["calls"]:
+        assert prohibited.isdisjoint(call)
