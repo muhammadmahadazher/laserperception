@@ -43,10 +43,13 @@
   "preflight": {
     "allowed_without_scientific_authorization": true,
     "artifact": "benchmarks/m8/diagnostics/m8_s1_runtime_sizing.json",
-    "artifact_sha256": "pending_committed_runtime_preflight",
+    "artifact_bytes": 54565,
+    "artifact_sha256": "f58e2dd124055c8b45482e443f8ee6d2071a5634a485f26fbe9a644d779974f5",
     "fresh_processes": 2,
     "ground_truth_loaded": false,
     "measured_calls": 40,
+    "runtime_implementation_head": "f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3",
+    "scientific_campaign_calls": 0,
     "semantic_output_retained": false,
     "warmup_calls": 4
   },

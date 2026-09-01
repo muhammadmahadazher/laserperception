@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -14,6 +15,8 @@ from laserperception.detection.m8_s1_runtime import STAGE_R_FRAMES
 
 ROOT = Path(__file__).resolve().parents[1]
 CENSUS = ROOT / "benchmarks/m8/diagnostics/m8_h10_capacity_census.json"
+SIZING = ROOT / "benchmarks/m8/diagnostics/m8_s1_runtime_sizing.json"
+RUNTIME_MANIFEST = ROOT / "benchmarks/m8/preregistration/m8_s1_measurement_runtime.json"
 
 
 def _worker(index: int) -> dict[str, object]:
@@ -112,3 +115,25 @@ def test_preflight_combines_exactly_two_processes_without_semantics() -> None:
 
 def test_preflight_does_not_create_or_require_scientific_authorization() -> None:
     assert not (ROOT / "benchmarks/m8/preregistration/m8_s1_inference_authorization.json").exists()
+
+
+def test_tracked_preflight_is_gt_blind_and_manifest_bound() -> None:
+    sizing_bytes = SIZING.read_bytes()
+    sizing = json.loads(sizing_bytes)
+    manifest = json.loads(RUNTIME_MANIFEST.read_text(encoding="utf-8"))
+    assert manifest["preflight"]["artifact_bytes"] == len(sizing_bytes)
+    assert manifest["preflight"]["artifact_sha256"] == hashlib.sha256(sizing_bytes).hexdigest()
+    assert sizing["process_count"] == 2
+    assert sizing["warmup_call_count"] == 4
+    assert sizing["measured_call_count"] == 40
+    assert sizing["scientific_campaign_call_count"] == 0
+    assert sizing["ground_truth_loaded"] is False
+    assert sizing["evaluator_loaded"] is False
+    assert sizing["semantic_output_retained"] is False
+    assert sizing["prediction_count_observed_or_stored"] is False
+    assert len({worker["process_uuid"] for worker in sizing["workers"]}) == 2
+    assert len({worker["process_id"] for worker in sizing["workers"]}) == 2
+    prohibited = {"box", "boxes", "score", "scores", "label", "labels", "prediction_count"}
+    for worker in sizing["workers"]:
+        for call in worker["measured_calls"]:
+            assert prohibited.isdisjoint(call)

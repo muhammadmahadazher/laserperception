@@ -107,9 +107,44 @@ exist only transiently and are immediately discarded by a backend method that re
 value or prediction count. The artifact records 40 measured and four warmup engineering calls,
 with GT/evaluator loaded and semantic output retained all explicitly false.
 
-The preflight is pending execution at the committed runtime head. Its final artifact and measured
-duration/resource summaries will be recorded here without changing source, the frozen protocol,
-or any scientific design.
+The preflight ran at runtime implementation commit
+`f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3`. Exactly two fresh processes performed four
+excluded warmup calls and 40 measured engineering calls. No ground truth or evaluator was loaded,
+no prediction count was observed or stored, no semantic output was retained, and no scientific
+campaign call was made. A later deterministic summary-only correction made the resource table use
+the already captured post-sizing CUDA peaks instead of initialization memory; it caused no further
+inference.
+
+The selected input-only representatives were:
+
+| Quantile | Frame | H10 candidate pillars |
+| ---: | --- | ---: |
+| 0.05 | `2011_09_26_drive_0091/0000000326` | 14,491 |
+| 0.15 | `2011_09_26_drive_0091/0000000332` | 15,148 |
+| 0.25 | `2011_09_26_drive_0091/0000000234` | 17,140 |
+| 0.35 | `2011_09_26_drive_0091/0000000221` | 18,708 |
+| 0.45 | `2011_09_26_drive_0091/0000000157` | 21,854 |
+| 0.55 | `2011_09_26_drive_0091/0000000015` | 25,503 |
+| 0.65 | `2011_09_26_drive_0091/0000000029` | 28,720 |
+| 0.75 | `2011_09_26_drive_0001/0000000039` | 29,116 |
+| 0.85 | `2011_09_26_drive_0091/0000000096` | 29,867 |
+| 0.95 | `2011_09_26_drive_0091/0000000058` | 31,960 |
+
+Initialization took 12.729 and 13.623 seconds (median 13.176 seconds). Observed synchronized
+wall-clock inference summaries were:
+
+| Input | Minimum (s) | Median (s) | Maximum (s) |
+| --- | ---: | ---: | ---: |
+| H10 | 0.299 | 0.336 | 0.367 |
+| H5 | 0.214 | 0.233 | 0.260 |
+| H10/H5 pair | 0.529 | 0.563 | 0.627 |
+
+Both workers ran on an NVIDIA GeForce RTX 4060 Laptop GPU with driver 610.88. During measured
+blocks, sampled SM clocks ranged from 2,280 to 2,655 MHz, memory clocks from 7,001 to 8,001 MHz,
+temperature from 54 to 64 degrees Celsius, power from 17.12 to 80.72 W, and GPU utilization from
+0% to 93%; observed P-states were P0 and P3. Power-limit telemetry was unavailable. The maximum
+captured CUDA reserve was 7,073,693,696 of 8,585,216,000 bytes (82.39%), while peak process RSS
+was 1,778,950,144 of 8,170,172,416 host bytes (21.77%).
 
 ## Operational estimate policy
 
@@ -119,3 +154,18 @@ and maximum pair and initialization times. It reports one 856-condition pass, St
 processes and 140 calls), three primary passes, three zero-intensity passes, and the full 5,276-call
 campaign. These stratified observations are not confidence bounds and cannot automatically revise
 the protocol.
+
+The resulting central estimates (with conservative observed-rate envelopes) are:
+
+| Scope | Central | Observed-rate envelope |
+| --- | ---: | ---: |
+| One 856-condition pass | 254.3 s | 239.0–282.0 s |
+| Stage R: 10 processes / 140 calls | 171.2 s | 164.3–180.1 s |
+| Three primary passes | 762.8 s | 716.9–846.0 s |
+| Three zero-intensity passes | 762.8 s | 716.9–846.0 s |
+| Full 5,276-call campaign | 1,696.8 s | 1,598.0–1,872.2 s |
+
+Classification: **OPERATIONALLY PLAUSIBLE**. Both fresh processes completed the fixed sizing
+workload and the recorded peak CUDA reserve and host RSS stayed below the preflight's documented
+90% engineering capacity-review boundary. That boundary is operational only, not a scientific
+acceptance threshold; the frozen scientific protocol is unchanged.
