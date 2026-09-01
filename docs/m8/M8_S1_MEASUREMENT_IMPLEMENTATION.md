@@ -1,7 +1,7 @@
 # M8 P1-S1 measurement runtime implementation
 
-Status: **M8 P1-S1 MEASUREMENT IMPLEMENTATION CANDIDATE — OWNER REVIEW REQUIRED —
-STAGE R AND GT-RELATIVE MEASUREMENT UNAUTHORIZED.**
+Status: **M8 P1-S1 MEASUREMENT IMPLEMENTATION CANDIDATE — OWNER MEMORY-MARGIN
+ACCEPTED — STAGE R AND GT-RELATIVE MEASUREMENT UNAUTHORIZED.**
 
 This document describes the reviewable execution machinery for the already frozen P1-S1
 protocol. It is not an inference authorization and records no S1 accuracy result. The frozen
@@ -9,22 +9,26 @@ protocol files remain byte-for-byte unchanged.
 
 ## Architecture and authorization barrier
 
-`scripts/detection/run_m8_s1.py` exposes only `preflight`, `stage-r`, `primary-pass`,
-`zero-intensity-pass`, and `aggregate`. The GT-blind preflight has a physically separate module
-and imports no KITTI tracklet loader or evaluator. The three scientific inference modes first
-verify the frozen protocol, candidate, checkpoint, upstream config, accepted input ledger, and
-final input revalidation. They then require a separate, exact future owner authorization. Only
-after that barrier passes can the CLI import the GT/evaluation worker or initialize DSVT.
+`scripts/detection/run_m8_s1.py` exposes only `preflight`, `runtime-binding`, `stage-r`,
+`primary-pass`, `zero-intensity-pass`, and `aggregate`. The GT-blind preflight has a physically
+separate module and imports no KITTI tracklet loader or evaluator. `runtime-binding` may query the
+pinned Torch/CUDA packages but loads no GT or evaluator, constructs no DSVT model, and performs no
+detector inference. The three scientific inference modes verify frozen static identities, exact
+mode/pass authorization, the machine-derived runtime-policy artifact and its live equality, and
+only then external DSVT/config/checkpoint paths. Only after all of those barriers pass can the CLI
+import the GT/evaluation worker or initialize DSVT.
 
 No authorization artifact is created by this implementation. There is no force, unsafe,
 skip-authorization, ignore-binding, or unfrozen bypass. A missing authorization is the expected,
 normal fail-closed state.
 
-The future authorization schema binds the protocol freeze commit and JSON hash, reviewed runtime
-commit, runtime-binding identity, checkpoint, config, candidate manifest, input ledger, evaluator
-identity, owner role and approval, and timestamp/provenance. The implementation manifest avoids a
-self-referential commit field: the reviewed Git commit is the external canonical implementation
-identity.
+The future authorization schema is `laserperception.m8.s1.authorization.v2`. It binds the protocol
+freeze commit and JSON hash, exact merged-main scientific execution commit, runtime-policy file
+SHA256, checkpoint, config, candidate manifest, input ledger, evaluator identity, operational
+constraints, owner role and approval, and timestamp/provenance. It also carries explicit non-empty
+allowlists for modes and logical pass IDs. Authorization v1, wildcard/`all`, missing scope, and
+implicit scope all fail closed. The reviewed feature head remains implementation provenance; it is
+not substituted for the later exact merged-main execution HEAD.
 
 ## Pass and Stage R process models
 
@@ -200,3 +204,45 @@ pillars, but reserved memory exceeded the engineering-only 90% boundary. Reserve
 is not active working-set allocation, so this is not called a scientific failure. It does prevent
 automatic merge under the owner-review rule. No ground truth or evaluator was loaded, no semantic
 prediction or prediction count was retained, and the frozen protocol remains unchanged.
+
+## Owner memory-margin resolution
+
+The historical capacity artifact and its classification above remain unchanged. The additive
+owner resolution in `benchmarks/m8/diagnostics/m8_s1_memory_margin_owner_review.json` records
+**ACCEPTED_FOR_S1_RUNTIME**. Peak active CUDA allocation was 2,922,354,688 bytes (34.04% of device
+total), while peak allocator reserve was 8,443,133,952 bytes (98.35%). The reserve was already
+exactly 8,443,133,952 bytes after the heterogeneous quantile replay and remained exactly that
+value after the maximum call. The maximum condition completed with zero OOM and zero pillar
+truncation. Reserved allocator memory is not the active working-set allocation.
+
+The acceptance is for exclusive-GPU operation: exactly one LaserPerception S1 detector process at
+a time, with no parallel Stage R, primary, or zero-intensity processes and no other user-launched
+CUDA workload. `PYTORCH_CUDA_ALLOC_CONF` remains unset. The runtime does not add deterministic
+algorithm settings, change allocator policy, or apply allocator tuning such as
+`expandable_segments` or `max_split_size_mb`. The fresh-process orchestrator remains sequential.
+These are operational constraints, not additions to the frozen scientific acceptance criteria.
+
+## Staged authorization model
+
+Authorization is both mode-scoped and logical-pass-scoped. A Stage R authorization must contain
+only `authorized_modes: ["stage-r"]` and exactly `stage-r-1` through `stage-r-10`. It cannot start a
+primary or zero-intensity DSVT process. After the ten Stage R raw repeats receive separate owner
+review, a later corpus authorization may explicitly list the approved primary and zero-intensity
+modes and logical passes. No Stage R or corpus authorization artifact exists at this stage.
+
+## Runtime policy binding
+
+The old caller-provided runtime-binding string has been removed. The GT-blind `runtime-binding`
+mode instead atomically records exact stable environment and policy identity: repository execution
+commit; Python, Torch, CUDA, NVIDIA driver/device/UUID, spconv, torch-scatter, and NumPy versions;
+TF32/cuDNN/deterministic settings; allocator and CUDA module-loading environment; point-order
+policy; candidate/config/checkpoint hashes; and the policy that LaserPerception does not reseed the
+runtime. Process-specific random states and actual seeds are intentionally recorded later as
+per-process evidence, not required to equal across fresh processes.
+
+For future science, the runner verifies static bindings, authorization mode/pass scope, the bound
+runtime-policy file SHA256, and exact live stable-policy equality before it checks external DSVT
+paths or imports the scientific worker. A mismatch therefore fails before model construction. The
+final binding is intentionally not captured here: it must name the exact normal-merge commit on
+`main`, and the later owner authorization must bind that same commit as
+`measurement_runtime_execution_commit`.

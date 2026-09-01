@@ -15,7 +15,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("mode", choices=("stage-r", "primary-pass", "zero-intensity-pass"))
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--runtime-commit", required=True)
-    parser.add_argument("--runtime-binding-identity", required=True)
+    parser.add_argument("--runtime-policy-binding", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
@@ -40,8 +40,8 @@ def main() -> int:
             str(args.repository_root),
             "--runtime-commit",
             args.runtime_commit,
-            "--runtime-binding-identity",
-            args.runtime_binding_identity,
+            "--runtime-policy-binding",
+            str(args.runtime_policy_binding),
             "--authorization",
             str(args.authorization),
             "--full-ledger",

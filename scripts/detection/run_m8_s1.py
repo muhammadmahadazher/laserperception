@@ -16,19 +16,28 @@ from laserperception.detection.m8_s1_runtime import (
     M8S1ProtocolViolation,
     atomic_write_json,
     require_scientific_authorization,
+    verify_runtime_policy_binding,
     verify_static_bindings,
 )
+from laserperception.detection.m8_s1_runtime_policy import capture_runtime_policy
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "mode",
-        choices=("preflight", "stage-r", "primary-pass", "zero-intensity-pass", "aggregate"),
+        choices=(
+            "preflight",
+            "runtime-binding",
+            "stage-r",
+            "primary-pass",
+            "zero-intensity-pass",
+            "aggregate",
+        ),
     )
     parser.add_argument("--repository-root", type=Path, default=Path.cwd())
     parser.add_argument("--runtime-commit", required=True)
-    parser.add_argument("--runtime-binding-identity")
+    parser.add_argument("--runtime-policy-binding", type=Path)
     parser.add_argument("--authorization", type=Path)
     parser.add_argument("--full-ledger", type=Path)
     parser.add_argument("--date-root", type=Path)
@@ -99,12 +108,35 @@ def main() -> int:
 
     binding = verify_static_bindings(root)
     if binding.repository_head != args.runtime_commit:
-        raise M8S1ProtocolViolation("scientific runner HEAD differs from --runtime-commit")
-    expected = AuthorizationIdentity(
-        args.runtime_commit,
-        _require_text(args.runtime_binding_identity, "--runtime-binding-identity"),
+        raise M8S1ProtocolViolation("M8 S1 runner HEAD differs from --runtime-commit")
+    if args.mode == "runtime-binding":
+        atomic_write_json(
+            args.output,
+            capture_runtime_policy(args.runtime_commit, binding.candidate_manifest),
+        )
+        return 0
+
+    logical_pass_id = _require_text(args.logical_pass_id, "--logical-pass-id")
+    runtime_policy_path = _require_path(
+        args.runtime_policy_binding,
+        "--runtime-policy-binding",
     )
-    require_scientific_authorization(args.mode, args.authorization, expected)
+    expected = AuthorizationIdentity(args.runtime_commit)
+    authorization = require_scientific_authorization(
+        args.mode,
+        logical_pass_id,
+        args.authorization,
+        expected,
+    )
+    runtime_policy_sha256 = authorization["runtime_policy_binding_sha256"]
+    if not isinstance(runtime_policy_sha256, str):
+        raise AssertionError("verified runtime-policy SHA256 changed type")
+    live_policy = capture_runtime_policy(args.runtime_commit, binding.candidate_manifest)
+    verify_runtime_policy_binding(
+        runtime_policy_path,
+        runtime_policy_sha256,
+        live_policy,
+    )
     upstream, checkpoint = _external_runtime_paths(root)
     verify_static_bindings(
         root,
@@ -123,7 +155,7 @@ def main() -> int:
         date_root=_require_path(args.date_root, "--date-root").resolve(),
         runtime_commit=args.runtime_commit,
         attempt_root=_require_path(args.attempt_root, "--attempt-root").resolve(),
-        logical_pass_id=args.logical_pass_id or "",
+        logical_pass_id=logical_pass_id,
         attempt_id=args.attempt_id or "",
     )
     return 0

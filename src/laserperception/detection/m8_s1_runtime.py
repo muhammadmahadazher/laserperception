@@ -52,6 +52,51 @@ STAGE_R_FRAMES = (
 )
 SCIENTIFIC_MODES = frozenset({"stage-r", "primary-pass", "zero-intensity-pass"})
 PASS_MODES = frozenset({"primary-pass", "zero-intensity-pass"})
+AUTHORIZATION_SCHEMA = "laserperception.m8.s1.authorization.v2"
+RUNTIME_POLICY_SCHEMA = "laserperception.m8.s1.runtime-policy-binding.v1"
+RUNTIME_POLICY_FIELDS = frozenset(
+    {
+        "schema_version",
+        "repository_execution_commit",
+        "python_exact_version",
+        "pytorch_exact_version",
+        "cuda_runtime",
+        "nvidia_driver",
+        "gpu_name",
+        "gpu_uuid",
+        "spconv",
+        "torch_scatter",
+        "numpy",
+        "tf32",
+        "cudnn_benchmark",
+        "cudnn_deterministic",
+        "torch_deterministic_algorithms",
+        "PYTORCH_CUDA_ALLOC_CONF",
+        "CUDA_MODULE_LOADING",
+        "point_order_policy",
+        "candidate_identity",
+        "random_policy",
+        "operational_constraints",
+    }
+)
+POINT_ORDER_POLICY = "preserve frozen source-row order; no random inference shuffle"
+RANDOM_POLICY = "not reseeded by LaserPerception S1 runtime"
+LOGICAL_PASS_IDS_BY_MODE = {
+    "stage-r": tuple(f"stage-r-{index}" for index in range(1, 11)),
+    "primary-pass": tuple(f"primary-pass-{index}" for index in range(1, 4)),
+    "zero-intensity-pass": tuple(f"zero-intensity-pass-{index}" for index in range(1, 4)),
+}
+OPERATIONAL_CONSTRAINTS: dict[str, object] = {
+    "maximum_concurrent_s1_detector_processes": 1,
+    "parallel_stage_r_processes_permitted": False,
+    "parallel_primary_passes_permitted": False,
+    "parallel_zero_intensity_passes_permitted": False,
+    "other_user_cuda_workloads_permitted": False,
+    "pytorch_cuda_alloc_conf": "unset",
+    "allocator_policy_changes_permitted": False,
+    "allocator_tuning_permitted": False,
+    "new_deterministic_algorithm_settings_permitted": False,
+}
 TBackend = TypeVar("TBackend")
 
 
@@ -234,8 +279,7 @@ def verify_static_bindings(
 class AuthorizationIdentity:
     """Expected future owner authorization bindings."""
 
-    measurement_runtime_commit: str
-    runtime_binding_identity: str
+    measurement_runtime_execution_commit: str
 
     def to_dict(self) -> dict[str, object]:
         """Return exact fields bound by a future separate authorization artifact."""
@@ -243,34 +287,41 @@ class AuthorizationIdentity:
         return {
             "protocol_freeze_commit": PROTOCOL_FREEZE_COMMIT,
             "protocol_json_sha256": PROTOCOL_JSON_SHA256,
-            "measurement_runtime_reviewed_commit": self.measurement_runtime_commit,
-            "runtime_binding_identity": self.runtime_binding_identity,
+            "measurement_runtime_execution_commit": self.measurement_runtime_execution_commit,
             "checkpoint_sha256": CHECKPOINT_SHA256,
             "config_sha256": CONFIG_SHA256,
             "candidate_manifest_sha256": CANDIDATE_MANIFEST_SHA256,
             "input_ledger_sha256": INPUT_LEDGER_SHA256,
             "evaluator_identity": EVALUATOR_IDENTITY,
+            "operational_constraints": dict(OPERATIONAL_CONSTRAINTS),
         }
 
 
 def verify_scientific_authorization(
-    authorization: Mapping[str, object], expected: AuthorizationIdentity
+    authorization: Mapping[str, object],
+    expected: AuthorizationIdentity,
+    requested_mode: str,
+    requested_logical_pass_id: str,
 ) -> None:
-    """Reject anything except an exact, separately issued future owner authorization."""
+    """Reject anything except an exact, mode/pass-scoped owner authorization."""
 
     fixed = expected.to_dict()
     required = {
         "schema_version",
         "scientific_inference_authorized",
+        "authorization_id",
         "authorization_role",
         "owner_approval",
         "authorization_timestamp_utc",
         "authorization_provenance",
+        "authorized_modes",
+        "authorized_logical_pass_ids",
+        "runtime_policy_binding_sha256",
         *fixed,
     }
     if set(authorization) != required:
         raise M8S1ProtocolViolation("M8 S1 authorization schema fields differ")
-    if authorization.get("schema_version") != "laserperception.m8.s1.authorization.v1":
+    if authorization.get("schema_version") != AUTHORIZATION_SCHEMA:
         raise M8S1ProtocolViolation("M8 S1 authorization schema is invalid")
     if authorization.get("scientific_inference_authorized") is not True:
         raise M8S1ProtocolViolation("M8 S1 scientific inference is not authorized")
@@ -278,10 +329,71 @@ def verify_scientific_authorization(
         raise M8S1ProtocolViolation("M8 S1 authorization role is invalid")
     if authorization.get("owner_approval") is not True:
         raise M8S1ProtocolViolation("M8 S1 owner approval is absent")
-    for name in ("authorization_timestamp_utc", "authorization_provenance"):
+    for name in (
+        "authorization_id",
+        "authorization_timestamp_utc",
+        "authorization_provenance",
+    ):
         value = authorization.get(name)
         if not isinstance(value, str) or not value.strip():
             raise M8S1ProtocolViolation(f"M8 S1 authorization {name} is absent")
+    runtime_policy_sha256 = authorization.get("runtime_policy_binding_sha256")
+    if (
+        not isinstance(runtime_policy_sha256, str)
+        or len(runtime_policy_sha256) != 64
+        or any(character not in "0123456789abcdef" for character in runtime_policy_sha256)
+    ):
+        raise M8S1ProtocolViolation("M8 S1 runtime-policy binding identity is invalid")
+    modes = authorization.get("authorized_modes")
+    if (
+        not isinstance(modes, list)
+        or not modes
+        or any(not isinstance(mode, str) for mode in modes)
+        or len(set(modes)) != len(modes)
+        or not set(modes).issubset(SCIENTIFIC_MODES)
+    ):
+        raise M8S1ProtocolViolation("M8 S1 authorized_modes is invalid")
+    logical_pass_ids = authorization.get("authorized_logical_pass_ids")
+    all_logical_pass_ids = {
+        logical_pass_id
+        for mode_logical_pass_ids in LOGICAL_PASS_IDS_BY_MODE.values()
+        for logical_pass_id in mode_logical_pass_ids
+    }
+    if (
+        not isinstance(logical_pass_ids, list)
+        or not logical_pass_ids
+        or any(not isinstance(logical_pass_id, str) for logical_pass_id in logical_pass_ids)
+        or len(set(logical_pass_ids)) != len(logical_pass_ids)
+        or not set(logical_pass_ids).issubset(all_logical_pass_ids)
+    ):
+        raise M8S1ProtocolViolation("M8 S1 authorized_logical_pass_ids is invalid")
+    if "stage-r" in modes and (
+        modes != ["stage-r"] or logical_pass_ids != list(LOGICAL_PASS_IDS_BY_MODE["stage-r"])
+    ):
+        raise M8S1ProtocolViolation("M8 S1 Stage R authorization scope is invalid")
+    for logical_pass_id in logical_pass_ids:
+        logical_mode = next(
+            (
+                mode
+                for mode, known_ids in LOGICAL_PASS_IDS_BY_MODE.items()
+                if logical_pass_id in known_ids
+            ),
+            None,
+        )
+        if logical_mode not in modes:
+            raise M8S1ProtocolViolation("M8 S1 authorization mode/pass scope is invalid")
+    if any(
+        not set(logical_pass_ids).intersection(LOGICAL_PASS_IDS_BY_MODE[mode]) for mode in modes
+    ):
+        raise M8S1ProtocolViolation("M8 S1 authorization mode/pass scope is invalid")
+    if requested_mode not in SCIENTIFIC_MODES or requested_mode not in modes:
+        raise M8S1ProtocolViolation(f"M8 S1 mode is not authorized: {requested_mode}")
+    if requested_logical_pass_id not in logical_pass_ids:
+        raise M8S1ProtocolViolation(
+            f"M8 S1 logical pass is not authorized: {requested_logical_pass_id}"
+        )
+    if requested_logical_pass_id not in LOGICAL_PASS_IDS_BY_MODE[requested_mode]:
+        raise M8S1ProtocolViolation("M8 S1 requested mode/logical-pass pair is invalid")
     for name, value in fixed.items():
         if authorization.get(name) != value:
             raise M8S1ProtocolViolation(f"M8 S1 authorization binding mismatch: {name}")
@@ -289,6 +401,7 @@ def verify_scientific_authorization(
 
 def require_scientific_authorization(
     mode: str,
+    logical_pass_id: str,
     path: str | Path | None,
     expected: AuthorizationIdentity,
 ) -> dict[str, object]:
@@ -302,19 +415,65 @@ def require_scientific_authorization(
             "authorization artifact exists"
         )
     payload = _load_mapping(Path(path))
-    verify_scientific_authorization(payload, expected)
+    verify_scientific_authorization(payload, expected, mode, logical_pass_id)
     return payload
+
+
+def verify_runtime_policy_binding(
+    path: str | Path,
+    expected_sha256: str,
+    live_policy: Mapping[str, object],
+) -> dict[str, object]:
+    """Require an exact file identity and exact live stable-policy equality."""
+
+    source = Path(path)
+    if not source.is_file():
+        raise M8S1ProtocolViolation("M8 S1 runtime-policy binding artifact is missing")
+    if sha256_file(source) != expected_sha256:
+        raise M8S1ProtocolViolation("M8 S1 runtime-policy binding SHA256 mismatch")
+    bound = _load_mapping(source)
+    if bound.get("schema_version") != RUNTIME_POLICY_SCHEMA:
+        raise M8S1ProtocolViolation("M8 S1 runtime-policy binding schema is invalid")
+    if set(bound) != RUNTIME_POLICY_FIELDS:
+        raise M8S1ProtocolViolation("M8 S1 runtime-policy binding fields differ")
+    if bound.get("operational_constraints") != OPERATIONAL_CONSTRAINTS:
+        raise M8S1ProtocolViolation("M8 S1 runtime operational constraints changed")
+    if bound.get("PYTORCH_CUDA_ALLOC_CONF") is not None:
+        raise M8S1ProtocolViolation("M8 S1 runtime allocator configuration changed")
+    if (
+        bound.get("cudnn_deterministic") is not False
+        or bound.get("torch_deterministic_algorithms") is not False
+    ):
+        raise M8S1ProtocolViolation("M8 S1 runtime deterministic policy changed")
+    if bound != dict(live_policy):
+        differing = sorted(
+            key for key in set(bound).union(live_policy) if bound.get(key) != live_policy.get(key)
+        )
+        detail = differing[0] if differing else "unknown"
+        raise M8S1ProtocolViolation(f"M8 S1 live runtime-policy mismatch: {detail}")
+    return bound
 
 
 def authorize_then_construct(
     mode: str,
+    logical_pass_id: str,
     path: str | Path | None,
     expected: AuthorizationIdentity,
+    runtime_policy_path: str | Path,
+    live_policy: Mapping[str, object],
     factory: Callable[[], TBackend],
 ) -> TBackend:
-    """Testable ordering guarantee: authorization always precedes construction."""
+    """Testable ordering: scoped authorization and live policy precede construction."""
 
-    require_scientific_authorization(mode, path, expected)
+    authorization = require_scientific_authorization(mode, logical_pass_id, path, expected)
+    runtime_policy_sha256 = authorization["runtime_policy_binding_sha256"]
+    if not isinstance(runtime_policy_sha256, str):
+        raise AssertionError("verified runtime-policy SHA256 changed type")
+    verify_runtime_policy_binding(
+        runtime_policy_path,
+        runtime_policy_sha256,
+        live_policy,
+    )
     return factory()
 
 

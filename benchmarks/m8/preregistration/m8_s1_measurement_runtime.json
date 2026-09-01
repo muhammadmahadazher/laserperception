@@ -1,7 +1,12 @@
 {
   "authorization": {
+    "authorization_schema": "laserperception.m8.s1.authorization.v2",
     "artifact_created_by_this_change": false,
+    "caller_supplied_binding_identity": "prohibited",
+    "logical_pass_scoped": true,
+    "mode_scoped": true,
     "authorization_required": true,
+    "runtime_binding_source": "machine-derived runtime-policy binding artifact",
     "scientific_inference_authorized": false,
     "scientific_modes_currently_executable": []
   },
@@ -23,6 +28,14 @@
     "scientific_calls": 0,
     "semantic_output_retained": false
   },
+  "capacity_review_owner_resolution": {
+    "artifact": "benchmarks/m8/diagnostics/m8_s1_memory_margin_owner_review.json",
+    "artifact_bytes": 2285,
+    "artifact_sha256": "16d74a9672b351bc5cec3cd0b51bb654bed6327d7fb5df5ab9748229115826d0",
+    "capacity_evidence_commit": "2655c26ce3f4298438a80f265fb3884c7046e40c",
+    "decision": "ACCEPTED_FOR_S1_RUNTIME",
+    "historical_capacity_classification_preserved": true
+  },
   "evaluator": {
     "identity": "m6b-r2-score-0.25-oriented-bev-iou-0.30-0.50-0.70",
     "reused_AP_implementation": "laserperception.evaluation.m6b_metrics.all_points_average_precision",
@@ -41,7 +54,7 @@
   },
   "implementation_commit_binding": {
     "self_reference_avoided": true,
-    "strategy": "the reviewed Git commit is the external canonical implementation identity; authorization and every process bind it exactly"
+    "strategy": "future scientific authorization binds measurement_runtime_execution_commit to the exact merged-main execution HEAD; the reviewed feature head remains separate provenance"
   },
   "input": {
     "accepted_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
@@ -78,7 +91,10 @@
     "fresh_process_orchestrator": "scripts/detection/orchestrate_m8_s1.py",
     "preflight_entrypoint": "scripts/detection/run_m8_s1_preflight.py",
     "raw_pass_schema": "laserperception.m8.s1.raw-pass.v1",
+    "runtime_policy_capture_mode": "runtime-binding",
+    "runtime_policy_schema": "laserperception.m8.s1.runtime-policy-binding.v1",
     "runtime_core": "src/laserperception/detection/m8_s1_runtime.py",
+    "runtime_policy_capture": "src/laserperception/detection/m8_s1_runtime_policy.py",
     "scientific_worker": "src/laserperception/evaluation/m8_s1_science.py"
   },
   "runtime_contract": {
@@ -88,6 +104,17 @@
     "stage_r": "ten fresh processes; fourteen calls each; never reused as corpus output",
     "zero_intensity": "verified primary input with only intensity changed to float32 positive zero"
   },
+  "operational_constraints": {
+    "allocator_policy_changes_permitted": false,
+    "allocator_tuning_permitted": false,
+    "maximum_concurrent_s1_detector_processes": 1,
+    "new_deterministic_algorithm_settings_permitted": false,
+    "other_user_cuda_workloads_permitted": false,
+    "parallel_primary_passes_permitted": false,
+    "parallel_stage_r_processes_permitted": false,
+    "parallel_zero_intensity_passes_permitted": false,
+    "pytorch_cuda_alloc_conf": "unset"
+  },
   "schema_version": "laserperception.m8.s1.measurement-runtime.v1",
-  "status": "M8 P1-S1 MEASUREMENT IMPLEMENTATION CANDIDATE — OWNER REVIEW REQUIRED — STAGE R AND GT-RELATIVE MEASUREMENT UNAUTHORIZED"
+  "status": "M8 P1-S1 MEASUREMENT IMPLEMENTATION CANDIDATE — OWNER MEMORY-MARGIN ACCEPTED — STAGE R AND GT-RELATIVE MEASUREMENT UNAUTHORIZED"
 }
