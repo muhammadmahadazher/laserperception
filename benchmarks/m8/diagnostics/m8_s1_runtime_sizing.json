@@ -1,0 +1,1631 @@
+{
+  "engineering_duration_estimates": {
+    "full_5276_accepted_call_campaign": {
+      "central_seconds": 1696.8077813509997,
+      "conservative_observed_rate_envelope_seconds": [
+        1597.9996551359998,
+        1872.155871024
+      ]
+    },
+    "method": "observed median/min/max H10+H5 pair rate plus observed model initialization per required fresh process; stratified engineering sizing, not confidence bounds",
+    "one_856_condition_pass": {
+      "central_seconds": 254.26969569599996,
+      "conservative_observed_rate_envelope_seconds": [
+        238.95187166099998,
+        282.00567907899995
+      ]
+    },
+    "primary_3_passes": {
+      "central_seconds": 762.8090870879998,
+      "conservative_observed_rate_envelope_seconds": [
+        716.8556149829999,
+        846.0170372369998
+      ]
+    },
+    "stage_r_10_processes_140_calls": {
+      "central_seconds": 171.189607175,
+      "conservative_observed_rate_envelope_seconds": [
+        164.28842516999998,
+        180.12179655
+      ]
+    },
+    "zero_intensity_3_passes": {
+      "central_seconds": 762.8090870879998,
+      "conservative_observed_rate_envelope_seconds": [
+        716.8556149829999,
+        846.0170372369998
+      ]
+    }
+  },
+  "evaluator_loaded": false,
+  "ground_truth_loaded": false,
+  "input_selection": {
+    "census_sha256": "c7d5da5a1b5162613cdc45dff420ae2d811ead2a6ba753b3202008bcb0ac86a6",
+    "nearest_rank_rule": "round(q * (N - 1)); ties by earliest frozen corpus order",
+    "selected_before_model_output": true,
+    "selected_frames": [
+      {
+        "H10_candidate_dynamic_pillars": 14491,
+        "frame_id": "2011_09_26_drive_0091/0000000326",
+        "frozen_corpus_ordinal_1_based": 415,
+        "ordered_rank_0_based": 21,
+        "target_quantile": 0.05
+      },
+      {
+        "H10_candidate_dynamic_pillars": 15148,
+        "frame_id": "2011_09_26_drive_0091/0000000332",
+        "frozen_corpus_ordinal_1_based": 421,
+        "ordered_rank_0_based": 63,
+        "target_quantile": 0.15
+      },
+      {
+        "H10_candidate_dynamic_pillars": 17140,
+        "frame_id": "2011_09_26_drive_0091/0000000234",
+        "frozen_corpus_ordinal_1_based": 323,
+        "ordered_rank_0_based": 105,
+        "target_quantile": 0.25
+      },
+      {
+        "H10_candidate_dynamic_pillars": 18708,
+        "frame_id": "2011_09_26_drive_0091/0000000221",
+        "frozen_corpus_ordinal_1_based": 310,
+        "ordered_rank_0_based": 147,
+        "target_quantile": 0.35
+      },
+      {
+        "H10_candidate_dynamic_pillars": 21854,
+        "frame_id": "2011_09_26_drive_0091/0000000157",
+        "frozen_corpus_ordinal_1_based": 246,
+        "ordered_rank_0_based": 189,
+        "target_quantile": 0.45
+      },
+      {
+        "H10_candidate_dynamic_pillars": 25503,
+        "frame_id": "2011_09_26_drive_0091/0000000015",
+        "frozen_corpus_ordinal_1_based": 104,
+        "ordered_rank_0_based": 231,
+        "target_quantile": 0.55
+      },
+      {
+        "H10_candidate_dynamic_pillars": 28720,
+        "frame_id": "2011_09_26_drive_0091/0000000029",
+        "frozen_corpus_ordinal_1_based": 118,
+        "ordered_rank_0_based": 273,
+        "target_quantile": 0.65
+      },
+      {
+        "H10_candidate_dynamic_pillars": 29116,
+        "frame_id": "2011_09_26_drive_0001/0000000039",
+        "frozen_corpus_ordinal_1_based": 30,
+        "ordered_rank_0_based": 315,
+        "target_quantile": 0.75
+      },
+      {
+        "H10_candidate_dynamic_pillars": 29867,
+        "frame_id": "2011_09_26_drive_0091/0000000096",
+        "frozen_corpus_ordinal_1_based": 185,
+        "ordered_rank_0_based": 357,
+        "target_quantile": 0.85
+      },
+      {
+        "H10_candidate_dynamic_pillars": 31960,
+        "frame_id": "2011_09_26_drive_0091/0000000058",
+        "frozen_corpus_ordinal_1_based": 147,
+        "ordered_rank_0_based": 399,
+        "target_quantile": 0.95
+      }
+    ],
+    "sentinels_excluded": [
+      "2011_09_26_drive_0001/0000000010",
+      "2011_09_26_drive_0001/0000000011",
+      "2011_09_26_drive_0001/0000000015",
+      "2011_09_26_drive_0001/0000000083",
+      "2011_09_26_drive_0091/0000000010",
+      "2011_09_26_drive_0091/0000000011",
+      "2011_09_26_drive_0091/0000000012"
+    ],
+    "source": "selected-candidate H10 input-only dynamic-pillar census",
+    "target_quantiles": [
+      0.05,
+      0.15,
+      0.25,
+      0.35,
+      0.45,
+      0.55,
+      0.65,
+      0.75,
+      0.85,
+      0.95
+    ]
+  },
+  "measured_call_count": 40,
+  "operational_feasibility": {
+    "classification": "OPERATIONALLY PLAUSIBLE",
+    "protocol_unchanged": true,
+    "reason": "observed sizing completed in two fresh processes and measured memory stayed below available device/host capacity"
+  },
+  "prediction_count_observed_or_stored": false,
+  "process_count": 2,
+  "protocol_freeze_commit": "5061d5d2c6a6057fed1f3f537c5857d2d84f6b3f",
+  "protocol_json_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+  "resources": {
+    "capacity_assessment_rule": "engineering preflight classification requires both observed peak fractions to remain below 0.90; this is not a scientific acceptance gate",
+    "comfortably_below_available_capacity": true,
+    "maximum_cuda_reserved_fraction": 0.8239389312977099,
+    "maximum_process_rss_fraction_of_host_total": 0.2177371606645908,
+    "workers": [
+      {
+        "host_memory": {
+          "available_bytes_at_capture": 6182776832,
+          "process_max_rss_bytes": 1775710208,
+          "total_bytes": 8170172416
+        },
+        "initialization_cuda_memory": {
+          "allocated_bytes": 28558848,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 28558848,
+          "max_reserved_bytes": 35651584,
+          "reserved_bytes": 35651584
+        },
+        "post_sizing_cuda_memory": {
+          "allocated_bytes": 37080576,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 2922341888,
+          "max_reserved_bytes": 7073693696,
+          "reserved_bytes": 7073693696
+        },
+        "process_uuid": "4194f498-c80a-48fe-a19d-ae6debc54563"
+      },
+      {
+        "host_memory": {
+          "available_bytes_at_capture": 6175318016,
+          "process_max_rss_bytes": 1778950144,
+          "total_bytes": 8170172416
+        },
+        "initialization_cuda_memory": {
+          "allocated_bytes": 28558848,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 28558848,
+          "max_reserved_bytes": 35651584,
+          "reserved_bytes": 35651584
+        },
+        "post_sizing_cuda_memory": {
+          "allocated_bytes": 37080576,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 2922341888,
+          "max_reserved_bytes": 7073693696,
+          "reserved_bytes": 7073693696
+        },
+        "process_uuid": "dd22f646-4e4a-4cba-88c3-2cc48aca45fb"
+      }
+    ]
+  },
+  "runtime_implementation_head": "f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3",
+  "schema_version": "laserperception.m8.s1.runtime-sizing.v1",
+  "scientific_campaign_call_count": 0,
+  "semantic_output_retained": false,
+  "status": "M8_P1_S1_GT_BLIND_RUNTIME_SIZING_COMPLETE",
+  "telemetry": [
+    {
+      "process_uuid": "4194f498-c80a-48fe-a19d-ae6debc54563",
+      "telemetry": {
+        "by_block": {
+          "measured": {
+            "available": true,
+            "available_sample_count": 48,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 48,
+                "maximum": 8001.0,
+                "mean": 7542.666666666667,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 48,
+                "maximum": 2655.0,
+                "mean": 2592.1875,
+                "median": 2655.0,
+                "minimum": 2325.0
+              },
+              "power.draw": {
+                "count": 48,
+                "maximum": 77.54,
+                "mean": 31.394375,
+                "median": 20.225,
+                "minimum": 17.12
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 48,
+                "maximum": 61.0,
+                "mean": 57.3125,
+                "median": 57.0,
+                "minimum": 54.0
+              },
+              "utilization.gpu": {
+                "count": 48,
+                "maximum": 93.0,
+                "mean": 26.6875,
+                "median": 0.0,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 48,
+                "maximum": 90.0,
+                "mean": 23.6875,
+                "median": 0.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 25,
+              "P3": 23
+            },
+            "sample_count": 48,
+            "unavailable_sample_count": 0
+          },
+          "warmup": {
+            "available": true,
+            "available_sample_count": 12,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 12,
+                "maximum": 8001.0,
+                "mean": 7751.0,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 12,
+                "maximum": 2655.0,
+                "mean": 2232.5,
+                "median": 2152.5,
+                "minimum": 1890.0
+              },
+              "power.draw": {
+                "count": 12,
+                "maximum": 69.53,
+                "mean": 24.6275,
+                "median": 18.715,
+                "minimum": 5.02
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 12,
+                "maximum": 55.0,
+                "mean": 53.0,
+                "median": 53.0,
+                "minimum": 51.0
+              },
+              "utilization.gpu": {
+                "count": 12,
+                "maximum": 79.0,
+                "mean": 21.916666666666668,
+                "median": 5.0,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 12,
+                "maximum": 71.0,
+                "mean": 17.333333333333332,
+                "median": 2.5,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 9,
+              "P3": 3
+            },
+            "sample_count": 12,
+            "unavailable_sample_count": 0
+          }
+        },
+        "summary": {
+          "available": true,
+          "available_sample_count": 62,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 62,
+              "maximum": 8001.0,
+              "mean": 7475.258064516129,
+              "median": 8001.0,
+              "minimum": 405.0
+            },
+            "clocks.sm": {
+              "count": 62,
+              "maximum": 2655.0,
+              "mean": 2482.7419354838707,
+              "median": 2655.0,
+              "minimum": 210.0
+            },
+            "power.draw": {
+              "count": 62,
+              "maximum": 77.54,
+              "mean": 29.515645161290323,
+              "median": 19.8,
+              "minimum": 5.02
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 62,
+              "maximum": 61.0,
+              "mean": 56.435483870967744,
+              "median": 57.0,
+              "minimum": 51.0
+            },
+            "utilization.gpu": {
+              "count": 62,
+              "maximum": 93.0,
+              "mean": 26.112903225806452,
+              "median": 2.5,
+              "minimum": 0.0
+            },
+            "utilization.memory": {
+              "count": 62,
+              "maximum": 90.0,
+              "mean": 22.70967741935484,
+              "median": 0.5,
+              "minimum": 0.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 36,
+            "P3": 26
+          },
+          "sample_count": 62,
+          "unavailable_sample_count": 0
+        }
+      }
+    },
+    {
+      "process_uuid": "dd22f646-4e4a-4cba-88c3-2cc48aca45fb",
+      "telemetry": {
+        "by_block": {
+          "measured": {
+            "available": true,
+            "available_sample_count": 44,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 44,
+                "maximum": 8001.0,
+                "mean": 7569.181818181818,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 44,
+                "maximum": 2655.0,
+                "mean": 2628.75,
+                "median": 2655.0,
+                "minimum": 2280.0
+              },
+              "power.draw": {
+                "count": 44,
+                "maximum": 80.72,
+                "mean": 32.39727272727273,
+                "median": 21.685000000000002,
+                "minimum": 18.14
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 44,
+                "maximum": 64.0,
+                "mean": 58.63636363636363,
+                "median": 58.0,
+                "minimum": 55.0
+              },
+              "utilization.gpu": {
+                "count": 44,
+                "maximum": 93.0,
+                "mean": 28.727272727272727,
+                "median": 3.5,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 44,
+                "maximum": 87.0,
+                "mean": 24.931818181818183,
+                "median": 1.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 25,
+              "P3": 19
+            },
+            "sample_count": 44,
+            "unavailable_sample_count": 0
+          },
+          "warmup": {
+            "available": true,
+            "available_sample_count": 8,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 8,
+                "maximum": 8001.0,
+                "mean": 8001.0,
+                "median": 8001.0,
+                "minimum": 8001.0
+              },
+              "clocks.sm": {
+                "count": 8,
+                "maximum": 2655.0,
+                "mean": 2176.875,
+                "median": 1890.0,
+                "minimum": 1890.0
+              },
+              "power.draw": {
+                "count": 8,
+                "maximum": 77.3,
+                "mean": 32.25625,
+                "median": 19.979999999999997,
+                "minimum": 12.38
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 8,
+                "maximum": 57.0,
+                "mean": 55.25,
+                "median": 55.0,
+                "minimum": 54.0
+              },
+              "utilization.gpu": {
+                "count": 8,
+                "maximum": 36.0,
+                "mean": 17.625,
+                "median": 15.5,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 8,
+                "maximum": 34.0,
+                "mean": 15.25,
+                "median": 10.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 8
+            },
+            "sample_count": 8,
+            "unavailable_sample_count": 0
+          }
+        },
+        "summary": {
+          "available": true,
+          "available_sample_count": 54,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 54,
+              "maximum": 8001.0,
+              "mean": 7649.148148148148,
+              "median": 8001.0,
+              "minimum": 7001.0
+            },
+            "clocks.sm": {
+              "count": 54,
+              "maximum": 2655.0,
+              "mean": 2543.3333333333335,
+              "median": 2655.0,
+              "minimum": 1890.0
+            },
+            "power.draw": {
+              "count": 54,
+              "maximum": 80.72,
+              "mean": 32.53962962962963,
+              "median": 21.16,
+              "minimum": 12.38
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 54,
+              "maximum": 64.0,
+              "mean": 58.03703703703704,
+              "median": 58.0,
+              "minimum": 54.0
+            },
+            "utilization.gpu": {
+              "count": 54,
+              "maximum": 93.0,
+              "mean": 27.666666666666668,
+              "median": 4.5,
+              "minimum": 0.0
+            },
+            "utilization.memory": {
+              "count": 54,
+              "maximum": 87.0,
+              "mean": 23.944444444444443,
+              "median": 1.5,
+              "minimum": 0.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 35,
+            "P3": 19
+          },
+          "sample_count": 54,
+          "unavailable_sample_count": 0
+        }
+      }
+    }
+  ],
+  "tier": "engineering_preflight",
+  "timing": {
+    "H10": {
+      "count": 20,
+      "maximum_seconds": 0.36717528,
+      "median_seconds": 0.3364359745,
+      "minimum_seconds": 0.299018246
+    },
+    "H10_H5_pair": {
+      "count": 20,
+      "maximum_seconds": 0.627062944,
+      "median_seconds": 0.5633034084999999,
+      "minimum_seconds": 0.5285582639999999
+    },
+    "H5": {
+      "count": 20,
+      "maximum_seconds": 0.259887664,
+      "median_seconds": 0.23256711400000002,
+      "minimum_seconds": 0.213582839
+    },
+    "initialization": {
+      "count": 2,
+      "maximum_seconds": 13.622739047,
+      "median_seconds": 13.175836858,
+      "minimum_seconds": 12.728934669
+    }
+  },
+  "timing_method": "CUDA synchronize, monotonic wall timer, candidate inference, CUDA synchronize",
+  "warmup_call_count": 4,
+  "workers": [
+    {
+      "evaluator_loaded": false,
+      "generated_at_utc": "2026-09-01T04:53:15.723863+00:00",
+      "ground_truth_loaded": false,
+      "host_memory": {
+        "available_bytes_at_capture": 6182776832,
+        "process_max_rss_bytes": 1775710208,
+        "total_bytes": 8170172416
+      },
+      "initialization_seconds": 12.728934669,
+      "measured_call_count": 20,
+      "measured_calls": [
+        {
+          "candidate_dynamic_pillars": 14491,
+          "condition_id": "2011_09_26_drive_0091/0000000326/H10",
+          "history": "H10",
+          "input_point_count": 1338334,
+          "input_sha256": "2afdd600488a20b9e9e66ee76ef55003f7120c0d38ce3637ddfde54f981f49e0",
+          "process_id": 423,
+          "wall_seconds": 0.335079929
+        },
+        {
+          "candidate_dynamic_pillars": 12176,
+          "condition_id": "2011_09_26_drive_0091/0000000326/H5",
+          "history": "H5",
+          "input_point_count": 729635,
+          "input_sha256": "3bf2cd517e84761e708153f6da2db65cf997f63f821ba60220a2dc62688d41ff",
+          "process_id": 423,
+          "wall_seconds": 0.232644506
+        },
+        {
+          "candidate_dynamic_pillars": 15148,
+          "condition_id": "2011_09_26_drive_0091/0000000332/H10",
+          "history": "H10",
+          "input_point_count": 1337836,
+          "input_sha256": "cdb23201d8cdc301c724b5b996e70d7bb9faf033703f3d3c0e47c592d0d9668c",
+          "process_id": 423,
+          "wall_seconds": 0.317682149
+        },
+        {
+          "candidate_dynamic_pillars": 12405,
+          "condition_id": "2011_09_26_drive_0091/0000000332/H5",
+          "history": "H5",
+          "input_point_count": 730602,
+          "input_sha256": "e3ddb592a3dce50a3856b6e156739bdf57006cce24696cfe079165dd30180c30",
+          "process_id": 423,
+          "wall_seconds": 0.232489722
+        },
+        {
+          "candidate_dynamic_pillars": 17140,
+          "condition_id": "2011_09_26_drive_0091/0000000234/H10",
+          "history": "H10",
+          "input_point_count": 1331095,
+          "input_sha256": "c247055b1c00dd10731ac1b8fb6c86763f18b48324ee2dcb4f1758ddef7ec0ba",
+          "process_id": 423,
+          "wall_seconds": 0.33779202
+        },
+        {
+          "candidate_dynamic_pillars": 13476,
+          "condition_id": "2011_09_26_drive_0091/0000000234/H5",
+          "history": "H5",
+          "input_point_count": 724604,
+          "input_sha256": "8c812f7efd8ca97214ba677b06ca6d5779bb1bd2da1b54fe3c470b50bd098103",
+          "process_id": 423,
+          "wall_seconds": 0.226346255
+        },
+        {
+          "candidate_dynamic_pillars": 18708,
+          "condition_id": "2011_09_26_drive_0091/0000000221/H10",
+          "history": "H10",
+          "input_point_count": 1335159,
+          "input_sha256": "2538f2b40107f9482e0342d3f7d67d28555ef2b431b1132c069afe509dc53177",
+          "process_id": 423,
+          "wall_seconds": 0.323395544
+        },
+        {
+          "candidate_dynamic_pillars": 15529,
+          "condition_id": "2011_09_26_drive_0091/0000000221/H5",
+          "history": "H5",
+          "input_point_count": 728763,
+          "input_sha256": "ed893e99fd550989e98db0604b2fbd97d29db81b35ab614960fb829121689c2a",
+          "process_id": 423,
+          "wall_seconds": 0.237187011
+        },
+        {
+          "candidate_dynamic_pillars": 21854,
+          "condition_id": "2011_09_26_drive_0091/0000000157/H10",
+          "history": "H10",
+          "input_point_count": 1332673,
+          "input_sha256": "5e32858445a4fedb75260ac33e86fda4b68748e85fe7a124c60148c08a52ad71",
+          "process_id": 423,
+          "wall_seconds": 0.332802804
+        },
+        {
+          "candidate_dynamic_pillars": 18028,
+          "condition_id": "2011_09_26_drive_0091/0000000157/H5",
+          "history": "H5",
+          "input_point_count": 727929,
+          "input_sha256": "12de31c41433b41cfd7ec2bdc562ffedf3c418b71ee553f682b922744befa63a",
+          "process_id": 423,
+          "wall_seconds": 0.222349916
+        },
+        {
+          "candidate_dynamic_pillars": 25503,
+          "condition_id": "2011_09_26_drive_0091/0000000015/H10",
+          "history": "H10",
+          "input_point_count": 1260241,
+          "input_sha256": "a482c71993290f3c9e1f353069d297311b85015630a8f07bdb6127965a52de00",
+          "process_id": 423,
+          "wall_seconds": 0.321729696
+        },
+        {
+          "candidate_dynamic_pillars": 20603,
+          "condition_id": "2011_09_26_drive_0091/0000000015/H5",
+          "history": "H5",
+          "input_point_count": 696901,
+          "input_sha256": "8882e33570b512d1cddfb094c6d788d4c54d4f84bc41a6f252e34ef33646e8d5",
+          "process_id": 423,
+          "wall_seconds": 0.228156552
+        },
+        {
+          "candidate_dynamic_pillars": 28720,
+          "condition_id": "2011_09_26_drive_0091/0000000029/H10",
+          "history": "H10",
+          "input_point_count": 1336456,
+          "input_sha256": "b9a198855835a6a5a8a0e8a54ccf5c6392896077b8a47b5d6df8db5b9689ce0e",
+          "process_id": 423,
+          "wall_seconds": 0.340874107
+        },
+        {
+          "candidate_dynamic_pillars": 23525,
+          "condition_id": "2011_09_26_drive_0091/0000000029/H5",
+          "history": "H5",
+          "input_point_count": 729323,
+          "input_sha256": "0e27d89ce9af88350d769838ee3d4055b1e2dec79ae38b6759aa57d7f29374ba",
+          "process_id": 423,
+          "wall_seconds": 0.248184498
+        },
+        {
+          "candidate_dynamic_pillars": 29116,
+          "condition_id": "2011_09_26_drive_0001/0000000039/H10",
+          "history": "H10",
+          "input_point_count": 1313712,
+          "input_sha256": "84bfa29a2a8cc6a2285e6a1d3d335f9c3f467275a82bdbf38d6b774ac52898c4",
+          "process_id": 423,
+          "wall_seconds": 0.340864175
+        },
+        {
+          "candidate_dynamic_pillars": 24503,
+          "condition_id": "2011_09_26_drive_0001/0000000039/H5",
+          "history": "H5",
+          "input_point_count": 718542,
+          "input_sha256": "f098158cf73f3a39f159fa50162762c5de901b2ecbc2d39203a273e61c21653d",
+          "process_id": 423,
+          "wall_seconds": 0.247734132
+        },
+        {
+          "candidate_dynamic_pillars": 29867,
+          "condition_id": "2011_09_26_drive_0091/0000000096/H10",
+          "history": "H10",
+          "input_point_count": 1328051,
+          "input_sha256": "845aaee598d42e9f0f5542495319abda125a518f0cf11f65629fdf2a1dcdb72c",
+          "process_id": 423,
+          "wall_seconds": 0.355334402
+        },
+        {
+          "candidate_dynamic_pillars": 24635,
+          "condition_id": "2011_09_26_drive_0091/0000000096/H5",
+          "history": "H5",
+          "input_point_count": 726105,
+          "input_sha256": "811906791e3badc245d79f2d316510924da132e4e8e9e64b4c96eb5bdcaab30e",
+          "process_id": 423,
+          "wall_seconds": 0.241672197
+        },
+        {
+          "candidate_dynamic_pillars": 31960,
+          "condition_id": "2011_09_26_drive_0091/0000000058/H10",
+          "history": "H10",
+          "input_point_count": 1339311,
+          "input_sha256": "dcb236b941d7adc02e30c3170822ba188091900c0e44cacf0269f94a84505c02",
+          "process_id": 423,
+          "wall_seconds": 0.361888895
+        },
+        {
+          "candidate_dynamic_pillars": 26161,
+          "condition_id": "2011_09_26_drive_0091/0000000058/H5",
+          "history": "H5",
+          "input_point_count": 729448,
+          "input_sha256": "d585df4e19c3aa19e9e5f65aafce2811783adadcf3b8475fc62a891c4e4f9d74",
+          "process_id": 423,
+          "wall_seconds": 0.255882386
+        }
+      ],
+      "prediction_count_observed_or_stored": false,
+      "process_id": 423,
+      "process_uuid": "4194f498-c80a-48fe-a19d-ae6debc54563",
+      "python": "3.10.12",
+      "resource_after": {
+        "allocated_bytes": 37080576,
+        "device_total_bytes": 8585216000,
+        "max_allocated_bytes": 2922341888,
+        "max_reserved_bytes": 7073693696,
+        "reserved_bytes": 7073693696
+      },
+      "runtime_commit": "f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3",
+      "runtime_state": {
+        "candidate_eval_train_state": "eval",
+        "cuda_memory": {
+          "allocated_bytes": 28558848,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 28558848,
+          "max_reserved_bytes": 35651584,
+          "reserved_bytes": 35651584
+        },
+        "cuda_runtime": "11.8",
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false,
+        "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "grad_enabled_at_capture": true,
+        "inference_mode_enabled_at_capture": false,
+        "model_config_checkpoint_identities": {
+          "architecture": "DSVT-Pillar with TransFusion head",
+          "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+          "class_mapping": {
+            "car": "car",
+            "pedestrian": "pedestrian"
+          },
+          "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+          "coordinate_adapter": "openpcdet_lidar_box_direct",
+          "cuda": "11.8",
+          "device": "cuda:0",
+          "feature_contract": [
+            "x",
+            "y",
+            "z",
+            "intensity",
+            "time_lag"
+          ],
+          "spconv": "2.3.8",
+          "torch": "2.1.0+cu118",
+          "torch_scatter": "2.1.2+pt21cu118",
+          "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+        },
+        "numpy": "1.23.5",
+        "numpy_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "numpy_random_state_sha256": "2c903fd9d5bc9155ce80a928b7c306de7f3bd0f8212ff9c3fb26ab7e03686f26",
+        "nvidia_driver_and_gpu_uuid_query": "GPU-fb8f7552-21ae-1dbb-798c-e9fa3dca54fc, 610.88",
+        "point_order_policy": "preserve frozen source-row order; no random inference shuffle",
+        "python_exact_version": "3.10.12 (main, Jun 22 2026, 18:55:27) [GCC 11.4.0]",
+        "python_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "python_random_state_sha256": "96c8e054f9d86905bc50e5eb1421b2ea4f76a77e90b3eda73d5f32035b9f2903",
+        "pytorch_exact_version": "2.1.0+cu118",
+        "relevant_environment": {
+          "CUDA_MODULE_LOADING": "LAZY"
+        },
+        "spconv": "2.3.8",
+        "tf32": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": true
+        },
+        "torch_cpu_initial_seed": 3495235793131230220,
+        "torch_cpu_rng_state_sha256": "5bc955bb91d81373bdd703a6f1f1b94ef423ea2fd2df0e6bbe38c947840619fc",
+        "torch_cuda_initial_seed": 482342304396176,
+        "torch_cuda_rng_state_sha256": "ff9a3893b1cde60ebb2f08d4d6c6e24b500dc6f33d59c017e65b4f9f1d306931",
+        "torch_deterministic_algorithms": false,
+        "torch_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "torch_scatter": "2.1.2+pt21cu118"
+      },
+      "schema_version": "laserperception.m8.s1.preflight-worker.v1",
+      "semantic_output_retained": false,
+      "started_in_fresh_python_process": true,
+      "status": "COMPLETE",
+      "telemetry": {
+        "by_block": {
+          "measured": {
+            "available": true,
+            "available_sample_count": 48,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 48,
+                "maximum": 8001.0,
+                "mean": 7542.666666666667,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 48,
+                "maximum": 2655.0,
+                "mean": 2592.1875,
+                "median": 2655.0,
+                "minimum": 2325.0
+              },
+              "power.draw": {
+                "count": 48,
+                "maximum": 77.54,
+                "mean": 31.394375,
+                "median": 20.225,
+                "minimum": 17.12
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 48,
+                "maximum": 61.0,
+                "mean": 57.3125,
+                "median": 57.0,
+                "minimum": 54.0
+              },
+              "utilization.gpu": {
+                "count": 48,
+                "maximum": 93.0,
+                "mean": 26.6875,
+                "median": 0.0,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 48,
+                "maximum": 90.0,
+                "mean": 23.6875,
+                "median": 0.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 25,
+              "P3": 23
+            },
+            "sample_count": 48,
+            "unavailable_sample_count": 0
+          },
+          "warmup": {
+            "available": true,
+            "available_sample_count": 12,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 12,
+                "maximum": 8001.0,
+                "mean": 7751.0,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 12,
+                "maximum": 2655.0,
+                "mean": 2232.5,
+                "median": 2152.5,
+                "minimum": 1890.0
+              },
+              "power.draw": {
+                "count": 12,
+                "maximum": 69.53,
+                "mean": 24.6275,
+                "median": 18.715,
+                "minimum": 5.02
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 12,
+                "maximum": 55.0,
+                "mean": 53.0,
+                "median": 53.0,
+                "minimum": 51.0
+              },
+              "utilization.gpu": {
+                "count": 12,
+                "maximum": 79.0,
+                "mean": 21.916666666666668,
+                "median": 5.0,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 12,
+                "maximum": 71.0,
+                "mean": 17.333333333333332,
+                "median": 2.5,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 9,
+              "P3": 3
+            },
+            "sample_count": 12,
+            "unavailable_sample_count": 0
+          }
+        },
+        "summary": {
+          "available": true,
+          "available_sample_count": 62,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 62,
+              "maximum": 8001.0,
+              "mean": 7475.258064516129,
+              "median": 8001.0,
+              "minimum": 405.0
+            },
+            "clocks.sm": {
+              "count": 62,
+              "maximum": 2655.0,
+              "mean": 2482.7419354838707,
+              "median": 2655.0,
+              "minimum": 210.0
+            },
+            "power.draw": {
+              "count": 62,
+              "maximum": 77.54,
+              "mean": 29.515645161290323,
+              "median": 19.8,
+              "minimum": 5.02
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 62,
+              "maximum": 61.0,
+              "mean": 56.435483870967744,
+              "median": 57.0,
+              "minimum": 51.0
+            },
+            "utilization.gpu": {
+              "count": 62,
+              "maximum": 93.0,
+              "mean": 26.112903225806452,
+              "median": 2.5,
+              "minimum": 0.0
+            },
+            "utilization.memory": {
+              "count": 62,
+              "maximum": 90.0,
+              "mean": 22.70967741935484,
+              "median": 0.5,
+              "minimum": 0.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 36,
+            "P3": 26
+          },
+          "sample_count": 62,
+          "unavailable_sample_count": 0
+        }
+      },
+      "warmup": {
+        "call_count": 2,
+        "condition_order": [
+          "2011_09_26_drive_0001/0000000012/H10",
+          "2011_09_26_drive_0001/0000000012/H5"
+        ],
+        "excluded_from_measurement": true,
+        "frame_id": "2011_09_26_drive_0001/0000000012"
+      },
+      "worker_index": 1
+    },
+    {
+      "evaluator_loaded": false,
+      "generated_at_utc": "2026-09-01T04:53:52.680119+00:00",
+      "ground_truth_loaded": false,
+      "host_memory": {
+        "available_bytes_at_capture": 6175318016,
+        "process_max_rss_bytes": 1778950144,
+        "total_bytes": 8170172416
+      },
+      "initialization_seconds": 13.622739047,
+      "measured_call_count": 20,
+      "measured_calls": [
+        {
+          "candidate_dynamic_pillars": 14491,
+          "condition_id": "2011_09_26_drive_0091/0000000326/H10",
+          "history": "H10",
+          "input_point_count": 1338334,
+          "input_sha256": "2afdd600488a20b9e9e66ee76ef55003f7120c0d38ce3637ddfde54f981f49e0",
+          "process_id": 629,
+          "wall_seconds": 0.349026929
+        },
+        {
+          "candidate_dynamic_pillars": 12176,
+          "condition_id": "2011_09_26_drive_0091/0000000326/H5",
+          "history": "H5",
+          "input_point_count": 729635,
+          "input_sha256": "3bf2cd517e84761e708153f6da2db65cf997f63f821ba60220a2dc62688d41ff",
+          "process_id": 629,
+          "wall_seconds": 0.213582839
+        },
+        {
+          "candidate_dynamic_pillars": 15148,
+          "condition_id": "2011_09_26_drive_0091/0000000332/H10",
+          "history": "H10",
+          "input_point_count": 1337836,
+          "input_sha256": "cdb23201d8cdc301c724b5b996e70d7bb9faf033703f3d3c0e47c592d0d9668c",
+          "process_id": 629,
+          "wall_seconds": 0.299018246
+        },
+        {
+          "candidate_dynamic_pillars": 12405,
+          "condition_id": "2011_09_26_drive_0091/0000000332/H5",
+          "history": "H5",
+          "input_point_count": 730602,
+          "input_sha256": "e3ddb592a3dce50a3856b6e156739bdf57006cce24696cfe079165dd30180c30",
+          "process_id": 629,
+          "wall_seconds": 0.229540018
+        },
+        {
+          "candidate_dynamic_pillars": 17140,
+          "condition_id": "2011_09_26_drive_0091/0000000234/H10",
+          "history": "H10",
+          "input_point_count": 1331095,
+          "input_sha256": "c247055b1c00dd10731ac1b8fb6c86763f18b48324ee2dcb4f1758ddef7ec0ba",
+          "process_id": 629,
+          "wall_seconds": 0.312338633
+        },
+        {
+          "candidate_dynamic_pillars": 13476,
+          "condition_id": "2011_09_26_drive_0091/0000000234/H5",
+          "history": "H5",
+          "input_point_count": 724604,
+          "input_sha256": "8c812f7efd8ca97214ba677b06ca6d5779bb1bd2da1b54fe3c470b50bd098103",
+          "process_id": 629,
+          "wall_seconds": 0.216593308
+        },
+        {
+          "candidate_dynamic_pillars": 18708,
+          "condition_id": "2011_09_26_drive_0091/0000000221/H10",
+          "history": "H10",
+          "input_point_count": 1335159,
+          "input_sha256": "2538f2b40107f9482e0342d3f7d67d28555ef2b431b1132c069afe509dc53177",
+          "process_id": 629,
+          "wall_seconds": 0.322780815
+        },
+        {
+          "candidate_dynamic_pillars": 15529,
+          "condition_id": "2011_09_26_drive_0091/0000000221/H5",
+          "history": "H5",
+          "input_point_count": 728763,
+          "input_sha256": "ed893e99fd550989e98db0604b2fbd97d29db81b35ab614960fb829121689c2a",
+          "process_id": 629,
+          "wall_seconds": 0.227991652
+        },
+        {
+          "candidate_dynamic_pillars": 21854,
+          "condition_id": "2011_09_26_drive_0091/0000000157/H10",
+          "history": "H10",
+          "input_point_count": 1332673,
+          "input_sha256": "5e32858445a4fedb75260ac33e86fda4b68748e85fe7a124c60148c08a52ad71",
+          "process_id": 629,
+          "wall_seconds": 0.339594923
+        },
+        {
+          "candidate_dynamic_pillars": 18028,
+          "condition_id": "2011_09_26_drive_0091/0000000157/H5",
+          "history": "H5",
+          "input_point_count": 727929,
+          "input_sha256": "12de31c41433b41cfd7ec2bdc562ffedf3c418b71ee553f682b922744befa63a",
+          "process_id": 629,
+          "wall_seconds": 0.224402126
+        },
+        {
+          "candidate_dynamic_pillars": 25503,
+          "condition_id": "2011_09_26_drive_0091/0000000015/H10",
+          "history": "H10",
+          "input_point_count": 1260241,
+          "input_sha256": "a482c71993290f3c9e1f353069d297311b85015630a8f07bdb6127965a52de00",
+          "process_id": 629,
+          "wall_seconds": 0.324653651
+        },
+        {
+          "candidate_dynamic_pillars": 20603,
+          "condition_id": "2011_09_26_drive_0091/0000000015/H5",
+          "history": "H5",
+          "input_point_count": 696901,
+          "input_sha256": "8882e33570b512d1cddfb094c6d788d4c54d4f84bc41a6f252e34ef33646e8d5",
+          "process_id": 629,
+          "wall_seconds": 0.229681842
+        },
+        {
+          "candidate_dynamic_pillars": 28720,
+          "condition_id": "2011_09_26_drive_0091/0000000029/H10",
+          "history": "H10",
+          "input_point_count": 1336456,
+          "input_sha256": "b9a198855835a6a5a8a0e8a54ccf5c6392896077b8a47b5d6df8db5b9689ce0e",
+          "process_id": 629,
+          "wall_seconds": 0.342906797
+        },
+        {
+          "candidate_dynamic_pillars": 23525,
+          "condition_id": "2011_09_26_drive_0091/0000000029/H5",
+          "history": "H5",
+          "input_point_count": 729323,
+          "input_sha256": "0e27d89ce9af88350d769838ee3d4055b1e2dec79ae38b6759aa57d7f29374ba",
+          "process_id": 629,
+          "wall_seconds": 0.233384099
+        },
+        {
+          "candidate_dynamic_pillars": 29116,
+          "condition_id": "2011_09_26_drive_0001/0000000039/H10",
+          "history": "H10",
+          "input_point_count": 1313712,
+          "input_sha256": "84bfa29a2a8cc6a2285e6a1d3d335f9c3f467275a82bdbf38d6b774ac52898c4",
+          "process_id": 629,
+          "wall_seconds": 0.314725233
+        },
+        {
+          "candidate_dynamic_pillars": 24503,
+          "condition_id": "2011_09_26_drive_0001/0000000039/H5",
+          "history": "H5",
+          "input_point_count": 718542,
+          "input_sha256": "f098158cf73f3a39f159fa50162762c5de901b2ecbc2d39203a273e61c21653d",
+          "process_id": 629,
+          "wall_seconds": 0.240837778
+        },
+        {
+          "candidate_dynamic_pillars": 29867,
+          "condition_id": "2011_09_26_drive_0091/0000000096/H10",
+          "history": "H10",
+          "input_point_count": 1328051,
+          "input_sha256": "845aaee598d42e9f0f5542495319abda125a518f0cf11f65629fdf2a1dcdb72c",
+          "process_id": 629,
+          "wall_seconds": 0.351598383
+        },
+        {
+          "candidate_dynamic_pillars": 24635,
+          "condition_id": "2011_09_26_drive_0091/0000000096/H5",
+          "history": "H5",
+          "input_point_count": 726105,
+          "input_sha256": "811906791e3badc245d79f2d316510924da132e4e8e9e64b4c96eb5bdcaab30e",
+          "process_id": 629,
+          "wall_seconds": 0.241359946
+        },
+        {
+          "candidate_dynamic_pillars": 31960,
+          "condition_id": "2011_09_26_drive_0091/0000000058/H10",
+          "history": "H10",
+          "input_point_count": 1339311,
+          "input_sha256": "dcb236b941d7adc02e30c3170822ba188091900c0e44cacf0269f94a84505c02",
+          "process_id": 629,
+          "wall_seconds": 0.36717528
+        },
+        {
+          "candidate_dynamic_pillars": 26161,
+          "condition_id": "2011_09_26_drive_0091/0000000058/H5",
+          "history": "H5",
+          "input_point_count": 729448,
+          "input_sha256": "d585df4e19c3aa19e9e5f65aafce2811783adadcf3b8475fc62a891c4e4f9d74",
+          "process_id": 629,
+          "wall_seconds": 0.259887664
+        }
+      ],
+      "prediction_count_observed_or_stored": false,
+      "process_id": 629,
+      "process_uuid": "dd22f646-4e4a-4cba-88c3-2cc48aca45fb",
+      "python": "3.10.12",
+      "resource_after": {
+        "allocated_bytes": 37080576,
+        "device_total_bytes": 8585216000,
+        "max_allocated_bytes": 2922341888,
+        "max_reserved_bytes": 7073693696,
+        "reserved_bytes": 7073693696
+      },
+      "runtime_commit": "f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3",
+      "runtime_state": {
+        "candidate_eval_train_state": "eval",
+        "cuda_memory": {
+          "allocated_bytes": 28558848,
+          "device_total_bytes": 8585216000,
+          "max_allocated_bytes": 28558848,
+          "max_reserved_bytes": 35651584,
+          "reserved_bytes": 35651584
+        },
+        "cuda_runtime": "11.8",
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false,
+        "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "grad_enabled_at_capture": true,
+        "inference_mode_enabled_at_capture": false,
+        "model_config_checkpoint_identities": {
+          "architecture": "DSVT-Pillar with TransFusion head",
+          "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+          "class_mapping": {
+            "car": "car",
+            "pedestrian": "pedestrian"
+          },
+          "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+          "coordinate_adapter": "openpcdet_lidar_box_direct",
+          "cuda": "11.8",
+          "device": "cuda:0",
+          "feature_contract": [
+            "x",
+            "y",
+            "z",
+            "intensity",
+            "time_lag"
+          ],
+          "spconv": "2.3.8",
+          "torch": "2.1.0+cu118",
+          "torch_scatter": "2.1.2+pt21cu118",
+          "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+        },
+        "numpy": "1.23.5",
+        "numpy_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "numpy_random_state_sha256": "eec4a43757a2db547f7b474ba80d23eca610754ab952e9f40020d58c48d0cd54",
+        "nvidia_driver_and_gpu_uuid_query": "GPU-fb8f7552-21ae-1dbb-798c-e9fa3dca54fc, 610.88",
+        "point_order_policy": "preserve frozen source-row order; no random inference shuffle",
+        "python_exact_version": "3.10.12 (main, Jun 22 2026, 18:55:27) [GCC 11.4.0]",
+        "python_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "python_random_state_sha256": "7a59dddfbe97cf3092c0ba7d9222a61976d87c19b86ae39726b31df2e2f98992",
+        "pytorch_exact_version": "2.1.0+cu118",
+        "relevant_environment": {
+          "CUDA_MODULE_LOADING": "LAZY"
+        },
+        "spconv": "2.3.8",
+        "tf32": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": true
+        },
+        "torch_cpu_initial_seed": 1423872885233296186,
+        "torch_cpu_rng_state_sha256": "67c75f6067a8a8b52de2ef090ff502561e2e7406d08239d95179289a2c865a2b",
+        "torch_cuda_initial_seed": 1595525868507020,
+        "torch_cuda_rng_state_sha256": "4b46147c32855e524dec1d2af2aa7888a9a5a334e1064d51468d1c4822e00c75",
+        "torch_deterministic_algorithms": false,
+        "torch_random_policy": "not reseeded by LaserPerception S1 runtime",
+        "torch_scatter": "2.1.2+pt21cu118"
+      },
+      "schema_version": "laserperception.m8.s1.preflight-worker.v1",
+      "semantic_output_retained": false,
+      "started_in_fresh_python_process": true,
+      "status": "COMPLETE",
+      "telemetry": {
+        "by_block": {
+          "measured": {
+            "available": true,
+            "available_sample_count": 44,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 44,
+                "maximum": 8001.0,
+                "mean": 7569.181818181818,
+                "median": 8001.0,
+                "minimum": 7001.0
+              },
+              "clocks.sm": {
+                "count": 44,
+                "maximum": 2655.0,
+                "mean": 2628.75,
+                "median": 2655.0,
+                "minimum": 2280.0
+              },
+              "power.draw": {
+                "count": 44,
+                "maximum": 80.72,
+                "mean": 32.39727272727273,
+                "median": 21.685000000000002,
+                "minimum": 18.14
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 44,
+                "maximum": 64.0,
+                "mean": 58.63636363636363,
+                "median": 58.0,
+                "minimum": 55.0
+              },
+              "utilization.gpu": {
+                "count": 44,
+                "maximum": 93.0,
+                "mean": 28.727272727272727,
+                "median": 3.5,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 44,
+                "maximum": 87.0,
+                "mean": 24.931818181818183,
+                "median": 1.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 25,
+              "P3": 19
+            },
+            "sample_count": 44,
+            "unavailable_sample_count": 0
+          },
+          "warmup": {
+            "available": true,
+            "available_sample_count": 8,
+            "driver_versions": [
+              "610.88"
+            ],
+            "gpu_names": [
+              "NVIDIA GeForce RTX 4060 Laptop GPU"
+            ],
+            "numeric": {
+              "clocks.mem": {
+                "count": 8,
+                "maximum": 8001.0,
+                "mean": 8001.0,
+                "median": 8001.0,
+                "minimum": 8001.0
+              },
+              "clocks.sm": {
+                "count": 8,
+                "maximum": 2655.0,
+                "mean": 2176.875,
+                "median": 1890.0,
+                "minimum": 1890.0
+              },
+              "power.draw": {
+                "count": 8,
+                "maximum": 77.3,
+                "mean": 32.25625,
+                "median": 19.979999999999997,
+                "minimum": 12.38
+              },
+              "power.limit": {
+                "count": 0,
+                "maximum": null,
+                "mean": null,
+                "median": null,
+                "minimum": null
+              },
+              "temperature.gpu": {
+                "count": 8,
+                "maximum": 57.0,
+                "mean": 55.25,
+                "median": 55.0,
+                "minimum": 54.0
+              },
+              "utilization.gpu": {
+                "count": 8,
+                "maximum": 36.0,
+                "mean": 17.625,
+                "median": 15.5,
+                "minimum": 0.0
+              },
+              "utilization.memory": {
+                "count": 8,
+                "maximum": 34.0,
+                "mean": 15.25,
+                "median": 10.0,
+                "minimum": 0.0
+              }
+            },
+            "pstate_counts": {
+              "P0": 8
+            },
+            "sample_count": 8,
+            "unavailable_sample_count": 0
+          }
+        },
+        "summary": {
+          "available": true,
+          "available_sample_count": 54,
+          "driver_versions": [
+            "610.88"
+          ],
+          "gpu_names": [
+            "NVIDIA GeForce RTX 4060 Laptop GPU"
+          ],
+          "numeric": {
+            "clocks.mem": {
+              "count": 54,
+              "maximum": 8001.0,
+              "mean": 7649.148148148148,
+              "median": 8001.0,
+              "minimum": 7001.0
+            },
+            "clocks.sm": {
+              "count": 54,
+              "maximum": 2655.0,
+              "mean": 2543.3333333333335,
+              "median": 2655.0,
+              "minimum": 1890.0
+            },
+            "power.draw": {
+              "count": 54,
+              "maximum": 80.72,
+              "mean": 32.53962962962963,
+              "median": 21.16,
+              "minimum": 12.38
+            },
+            "power.limit": {
+              "count": 0,
+              "maximum": null,
+              "mean": null,
+              "median": null,
+              "minimum": null
+            },
+            "temperature.gpu": {
+              "count": 54,
+              "maximum": 64.0,
+              "mean": 58.03703703703704,
+              "median": 58.0,
+              "minimum": 54.0
+            },
+            "utilization.gpu": {
+              "count": 54,
+              "maximum": 93.0,
+              "mean": 27.666666666666668,
+              "median": 4.5,
+              "minimum": 0.0
+            },
+            "utilization.memory": {
+              "count": 54,
+              "maximum": 87.0,
+              "mean": 23.944444444444443,
+              "median": 1.5,
+              "minimum": 0.0
+            }
+          },
+          "pstate_counts": {
+            "P0": 35,
+            "P3": 19
+          },
+          "sample_count": 54,
+          "unavailable_sample_count": 0
+        }
+      },
+      "warmup": {
+        "call_count": 2,
+        "condition_order": [
+          "2011_09_26_drive_0001/0000000012/H10",
+          "2011_09_26_drive_0001/0000000012/H5"
+        ],
+        "excluded_from_measurement": true,
+        "frame_id": "2011_09_26_drive_0001/0000000012"
+      },
+      "worker_index": 2
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import json
 import math
 import sys
@@ -31,6 +32,11 @@ def test_backend_module_import_is_lightweight_and_lazy() -> None:
     assert "pcdet" not in newly_imported
     assert "torch" not in newly_imported
     assert "spconv" not in newly_imported
+
+
+def test_runtime_state_explicitly_records_cuda_allocator_configuration() -> None:
+    source = inspect.getsource(DsvtBackend.runtime_state)
+    assert 'relevant_environment["PYTORCH_CUDA_ALLOC_CONF"]' in source
 
 
 def test_manifest_binds_candidate_artifacts_and_score_contract() -> None:

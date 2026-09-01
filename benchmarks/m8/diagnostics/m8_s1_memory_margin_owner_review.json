@@ -1,0 +1,50 @@
+{
+  "capacity_evidence": {
+    "artifact": "benchmarks/m8/diagnostics/m8_s1_max_pillar_capacity.json",
+    "artifact_sha256": "4a62265fb2581470837f0ece3408ce6896a3a540dc5c5f843abd4b68e1a58c4e",
+    "measurement_runtime_commit": "2655c26ce3f4298438a80f265fb3884c7046e40c"
+  },
+  "decision": "ACCEPTED_FOR_S1_RUNTIME",
+  "decision_basis": {
+    "maximum_call_completed": true,
+    "maximum_call_wall_seconds": 0.577787803,
+    "oom": false,
+    "pillar_truncation_count": 0,
+    "post_maximum_reserved_bytes": 8443133952,
+    "post_quantile_reserved_bytes": 8443133952,
+    "post_quantile_reserved_equals_post_maximum_reserved": true,
+    "reserved_memory_is_active_working_set": false,
+    "summary": "The greater-than-90-percent review trigger reflects cached allocator reserve, not a greater-than-90-percent active working-set allocation. The maximum call did not increase the reserve established by the heterogeneous replay."
+  },
+  "maximum_condition": {
+    "candidate_pillars": 32774,
+    "condition_id": "2011_09_26_drive_0091/0000000069/H10",
+    "input_point_count": 1339216,
+    "retained_pillars": 32774
+  },
+  "memory": {
+    "device_total_bytes": 8585216000,
+    "peak_allocated_bytes": 2922354688,
+    "peak_allocated_fraction_of_device_total": 0.34039384541984735,
+    "peak_reserved_bytes": 8443133952,
+    "peak_reserved_fraction_of_device_total": 0.9834503816793894,
+    "post_maximum_reserved_bytes": 8443133952,
+    "post_quantile_reserved_bytes": 8443133952
+  },
+  "operational_constraints": {
+    "allocator_policy_changes_permitted": false,
+    "allocator_tuning_permitted": false,
+    "maximum_concurrent_s1_detector_processes": 1,
+    "new_deterministic_algorithm_settings_permitted": false,
+    "other_user_cuda_workloads_permitted": false,
+    "parallel_primary_passes_permitted": false,
+    "parallel_stage_r_processes_permitted": false,
+    "parallel_zero_intensity_passes_permitted": false,
+    "pytorch_cuda_alloc_conf": "unset"
+  },
+  "owner_review_scope": "exclusive-GPU M8 P1-S1 runtime operation under the recorded operational constraints",
+  "schema_version": "laserperception.m8.s1.memory-margin-owner-review.v1",
+  "scientific_acceptance_criteria_changed": false,
+  "scientific_inference_authorized": false,
+  "status": "ACCEPTED_FOR_S1_RUNTIME"
+}

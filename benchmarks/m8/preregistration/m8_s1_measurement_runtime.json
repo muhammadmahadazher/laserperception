@@ -1,0 +1,120 @@
+{
+  "authorization": {
+    "authorization_schema": "laserperception.m8.s1.authorization.v2",
+    "artifact_created_by_this_change": false,
+    "caller_supplied_binding_identity": "prohibited",
+    "logical_pass_scoped": true,
+    "mode_scoped": true,
+    "authorization_required": true,
+    "runtime_binding_source": "machine-derived runtime-policy binding artifact",
+    "scientific_inference_authorized": false,
+    "scientific_modes_currently_executable": []
+  },
+  "candidate": {
+    "architecture": "DSVT-Pillar with TransFusion head",
+    "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "capacity_review": {
+    "artifact": "benchmarks/m8/diagnostics/m8_s1_max_pillar_capacity.json",
+    "artifact_bytes": 27107,
+    "artifact_sha256": "4a62265fb2581470837f0ece3408ce6896a3a540dc5c5f843abd4b68e1a58c4e",
+    "classification": "OWNER MEMORY-MARGIN REVIEW REQUIRED",
+    "engineering_calls": 23,
+    "ground_truth_loaded": false,
+    "measurement_runtime_head": "2655c26ce3f4298438a80f265fb3884c7046e40c",
+    "scientific_calls": 0,
+    "semantic_output_retained": false
+  },
+  "capacity_review_owner_resolution": {
+    "artifact": "benchmarks/m8/diagnostics/m8_s1_memory_margin_owner_review.json",
+    "artifact_bytes": 2285,
+    "artifact_sha256": "16d74a9672b351bc5cec3cd0b51bb654bed6327d7fb5df5ab9748229115826d0",
+    "capacity_evidence_commit": "2655c26ce3f4298438a80f265fb3884c7046e40c",
+    "decision": "ACCEPTED_FOR_S1_RUNTIME",
+    "historical_capacity_classification_preserved": true
+  },
+  "evaluator": {
+    "identity": "m6b-r2-score-0.25-oriented-bev-iou-0.30-0.50-0.70",
+    "reused_AP_implementation": "laserperception.evaluation.m6b_metrics.all_points_average_precision",
+    "source_identities": {
+      "benchmarks/m6b/run_characterization.py": "824b431bd8231db9afd7f7a2b943dd5b2877276113cd33a145997cea3b09cb91",
+      "configs/m6/kitti_m6b.yaml": "c6d839f2b0d62bc57c958a99b25dbb4a897e3063f080d0a3d6ea24bdde307620",
+      "src/laserperception/evaluation/kitti_m6b.py": "07e731462a0a805474da7449f95e82a9e8c105204c0e87459cc1ff946065abb8",
+      "src/laserperception/evaluation/m6b_metrics.py": "4ac80e80647aaf882798d91c20531c18c875b80253cc8d56f1c49ed67efa358b"
+    }
+  },
+  "expected_scientific_call_counts": {
+    "full_campaign": 5276,
+    "primary_3_passes": 2568,
+    "stage_r_10_processes": 140,
+    "zero_intensity_3_passes": 2568
+  },
+  "implementation_commit_binding": {
+    "self_reference_avoided": true,
+    "strategy": "future scientific authorization binds measurement_runtime_execution_commit to the exact merged-main execution HEAD; the reviewed feature head remains separate provenance"
+  },
+  "input": {
+    "accepted_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
+    "condition_count_per_pass": 856,
+    "final_head_revalidation_sha256": "71ac9418c29da5efd64f9eaeb03e859f85d6b1c56dc2fe47cef6563a9f960341",
+    "frame_count": 428,
+    "order": "frozen frame order; H10 then H5",
+    "ordered_frame_identity_sha256": "76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95"
+  },
+  "preflight": {
+    "allowed_without_scientific_authorization": true,
+    "artifact": "benchmarks/m8/diagnostics/m8_s1_runtime_sizing.json",
+    "artifact_bytes": 54565,
+    "artifact_sha256": "f58e2dd124055c8b45482e443f8ee6d2071a5634a485f26fbe9a644d779974f5",
+    "fresh_processes": 2,
+    "ground_truth_loaded": false,
+    "measured_calls": 40,
+    "runtime_implementation_head": "f23de4d3bbf538166f25ba6fa5e96dccd3a5c7e3",
+    "scientific_campaign_calls": 0,
+    "semantic_output_retained": false,
+    "warmup_calls": 4
+  },
+  "protocol": {
+    "freeze_commit": "5061d5d2c6a6057fed1f3f537c5857d2d84f6b3f",
+    "json_bytes": 15956,
+    "json_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "markdown_bytes": 23802,
+    "markdown_sha256": "1ad58ebbdd04897558ef9802fee6288b806c5e633d393f1bed957ecc6d6f6b10"
+  },
+  "runner": {
+    "atomic_attempt_schema": "laserperception.m8.s1.attempt.v1",
+    "condition_schema": "laserperception.m8.s1.condition.v1",
+    "entrypoint": "scripts/detection/run_m8_s1.py",
+    "fresh_process_orchestrator": "scripts/detection/orchestrate_m8_s1.py",
+    "preflight_entrypoint": "scripts/detection/run_m8_s1_preflight.py",
+    "raw_pass_schema": "laserperception.m8.s1.raw-pass.v1",
+    "runtime_policy_capture_mode": "runtime-binding",
+    "runtime_policy_schema": "laserperception.m8.s1.runtime-policy-binding.v1",
+    "runtime_core": "src/laserperception/detection/m8_s1_runtime.py",
+    "runtime_policy_capture": "src/laserperception/detection/m8_s1_runtime_policy.py",
+    "scientific_worker": "src/laserperception/evaluation/m8_s1_science.py"
+  },
+  "runtime_contract": {
+    "complete_pass_processes": "one fresh Python process per uninterrupted 856-condition pass",
+    "failure": "INCOMPLETE; preserve externally; restart condition 1 in a fresh process; never splice",
+    "finalization": "temporary write, flush, fsync, os.replace; canonical only at exact count",
+    "stage_r": "ten fresh processes; fourteen calls each; never reused as corpus output",
+    "zero_intensity": "verified primary input with only intensity changed to float32 positive zero"
+  },
+  "operational_constraints": {
+    "allocator_policy_changes_permitted": false,
+    "allocator_tuning_permitted": false,
+    "maximum_concurrent_s1_detector_processes": 1,
+    "new_deterministic_algorithm_settings_permitted": false,
+    "other_user_cuda_workloads_permitted": false,
+    "parallel_primary_passes_permitted": false,
+    "parallel_stage_r_processes_permitted": false,
+    "parallel_zero_intensity_passes_permitted": false,
+    "pytorch_cuda_alloc_conf": "unset"
+  },
+  "schema_version": "laserperception.m8.s1.measurement-runtime.v1",
+  "status": "M8 P1-S1 MEASUREMENT IMPLEMENTATION CANDIDATE — OWNER MEMORY-MARGIN ACCEPTED — STAGE R AND GT-RELATIVE MEASUREMENT UNAUTHORIZED"
+}

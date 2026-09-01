@@ -23,6 +23,8 @@ NVIDIA_SMI_FIELDS = (
     "clocks.mem",
     "utilization.gpu",
     "utilization.memory",
+    "memory.used",
+    "memory.total",
 )
 _NUMERIC_FIELDS = frozenset(
     {
@@ -33,6 +35,8 @@ _NUMERIC_FIELDS = frozenset(
         "clocks.mem",
         "utilization.gpu",
         "utilization.memory",
+        "memory.used",
+        "memory.total",
     }
 )
 
