@@ -1,0 +1,37 @@
+{
+  "authorization_id": "m8-s1-primary-v1",
+  "authorization_provenance": "The protocol was frozen before V2 GT-relative output. Stage R was separately authorized, completed, frozen as raw evidence, and owner-reviewed before this primary-only authorization. Scope is three complete fresh-process primary passes; zero-intensity remains unauthorized.",
+  "authorization_role": "owner_scientific_inference_authorization",
+  "authorization_timestamp_utc": "2026-09-01T17:33:32Z",
+  "authorized_logical_pass_ids": [
+    "primary-pass-1",
+    "primary-pass-2",
+    "primary-pass-3"
+  ],
+  "authorized_modes": [
+    "primary-pass"
+  ],
+  "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+  "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+  "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+  "evaluator_identity": "m6b-r2-score-0.25-oriented-bev-iou-0.30-0.50-0.70",
+  "input_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
+  "measurement_runtime_execution_commit": "d8e5012312b6ee0b3c891e1c2d794424f8a35c36",
+  "operational_constraints": {
+    "allocator_policy_changes_permitted": false,
+    "allocator_tuning_permitted": false,
+    "maximum_concurrent_s1_detector_processes": 1,
+    "new_deterministic_algorithm_settings_permitted": false,
+    "other_user_cuda_workloads_permitted": false,
+    "parallel_primary_passes_permitted": false,
+    "parallel_stage_r_processes_permitted": false,
+    "parallel_zero_intensity_passes_permitted": false,
+    "pytorch_cuda_alloc_conf": "unset"
+  },
+  "owner_approval": true,
+  "protocol_freeze_commit": "5061d5d2c6a6057fed1f3f537c5857d2d84f6b3f",
+  "protocol_json_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+  "runtime_policy_binding_sha256": "703e453a8bca0e6e2e4b1c4b976deaa5bc4ed27b3a4847144204193baab77563",
+  "schema_version": "laserperception.m8.s1.authorization.v2",
+  "scientific_inference_authorized": true
+}
