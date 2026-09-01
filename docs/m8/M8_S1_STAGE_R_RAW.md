@@ -155,15 +155,5 @@ pre/post file-SHA manifest was byte-identical. No source file changed, no detect
 and the detached execution worktree was clean after relocation. This was evidence-location
 handling, not a failed scientific attempt.
 
-## Prospective relationship to a future primary campaign
-
-Before any primary result exists, the following reporting yardstick is fixed: the observed Stage R
-spread, normalized by the applicable evaluated-condition class denominator, is the reference scale
-for interpreting future S1 H10-versus-H5 and V2-versus-PointPillars deltas. Deltas within that scale
-will be reported as within observed run-to-run variation.
-
-This yardstick is not a pass/fail gate, does not make the Stage R mini-corpus denominator directly
-interchangeable with a full-corpus denominator, and does not authorize a primary campaign.
-
 Primary and zero-intensity measurement remain unauthorized pending a separate owner review and
 authorization act.

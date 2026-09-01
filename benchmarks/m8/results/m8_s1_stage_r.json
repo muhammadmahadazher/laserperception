@@ -459,10 +459,5 @@
     "all_primary_matched_gt_sets_exact_for_both_classes": true,
     "wildly_discrepant_primary_tp_process_observed": false,
     "primary_authorization_requires_separate_owner_act": true
-  },
-  "prospective_primary_campaign_yardstick": {
-    "established_before_primary_results": true,
-    "rule": "The observed Stage R spread, normalized by the applicable evaluated-condition class denominator, is the reference scale for interpreting future S1 H10-versus-H5 and V2-versus-PointPillars deltas. Deltas within that scale will be reported as within observed run-to-run variation.",
-    "qualification": "Stage R uses a seven-frame, fourteen-condition mini-corpus and is not directly interchangeable with a full-corpus denominator. This is an interpretation yardstick, not a pass/fail gate or primary authorization."
   }
 }
