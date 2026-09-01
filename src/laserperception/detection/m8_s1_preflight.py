@@ -439,8 +439,7 @@ def combine_sizing_workers(
     cuda_ratios = []
     host_ratios = []
     for worker in workers:
-        runtime = cast(Mapping[str, object], worker["runtime_state"])
-        cuda = cast(Mapping[str, object], runtime["cuda_memory"])
+        cuda = cast(Mapping[str, object], worker["resource_after"])
         cuda_ratios.append(
             _number(cuda["max_reserved_bytes"]) / _number(cuda["device_total_bytes"])
         )
@@ -496,13 +495,18 @@ def combine_sizing_workers(
         "resources": {
             "maximum_cuda_reserved_fraction": max(cuda_ratios),
             "maximum_process_rss_fraction_of_host_total": max(host_ratios),
+            "capacity_assessment_rule": (
+                "engineering preflight classification requires both observed peak fractions "
+                "to remain below 0.90; this is not a scientific acceptance gate"
+            ),
             "comfortably_below_available_capacity": comfortable,
             "workers": [
                 {
                     "process_uuid": worker["process_uuid"],
-                    "cuda_memory": cast(Mapping[str, object], worker["runtime_state"])[
-                        "cuda_memory"
-                    ],
+                    "initialization_cuda_memory": cast(
+                        Mapping[str, object], worker["runtime_state"]
+                    )["cuda_memory"],
+                    "post_sizing_cuda_memory": worker["resource_after"],
                     "host_memory": worker["host_memory"],
                 }
                 for worker in workers

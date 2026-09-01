@@ -42,6 +42,10 @@ def _worker(index: int) -> dict[str, object]:
                 "device_total_bytes": 10_000,
             }
         },
+        "resource_after": {
+            "max_reserved_bytes": 6_000,
+            "device_total_bytes": 10_000,
+        },
         "host_memory": {"process_max_rss_bytes": 2_000, "total_bytes": 10_000},
         "telemetry": {"summary": {"available": False}, "by_block": {}},
     }
@@ -96,6 +100,14 @@ def test_preflight_combines_exactly_two_processes_without_semantics() -> None:
     assert result["evaluator_loaded"] is False
     assert result["semantic_output_retained"] is False
     assert result["operational_feasibility"]["classification"] == "OPERATIONALLY PLAUSIBLE"
+    assert result["resources"]["maximum_cuda_reserved_fraction"] == 0.6
+    assert (
+        result["resources"]["workers"][0]["initialization_cuda_memory"]["max_reserved_bytes"]
+        == 4_000
+    )
+    assert (
+        result["resources"]["workers"][0]["post_sizing_cuda_memory"]["max_reserved_bytes"] == 6_000
+    )
 
 
 def test_preflight_does_not_create_or_require_scientific_authorization() -> None:
