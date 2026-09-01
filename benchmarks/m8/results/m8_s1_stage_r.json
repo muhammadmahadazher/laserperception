@@ -1,0 +1,468 @@
+{
+  "schema_version": "laserperception.m8.s1.stage-r-raw.v1",
+  "status": "owner_review_required_primary_and_zero_intensity_not_authorized",
+  "generated_at_utc": "2026-09-01T16:09:39.3033686Z",
+  "scope": {
+    "mode": "stage-r",
+    "canonical_process_count": 10,
+    "conditions_per_process": 14,
+    "accepted_canonical_calls": 140,
+    "total_attempted_detector_calls": 140,
+    "failed_technical_attempts": 0,
+    "primary_calls": 0,
+    "zero_intensity_calls": 0,
+    "b2_c2_d2_f2_calls": 0,
+    "pointpillars_calls": 0,
+    "training_or_fine_tuning_calls": 0,
+    "scientific_interpretation_included": false
+  },
+  "frozen_identities": {
+    "protocol_freeze_commit": "5061d5d2c6a6057fed1f3f537c5857d2d84f6b3f",
+    "protocol_markdown_sha256": "1ad58ebbdd04897558ef9802fee6288b806c5e633d393f1bed957ecc6d6f6b10",
+    "protocol_json_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "execution_commit": "d8e5012312b6ee0b3c891e1c2d794424f8a35c36",
+    "authorization_commit": "81eb156e1f384b18e16af8189ad546965e007b6e",
+    "authorization_merge_commit": "0f93c480acb6c98bc07781db8ed64b8433ec9238",
+    "authorization_artifact_sha256": "3c16a0c0ff9680b6418a53b20a5a51dd8f2a40d864a75c380397f2454ce06b9c",
+    "runtime_policy_sha256": "703e453a8bca0e6e2e4b1c4b976deaa5bc4ed27b3a4847144204193baab77563",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+    "input_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
+    "external_full_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa",
+    "evaluator_identity": "m6b-r2-score-0.25-oriented-bev-iou-0.30-0.50-0.70",
+    "dsvt_upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061",
+    "owner_memory_margin_review_sha256": "16d74a9672b351bc5cec3cd0b51bb654bed6327d7fb5df5ab9748229115826d0"
+  },
+  "pre_science_verification": {
+    "execution_head_exact": true,
+    "execution_worktree_clean_before_first_call": true,
+    "authorization_schema": "laserperception.m8.s1.authorization.v2",
+    "authorization_schema_supported_by_execution_runtime": true,
+    "runtime_policy_schema": "laserperception.m8.s1.runtime-policy-binding.v1",
+    "runtime_policy_schema_supported_by_execution_runtime": true,
+    "live_runtime_policy_exact": true,
+    "candidate_bindings_exact": true,
+    "input_bindings_exact": true,
+    "exclusive_gpu_precheck": true,
+    "other_compute_process_count": 0,
+    "pytorch_cuda_alloc_conf": null,
+    "cuda_module_loading": "LAZY",
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_uuid": "GPU-fb8f7552-21ae-1dbb-798c-e9fa3dca54fc",
+    "driver": "610.88",
+    "python": "3.10.12",
+    "pytorch": "2.1.0+cu118",
+    "cuda_runtime": "11.8",
+    "spconv": "2.3.8",
+    "torch_scatter": "2.1.2+pt21cu118",
+    "numpy": "1.23.5"
+  },
+  "process_order": [
+    "stage-r-1",
+    "stage-r-2",
+    "stage-r-3",
+    "stage-r-4",
+    "stage-r-5",
+    "stage-r-6",
+    "stage-r-7",
+    "stage-r-8",
+    "stage-r-9",
+    "stage-r-10"
+  ],
+  "sentinel_condition_order": [
+    "2011_09_26_drive_0001/0000000010/H10",
+    "2011_09_26_drive_0001/0000000010/H5",
+    "2011_09_26_drive_0001/0000000011/H10",
+    "2011_09_26_drive_0001/0000000011/H5",
+    "2011_09_26_drive_0001/0000000015/H10",
+    "2011_09_26_drive_0001/0000000015/H5",
+    "2011_09_26_drive_0001/0000000083/H10",
+    "2011_09_26_drive_0001/0000000083/H5",
+    "2011_09_26_drive_0091/0000000010/H10",
+    "2011_09_26_drive_0091/0000000010/H5",
+    "2011_09_26_drive_0091/0000000011/H10",
+    "2011_09_26_drive_0091/0000000011/H5",
+    "2011_09_26_drive_0091/0000000012/H10",
+    "2011_09_26_drive_0091/0000000012/H5"
+  ],
+  "eligible_gt_denominators": {
+    "car": {
+      "seven_unique_frames": 8,
+      "fourteen_evaluated_conditions": 16,
+      "note": "H10 and H5 for a frame share GT; the evaluated-condition denominator counts both conditions."
+    },
+    "pedestrian": {
+      "seven_unique_frames": 6,
+      "fourteen_evaluated_conditions": 12,
+      "note": "H10 and H5 for a frame share GT; the evaluated-condition denominator counts both conditions."
+    }
+  },
+  "canonical_processes": [
+    {
+      "logical_pass_id": "stage-r-1",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "ceae628a-7f0d-49c7-a9d1-a43cda679b92",
+      "process_id": 402,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002604,
+      "file_count": 19,
+      "manifest_tree_sha256": "7c3cdfb4ccebdd0534848b0ebac35b84b32590eb8930b608b905be810f123cdf",
+      "raw_pass_bytes": 1543443,
+      "raw_pass_sha256": "c4ff505cfa19d60d096ccfac6bcb9750a6305513607c824effcded4380e64a8f",
+      "result_sha256": "daf990abe01eb777870852deac9345930a6727476dc5406960d367263088a799",
+      "start_timestamp_utc": "2026-09-01T11:04:31.950186+00:00",
+      "end_timestamp_utc": "2026-09-01T11:09:10.520471+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-2",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "bade393f-b46e-475b-8216-dead3797acf7",
+      "process_id": 520,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002535,
+      "file_count": 19,
+      "manifest_tree_sha256": "b10b18cb49582bd0b4f1fe3df47a1a46bf264717cdf031fb8486014849457069",
+      "raw_pass_bytes": 1543407,
+      "raw_pass_sha256": "f12dace0e8d05788c92fa6c26b50b03409e93d4c4850d9adf5bfd3eb54568afa",
+      "result_sha256": "0d1f1356058818d0e5090ae1abb0dab579981f68870150145fb45e7dc71b3e23",
+      "start_timestamp_utc": "2026-09-01T11:09:14.873747+00:00",
+      "end_timestamp_utc": "2026-09-01T11:14:09.101819+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-3",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "92101bbe-1f71-4eef-a24d-aec889f94b37",
+      "process_id": 735,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002083,
+      "file_count": 19,
+      "manifest_tree_sha256": "1f8bfbd955de1b86d359984e6ae5289cb535d076821df65e604aa7846bf125e9",
+      "raw_pass_bytes": 1543175,
+      "raw_pass_sha256": "af074821ab25d3b8fbc59b185cee8f8b9d7892be16bd412b9790eb4a211d6f10",
+      "result_sha256": "ae199d9d2946eb7f1ad79f18c8d57dfa4dbedb31b46d1954b25aec0a974d67d6",
+      "start_timestamp_utc": "2026-09-01T11:14:12.346645+00:00",
+      "end_timestamp_utc": "2026-09-01T11:19:24.219554+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-4",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "607e4dcb-43da-4eb8-9f3d-8a15bea7b19a",
+      "process_id": 954,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002272,
+      "file_count": 19,
+      "manifest_tree_sha256": "6ba6ada5bee9a1ae9810e7096df475f4c12eb6518d0e43a5119138959a10ea45",
+      "raw_pass_bytes": 1543236,
+      "raw_pass_sha256": "c99545515e38de0852eebc859fcbb04fd1cbe9073097ad5ed9a7e2da26385ccb",
+      "result_sha256": "70447661e4f9b9438885696a3b393dbf05fa7b88108f79da42b369b8513ac131",
+      "start_timestamp_utc": "2026-09-01T11:19:26.935903+00:00",
+      "end_timestamp_utc": "2026-09-01T11:24:15.533578+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-5",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "cb5d1b68-6b99-4164-8e34-94a2b5aba960",
+      "process_id": 1072,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002452,
+      "file_count": 19,
+      "manifest_tree_sha256": "806611b0e7f801ac86f17ae4ff21b0e65d3f960927f875eff8a7a88da3de2a23",
+      "raw_pass_bytes": 1543327,
+      "raw_pass_sha256": "59bae97286fe87a9b357207d872dc3df8c93bb97dff98f990631f24747c5e0f4",
+      "result_sha256": "9e3e71af66e1b0665fbb024ce29204807640fbaaa2fcb23cf7d8e99234fbe6f0",
+      "start_timestamp_utc": "2026-09-01T11:24:18.520207+00:00",
+      "end_timestamp_utc": "2026-09-01T11:28:23.995994+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-6",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "57409512-ee0b-40c5-9d19-78646611beeb",
+      "process_id": 1184,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002200,
+      "file_count": 19,
+      "manifest_tree_sha256": "fabafec2132c70abe098258b4bbfbf0068036b753f109ac52469dd567437c31d",
+      "raw_pass_bytes": 1543226,
+      "raw_pass_sha256": "aa1e58bd021c44388c4a5d5393043361939f754995f28fe01a329cf543ebdc8f",
+      "result_sha256": "71d7022a8d9ecd795568915ec3f7223b71afa3864a3747b57ca5a6521f2a06e1",
+      "start_timestamp_utc": "2026-09-01T11:28:26.896047+00:00",
+      "end_timestamp_utc": "2026-09-01T11:33:30.253531+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-7",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "17fe6bc8-1b32-4ebf-a6a6-f817b637ae55",
+      "process_id": 1756,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002727,
+      "file_count": 19,
+      "manifest_tree_sha256": "36f61308d8a991686be32d940492efa2a5467a68fb6d6f12ad1250574f53bebf",
+      "raw_pass_bytes": 1543495,
+      "raw_pass_sha256": "755206bcfb397cc6a8f856d1142cdc64167e2492eb07d40c69b8b4b81ceb9d74",
+      "result_sha256": "847914849548609063c5126671b89714cec96f2f731fbaf438e2d8b0f8818cb9",
+      "start_timestamp_utc": "2026-09-01T11:33:33.026614+00:00",
+      "end_timestamp_utc": "2026-09-01T11:38:23.766491+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-8",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "c1b046f5-0183-4b0f-b250-587d1d61ed8e",
+      "process_id": 1922,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002346,
+      "file_count": 19,
+      "manifest_tree_sha256": "b6d1ef0f535781f5cefbf8edf3e206235dc1f08bace4665abd143e6533c11925",
+      "raw_pass_bytes": 1543269,
+      "raw_pass_sha256": "d1e71941f158c9634330f3fdb4edef317f490d5eb507194aa99b6125ae4811e4",
+      "result_sha256": "6dfbb832474b51796ff891ee50a7aa4c454ee0d076e041c90e5309c35abfca6a",
+      "start_timestamp_utc": "2026-09-01T11:38:26.374803+00:00",
+      "end_timestamp_utc": "2026-09-01T11:43:38.288892+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-9",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "53cb9aae-e7b1-4982-9be0-eaca25a97fa7",
+      "process_id": 2034,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002346,
+      "file_count": 19,
+      "manifest_tree_sha256": "9987b5244e19275f80413fa1d8878531b7d822580535f32aeb8b4213b13aa12a",
+      "raw_pass_bytes": 1543298,
+      "raw_pass_sha256": "8f7743bc1f76f8b57ab61578a1c5275b1be771b9eea79b95499112a6cad3dd0c",
+      "result_sha256": "caf07ec63810a19d4471f2e5e12f90cc1bfe3298e49a33aa6f499a844d2f817c",
+      "start_timestamp_utc": "2026-09-01T11:43:41.016421+00:00",
+      "end_timestamp_utc": "2026-09-01T11:49:39.273104+00:00"
+    },
+    {
+      "logical_pass_id": "stage-r-10",
+      "attempt_count": 1,
+      "attempt_id": "54787349-5444-4874-84b0-36236e1c5725-attempt-1",
+      "process_uuid": "943c5ffe-ae29-4f53-ab54-23d6fda0d667",
+      "process_id": 2152,
+      "accepted_calls": 14,
+      "status": "COMPLETE",
+      "schema": "laserperception.m8.s1.raw-pass.v1",
+      "directory_bytes": 3002270,
+      "file_count": 19,
+      "manifest_tree_sha256": "b8c1ceae929f2b7fac05012402fac4b0c427be5ccca68574f4647cdcafa9a2e6",
+      "raw_pass_bytes": 1543225,
+      "raw_pass_sha256": "ed57b70ed6aeeaff98c0e90800edf4ad1051a307197c0ddd3bcc3e6d62a65e7c",
+      "result_sha256": "447073ec511c12d360cface0627858cc6dfbbeaa8ad450659a16da79c40d275e",
+      "start_timestamp_utc": "2026-09-01T11:49:42.037250+00:00",
+      "end_timestamp_utc": "2026-09-01T11:54:23.430546+00:00"
+    }
+  ],
+  "external_evidence": {
+    "logical_role": "external-stage-r-attempt-root",
+    "schema": "ten laserperception.m8.s1.raw-pass.v1 process records plus attempt manifests and condition files",
+    "producer_execution_commit": "d8e5012312b6ee0b3c891e1c2d794424f8a35c36",
+    "file_count": 190,
+    "bytes": 30023835,
+    "deterministic_manifest_tree_sha256": "85fbffcb48f83d28ff74b7ab2bab77f99166090dc994a7436ac8b4fc6d3a3c7d",
+    "physical_path_committed": false,
+    "evidence_location_handling": {
+      "technical_failed_attempt": false,
+      "description": "The WSL launcher materialized the untracked attempt directories beside the detached worktree because its attempt-root argument was empty. After all processes completed, all ten directories were relocated to the external evidence root.",
+      "pre_post_file_sha256_manifest_exact": true,
+      "source_files_modified": false,
+      "detector_calls_repeated": false,
+      "execution_worktree_clean_after_relocation": true
+    }
+  },
+  "aggregate_repeatability": {
+    "car": {
+      "eligible_gt_unique_frames": 8,
+      "eligible_gt_evaluated_conditions": 16,
+      "primary_iou_0_50": {
+        "tp_values": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+        "fp_values": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+        "fn_values": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+        "ignored_values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "thresholded_prediction_count_values": [12, 12, 12, 12, 12, 12, 12, 12, 12, 12],
+        "tp_minimum": 8,
+        "tp_median": 8.0,
+        "tp_maximum": 8,
+        "tp_range": 0,
+        "all_primary_discrete_outcomes_exact_across_10_processes": true,
+        "all_primary_matched_gt_sets_exact": true,
+        "unique_primary_discrete_process_signatures": 1,
+        "unique_primary_matched_gt_process_signatures": 1
+      },
+      "iou_0_30": {
+        "tp_values": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+        "tp_range": 0,
+        "all_matched_gt_sets_exact": true
+      },
+      "iou_0_70": {
+        "tp_values": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        "tp_range": 0,
+        "all_matched_gt_sets_exact": true
+      }
+    },
+    "pedestrian": {
+      "eligible_gt_unique_frames": 6,
+      "eligible_gt_evaluated_conditions": 12,
+      "primary_iou_0_50": {
+        "tp_values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "fp_values": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        "fn_values": [12, 12, 12, 12, 12, 12, 12, 12, 12, 12],
+        "ignored_values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "thresholded_prediction_count_values": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        "tp_minimum": 0,
+        "tp_median": 0.0,
+        "tp_maximum": 0,
+        "tp_range": 0,
+        "all_primary_discrete_outcomes_exact_across_10_processes": true,
+        "all_primary_matched_gt_sets_exact": true,
+        "unique_primary_discrete_process_signatures": 1,
+        "unique_primary_matched_gt_process_signatures": 1
+      },
+      "iou_0_30": {
+        "tp_values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "tp_range": 0,
+        "all_matched_gt_sets_exact": true
+      },
+      "iou_0_70": {
+        "tp_values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "tp_range": 0,
+        "all_matched_gt_sets_exact": true
+      }
+    }
+  },
+  "per_condition_repeatability": [
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000010/H10",
+      "car": {"eligible_gt": 1, "primary_outcome": {"thresholded_predictions": 1, "tp": 0, "fp": 1, "fn": 1, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000010/H5",
+      "car": {"eligible_gt": 1, "primary_outcome": {"thresholded_predictions": 2, "tp": 0, "fp": 2, "fn": 1, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000011/H10",
+      "car": {"eligible_gt": 4, "primary_outcome": {"thresholded_predictions": 1, "tp": 1, "fp": 0, "fn": 3, "ignored": 0}, "tp_values_by_iou": {"0.30": [1,1,1,1,1,1,1,1,1,1], "0.50": [1,1,1,1,1,1,1,1,1,1], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": ["2011_09_26_drive_0001/track_1"], "0.50": ["2011_09_26_drive_0001/track_1"], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000011/H5",
+      "car": {"eligible_gt": 4, "primary_outcome": {"thresholded_predictions": 2, "tp": 2, "fp": 0, "fn": 2, "ignored": 0}, "tp_values_by_iou": {"0.30": [2,2,2,2,2,2,2,2,2,2], "0.50": [2,2,2,2,2,2,2,2,2,2], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": ["2011_09_26_drive_0001/track_1", "2011_09_26_drive_0001/track_2"], "0.50": ["2011_09_26_drive_0001/track_1", "2011_09_26_drive_0001/track_2"], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000015/H10",
+      "car": {"eligible_gt": 3, "primary_outcome": {"thresholded_predictions": 2, "tp": 2, "fp": 0, "fn": 1, "ignored": 0}, "tp_values_by_iou": {"0.30": [2,2,2,2,2,2,2,2,2,2], "0.50": [2,2,2,2,2,2,2,2,2,2], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": ["2011_09_26_drive_0001/track_2", "2011_09_26_drive_0001/track_4"], "0.50": ["2011_09_26_drive_0001/track_2", "2011_09_26_drive_0001/track_4"], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000015/H5",
+      "car": {"eligible_gt": 3, "primary_outcome": {"thresholded_predictions": 4, "tp": 3, "fp": 1, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [3,3,3,3,3,3,3,3,3,3], "0.50": [3,3,3,3,3,3,3,3,3,3], "0.70": [1,1,1,1,1,1,1,1,1,1]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": ["2011_09_26_drive_0001/track_1", "2011_09_26_drive_0001/track_2", "2011_09_26_drive_0001/track_4"], "0.50": ["2011_09_26_drive_0001/track_1", "2011_09_26_drive_0001/track_2", "2011_09_26_drive_0001/track_4"], "0.70": ["2011_09_26_drive_0001/track_2"]}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000083/H10",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0001/0000000083/H5",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000010/H10",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 2, "primary_outcome": {"thresholded_predictions": 1, "tp": 0, "fp": 1, "fn": 2, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000010/H5",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 2, "primary_outcome": {"thresholded_predictions": 1, "tp": 0, "fp": 1, "fn": 2, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000011/H10",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 1, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 1, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000011/H5",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 1, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 1, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000012/H10",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 3, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 3, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    },
+    {
+      "condition_id": "2011_09_26_drive_0091/0000000012/H5",
+      "car": {"eligible_gt": 0, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 0, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}},
+      "pedestrian": {"eligible_gt": 3, "primary_outcome": {"thresholded_predictions": 0, "tp": 0, "fp": 0, "fn": 3, "ignored": 0}, "tp_values_by_iou": {"0.30": [0,0,0,0,0,0,0,0,0,0], "0.50": [0,0,0,0,0,0,0,0,0,0], "0.70": [0,0,0,0,0,0,0,0,0,0]}, "matched_gt_sets_exact_by_iou": true, "matched_gt_sets": {"0.30": [], "0.50": [], "0.70": []}}
+    }
+  ],
+  "score_ranked_repeatability": {
+    "car": {
+      "ranked_entry_count_values": [106,106,106,106,106,106,106,106,106,106],
+      "unique_exact_payload_signatures": 10,
+      "unique_order_identity_signatures": 3,
+      "entries_with_nonzero_score_spread": 106,
+      "maximum_corresponding_score_spread": 0.0003924369812011719,
+      "conditions_with_order_identity_variation": [
+        "2011_09_26_drive_0001/0000000083/H10",
+        "2011_09_26_drive_0091/0000000012/H10"
+      ]
+    },
+    "pedestrian": {
+      "ranked_entry_count_values": [543,543,543,543,543,543,543,543,543,543],
+      "unique_exact_payload_signatures": 10,
+      "unique_order_identity_signatures": 8,
+      "entries_with_nonzero_score_spread": 543,
+      "maximum_corresponding_score_spread": 0.010171376168727875,
+      "conditions_with_order_identity_variation": [
+        "2011_09_26_drive_0001/0000000083/H10",
+        "2011_09_26_drive_0001/0000000083/H5",
+        "2011_09_26_drive_0091/0000000012/H10"
+      ]
+    }
+  },
+  "owner_review_flags": {
+    "primary_matched_gt_identity_stability_is_primary_repeatability_signal": true,
+    "all_primary_matched_gt_sets_exact_for_both_classes": true,
+    "wildly_discrepant_primary_tp_process_observed": false,
+    "primary_authorization_requires_separate_owner_act": true
+  },
+  "prospective_primary_campaign_yardstick": {
+    "established_before_primary_results": true,
+    "rule": "The observed Stage R spread, normalized by the applicable evaluated-condition class denominator, is the reference scale for interpreting future S1 H10-versus-H5 and V2-versus-PointPillars deltas. Deltas within that scale will be reported as within observed run-to-run variation.",
+    "qualification": "Stage R uses a seven-frame, fourteen-condition mini-corpus and is not directly interchangeable with a full-corpus denominator. This is an interpretation yardstick, not a pass/fail gate or primary authorization."
+  }
+}
