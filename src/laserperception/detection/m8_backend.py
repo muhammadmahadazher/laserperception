@@ -250,10 +250,52 @@ class DsvtBackend:
             self._torch.cuda.synchronize(0)
         del auxiliary, predictions, batch
 
+    def run_gt_blind_capacity_call(self, points: np.ndarray) -> int:
+        """Run the unchanged GT-blind path while observing only retained pillar count."""
+
+        retained_pillars: list[int] = []
+
+        def observe_vfe_output(_module: object, _inputs: object, output: object) -> None:
+            if not isinstance(output, dict) or "voxel_coords" not in output:
+                raise RuntimeError("DSVT VFE output contract is unavailable for capacity review")
+            coordinates = output["voxel_coords"]
+            retained_pillars.append(int(coordinates.shape[0]))
+
+        handle = self._model.vfe.register_forward_hook(observe_vfe_output)
+        try:
+            self.run_gt_blind_timing_call(points)
+        finally:
+            handle.remove()
+        if len(retained_pillars) != 1:
+            raise RuntimeError("DSVT capacity review did not observe exactly one VFE execution")
+        return retained_pillars[0]
+
     def synchronize(self) -> None:
         """Synchronize CUDA device 0 for an external wall-clock boundary."""
 
         self._torch.cuda.synchronize(0)
+
+    def reset_cuda_peak_memory_stats(self) -> None:
+        """Reset CUDA peak counters immediately before an engineering capacity call."""
+
+        self.synchronize()
+        self._torch.cuda.reset_peak_memory_stats(0)
+
+    def cuda_memory_state(self) -> Mapping[str, int]:
+        """Capture allocated, reserved, allocator-peak, and driver-free CUDA memory."""
+
+        self.synchronize()
+        torch = self._torch
+        free_bytes, mem_get_info_total_bytes = torch.cuda.mem_get_info(0)
+        return {
+            "allocated_bytes": int(torch.cuda.memory_allocated(0)),
+            "reserved_bytes": int(torch.cuda.memory_reserved(0)),
+            "max_allocated_bytes": int(torch.cuda.max_memory_allocated(0)),
+            "max_reserved_bytes": int(torch.cuda.max_memory_reserved(0)),
+            "mem_get_info_free_bytes": int(free_bytes),
+            "mem_get_info_total_bytes": int(mem_get_info_total_bytes),
+            "device_total_bytes": int(torch.cuda.get_device_properties(0).total_memory),
+        }
 
     def candidate_pillar_count(self, points: np.ndarray) -> int:
         """Return the selected candidate's exact CUDA input-only pillar count."""
@@ -289,11 +331,12 @@ class DsvtBackend:
             ).stdout.strip()
         except (OSError, subprocess.TimeoutExpired):
             gpu_uuid = "unavailable"
-        relevant_environment = {
+        relevant_environment: dict[str, str | None] = {
             name: value
             for name, value in sorted(os.environ.items())
             if name.startswith(("CUDA", "CUBLAS", "CUDNN", "NVIDIA", "PYTORCH", "TORCH"))
         }
+        relevant_environment["PYTORCH_CUDA_ALLOC_CONF"] = os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
         return {
             "python_exact_version": sys.version,
             "pytorch_exact_version": torch.__version__,
@@ -329,13 +372,7 @@ class DsvtBackend:
             "relevant_environment": relevant_environment,
             "point_order_policy": "preserve frozen source-row order; no random inference shuffle",
             "model_config_checkpoint_identities": dict(self._identity),
-            "cuda_memory": {
-                "allocated_bytes": int(torch.cuda.memory_allocated(0)),
-                "reserved_bytes": int(torch.cuda.memory_reserved(0)),
-                "max_allocated_bytes": int(torch.cuda.max_memory_allocated(0)),
-                "max_reserved_bytes": int(torch.cuda.max_memory_reserved(0)),
-                "device_total_bytes": int(torch.cuda.get_device_properties(0).total_memory),
-            },
+            "cuda_memory": dict(self.cuda_memory_state()),
         }
 
     def _prepare_batch(self, points: np.ndarray) -> tuple[dict[str, object], int]:

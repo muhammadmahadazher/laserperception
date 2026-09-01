@@ -7,7 +7,10 @@ import json
 from pathlib import Path
 
 from laserperception.detection.m8_s1_preflight import (
+    MAX_PILLAR_CONDITION_ID,
+    classify_max_pillar_capacity,
     combine_sizing_workers,
+    select_capacity_replay_frames,
     select_preflight_frames,
     select_warmup_frame,
 )
@@ -74,6 +77,51 @@ def test_preflight_selection_is_input_only_deterministic_and_excludes_sentinels(
     ]
     assert not {str(record["frame_id"]) for record in first}.intersection(STAGE_R_FRAMES)
     assert select_warmup_frame(first) not in {str(record["frame_id"]) for record in first}
+
+
+def test_capacity_replay_uses_frozen_corpus_order_not_pillar_rank_order() -> None:
+    census = json.loads(CENSUS.read_text(encoding="utf-8"))
+    replay = select_capacity_replay_frames(census)
+    ordinals = [record["frozen_corpus_ordinal_1_based"] for record in replay]
+    pillars = [record["H10_candidate_dynamic_pillars"] for record in replay]
+    assert ordinals == sorted(ordinals)
+    assert pillars != sorted(pillars)
+    assert [record["frame_id"] for record in replay] == [
+        "2011_09_26_drive_0001/0000000039",
+        "2011_09_26_drive_0091/0000000015",
+        "2011_09_26_drive_0091/0000000029",
+        "2011_09_26_drive_0091/0000000058",
+        "2011_09_26_drive_0091/0000000096",
+        "2011_09_26_drive_0091/0000000157",
+        "2011_09_26_drive_0091/0000000221",
+        "2011_09_26_drive_0091/0000000234",
+        "2011_09_26_drive_0091/0000000326",
+        "2011_09_26_drive_0091/0000000332",
+    ]
+    assert MAX_PILLAR_CONDITION_ID not in {f"{record['frame_id']}/H10" for record in replay}
+
+
+def test_capacity_classification_separates_allocated_and_reserved_memory() -> None:
+    passed = classify_max_pillar_capacity(
+        peak_allocated_bytes=40,
+        peak_reserved_bytes=89,
+        device_total_bytes=100,
+    )
+    reserved_review = classify_max_pillar_capacity(
+        peak_allocated_bytes=40,
+        peak_reserved_bytes=90,
+        device_total_bytes=100,
+    )
+    allocated_review = classify_max_pillar_capacity(
+        peak_allocated_bytes=90,
+        peak_reserved_bytes=90,
+        device_total_bytes=100,
+    )
+    assert passed["classification"] == "MAX-PILLAR CAPACITY REVIEW — PASS"
+    assert reserved_review["classification"] == "OWNER MEMORY-MARGIN REVIEW REQUIRED"
+    assert allocated_review["classification"] == "OWNER MEMORY-MARGIN REVIEW REQUIRED"
+    assert passed["peak_allocated_fraction_of_device_total"] == 0.4
+    assert passed["peak_reserved_fraction_of_device_total"] == 0.89
 
 
 def test_preflight_dependency_graph_contains_no_gt_or_evaluator_import() -> None:

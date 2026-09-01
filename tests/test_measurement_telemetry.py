@@ -26,12 +26,15 @@ def _sample(*, block: str, pstate: str, sm_clock: float, mem_clock: float) -> di
         "clocks.mem": mem_clock,
         "utilization.gpu": 80.0,
         "utilization.memory": 20.0,
+        "memory.used": 2_000.0,
+        "memory.total": 8_000.0,
     }
 
 
 def test_parse_nvidia_smi_row_handles_numeric_and_unsupported_values() -> None:
     result = parse_nvidia_smi_row(
-        "NVIDIA GeForce RTX 4060 Laptop GPU, 610.88, P0, 61, 49.2, N/A, 2250, 8001, 98, 14"
+        "NVIDIA GeForce RTX 4060 Laptop GPU, 610.88, P0, 61, 49.2, N/A, 2250, 8001, "
+        "98, 14, 2048, 8188"
     )
 
     assert result["available"] is True
@@ -40,6 +43,8 @@ def test_parse_nvidia_smi_row_handles_numeric_and_unsupported_values() -> None:
     assert result["temperature.gpu"] == 61.0
     assert result["power.limit"] is None
     assert result["clocks.sm"] == 2250.0
+    assert result["memory.used"] == 2048.0
+    assert result["memory.total"] == 8188.0
 
 
 def test_parse_nvidia_smi_row_rejects_incomplete_rows() -> None:

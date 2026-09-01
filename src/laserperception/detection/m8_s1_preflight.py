@@ -27,6 +27,7 @@ from laserperception.detection.m8_backend import DsvtBackend
 from laserperception.detection.m8_input import M8MultiSweepBuilder
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
+    CANDIDATE_MANIFEST_SHA256,
     INPUT_LEDGER_PATH,
     INPUT_LEDGER_SHA256,
     PROTOCOL_FREEZE_COMMIT,
@@ -49,6 +50,14 @@ from laserperception.detection.multisweep import (
 )
 
 PREFLIGHT_QUANTILES = (0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95)
+CAPACITY_REVIEW_BOUNDARY = 0.90
+MAX_PILLAR_CONDITION_ID = "2011_09_26_drive_0091/0000000069/H10"
+MAX_PILLAR_FRAME_ID = "2011_09_26_drive_0091/0000000069"
+MAX_PILLAR_POINT_COUNT = 1_339_216
+MAX_PILLAR_COUNT = 32_774
+CAPACITY_CENSUS_SHA256 = "c7d5da5a1b5162613cdc45dff420ae2d811ead2a6ba753b3202008bcb0ac86a6"
+P1E_CAPACITY_SMOKE_PATH = Path("benchmarks/m8/diagnostics/dsvt_h10_capacity_smoke.json")
+P1E_CAPACITY_SMOKE_SHA256 = "fd8751778c7124ad66ee5e55e73de6df0b25174bf55daf89c5c18f5298a9c88b"
 
 
 def _load_mapping(path: Path) -> dict[str, object]:
@@ -112,6 +121,51 @@ def select_warmup_frame(selected: Sequence[Mapping[str, object]]) -> str:
 
     excluded = {*STAGE_R_FRAMES, *(str(item["frame_id"]) for item in selected)}
     return next(frame_id for frame_id in canonical_frame_ids() if frame_id not in excluded)
+
+
+def select_capacity_replay_frames(
+    census: Mapping[str, object],
+) -> tuple[dict[str, object], ...]:
+    """Return the frozen quantile representatives in frozen corpus order."""
+
+    selected = select_preflight_frames(census)
+    return tuple(
+        sorted(selected, key=lambda record: cast(int, record["frozen_corpus_ordinal_1_based"]))
+    )
+
+
+def classify_max_pillar_capacity(
+    *, peak_allocated_bytes: int, peak_reserved_bytes: int, device_total_bytes: int
+) -> dict[str, object]:
+    """Apply the preregistered engineering-only 90% capacity-review rule."""
+
+    if min(peak_allocated_bytes, peak_reserved_bytes, device_total_bytes) < 0:
+        raise ValueError("capacity-review memory values must be non-negative")
+    if device_total_bytes == 0:
+        raise ValueError("capacity-review device total must be positive")
+    allocated_fraction = peak_allocated_bytes / device_total_bytes
+    reserved_fraction = peak_reserved_bytes / device_total_bytes
+    passed = (
+        allocated_fraction < CAPACITY_REVIEW_BOUNDARY
+        and reserved_fraction < CAPACITY_REVIEW_BOUNDARY
+    )
+    return {
+        "classification": (
+            "MAX-PILLAR CAPACITY REVIEW — PASS" if passed else "OWNER MEMORY-MARGIN REVIEW REQUIRED"
+        ),
+        "peak_allocated_fraction_of_device_total": allocated_fraction,
+        "peak_reserved_fraction_of_device_total": reserved_fraction,
+        "engineering_boundary_fraction": CAPACITY_REVIEW_BOUNDARY,
+        "scientific_acceptance_criterion": False,
+        "reason": (
+            "maximum H10 inference completed with both allocated and reserved CUDA peaks "
+            "below the engineering 90% capacity-review boundary"
+            if passed
+            else "maximum H10 inference completed, but at least one CUDA peak reached the "
+            "engineering 90% capacity-review boundary; allocator reserve is reported "
+            "separately from active allocation"
+        ),
+    }
 
 
 def _historical_sweeps(
@@ -357,6 +411,276 @@ def run_sizing_worker(
         },
         "host_memory": _host_memory(),
         "resource_after": backend.runtime_state()["cuda_memory"],
+    }
+    atomic_write_json(output, result)
+    return result
+
+
+def run_max_pillar_capacity_review(
+    *,
+    repository_root: Path,
+    full_ledger: Path,
+    date_root: Path,
+    census_path: Path,
+    runtime_commit: str,
+    output: Path,
+    telemetry_interval_seconds: float = 0.25,
+) -> dict[str, object]:
+    """Run one fresh campaign-like, GT-blind maximum-pillar capacity process."""
+
+    if sha256_file(census_path) != CAPACITY_CENSUS_SHA256:
+        raise ValueError("M8 input-only capacity census identity changed")
+    census = _load_mapping(census_path)
+    summary = census.get("summary")
+    records = census.get("records")
+    if not isinstance(summary, Mapping) or not isinstance(records, list):
+        raise ValueError("M8 input-only capacity census is malformed")
+    if (
+        summary.get("max_condition_id") != MAX_PILLAR_CONDITION_ID
+        or summary.get("max") != MAX_PILLAR_COUNT
+    ):
+        raise ValueError("M8 input-only maximum-pillar selection changed")
+    max_record = next(
+        (
+            record
+            for record in records
+            if isinstance(record, Mapping) and record.get("condition_id") == MAX_PILLAR_CONDITION_ID
+        ),
+        None,
+    )
+    if not isinstance(max_record, Mapping):
+        raise ValueError("M8 input-only maximum-pillar record is missing")
+    if (
+        max_record.get("point_count") != MAX_PILLAR_POINT_COUNT
+        or max_record.get("candidate_dynamic_pillars") != MAX_PILLAR_COUNT
+        or max_record.get("would_truncate") is not False
+    ):
+        raise ValueError("M8 maximum-pillar input contract changed")
+
+    p1e_smoke_path = repository_root / P1E_CAPACITY_SMOKE_PATH
+    if sha256_file(p1e_smoke_path) != P1E_CAPACITY_SMOKE_SHA256:
+        raise ValueError("P1-E maximum-pillar structural evidence identity changed")
+    p1e_smoke = _load_mapping(p1e_smoke_path)
+    if (
+        p1e_smoke.get("condition_id") != MAX_PILLAR_CONDITION_ID
+        or p1e_smoke.get("candidate_dynamic_pillars") != MAX_PILLAR_COUNT
+        or p1e_smoke.get("retained_pillars") != MAX_PILLAR_COUNT
+        or p1e_smoke.get("discarded_or_truncated_pillars") != 0
+    ):
+        raise ValueError("P1-E maximum-pillar structural result changed")
+
+    manifest_path = repository_root / CANDIDATE_MANIFEST_PATH
+    manifest = _load_mapping(manifest_path)
+    environment = manifest.get("environment")
+    if not isinstance(environment, Mapping):
+        raise ValueError("candidate environment binding is malformed")
+    upstream_name = environment.get("upstream_root_variable")
+    checkpoint_name = environment.get("checkpoint_variable")
+    if not isinstance(upstream_name, str) or not isinstance(checkpoint_name, str):
+        raise ValueError("candidate environment variable names are malformed")
+    upstream_root = os.environ.get(upstream_name)
+    checkpoint_path = os.environ.get(checkpoint_name)
+    if not upstream_root or not checkpoint_path:
+        raise RuntimeError(f"set {upstream_name} and {checkpoint_name} before capacity review")
+    binding = verify_static_bindings(
+        repository_root,
+        upstream_root=upstream_root,
+        checkpoint_path=checkpoint_path,
+    )
+    if binding.repository_head != runtime_commit:
+        raise RuntimeError("capacity-review process HEAD differs from the bound runtime commit")
+
+    selected = select_capacity_replay_frames(census)
+    warmup_frame = select_warmup_frame(selected)
+    source = FrozenInputSource.load(
+        date_root=date_root,
+        full_ledger=full_ledger,
+        accepted_ledger=repository_root / INPUT_LEDGER_PATH,
+    )
+
+    initialization_start = time.monotonic_ns()
+    backend = DsvtBackend.from_environment(manifest_path=manifest_path)
+    backend.synchronize()
+    initialization_seconds = (time.monotonic_ns() - initialization_start) / 1_000_000_000
+    runtime_state = backend.runtime_state()
+    post_initialization = dict(backend.cuda_memory_state())
+    sampler = NvidiaSmiSampler(interval_seconds=telemetry_interval_seconds)
+    sampler.start()
+    replay_calls: list[dict[str, object]] = []
+    retained_pillars: int | None = None
+    max_wall_seconds: float | None = None
+    post_warmup: dict[str, int] | None = None
+    post_quantile: dict[str, int] | None = None
+    max_call_memory: dict[str, int] | None = None
+    try:
+        sampler.begin_block("warmup")
+        for points, _identity in source.pair(warmup_frame):
+            backend.run_gt_blind_timing_call(points)
+        backend.synchronize()
+        sampler.end_block("warmup")
+        post_warmup = dict(backend.cuda_memory_state())
+
+        sampler.begin_block("quantile_replay")
+        execution_ordinal = 0
+        for selection in selected:
+            frame_id = str(selection["frame_id"])
+            for points, identity in source.pair(frame_id):
+                execution_ordinal += 1
+                pillar_count = backend.candidate_pillar_count(points)
+                backend.synchronize()
+                started = time.monotonic_ns()
+                backend.run_gt_blind_timing_call(points)
+                backend.synchronize()
+                replay_calls.append(
+                    {
+                        **identity,
+                        "candidate_dynamic_pillars": pillar_count,
+                        "execution_ordinal_1_based": execution_ordinal,
+                        "wall_seconds": (time.monotonic_ns() - started) / 1_000_000_000,
+                    }
+                )
+        sampler.end_block("quantile_replay")
+        post_quantile = dict(backend.cuda_memory_state())
+
+        max_points, max_identity = source.pair(MAX_PILLAR_FRAME_ID)[0]
+        if (
+            max_identity.get("condition_id") != MAX_PILLAR_CONDITION_ID
+            or max_identity.get("input_point_count") != MAX_PILLAR_POINT_COUNT
+            or max_identity.get("input_sha256") != max_record.get("candidate_feature_sha256")
+        ):
+            raise RuntimeError("maximum-pillar reconstructed input identity changed")
+        candidate_pillars = backend.candidate_pillar_count(max_points)
+        if candidate_pillars != MAX_PILLAR_COUNT:
+            raise RuntimeError("maximum-pillar candidate CUDA count changed")
+        point_range = np.asarray(backend.capacity_contract.point_cloud_range, dtype=np.float32)
+        inside = np.all(max_points[:, :3] >= point_range[:3], axis=1) & np.all(
+            max_points[:, :3] < point_range[3:], axis=1
+        )
+        candidate_range_dropped = int(max_points.shape[0] - np.count_nonzero(inside))
+        if candidate_range_dropped != 0:
+            raise RuntimeError("maximum-pillar candidate range unexpectedly dropped points")
+
+        sampler.begin_block("maximum_h10")
+        backend.reset_cuda_peak_memory_stats()
+        started = time.monotonic_ns()
+        retained_pillars = backend.run_gt_blind_capacity_call(max_points)
+        backend.synchronize()
+        max_wall_seconds = (time.monotonic_ns() - started) / 1_000_000_000
+        max_call_memory = dict(backend.cuda_memory_state())
+        sampler.end_block("maximum_h10")
+        if retained_pillars != candidate_pillars:
+            raise RuntimeError("maximum-pillar DSVT inference unexpectedly truncated pillars")
+    finally:
+        sampler.stop()
+
+    if (
+        len(replay_calls) != 20
+        or post_warmup is None
+        or post_quantile is None
+        or max_call_memory is None
+        or max_wall_seconds is None
+        or retained_pillars is None
+    ):
+        raise RuntimeError("maximum-pillar capacity process did not complete its fixed sequence")
+    device_total = max_call_memory["device_total_bytes"]
+    capacity = classify_max_pillar_capacity(
+        peak_allocated_bytes=max_call_memory["max_allocated_bytes"],
+        peak_reserved_bytes=max_call_memory["max_reserved_bytes"],
+        device_total_bytes=device_total,
+    )
+    host_memory = _host_memory()
+    execution_order = [str(call["condition_id"]) for call in replay_calls]
+    result = {
+        "schema_version": "laserperception.m8.s1.max-pillar-capacity.v1",
+        "status": capacity["classification"],
+        "tier": "engineering_gt_blind_capacity_review",
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "protocol_freeze_commit": PROTOCOL_FREEZE_COMMIT,
+        "protocol_json_sha256": PROTOCOL_JSON_SHA256,
+        "measurement_runtime_head": runtime_commit,
+        "candidate_identity": {
+            "candidate_manifest_sha256": CANDIDATE_MANIFEST_SHA256,
+            **backend.identity,
+        },
+        "process": {
+            "process_uuid": str(uuid.uuid4()),
+            "process_id": os.getpid(),
+            "started_in_fresh_python_process": True,
+            "initialization_seconds": initialization_seconds,
+            "sequence": [
+                "initialize DSVT",
+                "excluded warmup H10/H5 pair",
+                "20 quantile-replay calls in frozen corpus order",
+                MAX_PILLAR_CONDITION_ID,
+            ],
+        },
+        "input_selection": {
+            "capacity_census_sha256": CAPACITY_CENSUS_SHA256,
+            "selection_basis": "previously frozen input-only maximum H10 candidate-pillar count",
+            "condition_id": MAX_PILLAR_CONDITION_ID,
+            "input_point_count": MAX_PILLAR_POINT_COUNT,
+            "input_sha256": max_record["candidate_feature_sha256"],
+            "historical_XYZT_projection_sha256": max_record["historical_XYZT_projection_sha256"],
+            "candidate_dynamic_pillars": MAX_PILLAR_COUNT,
+            "retained_pillars": retained_pillars,
+            "discarded_or_truncated_pillars": MAX_PILLAR_COUNT - retained_pillars,
+            "candidate_range_dropped_points": candidate_range_dropped,
+            "configured_dynamic_pillar_cap": backend.capacity_contract.dynamic_pillar_cap,
+            "p1e_structural_evidence_sha256": P1E_CAPACITY_SMOKE_SHA256,
+        },
+        "warmup": {
+            "frame_id": warmup_frame,
+            "condition_order": [f"{warmup_frame}/H10", f"{warmup_frame}/H5"],
+            "call_count": 2,
+            "engineering_only": True,
+        },
+        "quantile_replay": {
+            "selection_rule": (
+                "same input-only 0.05..0.95 representatives as accepted sizing preflight"
+            ),
+            "execution_rule": (
+                "selected frames in frozen corpus order; H10 then H5 within each frame"
+            ),
+            "selected_frames": list(selected),
+            "executed_condition_order": execution_order,
+            "calls": replay_calls,
+            "call_count": len(replay_calls),
+            "engineering_only": True,
+        },
+        "maximum_condition": {
+            "condition_id": MAX_PILLAR_CONDITION_ID,
+            "call_count": 1,
+            "wall_seconds": max_wall_seconds,
+            "output_completed": True,
+            "output_discarded_immediately": True,
+        },
+        "call_accounting": {
+            "warmup_calls": 2,
+            "quantile_replay_calls": 20,
+            "maximum_condition_calls": 1,
+            "engineering_calls_total": 23,
+            "scientific_calls": 0,
+        },
+        "memory": {
+            "post_initialization": post_initialization,
+            "post_warmup": post_warmup,
+            "post_quantile_replay": post_quantile,
+            "maximum_call": max_call_memory,
+            "host_after_maximum": host_memory,
+            "allocated_and_reserved_interpreted_separately": True,
+        },
+        "runtime_state": runtime_state,
+        "telemetry": {
+            "summary": summarize_gpu_telemetry(sampler.samples),
+            "by_block": summarize_telemetry_by_block(sampler.samples),
+        },
+        "capacity_review": capacity,
+        "ground_truth_loaded": False,
+        "evaluator_loaded": False,
+        "semantic_output_retained": False,
+        "prediction_count_retained": False,
+        "scientific_result_produced": False,
+        "protocol_unchanged": True,
     }
     atomic_write_json(output, result)
     return result
