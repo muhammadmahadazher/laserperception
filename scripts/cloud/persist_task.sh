@@ -21,6 +21,12 @@ source_dir=${1%/}
 capsule_name=${2:-$(basename "$source_dir")}
 [[ "$capsule_name" != */* && -n "$capsule_name" ]] || usage
 destination="${LP_DRIVE_ROOT}_CLOUD_WORK/${capsule_name}/"
+capsule_root="${LP_DRIVE_ROOT}_CLOUD_WORK/"
+
+if rclone lsf "$capsule_root" --dirs-only --max-depth 1 | grep -Fxq "${capsule_name}/"; then
+  echo "Refusing existing capsule destination: $destination" >&2
+  exit 3
+fi
 
 manifest=$(mktemp)
 remote_manifest=$(mktemp)
@@ -38,5 +44,5 @@ cmp --silent "$manifest" "$remote_manifest" || {
   echo "Remote checksum manifest did not round-trip exactly" >&2
   exit 1
 }
-rclone check "$source_dir" "$destination" --one-way --download
+rclone check "$source_dir" "$destination" --exclude /00_MANIFEST/FILE_SHA256.txt
 printf 'Persisted and verified %s -> %s\n' "$source_dir" "$destination"

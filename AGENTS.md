@@ -71,8 +71,15 @@ must not be modified or reinterpreted.
 
 ## Detection and deployment architecture
 
-- Use the official pretrained MMDetection3D PointPillars model and pinned nuScenes preprocessing.
-  LaserPerception did not train the detector and must not claim that it did.
+- The historical M1–M7 stack uses the official pretrained MMDetection3D PointPillars model and
+  pinned nuScenes preprocessing. Its checkpoint, contracts, and evidence remain frozen and bound
+  to PointPillars; do not reinterpret or rerun them without explicit authorization. LaserPerception
+  did not train that detector and must not claim that it did.
+- The active M8 stack is the DSVT/OpenPCDet-based DSVT-Pillar with TransFusion candidate selected
+  in P1-E. Frozen M8 candidate, config, checkpoint, and input identities govern M8; PointPillars is
+  the historical comparison baseline, not the active primary M8 detector.
+- The M8 feature contract is `[x, y, z, intensity, time_lag]`. Preserve the prospectively frozen
+  source-row order and do not introduce random test-time shuffle.
 - Keep the framework-independent `DetectionFrame` contract small and explicit. Document coordinate
   frame, axes, length-width-height order, yaw convention, classes, scores, and optional velocity;
   never silently swap length and width.
@@ -108,7 +115,9 @@ must not be modified or reinterpreted.
 
 - The core wheel remains lightweight, CPU-testable, and importable without GPU or ROS libraries.
 - PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, TensorRT, and ROS 2 remain optional, isolated
-  deployment dependencies. Standard GitHub CI must run without them.
+  historical reproduction or deployment dependencies. OpenPCDet/DSVT, PyTorch, CUDA, spconv, and
+  torch-scatter are likewise optional, isolated dependencies for the active M8 scientific runtime;
+  none are core-wheel dependencies. Standard GitHub CI must run without them.
 - Heavy environments, datasets, checkpoints, ONNX files, TensorRT engines, caches, logs, and
   generated outputs stay outside the repository and must be persisted to the canonical Drive when
   they are not reconstructible or have project value.

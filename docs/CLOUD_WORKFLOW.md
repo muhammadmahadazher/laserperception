@@ -92,7 +92,12 @@ Create only the applicable subdirectories. A full repository copy is unnecessary
 source is in GitHub. Record Git HEAD and preserve a patch when useful, plus untracked files, ignored
 task artifacts, logs, temporary work, external artifacts, and safe environment metadata. Preserve
 substantially more for expensive or scientific jobs. Use `scripts/cloud/persist_task.sh` for a
-non-destructive checked copy.
+non-destructive checked copy. The helper refuses an existing capsule destination rather than
+merging new files into old state. Its SHA256 manifest records canonical local identities; the
+small manifest is downloaded and compared byte-for-byte, while ordinary `rclone check` verifies
+the uploaded files through hashes supported by the remote (or size when no common hash exists).
+It does not download every remote byte by default. A scientific protocol or task may additionally
+require an explicit full round-trip of individual critical artifacts.
 
 ## GPU worker policy
 
