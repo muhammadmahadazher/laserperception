@@ -6,16 +6,19 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Project and milestone state
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
-M0 through M4.6 are complete and v0.2.0 is released. **M6 — Cross-Domain Validation: KITTI Raw**
-is complete and v0.3.0 is its release boundary. M6a is complete under prospective Protocol R2: the
-original Tier-A failure remains failed, R1 diagnosed its data-product/timing cause, and the new
-canonical offline oracle passed without relaxing that historical gate. M6b is complete under
-owner-approved Protocol R2: preserve the original 30k-engine failure, the prospective 40k
-remediation, and the frozen
-428-frame H10/H5 cross-domain characterization. M6c is complete with a positive final R3
-projected-reference ROS validation result; preserve the original R2 failure and D1 diagnosis.
-No technical submilestone is currently active. M5 remains conditional and inactive. Any next
-milestone requires explicit owner authorization.
+M1 through M7 are historical and frozen as applicable. **M8 — Detector V2 is active**, with
+DSVT-Pillar plus TransFusion selected as the modern detector. M8 P1-E is complete, the S1 protocol
+is frozen, and Stage R completed on the retired machine with its raw evidence merged. The retired
+machine received a historical authorization for primary A2/E2, but executed zero primary calls.
+That authorization is hardware- and runtime-bound and is not portable to a cloud worker, rented
+GPU, future laptop, or any other runtime. Zero-intensity remains unauthorized, S2 remains blocked
+and not started, and training has not started. No scientific inference may run without a fresh,
+explicit, runtime-specific owner authorization.
+
+Within that frozen history, M6c is complete with a positive final R3 projected-reference ROS
+validation result; preserve the original R2 failure and D1 diagnosis. M5 remains conditional and inactive
+rather than implicitly activated by later milestones. No technical submilestone is
+currently active within the closed M6 milestone; M8 is the separately authorized active milestone.
 
 The accepted v0.2 path uses an official pretrained MMDetection3D PointPillars checkpoint on
 nuScenes, TensorRT FP16, the LaserPerception `exact_fast` deterministic deployment voxelizer, a
@@ -35,44 +38,48 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 
 ## Roadmap and scope
 
-- M0: project direction and governance transition — complete.
-- M1: official pretrained PointPillars, nuScenes v1.0-mini, FP32 CUDA inference, BEV visualization,
-  and RTX 4060 measurements — complete.
-- M2: official MMDeploy ONNX/TensorRT FP16 path, parity/fidelity evidence, and repaired same-session
-  performance comparison — complete.
-- M3: ROS 2 Humble interface, exact deterministic deployment voxelization, correctness evidence,
-  and representative full-history ROS measurement — complete.
-- M4: evidence-backed v0.1.0 release — complete.
-- M4.5a: offline raw-sweep plus known-pose reconstruction to `ModelReadyPointCloud` — complete.
-- M4.5b: raw `PointCloud2`, time-aware tf2, bounded live history, transform-repair chronology, and
-  exact frozen detector-chain evidence — complete.
-- M4.5: offline and live raw-sweep integration — complete overall.
-- M4.6: v0.2.0 release engineering for the accepted M4.5 capability — complete.
-- M5: conditional physical Jetson measurements only if target hardware is actually available and
-  the owner explicitly activates the milestone; currently inactive.
-- M6: cross-domain validation using official KITTI Raw data — complete.
-- M6a: KITTI Raw discovery, dataset contract, exact Raw-devkit pose/calibration verification,
-  model-frame alignment, and ROS-independent reconstruction oracle — complete under prospective
-  Protocol R2. Preserve the original Tier-A FAIL and the post-failure R1 diagnosis.
-- M6b: offline frozen-detector execution, Raw-tracklet domain-shift characterization, history-10
-  versus history-5 comparison, and deterministic visualization — complete under owner-approved
-  Protocol R2.
-- M6c: KITTI Raw ROS replay, time-aware tf2, projected-reference live reconstruction exactness,
-  unchanged detector semantic-envelope verification, and ROS output-contract validation — complete
-  with a positive final R3 result. Preserve the R2 failure and D1 diagnosis.
+- M1–M7: historical and frozen as applicable; preserve their accepted and failed evidence.
+- M8 Detector V2: active. DSVT-Pillar plus TransFusion is selected; P1-E is complete.
+- M8 P1-S1: paused for runtime migration. Its protocol is frozen and the retired-machine Stage R
+  is complete. Primary A2/E2 calls remain zero.
+- A new runtime must undergo GT-blind qualification, machine-specific policy binding, a repeated
+  Stage R, owner review, and a new authorization before primary inference.
+- Zero-intensity, B2/C2/D2/F2, S2, and training are not authorized.
 
-Do not add training, a second detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
-without hardware, localization, vendor SDK drivers, postprocessing/DDS/executor/voxelization
-optimization, or unrelated features unless the owner explicitly changes scope. M6 is closed and
-does not authorize follow-on tuning, R4, or another technical milestone. M6a did not initialize or
-run the detector on KITTI, change the frozen runtime, or implement ROS replay; its canonical output
-is the offline exactness oracle used by M6b. M6c's same-platform projected references are a distinct
-ROS-representable product and must not be described as the M6a oracle.
+Do not add training, another detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
+without hardware, localization, vendor SDK drivers, unrelated optimization, or unrelated features
+unless the owner explicitly changes scope. Frozen scientific artifacts and historical failures
+must not be modified or reinterpreted.
+
+## Cloud persistence and worker lifecycle
+
+- GitHub is authoritative for tracked source, documentation, tests, configs, PRs, releases, and
+  compact final evidence suitable for Git.
+- The canonical private Google Drive remote is `lpdrive:` with folder ID
+  `18Q73IkiVcFT0EXAowIPlOiISNk0mkhHJ`. `_CLOUD_STATE/` holds durable indexes and
+  `_CLOUD_WORK/` holds task capsules. Datasets, checkpoints, binaries, large/raw/failed evidence,
+  logs, valuable temporary state, and other non-Git project state must be Drive-backed.
+- Codex, cloud, and GPU workers are disposable. A task is not complete while unique
+  LaserPerception state exists only on a worker. Git-suitable work must be represented in Git/PR;
+  non-Git state must be Drive-backed.
+- Checkpoint expensive or scientific results after every canonical pass/process before proceeding,
+  including failed attempts. Preserve temporary files when they have project, debug, or scientific
+  value. Never upload or commit credentials.
+- Hydrate only required inputs and verify recorded hashes. Never mirror the whole Drive project or
+  assume an internal branch such as `work` must be named `main`; verify the starting commit and use
+  the normal Codex/GitHub PR handoff. See `docs/CLOUD_WORKFLOW.md`.
 
 ## Detection and deployment architecture
 
-- Use the official pretrained MMDetection3D PointPillars model and pinned nuScenes preprocessing.
-  LaserPerception did not train the detector and must not claim that it did.
+- The historical M1–M7 stack uses the official pretrained MMDetection3D PointPillars model and
+  pinned nuScenes preprocessing. Its checkpoint, contracts, and evidence remain frozen and bound
+  to PointPillars; do not reinterpret or rerun them without explicit authorization. LaserPerception
+  did not train that detector and must not claim that it did.
+- The active M8 stack is the DSVT/OpenPCDet-based DSVT-Pillar with TransFusion candidate selected
+  in P1-E. Frozen M8 candidate, config, checkpoint, and input identities govern M8; PointPillars is
+  the historical comparison baseline, not the active primary M8 detector.
+- The M8 feature contract is `[x, y, z, intensity, time_lag]`. Preserve the prospectively frozen
+  source-row order and do not introduce random test-time shuffle.
 - Keep the framework-independent `DetectionFrame` contract small and explicit. Document coordinate
   frame, axes, length-width-height order, yaw convention, classes, scores, and optional velocity;
   never silently swap length and width.
@@ -108,9 +115,12 @@ ROS-representable product and must not be described as the M6a oracle.
 
 - The core wheel remains lightweight, CPU-testable, and importable without GPU or ROS libraries.
 - PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, TensorRT, and ROS 2 remain optional, isolated
-  deployment dependencies. Standard GitHub CI must run without them.
+  historical reproduction or deployment dependencies. OpenPCDet/DSVT, PyTorch, CUDA, spconv, and
+  torch-scatter are likewise optional, isolated dependencies for the active M8 scientific runtime;
+  none are core-wheel dependencies. Standard GitHub CI must run without them.
 - Heavy environments, datasets, checkpoints, ONNX files, TensorRT engines, caches, logs, and
-  generated outputs stay outside the repository, preferably on the WSL ext4 filesystem.
+  generated outputs stay outside the repository and must be persisted to the canonical Drive when
+  they are not reconstructible or have project value.
 - GPU and ROS integration tests are manual/local and must skip cleanly when their environment is
   absent. Setup failures must be actionable and fail closed.
 
