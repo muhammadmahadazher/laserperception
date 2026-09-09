@@ -1,22 +1,19 @@
-# Cloud task persistence helper
+# Canonical Drive helpers
 
-`persist_task.sh` copies a prepared task directory into the canonical `_CLOUD_WORK` root and checks
-its contents. It refuses an existing capsule destination, uses non-destructive `rclone copy`,
-writes a SHA256 manifest, downloads that small manifest for an exact comparison, and runs ordinary
-`rclone check` without `--download`. It contains no credentials or scientific logic and refuses a
-remote root other than `lpdrive:`.
+These fail-closed helpers address only the configured `lpdrive:` root. They never read or store
+credentials; provision rclone externally. Paths are relative to that root.
 
-```bash
-LP_DRIVE_ROOT=lpdrive: scripts/cloud/persist_task.sh \
-  /path/to/2026-09-08_example_ab12cd
-```
+- `drive_push.sh LOCAL DRIVE_PATH [SHA256]` stages to a temporary object, verifies it by a full
+  round trip, moves it to the final name, and verifies again.
+- `drive_pull.sh DRIVE_PATH LOCAL SHA256` downloads to a temporary local file and publishes it only
+  after verification.
+- `verify_drive_object.py DRIVE_PATH SHA256` streams and verifies one remote object.
+- `task_snapshot.sh TASK_ID OUTPUT.tar.gz` captures a Git bundle, binary working-tree patch, status,
+  and provenance. Upload its output into the task capsule.
+- `persist_task.sh TASK_DIRECTORY [CAPSULE_NAME]` non-destructively uploads a prepared capsule and
+  refuses an existing destination. Its normal remote check may use a common hash or file size, so
+  use the full-round-trip helpers above for critical scientific objects.
 
-Optionally pass a second argument to set the destination capsule name. Prepare the task manifest,
-applicable capsule subdirectories, safe environment record, and final outputs before invoking it.
-Never put rclone configs, tokens, secret environment values, or credentials in a capsule.
-
-The SHA256 manifest records the canonical local identities. The ordinary remote check compares
-uploaded files using hashes supported by both sides, falling back to size when no common hash is
-available; it does not force a full byte download of a potentially large capsule. When a scientific
-protocol or task requires stronger verification for a critical artifact, perform and record an
-explicit full round-trip of that artifact separately.
+A capsule uses `_CLOUD_WORK/<TASK_ID>/{00_MANIFEST,01_FINAL_OUTPUTS,02_RAW_EVIDENCE,03_LOGS,04_TEMP_PRESERVED,05_ENVIRONMENT,06_WORKSPACE_SNAPSHOT}/` and validates its manifest against
+`TASK_MANIFEST.schema.json`. Transfers do not grant scientific authorization. Never put rclone
+configs, tokens, secret environment values, or credentials in a capsule.

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://laserperception.dev/schemas/cloud-task-manifest-v1.json",
+  "title": "LaserPerception cloud task manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "start_time_utc", "end_time_utc", "repository_sha", "branch", "task_purpose", "drive_inputs", "drive_outputs", "github_outputs", "environment_identity", "scientific_authorization_state", "detector_call_accounting", "files_uploaded", "temporary_state_preserved", "worker_unique_state_remaining"],
+  "properties": {
+    "schema_version": {"const": "laserperception.cloud-task-manifest.v1"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]+$"},
+    "start_time_utc": {"type": "string", "format": "date-time"},
+    "end_time_utc": {"type": ["string", "null"], "format": "date-time"},
+    "repository_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "branch": {"type": "string", "minLength": 1},
+    "task_purpose": {"type": "string", "minLength": 1},
+    "drive_inputs": {"type": "array", "items": {"type": "string"}},
+    "drive_outputs": {"type": "array", "items": {"type": "string"}},
+    "github_outputs": {"type": "array", "items": {"type": "string"}},
+    "environment_identity": {"type": "object"},
+    "scientific_authorization_state": {"type": "object"},
+    "detector_call_accounting": {"type": "object", "required": ["cloud_detector_calls"], "properties": {"cloud_detector_calls": {"const": 0}}, "additionalProperties": true},
+    "files_uploaded": {"type": "array", "items": {"type": "object", "required": ["path", "bytes", "sha256"], "properties": {"path": {"type": "string"}, "bytes": {"type": "integer", "minimum": 0}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}, "additionalProperties": false}},
+    "temporary_state_preserved": {"type": "array", "items": {"type": "string"}},
+    "worker_unique_state_remaining": {"const": false}
+  }
+}

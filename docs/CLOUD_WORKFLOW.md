@@ -85,12 +85,12 @@ _CLOUD_WORK/YYYY-MM-DD_<task_slug>_<short_id>/
 ├── 03_LOGS/
 ├── 04_TEMP_PRESERVED/
 ├── 05_ENVIRONMENT/
-└── 06_EXTERNAL_ARTIFACTS/
+└── 06_WORKSPACE_SNAPSHOT/
 ```
 
 Create only the applicable subdirectories. A full repository copy is unnecessary when tracked
 source is in GitHub. Record Git HEAD and preserve a patch when useful, plus untracked files, ignored
-task artifacts, logs, temporary work, external artifacts, and safe environment metadata. Preserve
+task artifacts, logs, temporary work, external artifacts, safe environment metadata, and a workspace snapshot or patch bundle. Preserve
 substantially more for expensive or scientific jobs. Use `scripts/cloud/persist_task.sh` for a
 non-destructive checked copy. The helper refuses an existing capsule destination rather than
 merging new files into old state. Its SHA256 manifest records canonical local identities; the
