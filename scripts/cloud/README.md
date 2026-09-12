@@ -1,4 +1,10 @@
-# Cloud task persistence helper
+# External task persistence helper
+
+The `scripts/cloud/` path is retained for compatibility. Normal development is local and
+CPU-capable; Codex Cloud is not required. This helper only transfers a deliberately prepared task
+capsule. It does not provision a GPU or authorize scientific execution. See the
+[compute workflow](../../docs/CLOUD_WORKFLOW.md) for the full runtime gates and the scoped
+follow-up plan from closed, unmerged PR #32. That PR's other helpers are not installed here.
 
 `persist_task.sh` copies a prepared task directory into the canonical `_CLOUD_WORK` root and checks
 its contents. It refuses an existing capsule destination, uses non-destructive `rclone copy`,

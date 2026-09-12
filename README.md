@@ -44,6 +44,23 @@ remains preserved. [Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICA
 [M6 documentation index](docs/m6/README.md) maps the complete failure, diagnosis, protocol, and
 result chronology.
 
+## Current development
+
+- **Latest release: v0.3.0**, the historical PointPillars detection/deployment and KITTI Raw
+  validation line described below. Its measured claims remain unchanged.
+- **Active research: M8 Detector V2**, using DSVT-Pillar with TransFusion. M7 is complete and
+  frozen; M8 P1-E is complete and S1 is frozen. Retired-runtime Stage R is complete, with zero
+  primary A2/E2 calls. S1 is paused pending full qualification and fresh authorization on a
+  separately selected external GPU runtime. DSVT has only a partial TensorRT engineering route.
+- **Long-term direction:** a unified, sensor-conscious LiDAR perception framework with stable
+  contracts and a simple developer API. Broader tasks remain proposals in the
+  [platform RFC](docs/PERCEPTION_PLATFORM_RFC.md), not released features or authorization.
+
+Development is local and CPU-capable, with ephemeral external GPU compute on demand. Local work
+must not probe optional GPUs without explicit owner/runtime authorization. Codex Cloud is not
+required. See the [compute workflow](docs/CLOUD_WORKFLOW.md), [roadmap](docs/ROADMAP.md), and
+[frozen M7 interpretation](docs/m7/M7_RESULTS.md).
+
 ## What v0.3.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |
@@ -126,6 +143,9 @@ print(__version__, len(cloud), cloud.xyz.dtype)
 ```
 
 ### GPU detector and ROS demo
+
+The commands in this subsection are historical reproduction entry points for an explicitly
+authorized GPU runtime. Do not run them as CPU workstation setup or hardware-discovery checks.
 
 The validated deployment stack is Ubuntu 22.04 under WSL2, Python 3.10, CUDA 11.8, TensorRT 8.6.1,
 and ROS 2 Humble. nuScenes, the official checkpoint, ONNX, and TensorRT engine are external and are

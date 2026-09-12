@@ -465,7 +465,12 @@ def _static_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     ):
         target = tmp_path / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / relative, target)
+        if relative == runtime.PROTOCOL_MARKDOWN_PATH:
+            # Git may check Markdown out as CRLF on Windows. Materialize canonical LF
+            # only in this temporary fixture; keep the frozen hash validator unchanged.
+            target.write_bytes((ROOT / relative).read_bytes().replace(b"\r\n", b"\n"))
+        else:
+            shutil.copy2(ROOT / relative, target)
     monkeypatch.setattr(runtime, "_require_git_objects", lambda _: None)
     monkeypatch.setattr(runtime, "_repository_head", lambda _: "c" * 40)
     return tmp_path

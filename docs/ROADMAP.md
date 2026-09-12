@@ -6,9 +6,10 @@ complete and v0.3.0 is its release boundary. M6a is complete under prospective P
 original Tier-A failure remains preserved as a failure. M6b is complete under owner-approved
 Protocol R2 after structural 40k remediation, the non-evaluation H5 profile-gap parity gate, and
 the full frozen offline characterization. M6c is complete with a positive final R3
-projected-reference ROS validation; the original R2 failure and D1 diagnosis remain preserved. No
-technical submilestone is currently active, M5 remains conditional and inactive, and any next
-milestone requires explicit owner authorization.
+projected-reference ROS validation; the original R2 failure and D1 diagnosis remain preserved.
+M7 is complete and frozen. M8 Detector V2 is active, with its scientific S1 execution paused pending
+a newly qualified external GPU runtime. M5 remains conditional and inactive. Work beyond the
+explicitly authorized M8 scope requires a new owner decision.
 
 ## Completed foundations
 
@@ -99,7 +100,43 @@ M6 is closed; no R4 or later technical work starts automatically.
 ## v0.3.0 release boundary — complete
 
 v0.3.0 packages the completed M6 repository state, documentation, and reviewed evidence. The
-release does not reopen M6, start M7, or authorize another experiment.
+release itself did not reopen M6, start M7, or authorize another experiment. M7 and M8 were
+subsequently authorized separately.
+
+## M7 — complete and frozen
+
+The controlled history-mechanism study completed prospective R2 measurement, raw aggregation, and
+owner-approved interpretation. Preserve the earlier binding failure, diagnosis, corrected runtime,
+raw results, and [frozen interpretation](m7/M7_RESULTS.md). The measured encoded-lag contribution
+is class- and corpus-dependent; it does not authorize lag compression as a product default.
+
+## M8 Detector V2 — active; S1 execution paused
+
+| Step | Current state |
+|---|---|
+| Candidate | DSVT-Pillar plus TransFusion selected on engineering feasibility |
+| P1-E | Complete, including the amended H10 structural-capacity gates |
+| S1 protocol | Owner-approved and frozen |
+| Measurement implementation | Reviewed historical runtime with mode/pass authorization barriers |
+| Retired-runtime Stage R | Complete; raw evidence merged and reviewed |
+| Retired-runtime primary A2/E2 | Historically authorized on that runtime; **zero calls executed** |
+| New external runtime | Provider not selected; complete qualification and new authorization required |
+| S1 execution | Paused pending the newly qualified GPU runtime |
+| Zero-intensity / S2 / training | Not authorized; not started |
+
+Read the historical [candidate decision](m8/M8_CANDIDATE_DECISION.md),
+[P1-E integration](m8/M8_PHASE1_ENGINEERING.md), [S1 protocol](m8/M8_S1_PROTOCOL.md),
+[measurement implementation](m8/M8_S1_MEASUREMENT_IMPLEMENTATION.md),
+[Stage R raw evidence](m8/M8_S1_STAGE_R_RAW.md), and
+[primary authorization](m8/M8_S1_PRIMARY_AUTHORIZATION.md) in chronological order. Their status
+statements describe those acts at the time; the retired authorization is not portable.
+
+The [compute workflow](CLOUD_WORKFLOW.md) requires owner-scoped GT-blind qualification, artifact
+and capacity verification, machine-specific policy, owner review, fresh Stage-R-only authorization,
+repeated Stage R and raw review, then a fresh primary authorization before A2/E2. Verified transfers
+and historical capacity measurements grant no execution permission. The scientific comparison
+remains a frozen detector-stack comparison, not an architecture-only causal study. DSVT's partial
+TensorRT route is not end-to-end deployment parity. No PointPillars rerun is authorized.
 
 ## M5 — conditional physical Jetson measurement
 
@@ -107,7 +144,7 @@ M5 remains conditional and inactive. Measure or tune for Jetson only if target h
 physically available and the owner explicitly authorizes the milestone. No Jetson figure will be
 estimated, simulated, or inferred from the RTX 4060 Laptop result.
 
-## Post-v0.2 backlog — not started
+## Other engineering backlog — not authorized
 
 These are separate future proposals, not current work or commitments:
 
@@ -116,8 +153,18 @@ These are separate future proposals, not current work or commitments:
 - further exact-fast tuning;
 - custom CUDA only if later evidence justifies it;
 - INT8;
-- additional detector architectures; and
+- detector architectures beyond the separately selected M8 candidate; and
 - training infrastructure.
+
+## Future platform after M8 — direction only, not authorized
+
+The [platform RFC](PERCEPTION_PLATFORM_RFC.md) proposes stable input/result contracts, optional
+backend capabilities and manifests, model discovery, and a common Python/CLI pipeline. Later
+targets include richer sensor/temporal ingestion, semantic and instance/panoptic understanding,
+tracking, embeddings, scene understanding, and eventually language-queryable representations.
+These are neither current capabilities nor an active post-M8 milestone. They do not authorize
+training, another model, tracking, segmentation, a scientific experiment, or changes to frozen
+evidence. The owner must select and scope each increment separately.
 
 ## Parked experimental infrastructure
 
