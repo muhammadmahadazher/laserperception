@@ -5,6 +5,22 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### Changed
+
+- Adopt local CPU development with separately authorized external GPU compute on demand, retaining
+  GitHub/Drive persistence and all runtime-specific scientific gates.
+- Update current-development chronology through frozen M7 and paused M8 S1; preserve released
+  v0.3.0 claims and all historical evidence.
+- Exclude private engineering handoffs and operational state from source distributions, without
+  traversing excluded directories in a local Drive-backed workspace.
+- Materialize canonical protocol Markdown line endings in the temporary CPU binding-test fixture
+  on Windows; keep the frozen protocol and production byte/hash checks unchanged.
+
+### Added
+
+- Proposed perception-platform RFC and a bounded follow-up plan for provider-neutral worker
+  tooling reviewed from closed, unmerged PR #32. Neither authorizes new scientific execution.
+
 ## [0.3.0] - 2026-08-26
 
 ### Added

@@ -51,7 +51,25 @@ without hardware, localization, vendor SDK drivers, unrelated optimization, or u
 unless the owner explicitly changes scope. Frozen scientific artifacts and historical failures
 must not be modified or reinterpreted.
 
-## Cloud persistence and worker lifecycle
+## Local CPU development and external compute
+
+- Normal development must support CPU-only workstations. Do not assume a GPU exists, probe an
+  optional GPU, import a GPU runtime for discovery, or run GPU integration tests without explicit
+  owner/runtime authorization. Missing optional dependencies must fail closed before discovery.
+- GPU workers are separate, explicitly selected external runtimes. Provider selection is an owner
+  decision, not a hard-coded dependency. Codex Cloud is not required or the primary development
+  environment. Use local CPU development plus external GPU compute on demand.
+- Static GPU-worker editing, syntax checks, and CPU mocks do not authorize execution of the
+  worker's GPU paths. GPU discovery and execution belong only inside an explicitly authorized
+  GPU runtime. Qualification and scientific execution require their own scoped authorization.
+- The retired RTX runtime's policy and primary authorization remain historical and non-portable.
+  A new worker must pass the full qualification and authorization sequence in
+  `docs/CLOUD_WORKFLOW.md`; transferring verified artifacts does not transfer permission.
+- Implement on an owner-assigned feature branch from verified main, commit with the owner's
+  configured human identity, push, and open a PR. Never implement/commit/push directly on main,
+  merge the PR, or enable auto-merge. Keep fixing the same PR until required CI is green.
+
+## GitHub/Drive persistence and worker lifecycle
 
 - GitHub is authoritative for tracked source, documentation, tests, configs, PRs, releases, and
   compact final evidence suitable for Git.
@@ -59,15 +77,16 @@ must not be modified or reinterpreted.
   `18Q73IkiVcFT0EXAowIPlOiISNk0mkhHJ`. `_CLOUD_STATE/` holds durable indexes and
   `_CLOUD_WORK/` holds task capsules. Datasets, checkpoints, binaries, large/raw/failed evidence,
   logs, valuable temporary state, and other non-Git project state must be Drive-backed.
-- Codex, cloud, and GPU workers are disposable. A task is not complete while unique
+- External compute workers are disposable. A task is not complete while unique
   LaserPerception state exists only on a worker. Git-suitable work must be represented in Git/PR;
   non-Git state must be Drive-backed.
 - Checkpoint expensive or scientific results after every canonical pass/process before proceeding,
   including failed attempts. Preserve temporary files when they have project, debug, or scientific
   value. Never upload or commit credentials.
-- Hydrate only required inputs and verify recorded hashes. Never mirror the whole Drive project or
-  assume an internal branch such as `work` must be named `main`; verify the starting commit and use
-  the normal Codex/GitHub PR handoff. See `docs/CLOUD_WORKFLOW.md`.
+- Hydrate only required inputs and verify recorded hashes. Never mirror the whole Drive project,
+  recursively hydrate private state, or optimize Git metadata on Drive-backed storage as routine
+  cleanup. Preserve private untracked state. Diagnose unexpected tracked changes before proceeding;
+  do not hide them with Git configuration or index flags. See `docs/CLOUD_WORKFLOW.md`.
 
 ## Detection and deployment architecture
 
@@ -121,8 +140,9 @@ must not be modified or reinterpreted.
 - Heavy environments, datasets, checkpoints, ONNX files, TensorRT engines, caches, logs, and
   generated outputs stay outside the repository and must be persisted to the canonical Drive when
   they are not reconstructible or have project value.
-- GPU and ROS integration tests are manual/local and must skip cleanly when their environment is
-  absent. Setup failures must be actionable and fail closed.
+- GPU integration tests are manual and confined to authorized external GPU runtimes. ROS tests
+  require a separately provisioned environment. CPU development must skip these integrations
+  before optional hardware discovery; setup failures must be actionable and fail closed.
 
 ## Dataset and asset rules
 

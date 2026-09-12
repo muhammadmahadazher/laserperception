@@ -64,6 +64,8 @@ Documentation = "https://github.com/muhammadmahadazher/laserperception/tree/main
 packages = ["src/laserperception"]
 
 [tool.hatch.build.targets.sdist]
+# Do not descend into ignored/private Drive state while building a source archive.
+skip-excluded-dirs = true
 include = [
   "/src",
   "/tests",
@@ -79,7 +81,14 @@ include = [
   "/THIRD_PARTY_NOTICES.md",
 ]
 # The release note records this sdist's SHA256, so including it would create a circular identity.
-exclude = ["/docs/releases/v0.3.0.md"]
+exclude = [
+  "/docs/releases/v0.3.0.md",
+  # Private workstation handoffs can coexist with tracked docs on Drive.
+  "/docs/*_Engineering_Handoff_*.md",
+  "/_CLOUD_STATE",
+  "/_CLOUD_WORK",
+  "/_MACHINE_RETIREMENT_*",
+]
 
 [tool.ruff]
 target-version = "py310"
