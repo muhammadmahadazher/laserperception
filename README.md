@@ -61,6 +61,27 @@ must not probe optional GPUs without explicit owner/runtime authorization. Codex
 required. See the [compute workflow](docs/CLOUD_WORKFLOW.md), [roadmap](docs/ROADMAP.md), and
 [frozen M7 interpretation](docs/m7/M7_RESULTS.md).
 
+## Perception metadata API
+
+The additive P0 registry inspects reviewed models without GPU frameworks, downloads, or inference.
+Install the package and run `laserperception models list` or
+`laserperception models inspect dsvt-pillar-transfusion-m8 --json`.
+
+```python
+from laserperception.perception import registry, validate_input
+
+manifest = registry.get("pointpillars-nuscenes-v0.3")
+report = validate_input(
+    manifest, manifest.input_features, coordinates=manifest.coordinates, temporal=manifest.temporal
+)
+print(report.valid, manifest.tasks)
+```
+
+Pass metadata describing your actual input to validate compatibility. Missing frame/history metadata
+is reported as unverified; validation performs no transformations. The two model manifests preserve
+distinct feature and class orders. M8 remains paused research requiring fresh runtime authorization.
+P0 provides discovery and compatibility metadata; it does not initialize a unified inference runtime.
+
 ## What v0.3.0 does—and what was measured
 
 | Engineering story | Shipped behavior | Measured evidence |

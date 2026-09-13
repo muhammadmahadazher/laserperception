@@ -5,6 +5,12 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### Perception platform P0
+
+- Add immutable feature, coordinate, temporal, capability and model manifests with strict JSON loading.
+- Ship reviewed PointPillars and M8 DSVT model metadata, CPU-only registry/validation APIs, and model CLI commands.
+- Preserve historical entry points, model behavior, and frozen scientific evidence.
+
 ### Changed
 
 - Adopt local CPU development with separately authorized external GPU compute on demand, retaining
