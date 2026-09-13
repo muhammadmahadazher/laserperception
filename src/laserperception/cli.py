@@ -10,6 +10,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(prog="laserperception")
     commands = parser.add_subparsers(dest="command", required=True)
+    from laserperception.worker.cli import configure_worker, run_worker
+
+    configure_worker(commands.add_parser("worker"))
     models = commands.add_parser("models").add_subparsers(dest="action", required=True)
     listing = models.add_parser("list")
     listing.add_argument("--json", action="store_true")
@@ -18,6 +21,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.command == "worker":
+            return run_worker(args)
         if args.action == "list":
             manifests = registry.list_models()
             if args.json:
@@ -30,6 +35,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
         else:
             print(registry.get(args.model_id).to_json(), end="")
-    except (ValueError, OSError) as error:
+    except (ValueError, OSError, RuntimeError) as error:
         parser.error(str(error))
     return 0

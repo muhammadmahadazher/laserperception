@@ -164,7 +164,15 @@ corpus, pass counts, feature order, evaluator, and failure accounting remain unc
 Stage R is preserved and cannot stand in for new-runtime Stage R. A bootstrap, successful transfer,
 or capacity check must never emit or manufacture scientific authorization.
 
-## Closed PR #32 — selective review and deferred implementation
+## Provider-neutral worker tooling — implemented engineering layer
+
+The `laserperception.worker` package provides strict task/artifact records, portable paths,
+verified individual-object transfers, CPU-only planning, and guarded external qualification
+bootstrap. See [External workers](EXTERNAL_WORKERS.md) for APIs, schemas and failure behavior.
+No provider or scientific execution is selected or authorized by these tools. The review record
+below remains historical; bounded whole-workspace snapshots are not implemented.
+
+## Closed PR #32 — historical selective review and implementation plan
 
 [PR #32](https://github.com/muhammadmahadazher/laserperception/pull/32) is closed and unmerged.
 Its capsule remains historical; the Codex Cloud migration plan is inactive. This workflow retains

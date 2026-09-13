@@ -26,3 +26,7 @@ uploaded files using hashes supported by both sides, falling back to size when n
 available; it does not force a full byte download of a potentially large capsule. When a scientific
 protocol or task requires stronger verification for a critical artifact, perform and record an
 explicit full round-trip of that artifact separately.
+
+The additive Python worker tools provide full-byte verified individual-object transfers and guarded
+qualification planning. See [External workers](../../docs/EXTERNAL_WORKERS.md). This historical
+script and the Drive root names remain unchanged for compatibility.

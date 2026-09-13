@@ -5,6 +5,12 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### External worker tooling
+
+- Add provider-neutral task manifests, safe artifact paths, streamed identities and non-destructive verified transfers.
+- Add CPU-only worker plans and guarded external qualification records; keep scientific authorization separate.
+- Preserve failed transfer/qualification journals and historical cloud helper compatibility.
+
 ### Perception platform P0
 
 - Add immutable feature, coordinate, temporal, capability and model manifests with strict JSON loading.
