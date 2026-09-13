@@ -61,6 +61,9 @@ must not probe optional GPUs without explicit owner/runtime authorization. Codex
 required. See the [compute workflow](docs/CLOUD_WORKFLOW.md), [roadmap](docs/ROADMAP.md), and
 [frozen M7 interpretation](docs/m7/M7_RESULTS.md).
 
+Provider-neutral [external worker tools](docs/EXTERNAL_WORKERS.md) provide CPU-safe planning and
+verified artifact transport. Provider selection and scientific execution remain separate.
+
 ## Perception metadata API
 
 The additive P0 registry inspects reviewed models without GPU frameworks, downloads, or inference.
