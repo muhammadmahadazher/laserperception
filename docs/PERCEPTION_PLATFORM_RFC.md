@@ -1,6 +1,12 @@
 # RFC: a sensor-conscious perception platform
 
-Status: **architecture proposal only; not implemented and not scientific authorization**.
+Status: **P0 metadata/contracts/registry/CLI implemented; remaining architecture proposed. No scientific authorization**.
+
+The `laserperception.perception` package implements immutable model/feature/frame/history records,
+strict deterministic JSON, two reviewed built-in manifests, and CPU-only compatibility reports.
+`laserperception models list` and `models inspect <id> --json` are available. Execution adapters and
+pipelines below remain proposals until their separately scoped implementation. Unknown artifact
+sizes/hashes are explicit nulls; deterministic metadata serialization is not scientific identity.
 
 This RFC proposes a developer-facing interoperability layer around proven upstream models.
 LaserPerception would own stable contracts, reproducibility, model discovery, and a simple

@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "model_id": "pointpillars-nuscenes-v0.3",
+  "display_name": "PointPillars",
+  "model_version": "v0.3.0",
+  "status": "released_historical",
+  "family": "PointPillars",
+  "upstream": "open-mmlab/mmdetection3d@fe25f7a51d36e3702f961e198894580d83c4387b",
+  "capabilities": {
+    "tasks": [
+      "detection_3d"
+    ],
+    "temporal_support": true,
+    "velocity_output": true,
+    "runtime_targets": [
+      "external_cuda"
+    ],
+    "deployment_maturity": "historical validated FP32 and TensorRT FP16 deployment",
+    "training_support": false,
+    "output_schema": "DetectionFrame/1.0"
+  },
+  "input_features": [
+    {
+      "name": "x",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "forward coordinate",
+      "position": 0,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "y",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "left coordinate",
+      "position": 1,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "z",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "up coordinate",
+      "position": 2,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "time_lag",
+      "dtype": "float32",
+      "required": true,
+      "unit": "second",
+      "semantics": "current seconds minus historical seconds; current positive zero",
+      "position": 3,
+      "missing_policy": "reject",
+      "source": "acquisition timestamps"
+    }
+  ],
+  "coordinates": {
+    "frame_role": "lidar",
+    "handedness": "right",
+    "axes": [
+      "forward",
+      "left",
+      "up"
+    ],
+    "distance_unit": "metre",
+    "box_center": "geometric_center",
+    "dimension_order": [
+      "length",
+      "width",
+      "height"
+    ],
+    "yaw": "counter_clockwise_from_positive_x_radians",
+    "reference": "current/reference lidar acquisition"
+  },
+  "temporal": {
+    "mode": "multi_sweep",
+    "min_history": 0,
+    "max_history": 10,
+    "timestamp_unit": "microseconds",
+    "reference": "current acquisition",
+    "elapsed_feature": "time_lag",
+    "sweep_order": "current then nearest-to-farthest history; preserve source rows",
+    "motion_compensation": true
+  },
+  "class_names": [
+    "car",
+    "truck",
+    "trailer",
+    "bus",
+    "construction_vehicle",
+    "bicycle",
+    "motorcycle",
+    "pedestrian",
+    "traffic_cone",
+    "barrier"
+  ],
+  "runtime_requirements": [
+    "MMDetection3D 1.4.0",
+    "PyTorch 2.1.0+cu118",
+    "CUDA 11.8",
+    "optional TensorRT 8.6.1 FP16 deployment"
+  ],
+  "artifacts": [
+    {
+      "role": "checkpoint",
+      "name": "hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth",
+      "byte_size": null,
+      "sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+      "provenance": "Official OpenMMLab download recorded in configs/detection/m1_pointpillars_nuscenes.yaml"
+    },
+    {
+      "role": "config",
+      "name": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py",
+      "byte_size": null,
+      "sha256": null,
+      "provenance": "Pinned MMDetection3D commit; configs/detection/m1_pointpillars_nuscenes.yaml"
+    }
+  ],
+  "limitations": [
+    "Metadata supports the historical v0.3 line; runtime adapters have separately declared coverage.",
+    "PointPillars consumes XYZT, not intensity.",
+    "No portable performance or arbitrary-sensor accuracy guarantee."
+  ],
+  "scientific_status": "M1-M7 historical/frozen; no rerun authorization",
+  "authorization_required": true
+}

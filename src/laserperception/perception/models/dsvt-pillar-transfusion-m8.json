@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "model_id": "dsvt-pillar-transfusion-m8",
+  "display_name": "DSVT-Pillar with TransFusion",
+  "model_version": "M8-P1-E",
+  "status": "research",
+  "family": "DSVT-Pillar with TransFusion",
+  "upstream": "Haiyang-W/DSVT@8cfc2a6f23eed0b10aabcdc4768c60b184357061",
+  "capabilities": {
+    "tasks": [
+      "detection_3d"
+    ],
+    "temporal_support": true,
+    "velocity_output": true,
+    "runtime_targets": [
+      "external_cuda"
+    ],
+    "deployment_maturity": "research eager backend; partial TensorRT route only",
+    "training_support": false,
+    "output_schema": "DetectionFrame/1.0"
+  },
+  "input_features": [
+    {
+      "name": "x",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "forward coordinate",
+      "position": 0,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "y",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "left coordinate",
+      "position": 1,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "z",
+      "dtype": "float32",
+      "required": true,
+      "unit": "metre",
+      "semantics": "up coordinate",
+      "position": 2,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "intensity",
+      "dtype": "float32",
+      "required": true,
+      "unit": null,
+      "semantics": "raw reflectance; no normalization or synthesis",
+      "position": 3,
+      "missing_policy": "reject",
+      "source": "raw acquisition"
+    },
+    {
+      "name": "time_lag",
+      "dtype": "float32",
+      "required": true,
+      "unit": "second",
+      "semantics": "current seconds minus historical seconds; current positive zero",
+      "position": 4,
+      "missing_policy": "reject",
+      "source": "acquisition timestamps"
+    }
+  ],
+  "coordinates": {
+    "frame_role": "lidar",
+    "handedness": "right",
+    "axes": [
+      "forward",
+      "left",
+      "up"
+    ],
+    "distance_unit": "metre",
+    "box_center": "geometric_center",
+    "dimension_order": [
+      "length",
+      "width",
+      "height"
+    ],
+    "yaw": "counter_clockwise_from_positive_x_radians",
+    "reference": "current/reference lidar acquisition"
+  },
+  "temporal": {
+    "mode": "multi_sweep",
+    "min_history": 0,
+    "max_history": 10,
+    "timestamp_unit": "microseconds",
+    "reference": "current acquisition",
+    "elapsed_feature": "time_lag",
+    "sweep_order": "current then nearest-to-farthest history; preserve source rows",
+    "motion_compensation": true
+  },
+  "class_names": [
+    "car",
+    "truck",
+    "construction_vehicle",
+    "bus",
+    "trailer",
+    "barrier",
+    "motorcycle",
+    "bicycle",
+    "pedestrian",
+    "traffic_cone"
+  ],
+  "runtime_requirements": [
+    "OpenPCDet/DSVT 0.6.0+8cfc2a6",
+    "PyTorch 2.1.0+cu118",
+    "CUDA 11.8",
+    "spconv 2.3.8",
+    "torch-scatter 2.1.2+pt21cu118"
+  ],
+  "artifacts": [
+    {
+      "role": "checkpoint",
+      "name": "DSVT_Nuscenes_val.pth",
+      "byte_size": 28665215,
+      "sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+      "provenance": "https://drive.google.com/file/d/10d7c-uJxg5w4GN-JmRBQi4gQDwHiOHxP/view?usp=drive_link"
+    },
+    {
+      "role": "config",
+      "name": "tools/cfgs/dsvt_models/dsvt_plain_1f_onestage_nusences.yaml",
+      "byte_size": null,
+      "sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+      "provenance": "configs/m8/dsvt_nuscenes_pillar.json; pinned upstream commit"
+    }
+  ],
+  "limitations": [
+    "Research candidate; not an unrestricted production model.",
+    "Historical runtime authorization is non-portable.",
+    "S1 corpus and H5/H10 modes remain governed by the frozen scientific protocol.",
+    "No random inference shuffle; raw reflectance required; zero-intensity unauthorized.",
+    "Partial TensorRT engineering route is not end-to-end deployment parity."
+  ],
+  "scientific_status": "M8 P1-E complete; S1 paused; retired Stage R complete; primary calls zero; fresh runtime-specific authorization required",
+  "authorization_required": true
+}
