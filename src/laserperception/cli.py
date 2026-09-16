@@ -10,9 +10,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(prog="laserperception")
     commands = parser.add_subparsers(dest="command", required=True)
+    from laserperception.perception.cli import configure_predict, run_predict
     from laserperception.worker.cli import configure_worker, run_worker
 
     configure_worker(commands.add_parser("worker"))
+    configure_predict(commands.add_parser("predict"))
     models = commands.add_parser("models").add_subparsers(dest="action", required=True)
     listing = models.add_parser("list")
     listing.add_argument("--json", action="store_true")
@@ -23,15 +25,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "worker":
             return run_worker(args)
+        if args.command == "predict":
+            return run_predict(args)
         if args.action == "list":
             manifests = registry.list_models()
             if args.json:
                 print(json.dumps([m.to_dict() for m in manifests], sort_keys=True, allow_nan=False))
             else:
-                for m in manifests:
+                for manifest in manifests:
                     print(
-                        f"{m.model_id}\t{','.join(t.value for t in m.tasks)}\t{m.status}"
-                        f"\t{','.join(m.capabilities.runtime_targets)}\t{m.temporal.mode}"
+                        f"{manifest.model_id}\t{','.join(t.value for t in manifest.tasks)}"
+                        f"\t{manifest.status}"
+                        f"\t{','.join(manifest.capabilities.runtime_targets)}"
+                        f"\t{manifest.temporal.mode}"
                     )
         else:
             print(registry.get(args.model_id).to_json(), end="")

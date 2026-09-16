@@ -1,21 +1,26 @@
 # RFC: a sensor-conscious perception platform
 
-Status: **P0 metadata/contracts/registry/CLI implemented; remaining architecture proposed. No scientific authorization**.
+Status: **P0 metadata and P1 detection backends/planning implemented. No new scientific authorization**.
 
-The `laserperception.perception` package implements immutable model/feature/frame/history records,
-strict deterministic JSON, two reviewed built-in manifests, and CPU-only compatibility reports.
-`laserperception models list` and `models inspect <id> --json` are available. Execution adapters and
-pipelines below remain proposals until their separately scoped implementation. Unknown artifact
-sizes/hashes are explicit nulls; deterministic metadata serialization is not scientific identity.
+The `laserperception.perception` package now implements immutable model/feature/frame/history records,
+strict deterministic JSON, reviewed manifests, a static backend catalog, exact execution-input
+validation, explicit execution contexts, `load_model()`, and `predict --dry-run`. Metadata inspection,
+validation, and planning do not import detector frameworks or inspect hardware.
 
-This RFC proposes a developer-facing interoperability layer around proven upstream models.
-LaserPerception would own stable contracts, reproducibility, model discovery, and a simple
-perception API. It would not become a monolithic clone of MMDetection3D or OpenPCDet, duplicate
-their training systems, or replace validated model mathematics merely to unify interfaces.
+P1 also provides a thin eager-FP32 PointPillars delegate and an M8 adapter boundary. PointPillars
+requires exact owner, input, artifact, runtime, device, and precision bindings before adapter import.
+Generic DSVT execution remains disabled until the frozen S1 runner can supply a live-policy-verified,
+canonical-input, call-accounted session. The test-only fake backend returns no detections and is marked
+non-scientific.
 
-The [vision](VISION.md) describes the long-term direction; the [roadmap](ROADMAP.md) records
-authorized work. Every implementation increment below requires separate owner scope. No training,
-new detector, segmentation, tracking, language model, service, or scientific run starts here.
+This RFC describes the implemented foundation and the longer developer-facing interoperability layer
+around proven upstream models. LaserPerception owns stable contracts, reproducibility, model discovery,
+and a simple perception API. It does not duplicate upstream training systems or replace validated model
+mathematics merely to unify interfaces.
+
+The [vision](VISION.md) describes the long-term direction; the [roadmap](ROADMAP.md) distinguishes the
+implemented P0/P1 engineering surface from future work. No training, new detector, segmentation,
+tracking, language model, service, or scientific run starts here.
 
 ## Existing foundations and limits
 
@@ -64,23 +69,20 @@ through the parked single-scan abstraction or alter frozen builders to satisfy a
 
 ## 2. Model and backend abstraction
 
-Propose a framework-independent, typed `Protocol` with task-specific specializations. Metadata
-inspection is CPU-only and must never instantiate a model, import a heavy backend, or enumerate
-devices. Execution requires an explicit execution context; construction cannot silently choose a
-GPU. An illustrative signature, **not a current public API**, is:
+The implemented `DetectionBackend` protocol exposes `describe()`, `validate_input()`, `prepare()`,
+`predict() -> DetectionFrame`, and `close()`. `ExecutionContext` requires an explicit runtime target,
+precision, device, task/runtime identity, commit, deterministic policy, and optional hashed
+authorization reference. Construction and static backend descriptions perform no hardware discovery.
 
-```python
-class DetectionBackend(Protocol):
-    def describe(self) -> ModelManifest: ...
-    def validate_input(self, input: PerceptionInput) -> ValidationReport: ...
-    def predict(self, input: PerceptionInput, *, context: ExecutionContext) -> DetectionFrame: ...
-    def close(self) -> None: ...
-```
+`load_model()` returns a metadata-only handle. Its validation and planning paths use manifest and
+static catalog records. Only `predict()` may cross the guarded lazy-import boundary after exact input,
+context, authorization, and external artifact checks. The task-specific `DetectionPipeline` preserves
+the backend's exact `DetectionFrame` and applies no display/export filtering.
 
-Names other than the existing `DetectionFrame` are proposed types. A common metadata protocol
-should expose capability declarations; distinct detection, segmentation, embedding, and tracking
-protocols should give callers narrow result types. Avoid a single backend method returning an
-untyped dictionary or silently guessing the requested task.
+The PointPillars adapter delegates only to the existing `prepare_model_ready_points()` and
+`run_prepared()` eager FP32 path. The M8 adapter cannot construct `DsvtBackend`; its production session
+bridge fails closed until the frozen runner owns live policy verification, canonical input selection,
+and `AtomicAttempt` accounting. Tests exercise both adapters with CPU mocks.
 
 Each model manifest should bind an immutable model ID/version to:
 
@@ -145,23 +147,24 @@ backpressure and dropped-input accounting; these are future designs, not new ROS
 
 ## 5. Model registry and discovery
 
-The registry should initially be static, reviewed manifests distributed with source or explicitly
-selected by the user. Discovery reads metadata without downloads, framework imports or hardware
-inspection. Model IDs resolve to exact versions, never silently to changing checkpoint contents.
-Weight retrieval must be explicit, license-aware, external to the core wheel and hash-verified.
-Manifest metadata must not execute arbitrary code or install arbitrary dependencies.
+The registry is static and contains reviewed manifests distributed with the package. Discovery reads
+metadata without downloads, framework imports, or hardware inspection. Model IDs resolve to exact
+versions and never silently select changing checkpoint contents. Weight retrieval remains explicit,
+license-aware, external to the core wheel, and hash-verified. Manifest metadata cannot execute code or
+install dependencies.
 
-Illustrative future CLI commands — **proposed, not implemented**:
+Implemented commands are:
 
 ```text
 laserperception models list
-laserperception inspect <model>
-laserperception predict ...
+laserperception models inspect <model> --json
+laserperception predict --model <model> --input <description.json> ... --dry-run
 ```
 
-`inspect` would explain required features, classes, runtime requirements, artifact provenance and
-limitations before execution. `predict` would require an explicit model/target and preserve all
-applicable runtime/scientific authorization gates. Model availability is not execution permission.
+The prediction command is deliberately planning-only. It reports exact input compatibility, runtime
+and artifact requirements, authorization reference state, dependency expectations, and blockers. It
+always records that hardware, artifacts, dependencies, and live policy were not verified. Registry
+availability and a dry-run plan do not grant execution permission.
 
 ## 6. Evaluation and reproducibility
 
@@ -203,17 +206,18 @@ language alignment, language model training or query service are implemented or 
 
 ## 9. Incremental migration and review gates
 
-1. **Inventory, then metadata:** owner-scope a manifest/capability design against existing contracts.
-   Prove discovery imports no GPU frameworks and performs no device discovery or network action.
-2. **Thin detection adapters:** wrap existing PointPillars and DSVT entry points without changing
-   their frozen feature construction or model execution. CPU fixtures test coordinate/feature
-   validation and missing-dependency failures. Any real parity gate needs separate authorization.
-3. **Shared developer entry points:** introduce a Python/CLI layer only after adapter contract and
-   failure-path review; preserve historical wrappers and scientific runners as versioned paths.
-4. **Additional tasks:** separately scope typed result families, models and evaluations. Do not
-   bundle segmentation, tracking, embeddings or training into an interface cleanup.
-5. **Services or language research:** proceed only after stable contracts and explicit owner scope,
-   with their own reproducibility and evaluation criteria.
+1. **Metadata foundation — implemented:** typed contracts, reviewed manifests, strict JSON, registry,
+   validation, and CPU-safe model CLI.
+2. **Thin detection adapters — implemented with gates:** PointPillars exact delegation is available
+   behind new owner/resource/input authorization; DSVT discovery and mocked delegation are available,
+   while production generic execution stays owned by the frozen S1 runner.
+3. **Shared developer entry points — implemented for validation and planning:** `load_model()`, the
+   detection pipeline, and `predict --dry-run` share the same contracts. Actual external execution
+   still requires its model-specific runtime and authorization path.
+4. **Additional tasks — future owner scope:** typed results and reviewed models for segmentation,
+   tracking, or embeddings must be added separately.
+5. **Services or language research — future owner scope:** proceed only after stable contracts and
+   explicit evaluation design.
 
 Adoption should be additive and reversible: retain original entry points and frozen manifests,
 compare adapter behavior using CPU fixtures first, and leave historical scientific code untouched
