@@ -5,6 +5,12 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### CPU tracking P2
+
+- Add real class-aware constant-velocity tracking of precomputed DetectionFrames, immutable results,
+  strict finite serialization, explicit timestamp streaming, CLI, CPU example and lifecycle regressions.
+- Preserve detector scores, boxes, source frames, scientific evidence and GPU authorization gates.
+
 ### Perception platform P1
 
 - Add an explicit execution context, zero-copy input envelope, static backend catalog, deterministic

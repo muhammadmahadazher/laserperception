@@ -1,6 +1,6 @@
 # RFC: a sensor-conscious perception platform
 
-Status: **P0 metadata and P1 detection backends/planning implemented. No new scientific authorization**.
+Status: **P0 metadata, P1 detection backends/planning, and P2 CPU tracking implemented. No new scientific authorization**.
 
 The `laserperception.perception` package now implements immutable model/feature/frame/history records,
 strict deterministic JSON, reviewed manifests, a static backend catalog, exact execution-input
@@ -19,8 +19,9 @@ and a simple perception API. It does not duplicate upstream training systems or 
 mathematics merely to unify interfaces.
 
 The [vision](VISION.md) describes the long-term direction; the [roadmap](ROADMAP.md) distinguishes the
-implemented P0/P1 engineering surface from future work. No training, new detector, segmentation,
-tracking, language model, service, or scientific run starts here.
+implemented P0/P1/P2 engineering surface from future work. CPU tracking is implemented under
+separate owner scope. No training, new detector, segmentation model, language service, or scientific
+run starts here.
 
 ## Existing foundations and limits
 
@@ -106,11 +107,11 @@ Existing M8 authorization checks remain mandatory beneath any future API and CLI
 Retain `DetectionFrame` unchanged. Add result families only with an owner-approved implementation
 and serialization contract:
 
-| Proposed family | Required semantics |
+| Result family (status below) | Required semantics |
 |---|---|
 | Semantic point result | Per-source-row class IDs, taxonomy/version, ignored/unknown distinction, optional scores |
 | Instance/panoptic point result | Per-row instance membership, semantic classes, explicit unassigned value, thing/stuff policy |
-| Track result | Stable IDs within a declared sequence scope, timestamp/frame, source detections, lifecycle state and association provenance |
+| Track result (implemented P2) | Stable IDs within a declared sequence scope, timestamp/frame, source detections, lifecycle state and association provenance |
 | Embedding result | Point/object/scene granularity, source identities, model/version, vector dimension, dtype, normalization and similarity convention |
 | Scene result | Typed entities and spatial/temporal relationships with evidence references and uncertainty; an extensible future schema |
 
@@ -141,9 +142,9 @@ resource limits, cancellation and failure accounting; no network service is impl
 
 Distinguish backend-owned model postprocessing from optional display/export filtering. Record
 thresholds and transformations without letting presentation settings redefine benchmark execution.
-An optional tracker consumes detections through a separately versioned association policy and
-cannot modify detector evidence. Streaming implementations must define bounded history, ordering,
-backpressure and dropped-input accounting; these are future designs, not new ROS behavior.
+The P2 tracker consumes detections through a versioned association policy and cannot modify detector
+evidence. It streams explicitly timed frames and retains active tracks by its miss policy. ROS
+tracking and backpressure remain future work.
 
 ## 5. Model registry and discovery
 
@@ -224,3 +225,11 @@ compare adapter behavior using CPU fixtures first, and leave historical scientif
 unless a separately reviewed need justifies a change. Architecture consistency is not a reason to
 rewrite frozen evidence code. No dates, universal support, performance or accuracy promises follow
 from this RFC.
+
+## CPU tracking — implemented P2
+
+`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
+constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
+lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
+No detector is executed. See [tracking documentation](TRACKING.md) for coordinate assumptions and
+limitations. The synthetic example is not benchmark evidence.

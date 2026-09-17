@@ -854,8 +854,6 @@ def test_custom_registry_cannot_change_builtin_execution_identity(monkeypatch, t
 
 
 def test_loaded_model_predict_lifecycle_and_execution_binding(monkeypatch, tmp_path):
-    import laserperception.perception.api as module
-
     manifest, cloud, description, context, resources = _pointpillars_fixture(tmp_path)
     backend = FakeDetectionBackend(manifest, payload_kind="model_ready_xyzt")
     constructions = []
@@ -864,7 +862,7 @@ def test_loaded_model_predict_lifecycle_and_execution_binding(monkeypatch, tmp_p
         constructions.append(args)
         return backend
 
-    monkeypatch.setattr(module, "backend_for", factory)
+    monkeypatch.setitem(load_model.__globals__, "backend_for", factory)
     model = load_model(manifest.model_id)
     value = PerceptionInput(description, cloud)
     assert (
@@ -883,8 +881,6 @@ def test_loaded_model_predict_lifecycle_and_execution_binding(monkeypatch, tmp_p
 
 
 def test_loaded_model_closes_after_backend_failure(monkeypatch, tmp_path):
-    import laserperception.perception.api as module
-
     manifest, cloud, description, context, resources = _pointpillars_fixture(tmp_path)
 
     class FailedBackend(FakeDetectionBackend):
@@ -892,7 +888,7 @@ def test_loaded_model_closes_after_backend_failure(monkeypatch, tmp_path):
             raise ValueError("mock prepare failure")
 
     backend = FailedBackend(manifest, payload_kind="model_ready_xyzt")
-    monkeypatch.setattr(module, "backend_for", lambda *a: backend)
+    monkeypatch.setitem(load_model.__globals__, "backend_for", lambda *a: backend)
     model = load_model(manifest.model_id)
     value = PerceptionInput(description, cloud)
     with pytest.raises(ValueError, match="prepare failure"):
@@ -977,8 +973,6 @@ def test_pipeline_preserves_prediction_error_if_cleanup_also_fails():
 
 
 def test_loaded_model_context_manager_returns_exact_frame_and_closes(monkeypatch, tmp_path):
-    import laserperception.perception.api as module
-
     manifest, cloud, description, context, resources = _pointpillars_fixture(tmp_path)
     frame = DetectionFrame((), "exact-delegate-sample", "exact-frame", {"unchanged": True})
 
@@ -988,7 +982,7 @@ def test_loaded_model_context_manager_returns_exact_frame_and_closes(monkeypatch
             return frame
 
     backend = ExactBackend(manifest, payload_kind="model_ready_xyzt")
-    monkeypatch.setattr(module, "backend_for", lambda *a: backend)
+    monkeypatch.setitem(load_model.__globals__, "backend_for", lambda *a: backend)
     with load_model(manifest.model_id) as model:
         assert (
             model.predict(PerceptionInput(description, cloud), context=context, resources=resources)

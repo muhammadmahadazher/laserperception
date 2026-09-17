@@ -74,6 +74,7 @@ include = [
   "/tests",
   "/configs",
   "/scripts",
+  "/examples",
   "/ros2",
   "/benchmarks",
   "/docs",
