@@ -5,6 +5,9 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+- Add deterministic data-adapter discovery, existing-reader wrappers, lazy dataset references,
+  truthful input/model compatibility inspection and a complete synthetic CPU developer journey.
+
 - Add immutable semantic point results, versioned ontology descriptions, strict source-row alignment,
   NumPy confusion/IoU metrics, identity-checked NPY sidecars, SemanticKITTI/DALES helpers and CPU CLI.
   This adds result/evaluation infrastructure without a production segmentation model.
