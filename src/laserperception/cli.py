@@ -11,9 +11,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="laserperception")
     commands = parser.add_subparsers(dest="command", required=True)
     from laserperception.perception.cli import configure_predict, run_predict
+    from laserperception.semantic.cli import configure_semantic, run_semantic
     from laserperception.tracking.cli import configure_track, run_track
     from laserperception.worker.cli import configure_worker, run_worker
 
+    configure_semantic(commands.add_parser("semantic"))
     configure_track(commands.add_parser("track"))
     configure_worker(commands.add_parser("worker"))
     configure_predict(commands.add_parser("predict"))
@@ -25,6 +27,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.command == "semantic":
+            return run_semantic(args)
         if args.command == "track":
             return run_track(args)
         if args.command == "worker":
