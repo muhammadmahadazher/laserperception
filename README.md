@@ -24,6 +24,7 @@ plus current, 354,182 points), 10 Hz was the highest tested clean sustained ROS 
 and 20 Hz were not sustained. M4.5 raw ingestion was correctness/integration work and has no new
 throughput claim.
 
+[Run the perception platform quickstart](docs/QUICKSTART_PERCEPTION.md) ·
 [Run the v0.2 detection/ROS quickstart](docs/QUICKSTART_V0_2.md) ·
 [Read the v0.3.0 release notes](docs/releases/v0.3.0.md) ·
 [Inspect the benchmark evidence](docs/BENCHMARKS.md)
@@ -64,26 +65,43 @@ required. See the [compute workflow](docs/CLOUD_WORKFLOW.md), [roadmap](docs/ROA
 Provider-neutral [external worker tools](docs/EXTERNAL_WORKERS.md) provide CPU-safe planning and
 verified artifact transport. Provider selection and scientific execution remain separate.
 
-## Perception metadata API
+## Perception platform API
 
-The additive P0 registry inspects reviewed models without GPU frameworks, downloads, or inference.
-Install the package and run `laserperception models list` or
-`laserperception models inspect dsvt-pillar-transfusion-m8 --json`.
+The P0/P1 platform layer inspects reviewed models, validates exact LiDAR feature/frame/history
+contracts, and creates deterministic execution plans without GPU frameworks, downloads, or hardware
+discovery. Run `laserperception models list`, inspect a manifest, or create a dry run:
 
-```python
-from laserperception.perception import registry, validate_input
-
-manifest = registry.get("pointpillars-nuscenes-v0.3")
-report = validate_input(
-    manifest, manifest.input_features, coordinates=manifest.coordinates, temporal=manifest.temporal
-)
-print(report.valid, manifest.tasks)
+```console
+laserperception models inspect dsvt-pillar-transfusion-m8 --json
+laserperception predict --help
 ```
 
-Pass metadata describing your actual input to validate compatibility. Missing frame/history metadata
-is reported as unverified; validation performs no transformations. The two model manifests preserve
-distinct feature and class orders. M8 remains paused research requiring fresh runtime authorization.
-P0 provides discovery and compatibility metadata; it does not initialize a unified inference runtime.
+```python
+from laserperception.perception import InputDescription, load_model
+
+model = load_model("pointpillars-nuscenes-v0.3")
+manifest = model.describe()
+input_description = InputDescription(
+    "1.0",
+    "planned-sample",
+    "lidar",
+    "model_ready_xyzt",
+    manifest.input_features,
+    manifest.coordinates,
+    manifest.temporal,
+    "explicit model-ready input",
+)
+report = model.validate(input_description)
+assert report.valid
+```
+
+`load_model()`, validation, and planning remain metadata-only. Actual PointPillars prediction verifies
+an exact owner authorization, input payload, config, checkpoint, runtime, device, and precision before
+its lazy adapter import. DSVT discovery and planning are available, while generic DSVT execution
+fails closed until the frozen S1 runner supplies a live-policy-verified, canonical-input, call-accounted
+session. Neither model is initialized by a dry run.
+
+[Use the perception quickstart](docs/QUICKSTART_PERCEPTION.md) for complete input and CLI examples.
 
 ## What v0.3.0 does—and what was measured
 

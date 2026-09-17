@@ -156,15 +156,18 @@ These are separate future proposals, not current work or commitments:
 - detector architectures beyond the separately selected M8 candidate; and
 - training infrastructure.
 
-## Future platform after M8 — direction only, not authorized
+## Perception platform engineering track
 
-The [platform RFC](PERCEPTION_PLATFORM_RFC.md) proposes stable input/result contracts, optional
-backend capabilities and manifests, model discovery, and a common Python/CLI pipeline. Later
-targets include richer sensor/temporal ingestion, semantic and instance/panoptic understanding,
-tracking, embeddings, scene understanding, and eventually language-queryable representations.
-These are neither current capabilities nor an active post-M8 milestone. They do not authorize
-training, another model, tracking, segmentation, a scientific experiment, or changes to frozen
-evidence. The owner must select and scope each increment separately.
+P0 and P1 now provide stable input/model contracts, reviewed manifests, model discovery, an explicit
+execution context, static backend descriptions, a generic detection pipeline, `load_model()`, and a
+CPU-safe prediction dry run. Thin adapters preserve the existing PointPillars output path and the M8
+S1 authorization/accounting boundary; this engineering work made no detector call.
+
+Later targets include richer sensor/temporal ingestion, semantic and instance/panoptic understanding,
+tracking, embeddings, scene understanding, and eventually language-queryable representations. These
+are not current capabilities or active milestones. They do not authorize training, another model,
+tracking, segmentation, a scientific experiment, or changes to frozen evidence. The owner must select
+and scope each increment separately.
 
 ## Parked experimental infrastructure
 

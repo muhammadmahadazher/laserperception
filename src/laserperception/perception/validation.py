@@ -69,8 +69,8 @@ def validate_input(
             <= manifest.temporal.max_history
         ):
             temporal_errors.append("history_range")
-    errors.extend(f"coordinate mismatch: {n}" for n in coordinate_errors)
-    errors.extend(f"temporal mismatch: {n}" for n in temporal_errors)
+    errors.extend(f"coordinate mismatch: {name}" for name in coordinate_errors)
+    errors.extend(f"temporal mismatch: {name}" for name in temporal_errors)
     return ValidationReport(
         tuple(sorted(errors)),
         tuple(warnings),
@@ -78,4 +78,40 @@ def validate_input(
         extra,
         tuple(coordinate_errors),
         tuple(temporal_errors),
+    )
+
+
+def validate_execution_input(
+    manifest: ModelManifest,
+    features: tuple[FeatureSpec, ...],
+    *,
+    coordinates: CoordinateContract,
+    temporal: TemporalContract,
+    payload_kind: str,
+    expected_payload_kind: str,
+) -> ValidationReport:
+    """Require the exact prepared-input contract used by a thin adapter."""
+
+    report = validate_input(
+        manifest,
+        features,
+        coordinates=coordinates,
+        temporal=temporal,
+    )
+    errors = list(report.errors)
+    if features != manifest.input_features:
+        errors.append("execution feature sequence differs from the model manifest")
+    if coordinates != manifest.coordinates:
+        errors.append("execution coordinate contract differs from the model manifest")
+    if temporal != manifest.temporal:
+        errors.append("execution temporal contract differs from the model manifest")
+    if payload_kind != expected_payload_kind:
+        errors.append(f"payload kind {payload_kind!r} does not match {expected_payload_kind!r}")
+    return ValidationReport(
+        tuple(sorted(set(errors))),
+        report.warnings,
+        report.missing_required_features,
+        report.extra_features,
+        report.coordinate_incompatibilities,
+        report.temporal_incompatibilities,
     )

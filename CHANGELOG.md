@@ -5,6 +5,14 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+### Perception platform P1
+
+- Add an explicit execution context, zero-copy input envelope, static backend catalog, deterministic
+  dry-run plan, and developer-facing `load_model()` API.
+- Add authorization-first thin PointPillars delegation, a fail-closed accounted-session boundary for
+  M8 DSVT, a typed detection pipeline, and an obviously non-scientific test-only CPU fake.
+- Add `laserperception predict --dry-run`, exact input/resource binding checks, focused CPU tests,
+  and a perception platform quickstart. No model, GPU, or scientific call was executed.
 ### External worker tooling
 
 - Add provider-neutral task manifests, safe artifact paths, streamed identities and non-destructive verified transfers.
