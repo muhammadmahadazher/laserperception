@@ -20,6 +20,7 @@ from run_m8_h10_capacity_smoke import _load_mapping, _reconstruct_selected
 
 from laserperception.detection.m8_backend import DsvtBackend
 from laserperception.detection.m8_input import M8PointCloud
+from laserperception.worker.guards import require_external_worker
 
 NAMES = (
     "src",
@@ -37,6 +38,7 @@ def _sha256(path: Path) -> str:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--upstream-root", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -166,6 +168,7 @@ def _execute_h10(engine: Any, trt: Any, torch: Any, inputs: tuple[Any, ...]) -> 
 
 def main() -> None:
     args = _parse_args()
+    require_external_worker(args.external_worker)
     census = _load_mapping(args.census)
     summary = census.get("summary")
     records = census.get("records")

@@ -9,9 +9,12 @@ import sys
 import uuid
 from pathlib import Path
 
+from laserperception.worker.guards import require_external_worker
+
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("mode", choices=("stage-r", "primary-pass", "zero-intensity-pass"))
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--runtime-commit", required=True)
@@ -25,6 +28,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = _parser().parse_args()
+    require_external_worker(args.external_worker)
     repetitions = 10 if args.mode == "stage-r" else 3
     worker = Path(__file__).with_name("run_m8_s1.py")
     session = str(uuid.uuid4())
@@ -35,6 +39,7 @@ def main() -> int:
         command = [
             sys.executable,
             str(worker),
+            "--external-worker",
             args.mode,
             "--repository-root",
             str(args.repository_root),

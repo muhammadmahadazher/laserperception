@@ -8,10 +8,12 @@ import json
 from pathlib import Path
 
 from laserperception.detection.m8_s1_preflight import run_max_pillar_capacity_review
+from laserperception.worker.guards import require_external_worker
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
@@ -23,6 +25,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = _parser().parse_args()
+    require_external_worker(args.external_worker)
     result = run_max_pillar_capacity_review(
         repository_root=args.repository_root.resolve(),
         full_ledger=args.full_ledger.resolve(),

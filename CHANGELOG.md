@@ -5,6 +5,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+- Add a non-executing M8 qualification readiness plan, frozen artifact availability snapshot,
+  externally reported qualification/capacity records, ordered evidence indexes and external-only
+  M8 GPU CLI guards. Preserve all historical science and runtime-specific authorization barriers.
+
 - Add deterministic data-adapter discovery, existing-reader wrappers, lazy dataset references,
   truthful input/model compatibility inspection and a complete synthetic CPU developer journey.
 
