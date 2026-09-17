@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import resource
 import subprocess
 import time
 from collections.abc import Mapping, Sequence
@@ -32,6 +31,7 @@ from laserperception.detection.multisweep import (
     MultiSweepBuilderConfig,
     SweepTransform,
 )
+from laserperception.worker.guards import require_external_worker
 
 
 def _sha256_array(array: np.ndarray) -> str:
@@ -121,6 +121,9 @@ def _gpu_identity() -> dict[str, str]:
 
 def run_smoke(args: argparse.Namespace) -> dict[str, object]:
     """Execute the structural gate and return its compact non-semantic record."""
+
+    require_external_worker(getattr(args, "external_worker", False))
+    import resource
 
     census = _load_mapping(args.census)
     summary = census.get("summary")
@@ -244,6 +247,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, object]:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--census", type=Path, required=True)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
@@ -256,6 +260,7 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = _parse_args()
+    require_external_worker(args.external_worker)
     record = run_smoke(args)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")

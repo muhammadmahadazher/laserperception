@@ -325,3 +325,7 @@ segmentation model is included. See [semantic usage](docs/SEMANTIC_SEGMENTATION.
 Discover eight implemented input paths with `laserperception data adapters list`, inspect local inputs
 and model preparation requirements with `data inspect`, and follow the [complete CPU journey](docs/QUICKSTART_PERCEPTION.md).
 See [adapter formats and limitations](docs/DATA_ADAPTERS.md).
+
+Prepare a CPU-only M8 qualification dry plan with `worker plan --task m8-qualification`; follow the
+[external-runtime readiness runbook](docs/m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md). Provider selection,
+qualification and scientific execution require new owner decisions and runtime-specific permissions.

@@ -148,3 +148,12 @@ lazy sample references and local input inspection. Compatibility uses existing m
 reports missing preparation and unverified coordinates. `data adapters list/inspect` and `data inspect`
 are CPU-safe. Existing readers and scientific multi-sweep paths retain their behavior. See
 [data adapters](DATA_ADAPTERS.md) and the expanded [CPU quickstart](QUICKSTART_PERCEPTION.md).
+
+## M8 external-runtime readiness — implemented M8-R
+
+CPU-only `worker plan --task m8-qualification` binds exact frozen artifacts and current repository SHA,
+records static availability/missing gates and the 16 GB/24 GB planning envelope, and grants no execution
+permission. Externally reported qualification/capacity records and ordered evidence indexes preserve
+fresh owner/runtime/policy gates. M8 GPU CLIs fail closed without explicit external context. See the
+[external-runtime runbook](m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md). Provider selection and M8 execution have
+not started; retired authorizations remain historical and non-portable.

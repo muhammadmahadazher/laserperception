@@ -20,10 +20,12 @@ from laserperception.detection.m8_s1_runtime import (
     verify_static_bindings,
 )
 from laserperception.detection.m8_s1_runtime_policy import capture_runtime_policy
+from laserperception.worker.guards import require_external_worker
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument(
         "mode",
         choices=(
@@ -76,12 +78,15 @@ def _external_runtime_paths(repository_root: Path) -> tuple[str, str]:
 
 def main() -> int:
     args = _parser().parse_args()
+    if args.mode != "aggregate":
+        require_external_worker(args.external_worker)
     root = args.repository_root.resolve()
     if args.mode == "preflight":
         script = Path(__file__).with_name("run_m8_s1_preflight.py")
         command = [
             sys.executable,
             str(script),
+            "--external-worker",
             "--repository-root",
             str(root),
             "--full-ledger",

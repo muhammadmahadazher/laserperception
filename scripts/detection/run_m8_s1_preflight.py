@@ -15,10 +15,12 @@ from laserperception.detection.m8_s1_preflight import (
     run_sizing_worker,
 )
 from laserperception.detection.m8_s1_runtime import atomic_write_json
+from laserperception.worker.guards import require_external_worker
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
@@ -31,6 +33,7 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _worker(args: argparse.Namespace) -> int:
+    require_external_worker(getattr(args, "external_worker", False))
     if args.worker_output is None or args.worker_index not in (1, 2):
         raise ValueError("worker mode requires --worker-index 1/2 and --worker-output")
     run_sizing_worker(
@@ -47,6 +50,7 @@ def _worker(args: argparse.Namespace) -> int:
 
 def main() -> int:
     args = _parser().parse_args()
+    require_external_worker(args.external_worker)
     if args.worker_index is not None:
         return _worker(args)
     script = Path(__file__).resolve()
@@ -58,6 +62,7 @@ def main() -> int:
             command = [
                 sys.executable,
                 str(script),
+                "--external-worker",
                 "--repository-root",
                 str(args.repository_root),
                 "--full-ledger",

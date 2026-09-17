@@ -117,3 +117,12 @@ runtime. Preserve each valuable output and failed attempt to Drive before retiri
 
 `scripts/cloud/persist_task.sh` and historical `_CLOUD_STATE`/`_CLOUD_WORK` names remain compatible.
 The new tools do not reinterpret that helper's historical checksum checks as full-byte verification.
+
+## M8 preliminary readiness without a selected runtime
+
+`worker plan --task m8-qualification --execution-commit FULL_CURRENT_MAIN_SHA --repository-root .`
+creates a CPU-only plan while future permissions are missing. It never fabricates a qualification
+TaskManifest. After runtime selection and fresh owner qualification scope, use the existing manifest/
+plan/bootstrap sequence. Bootstrap remains environment-only with detector calls 0; any GT-blind
+DSVT sizing/capacity requires a distinct explicit runtime scope and honest attempt accounting.
+See [M8 readiness/runbook](m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md).

@@ -7,7 +7,6 @@ import argparse
 import hashlib
 import json
 import logging
-import resource
 import statistics
 import time
 from pathlib import Path
@@ -19,6 +18,7 @@ from laserperception.detection.m8_backend import (
     dsvt_predictions_to_detection_frame,
 )
 from laserperception.detection.m8_input import M8PointCloud
+from laserperception.worker.guards import require_external_worker
 
 
 def _sha256(array: np.ndarray) -> str:
@@ -32,6 +32,7 @@ def _frame_sha256(frame: dict[str, object]) -> str:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--upstream-root", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -42,6 +43,9 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = _parse_args()
+    require_external_worker(args.external_worker)
+    import resource
+
     backend = DsvtBackend(
         manifest_path=args.manifest,
         upstream_root=args.upstream_root,

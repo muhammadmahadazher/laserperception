@@ -32,6 +32,7 @@ from laserperception.detection.multisweep import (
     MultiSweepBuilderConfig,
     SweepTransform,
 )
+from laserperception.worker.guards import require_external_worker
 
 INITIAL_SOURCE_BOUNDARY_PILLARS = 3_687
 HISTORICAL_M6_MAX_VOXELS_CONTEXT = 43_810
@@ -82,9 +83,11 @@ def build_capacity_census(
     date_root: Path,
     manifest_path: Path,
     coordinate_device: str,
+    external_worker: bool = False,
 ) -> dict[str, object]:
     """Return the deterministic 428-condition H10 candidate-pillar census."""
 
+    require_external_worker(external_worker)
     source = _load_mapping(full_ledger)
     accepted = _load_mapping(accepted_ledger)
     manifest = _load_mapping(manifest_path)
@@ -224,6 +227,7 @@ def build_capacity_census(
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--external-worker", action="store_true")
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--accepted-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
@@ -235,12 +239,14 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = _parse_args()
+    require_external_worker(args.external_worker)
     result = build_capacity_census(
         full_ledger=args.full_ledger,
         accepted_ledger=args.accepted_ledger,
         date_root=args.date_root,
         manifest_path=args.manifest,
         coordinate_device=args.coordinate_device,
+        external_worker=args.external_worker,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
