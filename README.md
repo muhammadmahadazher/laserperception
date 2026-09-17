@@ -317,3 +317,7 @@ constant-XY-velocity prediction, class-aware deterministic global greedy associa
 lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
 No detector is executed. See [tracking documentation](docs/TRACKING.md) for coordinate assumptions and
 limitations. The synthetic example is not benchmark evidence.
+
+Semantic point results and CPU evaluation are available through `laserperception.semantic` and
+`laserperception semantic inspect/evaluate`. This is result/evaluation infrastructure; no production
+segmentation model is included. See [semantic usage](docs/SEMANTIC_SEGMENTATION.md).

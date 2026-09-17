@@ -5,6 +5,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+- Add immutable semantic point results, versioned ontology descriptions, strict source-row alignment,
+  NumPy confusion/IoU metrics, identity-checked NPY sidecars, SemanticKITTI/DALES helpers and CPU CLI.
+  This adds result/evaluation infrastructure without a production segmentation model.
+
 ### CPU tracking P2
 
 - Add real class-aware constant-velocity tracking of precomputed DetectionFrames, immutable results,

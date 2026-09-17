@@ -183,3 +183,12 @@ constant-XY-velocity prediction, class-aware deterministic global greedy associa
 lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
 No detector is executed. See [tracking documentation](TRACKING.md) for coordinate assumptions and
 limitations. The synthetic example is not benchmark evidence.
+
+## Semantic results and evaluation — implemented P3
+
+`laserperception.semantic` supplies immutable, row-aligned SemanticPointFrame results and a NumPy
+confusion/IoU evaluator. Versioned taxonomy descriptions reuse the Experiment 001 ontology and its
+explicit SemanticKITTI/DALES mapping policy. Evaluation requires identical sample, coordinate, taxonomy,
+source-count and source-row identities. NPY sidecars bind dtype, shape, size and SHA256; small fixtures
+may use bounded inline JSON. `semantic inspect` and `semantic evaluate` run on CPU.
+Production segmentation models are not integrated. See [semantic documentation](SEMANTIC_SEGMENTATION.md).
