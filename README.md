@@ -321,3 +321,7 @@ limitations. The synthetic example is not benchmark evidence.
 Semantic point results and CPU evaluation are available through `laserperception.semantic` and
 `laserperception semantic inspect/evaluate`. This is result/evaluation infrastructure; no production
 segmentation model is included. See [semantic usage](docs/SEMANTIC_SEGMENTATION.md).
+
+Discover eight implemented input paths with `laserperception data adapters list`, inspect local inputs
+and model preparation requirements with `data inspect`, and follow the [complete CPU journey](docs/QUICKSTART_PERCEPTION.md).
+See [adapter formats and limitations](docs/DATA_ADAPTERS.md).

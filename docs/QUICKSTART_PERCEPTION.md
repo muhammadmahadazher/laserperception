@@ -4,7 +4,8 @@ LaserPerception exposes reviewed model metadata, exact LiDAR input contracts, de
 plans, and an explicitly gated detection API. These operations are CPU-safe until a caller invokes
 `predict()` with a complete execution context, owner authorization, and external artifacts.
 
-The examples below inspect and plan work. They do not discover hardware, import a detector framework,
+The metadata examples below inspect and plan work; the final journey also performs real CPU tracking
+and semantic evaluation of synthetic/precomputed results. They do not discover hardware, import a detector framework,
 download weights, or run inference.
 
 ## 1. List reviewed models
@@ -132,3 +133,35 @@ It returns an empty frame marked `non_scientific` and is not part of the reviewe
 For external artifact preparation and qualification planning, see
 [External workers](EXTERNAL_WORKERS.md). Scientific execution still requires fresh authorization
 for the exact selected runtime.
+## 5. Discover ingestion and inspect a real local input
+
+```console
+laserperception data adapters list
+laserperception data adapters inspect semantickitti --json
+laserperception data inspect sample.las --model dsvt-pillar-transfusion-m8 --json
+laserperception data inspect scan.bin --adapter kitti-velodyne --json
+```
+
+No detector is loaded. Inspection reports actual stored features and labels; missing time_lag,
+unverified coordinates and single-scan history are preparation blockers. It does not manufacture
+model compatibility. See [data adapters](DATA_ADAPTERS.md) for explicit dataset options and sequences.
+
+## 6. Run a complete synthetic CPU journey
+
+Create a new Drive-backed local output directory for a small reusable synthetic fixture:
+
+```console
+python examples/perception_cpu_journey.py .local/cpu-example
+laserperception data inspect .local/cpu-example/synthetic-dales.las --json
+laserperception track .local/cpu-example/detections.jsonl --sequence-id synthetic-journey --json
+laserperception semantic inspect .local/cpu-example/prediction.json --json
+laserperception semantic evaluate .local/cpu-example/prediction.json .local/cpu-example/ground-truth.json --json
+```
+
+The script requires a fresh directory and preserves generated LAS/result/JSONL files. It demonstrates
+adapter-to-PointCloud-to-explicit-semantic-GT evaluation, alongside precomputed DetectionFrame-to-tracker
+composition. Synthetic predictions are fixtures, not a segmentation model or measured benchmark.
+All timestamps, sample identities and coordinate declarations are explicit. No GPU is needed.
+Tracking consumes the versioned timed envelope around the existing DetectionFrame representation.
+Semantic evaluation rejects mismatched sample/frame/taxonomy/source-row identities before metrics.
+For your own results, see [tracking](TRACKING.md) and [semantic evaluation](SEMANTIC_SEGMENTATION.md).

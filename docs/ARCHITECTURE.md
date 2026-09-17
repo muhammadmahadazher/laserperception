@@ -140,3 +140,11 @@ explicit SemanticKITTI/DALES mapping policy. Evaluation requires identical sampl
 source-count and source-row identities. NPY sidecars bind dtype, shape, size and SHA256; small fixtures
 may use bounded inline JSON. `semantic inspect` and `semantic evaluate` run on CPU.
 Production segmentation models are not integrated. See [semantic documentation](SEMANTIC_SEGMENTATION.md).
+
+## Data discovery and ingestion — implemented P4
+
+`laserperception.data` adds eight reviewed metadata adapters, canonical PointCloud reader wrappers,
+lazy sample references and local input inspection. Compatibility uses existing model metadata and
+reports missing preparation and unverified coordinates. `data adapters list/inspect` and `data inspect`
+are CPU-safe. Existing readers and scientific multi-sweep paths retain their behavior. See
+[data adapters](DATA_ADAPTERS.md) and the expanded [CPU quickstart](QUICKSTART_PERCEPTION.md).
