@@ -54,7 +54,7 @@ result chronology.
   primary A2/E2 calls. S1 is paused pending full qualification and fresh authorization on a
   separately selected external GPU runtime. DSVT has only a partial TensorRT engineering route.
 - **Long-term direction:** a unified, sensor-conscious LiDAR perception framework with stable
-  contracts and a simple developer API. Broader tasks remain proposals in the
+  contracts and a simple developer API. CPU tracking is implemented in unreleased P2; remaining broader tasks are proposals in the
   [platform RFC](docs/PERCEPTION_PLATFORM_RFC.md), not released features or authorization.
 
 Development is local and CPU-capable, with ephemeral external GPU compute on demand. Local work
@@ -309,3 +309,11 @@ reproducibility matters, the exact commit; no DOI is claimed. Citation metadata 
 Questions and contributions: [CONTRIBUTING.md](CONTRIBUTING.md) ·
 [GitHub Discussions](https://github.com/muhammadmahadazher/laserperception/discussions) ·
 [Security policy](SECURITY.md)
+
+## CPU tracking — implemented P2
+
+`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
+constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
+lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
+No detector is executed. See [tracking documentation](docs/TRACKING.md) for coordinate assumptions and
+limitations. The synthetic example is not benchmark evidence.

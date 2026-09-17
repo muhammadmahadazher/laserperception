@@ -11,8 +11,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="laserperception")
     commands = parser.add_subparsers(dest="command", required=True)
     from laserperception.perception.cli import configure_predict, run_predict
+    from laserperception.tracking.cli import configure_track, run_track
     from laserperception.worker.cli import configure_worker, run_worker
 
+    configure_track(commands.add_parser("track"))
     configure_worker(commands.add_parser("worker"))
     configure_predict(commands.add_parser("predict"))
     models = commands.add_parser("models").add_subparsers(dest="action", required=True)
@@ -23,6 +25,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.command == "track":
+            return run_track(args)
         if args.command == "worker":
             return run_worker(args)
         if args.command == "predict":
@@ -41,6 +45,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
         else:
             print(registry.get(args.model_id).to_json(), end="")
-    except (ValueError, OSError, RuntimeError) as error:
+    except (TypeError, ValueError, OSError, RuntimeError) as error:
         parser.error(str(error))
     return 0

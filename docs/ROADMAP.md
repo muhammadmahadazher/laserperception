@@ -164,9 +164,9 @@ CPU-safe prediction dry run. Thin adapters preserve the existing PointPillars ou
 S1 authorization/accounting boundary; this engineering work made no detector call.
 
 Later targets include richer sensor/temporal ingestion, semantic and instance/panoptic understanding,
-tracking, embeddings, scene understanding, and eventually language-queryable representations. These
+embeddings, scene understanding, and eventually language-queryable representations. These
 are not current capabilities or active milestones. They do not authorize training, another model,
-tracking, segmentation, a scientific experiment, or changes to frozen evidence. The owner must select
+segmentation, a scientific experiment, or changes to frozen evidence. The owner must select
 and scope each increment separately.
 
 ## Parked experimental infrastructure
@@ -175,3 +175,11 @@ The earlier Experiment 001 foundation—`PointCloud`, I/O, SemanticKITTI and DAL
 normalization, ontology mappings, and dataset audits—remains tested and supported. Its model,
 training, and accuracy evaluation remain `Pending measurement` and outside the current detection
 release line.
+
+## CPU tracking — implemented P2
+
+`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
+constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
+lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
+No detector is executed. See [tracking documentation](TRACKING.md) for coordinate assumptions and
+limitations. The synthetic example is not benchmark evidence.

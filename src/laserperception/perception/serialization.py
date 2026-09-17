@@ -7,6 +7,7 @@ import types
 from collections.abc import Callable
 from dataclasses import fields, is_dataclass
 from enum import Enum
+from math import isfinite
 from typing import Literal, TypeVar, Union, cast, get_args, get_origin, get_type_hints
 
 T = TypeVar("T", bound="JsonRecord")
@@ -50,6 +51,11 @@ def _decode(annotation: object, value: object) -> object:
             )
         decoded = {k: _decode(hints[k], v) for k, v in value.items()}
         return cast(Callable[..., object], annotation)(**decoded)
+    if annotation is float and type(value) in (int, float):
+        converted = float(cast("int | float", value))
+        if not isfinite(converted):
+            raise ValueError("numbers must be finite")
+        return converted
     if annotation in (str, int, bool, type(None)) and type(value) is annotation:
         if isinstance(value, str) and not value.strip():
             raise ValueError("strings must not be empty")
@@ -88,12 +94,29 @@ class JsonRecord:
 
     @classmethod
     def from_json(cls: type[T], value: str) -> T:
-        def pairs(items: list[tuple[str, object]]) -> dict[str, object]:
-            result: dict[str, object] = {}
-            for key, item in items:
-                if key in result:
-                    raise ValueError(f"duplicate JSON key: {key}")
-                result[key] = item
-            return result
+        return cls.from_dict(load_json(value))
 
-        return cls.from_dict(json.loads(value, object_pairs_hook=pairs))
+
+def load_json(value: str) -> object:
+    """Reject duplicate keys and non-finite constants for all platform envelopes."""
+
+    def pairs(items: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, item in items:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = item
+        return result
+
+    def constant(value: str) -> None:
+        raise ValueError(f"non-finite JSON constant: {value}")
+
+    def finite_float(value: str) -> float:
+        converted = float(value)
+        if not isfinite(converted):
+            raise ValueError("JSON numbers must be finite")
+        return converted
+
+    return json.loads(
+        value, object_pairs_hook=pairs, parse_constant=constant, parse_float=finite_float
+    )

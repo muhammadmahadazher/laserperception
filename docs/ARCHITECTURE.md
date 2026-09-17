@@ -123,3 +123,11 @@ flowchart LR
 This earlier infrastructure remains tested and supported. Readers preserve point-level data and do
 not silently normalize, crop, voxelize, or augment. Its semantic-segmentation model, training, and
 accuracy results remain `Pending measurement` and outside the current detection release line.
+
+## CPU tracking — implemented P2
+
+`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
+constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
+lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
+No detector is executed. See [tracking documentation](TRACKING.md) for coordinate assumptions and
+limitations. The synthetic example is not benchmark evidence.
