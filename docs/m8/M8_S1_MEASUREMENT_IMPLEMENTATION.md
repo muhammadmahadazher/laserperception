@@ -230,6 +230,30 @@ primary or zero-intensity DSVT process. After the ten Stage R raw repeats receiv
 review, a later corpus authorization may explicitly list the approved primary and zero-intensity
 modes and logical passes. No Stage R or corpus authorization artifact exists at this stage.
 
+## Stage R input-gate receipt
+
+Before any Stage R scientific process starts, the CPU-only
+`scripts/detection/revalidate_m8_input_projection.py` command reconstructs all 428 frozen frames in
+H10 and H5 form and compares all 856 conditions with the accepted input ledger. With
+`--receipt-output`, a successful 856/856 replay with zero mismatches atomically emits the closed
+`laserperception.m8.s1.input-gate-receipt.v1` schema. The receipt binds the repository execution
+commit, frozen protocol and ledger identities, full transform/source manifest, ordered frames and
+conditions, candidate feature contract, and the complete replay result. Partial or mismatching
+replays cannot emit a complete receipt.
+
+Every fresh Stage R process requires `--input-gate-receipt`, verifies its exact schema, self-hash,
+execution commit, current Git HEAD, and live source/transform identities before DSVT construction,
+then freshly reconstructs the seven frozen sentinel frames in H10/H5 order. The resulting 14 input
+identities are recorded in `stage_r_consumed_input_revalidation.json`; the receipt SHA256 and that
+artifact identity are also recorded in the raw pass and final attempt manifest. The reconstructed
+arrays are the arrays consumed by the 14 detector calls in that process.
+
+This removes redundant full-corpus CPU reconstruction from each of the ten Stage R processes while
+retaining the complete pre-inference corpus gate and independent verification of every input each
+Stage R process consumes. It does not alter the frozen Stage R sentinel set, order, fresh-process
+rule, or 14-call count. Primary and zero-intensity fresh processes continue to reconstruct and
+verify all 856 conditions before model initialization; the receipt is rejected for those modes.
+
 ## Runtime policy binding
 
 The old caller-provided runtime-binding string has been removed. The GT-blind `runtime-binding`

@@ -149,6 +149,15 @@ def test_future_authorization_binds_runtime_implementation(tmp_path: Path) -> No
     assert not (tmp_path / "m8_s1_inference_authorization.json").exists()
 
 
+def test_stage_r_authorization_binds_input_gate_receipt() -> None:
+    expected = AuthorizationIdentity("a" * 40, input_gate_receipt_sha256="f" * 64)
+    authorization = _authorization(expected)
+    verify_scientific_authorization(authorization, expected, "stage-r", "stage-r-1")
+    authorization["input_gate_receipt_sha256"] = "e" * 64
+    with pytest.raises(M8S1ProtocolViolation, match="input_gate_receipt_sha256"):
+        verify_scientific_authorization(authorization, expected, "stage-r", "stage-r-1")
+
+
 def test_authorization_file_is_exact_schema_and_has_no_bypass(tmp_path: Path) -> None:
     expected = AuthorizationIdentity("a" * 40)
     path = tmp_path / "authorization.json"
@@ -442,17 +451,22 @@ def test_cli_removes_free_form_binding_and_orchestrator_stays_sequential() -> No
     assert '"runtime-binding"' in runner
     assert '"--runtime-policy-binding"' in runner
     assert '"--runtime-policy-binding"' in orchestrator
+    assert '"--input-gate-receipt"' in runner
+    assert '"--input-gate-receipt"' in orchestrator
     assert "subprocess.run" in orchestrator
     assert "Popen" not in orchestrator
     authorization_position = runner.index("require_scientific_authorization(")
     live_capture_position = runner.index("live_policy = capture_runtime_policy(")
     live_verify_position = runner.index("verify_runtime_policy_binding(")
+    receipt_verify_position = runner.index("verify_input_gate_receipt(")
     external_position = runner.index("upstream, checkpoint = _external_runtime_paths(root)")
     science_import_position = runner.index(
         "from laserperception.evaluation.m8_s1_science import run_scientific_attempt"
     )
     assert authorization_position < live_capture_position < live_verify_position
-    assert live_verify_position < external_position < science_import_position
+    assert (
+        live_verify_position < receipt_verify_position < external_position < science_import_position
+    )
 
 
 def _static_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:

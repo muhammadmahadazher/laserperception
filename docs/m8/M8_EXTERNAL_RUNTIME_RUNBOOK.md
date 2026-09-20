@@ -103,6 +103,13 @@ live version; package metadata is not proof of runtime equivalence.
 
 ## Chronological future worker stages
 
+Before starting billed GPU time, run the CPU-only
+`scripts/detection/revalidate_m8_input_projection.py` command at the exact prospective execution
+commit with `--receipt-output`. Persist its complete revalidation record and
+`laserperception.m8.s1.input-gate-receipt.v1` receipt. The command must reconstruct all 856 frozen
+H10/H5 conditions with zero mismatches. Verify the receipt against the same checkout and the
+authoritative full transform/source ledger; a receipt from another commit or source fails closed.
+
 1. Owner selects/provisions an external worker and explicitly scopes qualification. No provider/API
    operation is part of M8-R. Preserve fresh task/runtime identity and qualification authorization.
 2. Hydrate exact authoritative Git SHA with a clean tracked checkout and canonical LF. Verify origin,
@@ -121,7 +128,9 @@ live version; package metadata is not proof of runtime equivalence.
 9. Obtain fresh Stage-R-only authorization for that exact runtime/policy/execution identity. This does
    not authorize primary or zero-intensity calls.
 10. Run fresh Stage R under the existing verifier/accounting path: 10 fresh processes with 14 canonical
-    calls each. No historical process/evidence substitution or spliced partial passes.
+    calls each. Every process verifies the global 856-condition receipt before backend construction,
+    then freshly reconstructs and verifies the exact 14 sentinel inputs it consumes. No historical
+    process/evidence substitution or spliced partial passes.
 11. Persist raw Stage R evidence and every failed attempt to its Drive capsule before further work.
 12. Owner reviews/freezes the fresh raw Stage R result. Engineering receipts alone do not satisfy this.
 13. Obtain fresh primary authorization bound to that reviewed Stage R and machine policy.
@@ -154,5 +163,5 @@ in their selected external runtime. No new execution command bypasses the existi
 or scientific verifier. Historical evidence and algorithms are unchanged.
 
 Zero-intensity remains separately unauthorized. B2/C2/D2/F2 are unauthorized. S2 is not started and
-training is not started. Do not rent/provision/select a provider, execute qualification, Stage R,
-A2/E2, zero-intensity, S2 or training after finishing this readiness engineering phase.
+training is not started. This engineering runbook grants no execution permission by itself; each
+external qualification or scientific stage still requires the applicable direct owner scope.

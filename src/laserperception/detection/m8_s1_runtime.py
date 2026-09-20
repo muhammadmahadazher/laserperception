@@ -280,11 +280,12 @@ class AuthorizationIdentity:
     """Expected future owner authorization bindings."""
 
     measurement_runtime_execution_commit: str
+    input_gate_receipt_sha256: str | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return exact fields bound by a future separate authorization artifact."""
 
-        return {
+        record: dict[str, object] = {
             "protocol_freeze_commit": PROTOCOL_FREEZE_COMMIT,
             "protocol_json_sha256": PROTOCOL_JSON_SHA256,
             "measurement_runtime_execution_commit": self.measurement_runtime_execution_commit,
@@ -295,6 +296,9 @@ class AuthorizationIdentity:
             "evaluator_identity": EVALUATOR_IDENTITY,
             "operational_constraints": dict(OPERATIONAL_CONSTRAINTS),
         }
+        if self.input_gate_receipt_sha256 is not None:
+            record["input_gate_receipt_sha256"] = self.input_gate_receipt_sha256
+        return record
 
 
 def verify_scientific_authorization(
@@ -538,6 +542,7 @@ class AtomicAttempt:
         *,
         condition_ids: Sequence[str] | None = None,
         allow_test_fixture: bool = False,
+        evidence_bindings: Mapping[str, object] | None = None,
     ) -> None:
         self.root = Path(root)
         self.identity = identity
@@ -554,10 +559,11 @@ class AtomicAttempt:
         self.started_at = datetime.now(timezone.utc).isoformat()
         self.completed: list[str] = []
         self.failed_calls = 0
+        self.evidence_bindings = dict(evidence_bindings or {})
         self._write_progress("IN_PROGRESS", None)
 
     def _progress(self, status: str, failure_reason: str | None) -> dict[str, object]:
-        return {
+        record: dict[str, object] = {
             "schema_version": "laserperception.m8.s1.attempt.v1",
             "status": status,
             "identity": self.identity.to_dict(),
@@ -580,6 +586,9 @@ class AtomicAttempt:
             ),
             "completed_condition_ids": list(self.completed),
         }
+        if self.evidence_bindings:
+            record["evidence_bindings"] = dict(self.evidence_bindings)
+        return record
 
     def _write_progress(self, status: str, failure_reason: str | None) -> None:
         atomic_write_json(

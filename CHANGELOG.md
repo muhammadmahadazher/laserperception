@@ -5,6 +5,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+- Add a fail-closed, execution-bound CPU input-gate receipt for M8 Stage R. Each fresh Stage R
+  process now verifies the complete 856-condition gate and freshly reconstructs its 14 consumed
+  inputs; primary and zero-intensity full-corpus replay remains unchanged.
+
 - Add a non-executing M8 qualification readiness plan, frozen artifact availability snapshot,
   externally reported qualification/capacity records, ordered evidence indexes and external-only
   M8 GPU CLI guards. Preserve all historical science and runtime-specific authorization barriers.

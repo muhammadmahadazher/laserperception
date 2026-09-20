@@ -18,6 +18,11 @@ import numpy as np
 
 from laserperception.datasets.kitti_raw import KittiRawSequence
 from laserperception.detection.m8_input import M8MultiSweepBuilder
+from laserperception.detection.m8_s1_input_gate import (
+    create_input_gate_receipt,
+    write_input_gate_receipt,
+)
+from laserperception.detection.m8_s1_runtime import atomic_write_json
 from laserperception.detection.multisweep import (
     HistoricalSweep,
     MultiSweepBuilderConfig,
@@ -226,6 +231,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--date-root", type=Path, required=True)
     parser.add_argument("--implementation-commit", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--repository-root", type=Path, default=Path.cwd())
+    parser.add_argument("--receipt-output", type=Path)
     return parser.parse_args()
 
 
@@ -237,8 +244,15 @@ def main() -> None:
         date_root=args.date_root,
         implementation_commit=args.implementation_commit,
     )
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    atomic_write_json(args.output, record)
+    if args.receipt_output is not None:
+        receipt = create_input_gate_receipt(
+            repository_root=args.repository_root.resolve(),
+            full_ledger=args.full_ledger.resolve(),
+            execution_commit=args.implementation_commit,
+            gate_result=record,
+        )
+        write_input_gate_receipt(args.receipt_output, receipt)
     print(json.dumps(record, indent=2, sort_keys=True))
 
 

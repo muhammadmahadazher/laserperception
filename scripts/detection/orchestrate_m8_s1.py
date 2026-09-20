@@ -20,6 +20,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-commit", required=True)
     parser.add_argument("--runtime-policy-binding", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
+    parser.add_argument("--input-gate-receipt", type=Path)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
     parser.add_argument("--attempt-root", type=Path, required=True)
@@ -29,6 +30,10 @@ def _parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = _parser().parse_args()
     require_external_worker(args.external_worker)
+    if args.mode == "stage-r" and args.input_gate_receipt is None:
+        raise ValueError("stage-r requires --input-gate-receipt")
+    if args.mode != "stage-r" and args.input_gate_receipt is not None:
+        raise ValueError("--input-gate-receipt is valid only for stage-r")
     repetitions = 10 if args.mode == "stage-r" else 3
     worker = Path(__file__).with_name("run_m8_s1.py")
     session = str(uuid.uuid4())
@@ -62,6 +67,8 @@ def main() -> int:
             "--output",
             str(root / "raw_pass.json"),
         ]
+        if args.input_gate_receipt is not None:
+            command.extend(["--input-gate-receipt", str(args.input_gate_receipt)])
         status = subprocess.run(command, cwd=args.repository_root, check=False)
         if status.returncode != 0:
             raise RuntimeError(
