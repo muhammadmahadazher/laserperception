@@ -30,10 +30,11 @@ def _parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = _parser().parse_args()
     require_external_worker(args.external_worker)
-    if args.mode == "stage-r" and args.input_gate_receipt is None:
-        raise ValueError("stage-r requires --input-gate-receipt")
-    if args.mode != "stage-r" and args.input_gate_receipt is not None:
-        raise ValueError("--input-gate-receipt is valid only for stage-r")
+    receipt_modes = {"stage-r", "primary-pass"}
+    if args.mode in receipt_modes and args.input_gate_receipt is None:
+        raise ValueError(f"{args.mode} requires --input-gate-receipt")
+    if args.mode not in receipt_modes and args.input_gate_receipt is not None:
+        raise ValueError("--input-gate-receipt is valid only for stage-r and primary-pass")
     repetitions = 10 if args.mode == "stage-r" else 3
     worker = Path(__file__).with_name("run_m8_s1.py")
     session = str(uuid.uuid4())

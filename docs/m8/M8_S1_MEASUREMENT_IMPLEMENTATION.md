@@ -251,8 +251,17 @@ arrays are the arrays consumed by the 14 detector calls in that process.
 This removes redundant full-corpus CPU reconstruction from each of the ten Stage R processes while
 retaining the complete pre-inference corpus gate and independent verification of every input each
 Stage R process consumes. It does not alter the frozen Stage R sentinel set, order, fresh-process
-rule, or 14-call count. Primary and zero-intensity fresh processes continue to reconstruct and
-verify all 856 conditions before model initialization; the receipt is rejected for those modes.
+rule, or 14-call count.
+
+Every fresh primary process also requires the complete receipt and verifies it before backend
+construction. It then independently reconstructs all 428 frozen frame pairs while executing the
+canonical pass. Each frame is reconstructed exactly once; H10 and then H5 from that same pair are
+freshly identity-verified and consumed by the corresponding detector calls. The process records 428
+fresh pair reconstructions, 856 freshly verified conditions, the exact canonical condition order,
+and the receipt SHA256 in deterministic consumed-input evidence. No point arrays are shared across
+frames or processes. This removes the extra pre-inference replay and the duplicate per-history pair
+reconstruction without changing the frozen 856-call primary protocol. Zero-intensity behavior is
+unchanged and continues to use its existing complete pre-inference reconstruction.
 
 ## Runtime policy binding
 

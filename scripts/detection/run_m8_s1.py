@@ -129,13 +129,16 @@ def main() -> int:
         args.runtime_policy_binding,
         "--runtime-policy-binding",
     )
+    receipt_modes = {"stage-r", "primary-pass"}
     input_gate_receipt = (
         _require_path(args.input_gate_receipt, "--input-gate-receipt").resolve()
-        if args.mode == "stage-r"
+        if args.mode in receipt_modes
         else None
     )
-    if args.mode != "stage-r" and args.input_gate_receipt is not None:
-        raise M8S1ProtocolViolation("--input-gate-receipt is valid only for stage-r")
+    if args.mode not in receipt_modes and args.input_gate_receipt is not None:
+        raise M8S1ProtocolViolation(
+            "--input-gate-receipt is valid only for stage-r and primary-pass"
+        )
     expected = AuthorizationIdentity(
         args.runtime_commit,
         input_gate_receipt_sha256=(
@@ -157,7 +160,7 @@ def main() -> int:
         runtime_policy_sha256,
         live_policy,
     )
-    if args.mode == "stage-r":
+    if args.mode in receipt_modes:
         assert input_gate_receipt is not None
         verify_input_gate_receipt(
             input_gate_receipt,

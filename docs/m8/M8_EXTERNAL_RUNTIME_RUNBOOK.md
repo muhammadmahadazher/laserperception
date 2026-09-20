@@ -109,6 +109,8 @@ commit with `--receipt-output`. Persist its complete revalidation record and
 `laserperception.m8.s1.input-gate-receipt.v1` receipt. The command must reconstruct all 856 frozen
 H10/H5 conditions with zero mismatches. Verify the receipt against the same checkout and the
 authoritative full transform/source ledger; a receipt from another commit or source fails closed.
+Stage R and primary processes require this receipt; omission or invalidity fails before backend
+construction. There is no fallback full-corpus preflight inside primary.
 
 1. Owner selects/provisions an external worker and explicitly scopes qualification. No provider/API
    operation is part of M8-R. Preserve fresh task/runtime identity and qualification authorization.
@@ -134,8 +136,12 @@ authoritative full transform/source ledger; a receipt from another commit or sou
 11. Persist raw Stage R evidence and every failed attempt to its Drive capsule before further work.
 12. Owner reviews/freezes the fresh raw Stage R result. Engineering receipts alone do not satisfy this.
 13. Obtain fresh primary authorization bound to that reviewed Stage R and machine policy.
-14. Run three uninterrupted primary processes, each completing 856 H10/H5 conditions. No splicing;
-    preserve incomplete attempts and restart a whole canonical process when required by protocol.
+14. Run three uninterrupted primary processes, each completing 856 H10/H5 conditions. Every fresh
+    process verifies the complete global receipt, then reconstructs all 428 frame pairs itself.
+    For each frame it consumes H10 followed by H5 from one pair reconstruction, freshly verifies all
+    856 input identities, and records deterministic consumed-input evidence. Pair data is not reused
+    across frames or processes. No splicing; preserve incomplete attempts and restart a whole
+    canonical process when required by protocol.
 15. Persist and verify each canonical pass/process immediately before proceeding. Expected accepted
     primary total is 2568 only after all three complete; never claim a result from this plan.
 16. Owner performs final evidence review. Keep raw/failed evidence distinct from compact final Git
