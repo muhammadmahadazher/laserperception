@@ -28,6 +28,7 @@ from laserperception.detection.m8_s1_runtime import (
     AttemptIdentity,
     atomic_write_json,
     canonical_condition_ids,
+    canonical_frame_ids,
     canonical_json_sha256,
     stage_r_condition_ids,
     validate_scientific_condition_payload,
@@ -349,17 +350,19 @@ def run_scientific_attempt(
     try:
         stage_r_inputs: dict[str, tuple[np.ndarray, dict[str, object]]] | None = None
         receipt_sha256: str | None = None
-        if mode == "stage-r":
+        if mode in {"stage-r", "primary-pass"}:
             if input_gate_receipt is None:
-                raise ValueError("Stage R requires a complete input-gate receipt")
+                raise ValueError(f"{mode} requires a complete input-gate receipt")
             receipt_sha256 = verify_input_gate_receipt(
                 input_gate_receipt,
                 repository_root=repository_root,
                 full_ledger=full_ledger,
                 execution_commit=runtime_commit,
             )
+            if receipt_sha256 is None:
+                raise AssertionError("verified input-gate receipt identity is absent")
         elif input_gate_receipt is not None:
-            raise ValueError("input-gate receipt is valid only for Stage R")
+            raise ValueError("input-gate receipt is valid only for Stage R and primary")
         source = FrozenInputSource.load(
             date_root=date_root,
             full_ledger=full_ledger,
@@ -374,6 +377,8 @@ def run_scientific_attempt(
                 "stage_r_consumed_input_revalidation_sha256": revalidation["result_sha256"],
                 "stage_r_freshly_revalidated_conditions": 14,
             }
+        elif mode == "primary-pass":
+            evidence_bindings = {"input_gate_receipt_sha256": receipt_sha256}
         else:
             revalidation = _revalidate_all(source)
         attempt = AtomicAttempt(attempt_root, identity, evidence_bindings=evidence_bindings)
@@ -382,7 +387,8 @@ def run_scientific_attempt(
             if mode == "stage-r"
             else "input_revalidation.json"
         )
-        atomic_write_json(attempt_root / revalidation_name, revalidation)
+        if mode != "primary-pass":
+            atomic_write_json(attempt_root / revalidation_name, revalidation)
         camera, poses_by_frame = _load_gt(date_root)
         backend = DsvtBackend.from_environment(
             manifest_path=repository_root / CANDIDATE_MANIFEST_PATH
@@ -392,18 +398,14 @@ def run_scientific_attempt(
         sampler.start()
         payloads = []
         try:
-            condition_ids = (
-                stage_r_condition_ids() if mode == "stage-r" else canonical_condition_ids()
-            )
             sampler.begin_block("scientific_attempt")
-            for condition_id in condition_ids:
+
+            def infer_condition(
+                condition_id: str,
+                points: np.ndarray,
+                input_identity: Mapping[str, object],
+            ) -> None:
                 frame_id, history = condition_id.rsplit("/", 1)
-                if mode == "stage-r":
-                    assert stage_r_inputs is not None
-                    points, input_identity = stage_r_inputs[condition_id]
-                else:
-                    pair = source.pair(frame_id)
-                    points, input_identity = pair[0 if history == "H10" else 1]
                 if mode == "zero-intensity-pass":
                     points = zero_intensity_copy(points)
                     input_identity = {
@@ -424,6 +426,73 @@ def run_scientific_attempt(
                 )
                 attempt.record(condition_id, payload)
                 payloads.append(payload)
+
+            if mode == "primary-pass":
+                primary_records: list[dict[str, object]] = []
+                primary_condition_ids: list[str] = []
+                h10 = h5 = 0
+                for frame_id in canonical_frame_ids():
+                    pair = source.pair(frame_id)
+                    expected = (f"{frame_id}/H10", f"{frame_id}/H5")
+                    actual = tuple(str(identity.get("condition_id")) for _, identity in pair)
+                    histories = tuple(str(identity.get("history")) for _, identity in pair)
+                    if len(pair) != 2 or actual != expected or histories != ("H10", "H5"):
+                        raise RuntimeError("primary consumed-input pair order changed")
+                    for (points, input_identity), condition_id in zip(pair, expected, strict=True):
+                        history = condition_id.rsplit("/", 1)[1]
+                        h10 += int(history == "H10")
+                        h5 += int(history == "H5")
+                        primary_condition_ids.append(condition_id)
+                        primary_records.append(dict(input_identity))
+                        infer_condition(condition_id, points, input_identity)
+                if (
+                    len(primary_records),
+                    h10,
+                    h5,
+                    tuple(primary_condition_ids),
+                ) != (856, 428, 428, canonical_condition_ids()):
+                    raise RuntimeError("primary consumed-input verification is incomplete")
+                consumed_verification: dict[str, object] = {
+                    "schema_version": "laserperception.m8.s1.primary-consumed-inputs.v1",
+                    "input_gate_receipt_sha256": receipt_sha256,
+                    "pair_reconstructions_exact": 428,
+                    "conditions_exact": 856,
+                    "H10_exact": h10,
+                    "H5_exact": h5,
+                    "condition_order_exact": True,
+                    "condition_ids": primary_condition_ids,
+                    "records": primary_records,
+                }
+                consumed_verification["result_sha256"] = canonical_json_sha256(
+                    consumed_verification
+                )
+                atomic_write_json(
+                    attempt_root / "primary_consumed_input_verification.json",
+                    consumed_verification,
+                )
+                attempt.evidence_bindings.update(
+                    {
+                        "primary_consumed_input_verification_sha256": consumed_verification[
+                            "result_sha256"
+                        ],
+                        "primary_fresh_pair_reconstructions": 428,
+                        "primary_freshly_verified_conditions": 856,
+                    }
+                )
+                evidence_bindings = dict(attempt.evidence_bindings)
+            else:
+                condition_ids = (
+                    stage_r_condition_ids() if mode == "stage-r" else canonical_condition_ids()
+                )
+                for condition_id in condition_ids:
+                    frame_id, history = condition_id.rsplit("/", 1)
+                    if mode == "stage-r":
+                        assert stage_r_inputs is not None
+                        points, input_identity = stage_r_inputs[condition_id]
+                    else:
+                        pair = source.pair(frame_id)
+                        points, input_identity = pair[0 if history == "H10" else 1]
+                    infer_condition(condition_id, points, input_identity)
             sampler.end_block("scientific_attempt")
         finally:
             sampler.stop()

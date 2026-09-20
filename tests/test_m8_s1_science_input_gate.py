@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -98,8 +99,9 @@ def test_full_revalidation_remains_856_for_canonical_passes() -> None:
     assert len(source.pair_calls) == 428
 
 
-def test_missing_or_invalid_stage_r_receipt_precedes_backend(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+@pytest.mark.parametrize("mode", ["stage-r", "primary-pass"])
+def test_missing_or_invalid_receipt_precedes_backend(
+    mode: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     constructed = False
 
@@ -110,13 +112,13 @@ def test_missing_or_invalid_stage_r_receipt_precedes_backend(
 
     monkeypatch.setattr(science.DsvtBackend, "from_environment", construct)
     common = {
-        "mode": "stage-r",
+        "mode": mode,
         "repository_root": tmp_path,
         "full_ledger": tmp_path / "ledger.json",
         "date_root": tmp_path,
         "runtime_commit": "a" * 40,
         "attempt_root": tmp_path / "attempt",
-        "logical_pass_id": "stage-r-1",
+        "logical_pass_id": f"{mode}-1",
         "attempt_id": "attempt-1",
     }
     with pytest.raises(ValueError, match="requires a complete"):
@@ -165,7 +167,9 @@ def _run_mock_attempt(
         attempt_root=tmp_path / mode,
         logical_pass_id=f"{mode}-1",
         attempt_id="attempt-1",
-        input_gate_receipt=(tmp_path / "receipt.json" if mode == "stage-r" else None),
+        input_gate_receipt=(
+            tmp_path / "receipt.json" if mode in {"stage-r", "primary-pass"} else None
+        ),
     )
     return source, backend, result
 
@@ -186,9 +190,56 @@ def test_valid_receipt_reaches_mock_backend_without_full_revalidation(
     assert bindings["stage_r_freshly_revalidated_conditions"] == 14
 
 
-@pytest.mark.parametrize("mode", ["primary-pass", "zero-intensity-pass"])
-def test_corpus_modes_still_run_full_856_revalidation(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mode: str
+def test_primary_uses_receipt_and_one_pair_reconstruction_per_frame(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(
+        science,
+        "_revalidate_all",
+        lambda source: (_ for _ in ()).throw(AssertionError("full replay called")),
+    )
+    source, backend, result = _run_mock_attempt(monkeypatch, tmp_path, "primary-pass")
+    expected = list(canonical_condition_ids())
+    assert source.pair_calls == list(dict.fromkeys(item.rsplit("/", 1)[0] for item in expected))
+    assert len(source.pair_calls) == 428
+    assert backend.calls == expected
+    bindings = result["final_manifest"]["evidence_bindings"]
+    assert bindings == {
+        "input_gate_receipt_sha256": "f" * 64,
+        "primary_consumed_input_verification_sha256": bindings[
+            "primary_consumed_input_verification_sha256"
+        ],
+        "primary_fresh_pair_reconstructions": 428,
+        "primary_freshly_verified_conditions": 856,
+    }
+    assert len(bindings["primary_consumed_input_verification_sha256"]) == 64
+
+
+def test_primary_consumed_input_evidence_is_complete_and_deterministic(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    first_root = tmp_path / "first"
+    source, _, _ = _run_mock_attempt(monkeypatch, first_root, "primary-pass")
+    first = (first_root / "primary-pass/primary_consumed_input_verification.json").read_bytes()
+    assert len(source.pair_calls) == 428
+
+    second_root = tmp_path / "second"
+    _, _, _ = _run_mock_attempt(monkeypatch, second_root, "primary-pass")
+    second = (second_root / "primary-pass/primary_consumed_input_verification.json").read_bytes()
+    assert first == second
+    payload = json.loads(first)
+    assert payload["pair_reconstructions_exact"] == 428
+    assert payload["conditions_exact"] == 856
+    assert payload["H10_exact"] == payload["H5_exact"] == 428
+    assert payload["condition_order_exact"] is True
+    assert payload["condition_ids"] == list(canonical_condition_ids())
+    assert len(payload["records"]) == 856
+    identity = payload.pop("result_sha256")
+    assert science.canonical_json_sha256(payload) == identity
+
+
+def test_zero_intensity_retains_full_revalidation_and_existing_pair_calls(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     full_revalidations = 0
 
@@ -198,6 +249,7 @@ def test_corpus_modes_still_run_full_856_revalidation(
         return {"H10_exact": 428, "H5_exact": 428, "conditions_exact": 856}
 
     monkeypatch.setattr(science, "_revalidate_all", full)
-    _, backend, _ = _run_mock_attempt(monkeypatch, tmp_path, mode)
+    source, backend, _ = _run_mock_attempt(monkeypatch, tmp_path, "zero-intensity-pass")
     assert full_revalidations == 1
+    assert len(source.pair_calls) == 856
     assert backend.calls == list(canonical_condition_ids())
