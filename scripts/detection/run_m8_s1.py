@@ -10,12 +10,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+from laserperception.detection.m8_s1_input_gate import verify_input_gate_receipt
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
     AuthorizationIdentity,
     M8S1ProtocolViolation,
     atomic_write_json,
     require_scientific_authorization,
+    sha256_file,
     verify_runtime_policy_binding,
     verify_static_bindings,
 )
@@ -41,6 +43,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-commit", required=True)
     parser.add_argument("--runtime-policy-binding", type=Path)
     parser.add_argument("--authorization", type=Path)
+    parser.add_argument("--input-gate-receipt", type=Path)
     parser.add_argument("--full-ledger", type=Path)
     parser.add_argument("--date-root", type=Path)
     parser.add_argument("--census", type=Path)
@@ -126,7 +129,19 @@ def main() -> int:
         args.runtime_policy_binding,
         "--runtime-policy-binding",
     )
-    expected = AuthorizationIdentity(args.runtime_commit)
+    input_gate_receipt = (
+        _require_path(args.input_gate_receipt, "--input-gate-receipt").resolve()
+        if args.mode == "stage-r"
+        else None
+    )
+    if args.mode != "stage-r" and args.input_gate_receipt is not None:
+        raise M8S1ProtocolViolation("--input-gate-receipt is valid only for stage-r")
+    expected = AuthorizationIdentity(
+        args.runtime_commit,
+        input_gate_receipt_sha256=(
+            sha256_file(input_gate_receipt) if input_gate_receipt is not None else None
+        ),
+    )
     authorization = require_scientific_authorization(
         args.mode,
         logical_pass_id,
@@ -142,6 +157,14 @@ def main() -> int:
         runtime_policy_sha256,
         live_policy,
     )
+    if args.mode == "stage-r":
+        assert input_gate_receipt is not None
+        verify_input_gate_receipt(
+            input_gate_receipt,
+            repository_root=root,
+            full_ledger=_require_path(args.full_ledger, "--full-ledger").resolve(),
+            execution_commit=args.runtime_commit,
+        )
     upstream, checkpoint = _external_runtime_paths(root)
     verify_static_bindings(
         root,
@@ -162,6 +185,7 @@ def main() -> int:
         attempt_root=_require_path(args.attempt_root, "--attempt-root").resolve(),
         logical_pass_id=logical_pass_id,
         attempt_id=args.attempt_id or "",
+        input_gate_receipt=input_gate_receipt,
     )
     return 0
 

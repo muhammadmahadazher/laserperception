@@ -18,10 +18,12 @@ from pathlib import Path
 import numpy as np
 
 from laserperception.detection.m8_backend import DsvtBackend
+from laserperception.detection.m8_s1_input_gate import verify_input_gate_receipt
 from laserperception.detection.m8_s1_preflight import FrozenInputSource
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
     EVALUATOR_IDENTITY,
+    STAGE_R_FRAMES,
     AtomicAttempt,
     AttemptIdentity,
     atomic_write_json,
@@ -295,6 +297,31 @@ def _revalidate_all(source: FrozenInputSource) -> dict[str, object]:
     return {"H10_exact": h10, "H5_exact": h5, "conditions_exact": h10 + h5}
 
 
+def _revalidate_stage_r(
+    source: FrozenInputSource,
+) -> tuple[dict[str, tuple[np.ndarray, dict[str, object]]], dict[str, object]]:
+    """Freshly reconstruct exactly the 14 Stage R inputs consumed by this process."""
+
+    consumed: dict[str, tuple[np.ndarray, dict[str, object]]] = {}
+    records: list[dict[str, object]] = []
+    for frame_id in STAGE_R_FRAMES:
+        for points, identity in source.pair(frame_id):
+            condition_id = str(identity["condition_id"])
+            consumed[condition_id] = (points, identity)
+            records.append(dict(identity))
+    expected = stage_r_condition_ids()
+    if tuple(consumed) != expected or len(records) != 14:
+        raise RuntimeError("Stage R consumed-input revalidation is incomplete")
+    evidence: dict[str, object] = {
+        "schema_version": "laserperception.m8.s1.stage-r-consumed-inputs.v1",
+        "conditions_exact": 14,
+        "condition_ids": list(expected),
+        "records": records,
+    }
+    evidence["result_sha256"] = canonical_json_sha256(evidence)
+    return consumed, evidence
+
+
 def run_scientific_attempt(
     *,
     mode: str,
@@ -305,6 +332,7 @@ def run_scientific_attempt(
     attempt_root: Path,
     logical_pass_id: str,
     attempt_id: str,
+    input_gate_receipt: Path | None = None,
 ) -> dict[str, object]:
     """Execute one future-authorized, uninterrupted fresh-process attempt."""
 
@@ -317,16 +345,44 @@ def run_scientific_attempt(
         process_id=os.getpid(),
         runtime_commit=runtime_commit,
     )
-    attempt = AtomicAttempt(attempt_root, identity)
+    attempt: AtomicAttempt | None = None
     try:
+        stage_r_inputs: dict[str, tuple[np.ndarray, dict[str, object]]] | None = None
+        receipt_sha256: str | None = None
+        if mode == "stage-r":
+            if input_gate_receipt is None:
+                raise ValueError("Stage R requires a complete input-gate receipt")
+            receipt_sha256 = verify_input_gate_receipt(
+                input_gate_receipt,
+                repository_root=repository_root,
+                full_ledger=full_ledger,
+                execution_commit=runtime_commit,
+            )
+        elif input_gate_receipt is not None:
+            raise ValueError("input-gate receipt is valid only for Stage R")
         source = FrozenInputSource.load(
             date_root=date_root,
             full_ledger=full_ledger,
             accepted_ledger=repository_root
             / "benchmarks/m8/diagnostics/m8_input_projection_ledger.json",
         )
-        revalidation = _revalidate_all(source)
-        atomic_write_json(attempt_root / "input_revalidation.json", revalidation)
+        evidence_bindings: dict[str, object] = {}
+        if mode == "stage-r":
+            stage_r_inputs, revalidation = _revalidate_stage_r(source)
+            evidence_bindings = {
+                "input_gate_receipt_sha256": receipt_sha256,
+                "stage_r_consumed_input_revalidation_sha256": revalidation["result_sha256"],
+                "stage_r_freshly_revalidated_conditions": 14,
+            }
+        else:
+            revalidation = _revalidate_all(source)
+        attempt = AtomicAttempt(attempt_root, identity, evidence_bindings=evidence_bindings)
+        revalidation_name = (
+            "stage_r_consumed_input_revalidation.json"
+            if mode == "stage-r"
+            else "input_revalidation.json"
+        )
+        atomic_write_json(attempt_root / revalidation_name, revalidation)
         camera, poses_by_frame = _load_gt(date_root)
         backend = DsvtBackend.from_environment(
             manifest_path=repository_root / CANDIDATE_MANIFEST_PATH
@@ -342,8 +398,12 @@ def run_scientific_attempt(
             sampler.begin_block("scientific_attempt")
             for condition_id in condition_ids:
                 frame_id, history = condition_id.rsplit("/", 1)
-                pair = source.pair(frame_id)
-                points, input_identity = pair[0 if history == "H10" else 1]
+                if mode == "stage-r":
+                    assert stage_r_inputs is not None
+                    points, input_identity = stage_r_inputs[condition_id]
+                else:
+                    pair = source.pair(frame_id)
+                    points, input_identity = pair[0 if history == "H10" else 1]
                 if mode == "zero-intensity-pass":
                     points = zero_intensity_copy(points)
                     input_identity = {
@@ -375,10 +435,13 @@ def run_scientific_attempt(
             "conditions": payloads,
             "telemetry": summarize_gpu_telemetry(sampler.samples),
         }
+        if evidence_bindings:
+            raw["evidence_bindings"] = evidence_bindings
         raw["result_sha256"] = canonical_json_sha256(raw)
         atomic_write_json(attempt_root / "raw_pass.json", raw)
         final = attempt.finalize()
         return {"raw_pass": raw, "final_manifest": final}
     except Exception as error:
-        attempt.fail(f"{type(error).__name__}: {error}")
+        if attempt is not None:
+            attempt.fail(f"{type(error).__name__}: {error}")
         raise
