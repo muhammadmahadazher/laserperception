@@ -165,7 +165,20 @@ def test_receipt_serialization_is_deterministic_and_atomic(
 def test_input_gate_module_imports_no_torch_or_cuda() -> None:
     code = (
         "import sys; import laserperception.detection.m8_s1_input_gate; "
+        "import laserperception.detection.m8_s1_frozen_input; "
         "assert 'torch' not in sys.modules; "
+        "assert 'laserperception.detection.m8_backend' not in sys.modules; "
         "assert not any(n.startswith('cuda') for n in sys.modules)"
     )
     subprocess.run([sys.executable, "-c", code], check=True)
+
+
+@pytest.mark.parametrize("value", [1, 4, gate.MAX_PRIMARY_INPUT_REVALIDATION_WORKERS])
+def test_primary_input_revalidation_worker_count_accepts_bounded_integers(value: int) -> None:
+    assert gate.validate_primary_input_revalidation_workers(value) == value
+
+
+@pytest.mark.parametrize("value", [True, 0, 9, 1.5, "4"])
+def test_primary_input_revalidation_worker_count_fails_closed(value: object) -> None:
+    with pytest.raises(M8S1ProtocolViolation, match="workers"):
+        gate.validate_primary_input_revalidation_workers(value)

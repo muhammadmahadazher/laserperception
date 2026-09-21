@@ -453,6 +453,8 @@ def test_cli_removes_free_form_binding_and_orchestrator_stays_sequential() -> No
     assert '"--runtime-policy-binding"' in orchestrator
     assert '"--input-gate-receipt"' in runner
     assert '"--input-gate-receipt"' in orchestrator
+    assert '"--input-revalidation-workers"' in runner
+    assert '"--input-revalidation-workers"' in orchestrator
     assert "subprocess.run" in orchestrator
     assert "Popen" not in orchestrator
     authorization_position = runner.index("require_scientific_authorization(")

@@ -110,7 +110,8 @@ commit with `--receipt-output`. Persist its complete revalidation record and
 H10/H5 conditions with zero mismatches. Verify the receipt against the same checkout and the
 authoritative full transform/source ledger; a receipt from another commit or source fails closed.
 Stage R and primary processes require this receipt; omission or invalidity fails before backend
-construction. There is no fallback full-corpus preflight inside primary.
+construction. Each primary process additionally performs its own live 856-condition pre-inference
+revalidation. The receipt is a provenance binding and does not replace that live gate.
 
 1. Owner selects/provisions an external worker and explicitly scopes qualification. No provider/API
    operation is part of M8-R. Preserve fresh task/runtime identity and qualification authorization.
@@ -137,11 +138,16 @@ construction. There is no fallback full-corpus preflight inside primary.
 12. Owner reviews/freezes the fresh raw Stage R result. Engineering receipts alone do not satisfy this.
 13. Obtain fresh primary authorization bound to that reviewed Stage R and machine policy.
 14. Run three uninterrupted primary processes, each completing 856 H10/H5 conditions. Every fresh
-    process verifies the complete global receipt, then reconstructs all 428 frame pairs itself.
-    For each frame it consumes H10 followed by H5 from one pair reconstruction, freshly verifies all
-    856 input identities, and records deterministic consumed-input evidence. Pair data is not reused
-    across frames or processes. No splicing; preserve incomplete attempts and restart a whole
-    canonical process when required by protocol.
+    process verifies the complete global receipt, then completes a live 856-condition reconstruction
+    and identity check before GT loading, backend/model construction, CUDA initialization, or any
+    detector call. `--input-revalidation-workers` bounds only this CPU gate to 1 through 8 workers,
+    with a default of 4. Spawned worker processes own isolated lazy sequence and native math runtime
+    state; contiguous frame partitions reduce overlapping source reads, and canonical aggregation
+    makes evidence independent of completion order. After the gate succeeds, scientific execution
+    reconstructs each of the 428 frame pairs once and consumes H10 followed by H5, producing 856
+    serial detector calls and deterministic consumed-input evidence. Pair data is not reused between
+    the gate and execution, across frames, or across processes. No splicing; preserve incomplete
+    attempts and restart a whole canonical process when required by protocol.
 15. Persist and verify each canonical pass/process immediately before proceeding. Expected accepted
     primary total is 2568 only after all three complete; never claim a result from this plan.
 16. Owner performs final evidence review. Keep raw/failed evidence distinct from compact final Git
