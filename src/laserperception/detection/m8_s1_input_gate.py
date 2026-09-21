@@ -11,8 +11,11 @@ import hashlib
 import json
 import subprocess
 from collections.abc import Mapping
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
+from multiprocessing import get_context
 from pathlib import Path
+from typing import Protocol
 
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_SHA256,
@@ -35,6 +38,8 @@ INPUT_GATE_IMPLEMENTATION = (
 )
 EXPECTED_CONDITIONS = 856
 EXPECTED_PER_HISTORY = 428
+DEFAULT_PRIMARY_INPUT_REVALIDATION_WORKERS = 4
+MAX_PRIMARY_INPUT_REVALIDATION_WORKERS = 8
 _RECEIPT_FIELDS = frozenset(
     {
         "schema_version",
@@ -59,6 +64,100 @@ _RECEIPT_FIELDS = frozenset(
         "receipt_sha256",
     }
 )
+
+
+def validate_primary_input_revalidation_workers(value: object) -> int:
+    """Return a bounded CPU worker count for primary pre-inference validation."""
+
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise M8S1ProtocolViolation("primary input-revalidation workers must be an integer")
+    if not 1 <= value <= MAX_PRIMARY_INPUT_REVALIDATION_WORKERS:
+        raise M8S1ProtocolViolation(
+            "primary input-revalidation workers must be between 1 and "
+            f"{MAX_PRIMARY_INPUT_REVALIDATION_WORKERS}"
+        )
+    return value
+
+
+class _PrimaryInputSource(Protocol):
+    def pair(self, frame_id: str) -> tuple[tuple[object, Mapping[str, object]], ...]: ...
+
+    def isolated(self) -> _PrimaryInputSource: ...
+
+
+def _validated_primary_pair(
+    source: _PrimaryInputSource, frame_id: str
+) -> tuple[dict[str, object], dict[str, object]]:
+    pair = source.pair(frame_id)
+    expected = (f"{frame_id}/H10", f"{frame_id}/H5")
+    actual = tuple(str(identity.get("condition_id")) for _, identity in pair)
+    histories = tuple(str(identity.get("history")) for _, identity in pair)
+    if len(pair) != 2 or actual != expected or histories != ("H10", "H5"):
+        raise RuntimeError("primary pre-inference pair order changed")
+    return dict(pair[0][1]), dict(pair[1][1])
+
+
+def _reconstruct_primary_chunk(
+    job: tuple[_PrimaryInputSource, tuple[str, ...]],
+) -> list[tuple[dict[str, object], dict[str, object]]]:
+    source, chunk = job
+    return [_validated_primary_pair(source, frame_id) for frame_id in chunk]
+
+
+def revalidate_primary_inputs(
+    source: _PrimaryInputSource, *, worker_count: int
+) -> dict[str, object]:
+    """Verify all primary inputs before inference with worker-local CPU state."""
+
+    workers = validate_primary_input_revalidation_workers(worker_count)
+    frame_ids = canonical_frame_ids()
+    if workers == 1:
+        pairs = [_validated_primary_pair(source, frame_id) for frame_id in frame_ids]
+    else:
+        chunk_size = (len(frame_ids) + workers - 1) // workers
+        frame_chunks = tuple(
+            frame_ids[start : start + chunk_size] for start in range(0, len(frame_ids), chunk_size)
+        )
+
+        jobs = tuple((source.isolated(), chunk) for chunk in frame_chunks)
+        with ProcessPoolExecutor(
+            max_workers=len(jobs),
+            mp_context=get_context("spawn"),
+        ) as executor:
+            chunk_results = list(executor.map(_reconstruct_primary_chunk, jobs))
+        pairs = [pair for chunk in chunk_results for pair in chunk]
+    records = [record for pair in pairs for record in pair]
+    condition_ids = [str(record["condition_id"]) for record in records]
+    histories = [str(record["history"]) for record in records]
+    h10 = histories.count("H10")
+    h5 = histories.count("H5")
+    if (
+        len(pairs),
+        len(records),
+        h10,
+        h5,
+        tuple(condition_ids),
+    ) != (428, 856, 428, 428, canonical_condition_ids()):
+        raise RuntimeError("primary pre-inference corpus revalidation is incomplete")
+    canonical_evidence: dict[str, object] = {
+        "frames_exact": len(pairs),
+        "H10_exact": h10,
+        "H5_exact": h5,
+        "conditions_exact": len(records),
+        "mismatch_count": 0,
+        "condition_order_exact": True,
+        "condition_ids": condition_ids,
+        "records": records,
+    }
+    evidence: dict[str, object] = {
+        "schema_version": "laserperception.m8.s1.primary-preinference-inputs.v1",
+        "worker_count": workers,
+        "execution_model": "serial" if workers == 1 else "spawned-processes",
+        **canonical_evidence,
+        "canonical_input_sha256": canonical_json_sha256(canonical_evidence),
+    }
+    evidence["result_sha256"] = canonical_json_sha256(evidence)
+    return evidence
 
 
 def _git_head(repository_root: Path) -> str:

@@ -10,7 +10,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from laserperception.detection.m8_s1_input_gate import verify_input_gate_receipt
+from laserperception.detection.m8_s1_input_gate import (
+    DEFAULT_PRIMARY_INPUT_REVALIDATION_WORKERS,
+    validate_primary_input_revalidation_workers,
+    verify_input_gate_receipt,
+)
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
     AuthorizationIdentity,
@@ -44,6 +48,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-policy-binding", type=Path)
     parser.add_argument("--authorization", type=Path)
     parser.add_argument("--input-gate-receipt", type=Path)
+    parser.add_argument("--input-revalidation-workers", type=int)
     parser.add_argument("--full-ledger", type=Path)
     parser.add_argument("--date-root", type=Path)
     parser.add_argument("--census", type=Path)
@@ -139,6 +144,18 @@ def main() -> int:
         raise M8S1ProtocolViolation(
             "--input-gate-receipt is valid only for stage-r and primary-pass"
         )
+    if args.mode == "primary-pass":
+        input_revalidation_workers = validate_primary_input_revalidation_workers(
+            args.input_revalidation_workers
+            if args.input_revalidation_workers is not None
+            else DEFAULT_PRIMARY_INPUT_REVALIDATION_WORKERS
+        )
+    else:
+        if args.input_revalidation_workers is not None:
+            raise M8S1ProtocolViolation(
+                "--input-revalidation-workers is valid only for primary-pass"
+            )
+        input_revalidation_workers = 1
     expected = AuthorizationIdentity(
         args.runtime_commit,
         input_gate_receipt_sha256=(
@@ -189,6 +206,7 @@ def main() -> int:
         logical_pass_id=logical_pass_id,
         attempt_id=args.attempt_id or "",
         input_gate_receipt=input_gate_receipt,
+        input_revalidation_workers=input_revalidation_workers,
     )
     return 0
 

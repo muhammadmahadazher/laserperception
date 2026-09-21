@@ -5,6 +5,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
+- Restore the frozen M8 primary requirement for complete live 856-condition revalidation before
+  backend construction. Use bounded worker-local CPU reconstruction while preserving deterministic
+  evidence and the 428-pair primary inference path.
+
 - Add a fail-closed, execution-bound CPU input-gate receipt for M8 Stage R. Each fresh Stage R
   process now verifies the complete 856-condition gate and freshly reconstructs its 14 consumed
   inputs; primary and zero-intensity full-corpus replay remains unchanged.

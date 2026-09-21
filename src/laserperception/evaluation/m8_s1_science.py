@@ -18,8 +18,11 @@ from pathlib import Path
 import numpy as np
 
 from laserperception.detection.m8_backend import DsvtBackend
-from laserperception.detection.m8_s1_input_gate import verify_input_gate_receipt
-from laserperception.detection.m8_s1_preflight import FrozenInputSource
+from laserperception.detection.m8_s1_frozen_input import FrozenInputSource
+from laserperception.detection.m8_s1_input_gate import (
+    revalidate_primary_inputs,
+    verify_input_gate_receipt,
+)
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
     EVALUATOR_IDENTITY,
@@ -334,6 +337,7 @@ def run_scientific_attempt(
     logical_pass_id: str,
     attempt_id: str,
     input_gate_receipt: Path | None = None,
+    input_revalidation_workers: int = 1,
 ) -> dict[str, object]:
     """Execute one future-authorized, uninterrupted fresh-process attempt."""
 
@@ -378,17 +382,27 @@ def run_scientific_attempt(
                 "stage_r_freshly_revalidated_conditions": 14,
             }
         elif mode == "primary-pass":
-            evidence_bindings = {"input_gate_receipt_sha256": receipt_sha256}
+            revalidation = revalidate_primary_inputs(
+                source,
+                worker_count=input_revalidation_workers,
+            )
+            evidence_bindings = {
+                "input_gate_receipt_sha256": receipt_sha256,
+                "primary_preinference_revalidation_sha256": revalidation["result_sha256"],
+                "primary_preinference_revalidation_workers": revalidation["worker_count"],
+                "primary_preinference_revalidated_conditions": revalidation["conditions_exact"],
+            }
         else:
             revalidation = _revalidate_all(source)
         attempt = AtomicAttempt(attempt_root, identity, evidence_bindings=evidence_bindings)
         revalidation_name = (
             "stage_r_consumed_input_revalidation.json"
             if mode == "stage-r"
+            else "primary_preinference_revalidation.json"
+            if mode == "primary-pass"
             else "input_revalidation.json"
         )
-        if mode != "primary-pass":
-            atomic_write_json(attempt_root / revalidation_name, revalidation)
+        atomic_write_json(attempt_root / revalidation_name, revalidation)
         camera, poses_by_frame = _load_gt(date_root)
         backend = DsvtBackend.from_environment(
             manifest_path=repository_root / CANDIDATE_MANIFEST_PATH

@@ -9,6 +9,10 @@ import sys
 import uuid
 from pathlib import Path
 
+from laserperception.detection.m8_s1_input_gate import (
+    DEFAULT_PRIMARY_INPUT_REVALIDATION_WORKERS,
+    validate_primary_input_revalidation_workers,
+)
 from laserperception.worker.guards import require_external_worker
 
 
@@ -21,6 +25,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-policy-binding", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
     parser.add_argument("--input-gate-receipt", type=Path)
+    parser.add_argument("--input-revalidation-workers", type=int)
     parser.add_argument("--full-ledger", type=Path, required=True)
     parser.add_argument("--date-root", type=Path, required=True)
     parser.add_argument("--attempt-root", type=Path, required=True)
@@ -35,6 +40,16 @@ def main() -> int:
         raise ValueError(f"{args.mode} requires --input-gate-receipt")
     if args.mode not in receipt_modes and args.input_gate_receipt is not None:
         raise ValueError("--input-gate-receipt is valid only for stage-r and primary-pass")
+    if args.mode == "primary-pass":
+        input_revalidation_workers = validate_primary_input_revalidation_workers(
+            args.input_revalidation_workers
+            if args.input_revalidation_workers is not None
+            else DEFAULT_PRIMARY_INPUT_REVALIDATION_WORKERS
+        )
+    else:
+        if args.input_revalidation_workers is not None:
+            raise ValueError("--input-revalidation-workers is valid only for primary-pass")
+        input_revalidation_workers = 1
     repetitions = 10 if args.mode == "stage-r" else 3
     worker = Path(__file__).with_name("run_m8_s1.py")
     session = str(uuid.uuid4())
@@ -70,6 +85,8 @@ def main() -> int:
         ]
         if args.input_gate_receipt is not None:
             command.extend(["--input-gate-receipt", str(args.input_gate_receipt)])
+        if args.mode == "primary-pass":
+            command.extend(["--input-revalidation-workers", str(input_revalidation_workers)])
         status = subprocess.run(command, cwd=args.repository_root, check=False)
         if status.returncode != 0:
             raise RuntimeError(

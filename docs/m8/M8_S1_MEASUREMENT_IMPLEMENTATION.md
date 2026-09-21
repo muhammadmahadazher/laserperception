@@ -230,7 +230,7 @@ primary or zero-intensity DSVT process. After the ten Stage R raw repeats receiv
 review, a later corpus authorization may explicitly list the approved primary and zero-intensity
 modes and logical passes. No Stage R or corpus authorization artifact exists at this stage.
 
-## Stage R input-gate receipt
+## Stage R and primary input gates
 
 Before any Stage R scientific process starts, the CPU-only
 `scripts/detection/revalidate_m8_input_projection.py` command reconstructs all 428 frozen frames in
@@ -253,15 +253,26 @@ retaining the complete pre-inference corpus gate and independent verification of
 Stage R process consumes. It does not alter the frozen Stage R sentinel set, order, fresh-process
 rule, or 14-call count.
 
-Every fresh primary process also requires the complete receipt and verifies it before backend
-construction. It then independently reconstructs all 428 frozen frame pairs while executing the
-canonical pass. Each frame is reconstructed exactly once; H10 and then H5 from that same pair are
-freshly identity-verified and consumed by the corresponding detector calls. The process records 428
-fresh pair reconstructions, 856 freshly verified conditions, the exact canonical condition order,
-and the receipt SHA256 in deterministic consumed-input evidence. No point arrays are shared across
-frames or processes. This removes the extra pre-inference replay and the duplicate per-history pair
-reconstruction without changing the frozen 856-call primary protocol. Zero-intensity behavior is
-unchanged and continues to use its existing complete pre-inference reconstruction.
+Every fresh primary process also requires the complete receipt and verifies it before loading GT or
+constructing the backend. The process then performs a full live reconstruction and identity check of
+all 428 H10/H5 pairs, covering all 856 conditions, before GT loading, model construction, CUDA
+initialization, or the first detector call. Independent contiguous frame ranges may be scheduled
+across bounded spawned CPU processes with `--input-revalidation-workers` (1 through 8; default 4).
+Each process owns isolated lazy KITTI sequence and native math runtime state. Results are aggregated
+back into frozen frame/H10/H5 order, so completion timing does not alter the canonical evidence
+identity or condition order. The evidence records the execution model, worker count, exact
+428/428/856 counts, zero mismatches, canonical records, canonical input SHA256, and complete result
+SHA256.
+
+Only after the full gate succeeds does primary scientific execution begin. It independently
+reconstructs each of the 428 frozen frame pairs once and consumes H10 followed by H5 from that pair.
+The process records 428 inference-time pair reconstructions, 856 freshly verified conditions, the
+exact canonical condition order, and the receipt SHA256 in deterministic consumed-input evidence.
+No point arrays are shared between the pre-inference gate and scientific execution, across frames,
+or across processes. This preserves pair reuse during inference while satisfying the frozen
+requirement for complete live 856-condition revalidation before inference. Stage R keeps its
+14-input process-local verification behavior. Zero-intensity behavior is unchanged and continues to
+use its existing complete pre-inference reconstruction.
 
 ## Runtime policy binding
 
