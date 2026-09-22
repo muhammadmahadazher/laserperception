@@ -11,6 +11,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+import laserperception.detection.m8_s1_frozen_input as frozen_input
 import laserperception.evaluation.m8_s1_science as science
 from laserperception.detection.m8_s1_input_gate import revalidate_primary_inputs
 from laserperception.detection.m8_s1_runtime import canonical_condition_ids
@@ -146,6 +147,7 @@ def _install_mock_runtime(
     source: _Source,
     *,
     real_attempt: bool = False,
+    real_source_load: bool = False,
 ) -> tuple[_Backend, dict[str, int]]:
     backend = _Backend()
     calls = {
@@ -175,7 +177,8 @@ def _install_mock_runtime(
 
     monkeypatch.setattr(science, "verify_input_gate_receipt", lambda *args, **kwargs: "f" * 64)
     monkeypatch.setattr(science, "revalidate_primary_inputs", revalidate)
-    monkeypatch.setattr(science.FrozenInputSource, "load", lambda **kwargs: source)
+    if not real_source_load:
+        monkeypatch.setattr(science.FrozenInputSource, "load", lambda **kwargs: source)
     monkeypatch.setattr(science, "_load_gt", load_gt)
     monkeypatch.setattr(science.DsvtBackend, "from_environment", construct)
     if not real_attempt:
@@ -267,6 +270,7 @@ def test_missing_or_invalid_receipt_precedes_backend(
             input_gate_receipt=tmp_path / "receipt.json",
         )
     assert constructed is False
+    assert not (tmp_path / "attempt").exists()
 
 
 def test_parallel_and_serial_revalidation_have_identical_canonical_evidence() -> None:
@@ -372,6 +376,132 @@ def _assert_failed_gate_manifest(
         "input_gate_receipt_sha256": "f" * 64,
     }
     assert not (attempt_root / "primary_preinference_revalidation.json").exists()
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ValueError("frozen source ledger schema is malformed"),
+        OSError("frozen source ledger is unreadable"),
+    ],
+)
+def test_primary_source_load_failure_persists_incomplete_before_science(
+    error: Exception,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = _Source(_canonical_frames())
+    backend, calls = _install_mock_runtime(monkeypatch, source, real_attempt=True)
+    monkeypatch.setattr(
+        science.FrozenInputSource,
+        "load",
+        lambda **kwargs: (_ for _ in ()).throw(error),
+    )
+    attempt_root = tmp_path / "primary-pass"
+    with pytest.raises(type(error), match=str(error)):
+        science.run_scientific_attempt(
+            mode="primary-pass",
+            repository_root=tmp_path,
+            full_ledger=tmp_path / "ledger.json",
+            date_root=tmp_path,
+            runtime_commit="a" * 40,
+            attempt_root=attempt_root,
+            logical_pass_id="primary-pass-1",
+            attempt_id="attempt-1",
+            input_gate_receipt=tmp_path / "receipt.json",
+            input_revalidation_workers=4,
+        )
+    assert calls["backend_constructions"] == 0
+    assert calls["gt_loads"] == 0
+    assert calls["gate_completions"] == 0
+    assert backend.calls == []
+    _assert_failed_gate_manifest(
+        attempt_root,
+        failure_type=type(error).__name__,
+        failure_message=str(error),
+    )
+
+
+def _run_real_source_load_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    *,
+    expected_message: str,
+) -> None:
+    source = _Source(_canonical_frames())
+    backend, calls = _install_mock_runtime(
+        monkeypatch,
+        source,
+        real_attempt=True,
+        real_source_load=True,
+    )
+    attempt_root = tmp_path / "primary-pass"
+    with pytest.raises(ValueError, match=expected_message):
+        science.run_scientific_attempt(
+            mode="primary-pass",
+            repository_root=tmp_path,
+            full_ledger=tmp_path / "full-ledger.json",
+            date_root=tmp_path,
+            runtime_commit="a" * 40,
+            attempt_root=attempt_root,
+            logical_pass_id="primary-pass-1",
+            attempt_id="attempt-1",
+            input_gate_receipt=tmp_path / "receipt.json",
+            input_revalidation_workers=4,
+        )
+    assert calls["backend_constructions"] == 0
+    assert calls["gt_loads"] == 0
+    assert calls["gate_completions"] == 0
+    assert backend.calls == []
+    _assert_failed_gate_manifest(
+        attempt_root,
+        failure_type="ValueError",
+        failure_message=expected_message,
+    )
+
+
+def test_primary_accepted_ledger_identity_failure_persists_incomplete(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    accepted = tmp_path / "benchmarks/m8/diagnostics/m8_input_projection_ledger.json"
+    accepted.parent.mkdir(parents=True)
+    accepted.write_text("{}", encoding="utf-8")
+    (tmp_path / "full-ledger.json").write_text('{"frames": []}', encoding="utf-8")
+    _run_real_source_load_failure(
+        monkeypatch,
+        tmp_path,
+        expected_message="accepted M8 input ledger identity changed",
+    )
+
+
+def test_primary_order_invalid_source_load_persists_incomplete(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    accepted = tmp_path / "benchmarks/m8/diagnostics/m8_input_projection_ledger.json"
+    accepted.parent.mkdir(parents=True)
+    accepted.write_text(
+        json.dumps(
+            {
+                "records": [
+                    {"condition_id": condition_id} for condition_id in canonical_condition_ids()
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        frozen_input,
+        "INPUT_LEDGER_SHA256",
+        frozen_input.sha256_file(accepted),
+    )
+    (tmp_path / "full-ledger.json").write_text('{"frames": []}', encoding="utf-8")
+    _run_real_source_load_failure(
+        monkeypatch,
+        tmp_path,
+        expected_message="frozen M8 input order or count changed",
+    )
 
 
 @pytest.mark.parametrize(

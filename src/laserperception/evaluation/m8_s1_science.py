@@ -355,6 +355,7 @@ def run_scientific_attempt(
     try:
         stage_r_inputs: dict[str, tuple[np.ndarray, dict[str, object]]] | None = None
         receipt_sha256: str | None = None
+        evidence_bindings: dict[str, object] = {}
         if mode in {"stage-r", "primary-pass"}:
             if input_gate_receipt is None:
                 raise ValueError(f"{mode} requires a complete input-gate receipt")
@@ -368,13 +369,20 @@ def run_scientific_attempt(
                 raise AssertionError("verified input-gate receipt identity is absent")
         elif input_gate_receipt is not None:
             raise ValueError("input-gate receipt is valid only for Stage R and primary")
+        if mode == "primary-pass":
+            evidence_bindings = {"input_gate_receipt_sha256": receipt_sha256}
+            attempt = AtomicAttempt(
+                attempt_root,
+                identity,
+                evidence_bindings=evidence_bindings,
+            )
+            primary_gate_in_progress = True
         source = FrozenInputSource.load(
             date_root=date_root,
             full_ledger=full_ledger,
             accepted_ledger=repository_root
             / "benchmarks/m8/diagnostics/m8_input_projection_ledger.json",
         )
-        evidence_bindings: dict[str, object] = {}
         if mode == "stage-r":
             stage_r_inputs, revalidation = _revalidate_stage_r(source)
             evidence_bindings = {
@@ -383,13 +391,7 @@ def run_scientific_attempt(
                 "stage_r_freshly_revalidated_conditions": 14,
             }
         elif mode == "primary-pass":
-            evidence_bindings = {"input_gate_receipt_sha256": receipt_sha256}
-            attempt = AtomicAttempt(
-                attempt_root,
-                identity,
-                evidence_bindings=evidence_bindings,
-            )
-            primary_gate_in_progress = True
+            assert attempt is not None
             revalidation = revalidate_primary_inputs(
                 source,
                 worker_count=input_revalidation_workers,
