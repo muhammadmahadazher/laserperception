@@ -5,8 +5,8 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
-- Preserve an `INCOMPLETE` M8 primary attempt manifest when the live pre-inference input gate
-  fails, with the verified receipt bound and zero scientific detector calls recorded.
+- Preserve an `INCOMPLETE` M8 primary attempt manifest when frozen-source loading or the live
+  pre-inference input gate fails, with the verified receipt bound and zero detector calls recorded.
 
 - Restore the frozen M8 primary requirement for complete live 856-condition revalidation before
   backend construction. Use bounded worker-local CPU reconstruction while preserving deterministic
