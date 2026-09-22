@@ -1,331 +1,181 @@
 # LaserPerception
 
-> Reproducible 3D LiDAR detection with raw ROS 2 ingestion, time-aware multi-sweep
-> reconstruction, TensorRT FP16, and exact deterministic voxelization.
+> A CPU-first 3D LiDAR perception and deployment-engineering toolkit with explicit data and model
+> contracts, deterministic tracking, semantic-result evaluation, reproducible detector evidence,
+> ROS 2 integration, and guarded external GPU execution.
 
 [![CI](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmahadazher/laserperception/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.0-4c1.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-4c1.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-LaserPerception v0.3.0 is an open-source research toolkit that runs one frozen, official pretrained
-PointPillars detector on nuScenes, deploys its network through TensorRT FP16, preserves deterministic
-voxel semantics with an exact fast path, and publishes 3D detections through ROS 2 Humble. It can
-accept either model-ready temporal input or compatible raw single-sweep XYZ `PointCloud2` plus a
-valid time-aware TF tree. LaserPerception did **not** train PointPillars or introduce a new detector
-architecture.
+LaserPerception combines a lightweight, CPU-testable perception platform with optional detector
+runtimes. The released historical path wraps the official pretrained MMDetection3D PointPillars
+model, deterministic voxelization, TensorRT FP16, ROS 2 Humble, and time-aware raw PointCloud2
+multi-sweep reconstruction. The platform now also provides reviewed model manifests, input
+adapters, guarded prediction plans, deterministic CPU tracking, immutable semantic results, and
+provider-neutral external-worker tooling. The active M8 DSVT-Pillar + TransFusion work remains a
+research campaign with no accepted primary A2/E2 result yet.
 
-![Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.](docs/assets/v0_1_ros_demo.png)
+[CPU-first quickstart](docs/QUICKSTART_PERCEPTION.md) ·
+[Project status](docs/PROJECT_STATUS.md) ·
+[v0.4.0 release notes](docs/releases/v0.4.0.md) ·
+[Benchmarks and evidence](docs/BENCHMARKS.md)
 
-*Real W1 ROS 2 replay output with predicted 3D boxes in RViz2.*
+## What LaserPerception is today
 
-**Historical model-ready performance:** on representative full-history W1 (10 historical sweeps
-plus current, 354,182 points), 10 Hz was the highest tested clean sustained ROS rate. Fifteen hertz
-and 20 Hz were not sustained. M4.5 raw ingestion was correctness/integration work and has no new
-throughput claim.
+| Capability | Status | Execution | Evidence and documentation |
+|---|---|---|---|
+| PointPillars detection and TensorRT deployment | Released, historical | Optional GPU environment | [Detection](docs/DETECTION.md), [benchmarks](docs/BENCHMARKS.md) |
+| Raw PointCloud2 and time-aware multi-sweep ROS 2 path | Released | ROS 2 plus optional detector runtime | [Raw LiDAR ROS 2](docs/RAW_LIDAR_ROS2.md) |
+| Model registry, exact input contracts, validation, dry-run planning | Released | CPU safe | [Perception quickstart](docs/QUICKSTART_PERCEPTION.md) |
+| Deterministic class-aware multi-object tracking | Released | CPU | [Tracking](docs/TRACKING.md) |
+| Immutable semantic point results and confusion/IoU evaluation | Released infrastructure | CPU | [Semantic results](docs/SEMANTIC_SEGMENTATION.md) |
+| Eight reviewed data-adapter paths and local inspection | Released | CPU | [Data adapters](docs/DATA_ADAPTERS.md) |
+| Verified external-worker artifacts and fail-closed gates | Released tooling | CPU planning; optional external GPU | [External workers](docs/EXTERNAL_WORKERS.md) |
+| DSVT-Pillar + TransFusion detector candidate | Active M8 research | Authorized external GPU only | [M8 status](docs/m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md) |
 
-[Run the perception platform quickstart](docs/QUICKSTART_PERCEPTION.md) ·
-[Run the v0.2 detection/ROS quickstart](docs/QUICKSTART_V0_2.md) ·
-[Read the v0.3.0 release notes](docs/releases/v0.3.0.md) ·
-[Inspect the benchmark evidence](docs/BENCHMARKS.md)
+Semantic infrastructure does not include a production segmentation model. Tracking consumes saved
+or precomputed `DetectionFrame` values; no detector-plus-tracker end-to-end benchmark is claimed.
 
-**New raw ingestion path:** compatible scalar float32 XYZ `PointCloud2` plus time-aware tf2 feeds a
-bounded current-plus-ten-sweep builder and then the unchanged model-ready detector. The frozen raw
-ROS suite matched accepted model-ready inputs, voxel tensors, TensorRT tensors, detections, and ROS
-message semantics exactly on 20/20 samples. [Read the raw ROS contract](docs/RAW_LIDAR_ROS2.md) or
-the [multi-sweep evidence](docs/MULTISWEEP.md).
+## Latest release and current research
 
-**Cross-domain KITTI Raw study:** the frozen detector's Car recall changed from 0.242 under H10 to
-0.727 under H5 without fine-tuning. H10/H5 is a compound temporal-and-density ablation, and the
-preregistered 40,000-voxel-cap hypothesis was not supported as the primary corpus-wide explanation.
-Final ROS integration reproduced 860/860 same-platform projected references exactly and passed the
-unchanged detector semantic envelope on ten frozen sentinels; the original R2 byte-exactness failure
-remains preserved. [Read the M6 technical note](docs/m6/M6_CROSS_DOMAIN_TECHNICAL_NOTE.md) or the
-[final M6c result](docs/m6/M6C_RESULTS_R3.md). The
-[M6 documentation index](docs/m6/README.md) maps the complete failure, diagnosis, protocol, and
-result chronology.
+**v0.4.0** packages the perception-platform APIs merged since v0.3.0: guarded model execution,
+CPU tracking, semantic-result evaluation, unified data adapters, external-worker tooling, and M8
+fail-closed readiness work. The [canonical project-status page](docs/PROJECT_STATUS.md) separates
+released capabilities, historical evidence, active research, and future work.
 
-## Current development
+M8 selected the official pretrained DSVT-Pillar + TransFusion candidate. Its S1 protocol is frozen,
+but the three-pass primary A2/E2 comparison is still pending. A prior external primary attempt
+executed 779 detector conditions and ended `INCOMPLETE`; it contributed zero accepted canonical
+primary calls and is not a scientific result. Zero-intensity, S2, and training have not run.
 
-- **Latest release: v0.3.0**, the historical PointPillars detection/deployment and KITTI Raw
-  validation line described below. Its measured claims remain unchanged.
-- **Active research: M8 Detector V2**, using DSVT-Pillar with TransFusion. M7 is complete and
-  frozen; M8 P1-E is complete and S1 is frozen. Retired-runtime Stage R is complete, with zero
-  primary A2/E2 calls. S1 is paused pending full qualification and fresh authorization on a
-  separately selected external GPU runtime. DSVT has only a partial TensorRT engineering route.
-- **Long-term direction:** a unified, sensor-conscious LiDAR perception framework with stable
-  contracts and a simple developer API. CPU tracking is implemented in unreleased P2; remaining broader tasks are proposals in the
-  [platform RFC](docs/PERCEPTION_PLATFORM_RFC.md), not released features or authorization.
+## Quick start — CPU first
 
-Development is local and CPU-capable, with ephemeral external GPU compute on demand. Local work
-must not probe optional GPUs without explicit owner/runtime authorization. Codex Cloud is not
-required. See the [compute workflow](docs/CLOUD_WORKFLOW.md), [roadmap](docs/ROADMAP.md), and
-[frozen M7 interpretation](docs/m7/M7_RESULTS.md).
+```bash
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -e .
 
-Provider-neutral [external worker tools](docs/EXTERNAL_WORKERS.md) provide CPU-safe planning and
-verified artifact transport. Provider selection and scientific execution remain separate.
-
-## Perception platform API
-
-The P0/P1 platform layer inspects reviewed models, validates exact LiDAR feature/frame/history
-contracts, and creates deterministic execution plans without GPU frameworks, downloads, or hardware
-discovery. Run `laserperception models list`, inspect a manifest, or create a dry run:
-
-```console
-laserperception models inspect dsvt-pillar-transfusion-m8 --json
-laserperception predict --help
+laserperception models list
+laserperception data adapters list
+python examples/perception_cpu_journey.py
+python examples/tracking_sequence.py
+python examples/semantic_evaluation.py
 ```
 
-```python
-from laserperception.perception import InputDescription, load_model
+These commands do not require CUDA, PyTorch, ROS, a dataset download, or a model checkpoint.
+Optional detector frameworks remain isolated from the core wheel. See
+[QUICKSTART_PERCEPTION.md](docs/QUICKSTART_PERCEPTION.md) for deterministic dry-run examples.
 
-model = load_model("pointpillars-nuscenes-v0.3")
-manifest = model.describe()
-input_description = InputDescription(
-    "1.0",
-    "planned-sample",
-    "lidar",
-    "model_ready_xyzt",
-    manifest.input_features,
-    manifest.coordinates,
-    manifest.temporal,
-    "explicit model-ready input",
-)
-report = model.validate(input_description)
-assert report.valid
-```
+## Models and detector status
 
-`load_model()`, validation, and planning remain metadata-only. Actual PointPillars prediction verifies
-an exact owner authorization, input payload, config, checkpoint, runtime, device, and precision before
-its lazy adapter import. DSVT discovery and planning are available, while generic DSVT execution
-fails closed until the frozen S1 runner supplies a live-policy-verified, canonical-input, call-accounted
-session. Neither model is initialized by a dry run.
+- `pointpillars-nuscenes-v0.3` identifies the frozen official pretrained PointPillars path used by
+  M1–M7. LaserPerception did not train it.
+- `dsvt-pillar-transfusion-m8` identifies the active official pretrained DSVT research candidate.
+  LaserPerception did not train it, and no accepted M8 primary comparison exists.
+- Model execution is guarded by explicit runtime, artifact, input, and authorization contracts.
+  Listing models, validating inputs, and producing dry-run plans are CPU-safe.
 
-[Use the perception quickstart](docs/QUICKSTART_PERCEPTION.md) for complete input and CLI examples.
-
-## What v0.3.0 does—and what was measured
-
-| Engineering story | Shipped behavior | Measured evidence |
-|---|---|---|
-| TensorRT deployment | Frozen pretrained PointPillars, pinned MMDeploy export, TensorRT 8.6.1 FP16 | Parity-v2 gates passed; repaired scene-start M2 median was 59.289 ms native PyTorch vs 45.637 ms TensorRT end to end (1.2991×) |
-| Deterministic voxelization | `exact_fast` preserves pinned official deterministic retained-point semantics | 81/81 validation samples bit-exact; frozen raw/final detector outputs exact; W1 hard layer 238.910 → 1.758 ms (≈136×, hard layer only) |
-| ROS 2 integration | Model-ready multi-sweep `PointCloud2` → `Detection3DArray` plus RViz/Foxglove markers | Historical model-ready W1 sustained 10 Hz cleanly; 15 Hz and 20 Hz were not sustained |
-| Raw multi-sweep ingestion | Compatible float32 XYZ `PointCloud2` + time-aware TF → bounded history → same model-ready detector | M4.5a 81/81 inputs exact; M4.5b complete raw ROS detector chain exact on 20/20 frozen samples; no new rate campaign |
-| KITTI Raw cross-domain validation | Official Raw decoding/reconstruction, frozen-detector characterization, and projected-reference ROS replay | M6a accepted offline route exact; M6b completed 856 H10/H5 conditions; M6c reproduced 860/860 projected live conditions exactly |
-
-The accepted M3B-V2 direct W1 live diagnostic changed from about 333 ms to 43.168 ms. The ~43 ms
-figure is **direct runtime evidence, not ROS callback or loopback latency**. The ≈136× ratio applies
-only to the hard voxel layer, not whole LiDAR inference.
-
-## Reproducibility scope
-
-Correctness claims—exact-fast 81/81 bit-exact voxel outputs, frozen detector exactness, and ROS
-message-contract correctness—are semantic/software evidence intended to be reproducible when the
-pinned software stack and inputs are reproduced.
-
-Performance claims are measurements from **one system**: an NVIDIA GeForce RTX 4060 Laptop GPU,
-WSL2, driver 610.88, and the pinned CUDA/TensorRT/OpenMMLab environment. **Timings are measurements
-of this specific environment, not portable hardware capability guarantees.** They do not promise
-10 Hz on every RTX 4060 laptop or equivalent behavior on another GPU, Windows native, native Linux,
-Jetson, or another environment.
-
-## Current architecture
+## Platform architecture
 
 ```mermaid
-flowchart TD
-    R["v0.2: raw single-sweep PointCloud2"] --> T["Time-aware tf2 + bounded live history"]
-    T --> A["Model-ready multi-sweep PointCloud2"]
-    A --> B["exact_fast deterministic voxelization"]
-    B --> C["Frozen TensorRT FP16 PointPillars network"]
-    C --> D["Unchanged MMDeploy postprocess"]
-    D --> E["Framework-independent DetectionFrame"]
-    E --> F["Detection3DArray"]
-    E --> G["RViz / Foxglove markers"]
+flowchart LR
+    A[Eight reviewed input adapters] --> B[Explicit input contracts]
+    B --> C[Model registry and validation]
+    C --> D{Guarded detector backend}
+    D -->|Historical| E[PointPillars / TensorRT]
+    D -->|M8 research| F[DSVT-Pillar + TransFusion]
+    E --> G[DetectionFrame]
+    F --> G
+    G --> H[ROS / export / visualization]
+    G --> I[Deterministic CPU tracking]
+    J[SemanticPointFrame] --> K[CPU confusion / IoU evaluation]
+    L[Verified external-worker boundary] -. optional execution .-> D
 ```
 
-v0.2 supports both boundaries. The v0.1-compatible path begins at model-ready `x`, `y`, `z`, and
-`time_lag`. The new path begins one boundary earlier: compatible raw single-sweep messages require
-scalar float32 XYZ and a valid time-indexed TF tree. The builder uses the current acquisition time as
-the target time and preserves historical acquisition stamps; a repeated frame name at different
-times is not assumed to be an identity transform. Extra fields are ignored by the frozen detector.
+The core package stays lightweight and CPU-testable. PyTorch, CUDA, OpenMMLab, DSVT/OpenPCDet,
+TensorRT, and ROS 2 are optional environments. See [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-Two explicit policies preserve historical evidence and deployed semantics:
+## Evidence and benchmark snapshot
 
-| Use | Voxelization | Provenance |
-|---|---|---|
-| Historical/core evidence | `official` pinned deterministic hard voxelization | `full` tensor hashes |
-| ROS deployment | `exact_fast` LaserPerception implementation | `live` lightweight metadata |
+Canonical internal evidence remains tied to exact commits, artifacts, inputs, hardware, and timing
+boundaries. Selected historical facts:
 
-`exact_fast` uses the pinned MMCV dynamic-coordinate CUDA operation plus PyTorch tensor grouping.
-It is a LaserPerception deployment optimization, not an upstream MMDetection3D implementation. It
-fails closed; there is no silent fallback to `deterministic=False`.
+- M2 measured a **1.299134×** direct end-to-end median speedup for TensorRT FP16 over native
+  MMDetection3D PyTorch FP32 on the recorded RTX 4060 Laptop GPU session. Its network timing is
+  not ROS callback or loopback latency.
+- In the representative M3 ROS session, **10 Hz was the highest tested clean sustained** rate;
+  15 Hz and 20 Hz were not sustained. These are not portable hardware capability guarantees.
+- The M3 hard voxel layer used `exact_fast`, proven bit-exact against the pinned official
+  deterministic implementation for the accepted gates.
+- M6c closed with a positive projected-reference ROS validation while preserving its earlier R2
+  failure. Final ROS integration reproduced 860/860 unique live conditions exactly. M7 preserved
+  both corrected results and preflight failures.
+- M8 has no accepted primary A2/E2 result. The current capacity blockers are infrastructure events,
+  not detector outcomes.
 
-## Quickstart
+Read [BENCHMARKS.md](docs/BENCHMARKS.md) for canonical, diagnostic, rejected, failed, incomplete,
+external, and pending records. Read [FAILURE_INDEX.md](docs/FAILURE_INDEX.md) for preserved negative
+results and engineering failures.
 
-### Lightweight CPU package
+## Independent external evaluation
 
-The Python wheel supports Python 3.10–3.13 and does not depend on CUDA, PyTorch, OpenMMLab,
-TensorRT, or ROS 2:
+An independent OmniLink/OmniSim evaluation of v0.3.0 reproduced the `MultiSweepBuilder` transform
+convention and verified a `233,950 × 4` accumulated native OmniSim input byte-for-byte. In both a
+sparse synthetic case and a denser authored scene, the frozen PointPillars detector produced no
+valid intended `traffic_cone` match at score threshold 0.25. This is preserved as a negative
+synthetic/domain-gap result, not an accuracy or hardware-performance claim. See the
+[external evaluation record](docs/external/OMNILINK_OMNISIM_EVALUATION.md).
 
-```bash
-git clone https://github.com/muhammadmahadazher/laserperception.git
-cd laserperception
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install .
-```
+## M8 Detector V2 status
 
-```python
-import numpy as np
-from laserperception import PointCloud, __version__
+DSVT-Pillar + TransFusion is the selected M8 candidate. Engineering integration, frozen input
+contracts, external-runtime qualification tooling, and fail-closed evidence handling are in place.
+The pending campaign remains bound to commit
+`6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt file SHA256
+`bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`; v0.4.0 does not replace
+that execution identity. See [M8 external-runtime status](docs/m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
-cloud = PointCloud(xyz=np.array([[0.0, 0.0, 0.0]], dtype=np.float32))
-print(__version__, len(cloud), cloud.xyz.dtype)
-```
+## Reproducibility
 
-### GPU detector and ROS demo
+Every accepted measurement records its commit, configuration, upstream versions, artifact hashes,
+dataset/split/sample, sweep history, precision, thresholds, warmups, timing boundaries, environment,
+hardware, and memory method. Failed and rejected evidence remains visible. Missing measurements say
+`Pending measurement`. See [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) and
+[CLOUD_WORKFLOW.md](docs/CLOUD_WORKFLOW.md).
 
-The commands in this subsection are historical reproduction entry points for an explicitly
-authorized GPU runtime. Do not run them as CPU workstation setup or hardware-discovery checks.
+## Known limitations
 
-The validated deployment stack is Ubuntu 22.04 under WSL2, Python 3.10, CUDA 11.8, TensorRT 8.6.1,
-and ROS 2 Humble. nuScenes, the official checkpoint, ONNX, and TensorRT engine are external and are
-not committed or included in the wheel.
+- The released detector evidence covers one official pretrained PointPillars model and bounded
+  datasets/hardware; it does not establish universal LiDAR generalization.
+- M8 primary A2/E2, zero-intensity, S2, DSVT training, and DSVT TensorRT parity are incomplete or
+  unstarted.
+- Semantic APIs evaluate saved row-aligned results; no production segmentation model is included.
+- CPU tracking is deterministic infrastructure over precomputed detections, without an end-to-end
+  detector/tracker benchmark.
+- No claim establishes production readiness, autonomous-driving safety, or physical-LiDAR
+  validation beyond the explicitly documented historical paths.
 
-Follow the [v0.2.0 quickstart](docs/QUICKSTART_V0_2.md). The existing model-ready W1 replay and
-actual predicted boxes remain available through the compatibility wrapper:
+## Repository and documentation map
 
-```bash
-bash scripts/run_v0_1_demo.sh
-```
+- Start: [perception quickstart](docs/QUICKSTART_PERCEPTION.md),
+  [data adapters](docs/DATA_ADAPTERS.md), [tracking](docs/TRACKING.md),
+  [semantic results](docs/SEMANTIC_SEGMENTATION.md)
+- Design: [architecture](docs/ARCHITECTURE.md), [vision](docs/VISION.md),
+  [roadmap](docs/ROADMAP.md), [project status](docs/PROJECT_STATUS.md)
+- Evidence: [benchmarks](docs/BENCHMARKS.md), [failure index](docs/FAILURE_INDEX.md),
+  [M6 index](docs/m6/README.md), [M7 results](docs/m7/M7_RESULTS.md),
+  [M8 status](docs/m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md)
+- Operations: [external workers](docs/EXTERNAL_WORKERS.md),
+  [cloud workflow](docs/CLOUD_WORKFLOW.md),
+  [M8 runbook](docs/m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md)
+- Releases: [v0.4.0 notes](docs/releases/v0.4.0.md), [changelog](CHANGELOG.md)
 
-The v0.2 raw XYZ plus time-aware TF replay uses the accepted M4.5b launch:
+## Licensing and citation
 
-```bash
-ros2 launch laserperception_ros m45b_raw_multisweep.launch.py
-```
-
-The wrapper and launch use the existing detector path. Missing prerequisites fail closed; no
-licensed dataset is silently downloaded and no engine is rebuilt. The raw replay is a nuScenes
-reproducibility example, not a physical-sensor validation or a new performance measurement.
-
-## Three evidence-backed engineering stories
-
-### 1. TensorRT without changing the detector
-
-M2 froze the pretrained checkpoint, ONNX, engine, samples, thresholds, and deployment boundary.
-The parity reference is MMDeploy-rewritten PyTorch FP32; the performance baseline is native
-MMDetection3D PyTorch FP32. Rewritten eager PyTorch is deliberately **not** the speedup denominator.
-
-Parity v1 failed and remains preserved. The separately preregistered parity v2 passed all Stage 1
-per-metric gates on the unchanged 20-sample suite and engine. The first M2 benchmark was rejected
-because it used the wrong denominator; the repaired result is the only canonical M2 performance
-record.
-
-### 2. Exact fast voxelization after rejecting the easy shortcut
-
-Official deterministic hard voxelization dominated representative full-history latency. Upstream
-`deterministic=False` was fast, but saturated voxels retained different point subsets and frozen
-repeatability exposed observable detection changes, so M3B-V1 rejected it.
-
-M3B-V2 then implemented `ExactDeterministicVoxelizer` without custom CUDA/C++. It reproduced all
-81 validation voxel tensors bit-for-bit, repeated exactly on W1/W2, and retained exact raw TensorRT
-and final detection outputs on the frozen suite. Its direct diagnostics are useful bottleneck
-evidence, but they are not ROS timing.
-
-### 3. Honest representative ROS behavior
-
-The final canonical M3 workload is `mini_val` index 42 with 10 historical sweeps plus the current
-keyframe. The full run records callback entry through `publish()` return, same-host publisher-stamp
-to sink reception, drops, effective output rate, GPU telemetry, and first/second-half backlog
-behavior.
-
-- 10 Hz: sustained cleanly, 9.949 Hz useful output, 0/200 measured input drops.
-- 15 Hz: not sustained, about 13.34 Hz useful output, 21/221 drops.
-- 20 Hz: not sustained, about 10.83 Hz useful output, 159/359 drops; entry intervals and drops grew
-  between run halves.
-
-This is behavior consistent with overload in the measured ROS configuration. The evidence does not
-establish DDS, executor, or thermal behavior as a single cause.
-
-## Benchmark map
-
-The release separates workloads and evidence types rather than combining incompatible sessions:
-
-- **M1:** historical FP32 warm-cache scene-start index 0, zero historical sweeps.
-- **M2:** canonical same-session native PyTorch FP32 vs TensorRT FP16 on that same scene-start input.
-- **M3B-V2:** direct diagnostic evidence for exact-fast correctness and component latency.
-- **M3:** canonical ROS result on representative full-history W1 index 42.
-
-Start with [BENCHMARKS.md](docs/BENCHMARKS.md), then inspect the sanitized records under
-[`benchmarks/`](benchmarks/). The rejected M2 run, failed M3A rate test, rejected M3B-V1 candidate,
-and accepted M3B-V2 diagnostics remain visible in the scientific chronology.
-
-## Known issues and limitations
-
-Observed issues include material GPU session-to-session timing variability, an uncontrolled later
-M1-style reproduction that differed from the archived M1 result, and decreasing useful output under
-15/20 Hz offered-rate overload. Causes were not isolated. See the separate
-[historical v0.1 known issues](docs/releases/v0.1.0.md#known-issues).
-
-v0.3.0 supports the model-ready interface and compatible raw PointCloud2 plus valid time-aware TF,
-and adds the completed KITTI Raw M6 validation and replay tooling.
-It does not prove arbitrary sensor calibration, localization, odometry, intra-scan deskew,
-physical-LiDAR accuracy, or plug-and-play support for any LiDAR. Training, tracking, camera fusion,
-a second detector, INT8, and Jetson measurements remain absent. LaserPerception is research/demo
-software, not a safety-certified perception system. See the
-[v0.3.0 limitations](docs/releases/v0.3.0.md#limitations).
-
-## Repository map
-
-```text
-src/laserperception/   Lightweight CPU core and optional detector/deployment surface
-ros2/                  Isolated ROS 2 Humble package, config, launch, and native tests
-scripts/                Setup, evidence, validation, and demo entry points
-configs/                Frozen detector/deployment protocols and parked experiment config
-benchmarks/             Sanitized canonical results and intentionally retained diagnostics
-docs/                   Quickstart, architecture, evidence, roadmap, and release notes
-tests/                  Synthetic CPU regression suite
-```
-
-## Parked experimental infrastructure
-
-The earlier SemanticKITTI-to-DALES `PointCloud`, I/O, transforms, ontology, adapters, and audit
-pipeline remain tested and supported, but they are not the current detection release line. No
-segmentation model or training result exists; those fields remain `Pending measurement`.
-
-## Safety, citation, and licensing
-
-Predictions can be missed, misclassified, or poorly localized. Do not treat LaserPerception as a
-certified component for operation around people or vehicles.
-
-Original LaserPerception code is [Apache-2.0](LICENSE). That license does not relicense nuScenes,
-external weights, TensorRT engines, ROS/OpenMMLab/NVIDIA components, datasets, or papers. See
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite LaserPerception v0.3.0 and, where
-reproducibility matters, the exact commit; no DOI is claimed. Citation metadata is in
-[CITATION.cff](CITATION.cff).
-
-Questions and contributions: [CONTRIBUTING.md](CONTRIBUTING.md) ·
-[GitHub Discussions](https://github.com/muhammadmahadazher/laserperception/discussions) ·
-[Security policy](SECURITY.md)
-
-## CPU tracking — implemented P2
-
-`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
-constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
-lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
-No detector is executed. See [tracking documentation](docs/TRACKING.md) for coordinate assumptions and
-limitations. The synthetic example is not benchmark evidence.
-
-Semantic point results and CPU evaluation are available through `laserperception.semantic` and
-`laserperception semantic inspect/evaluate`. This is result/evaluation infrastructure; no production
-segmentation model is included. See [semantic usage](docs/SEMANTIC_SEGMENTATION.md).
-
-Discover eight implemented input paths with `laserperception data adapters list`, inspect local inputs
-and model preparation requirements with `data inspect`, and follow the [complete CPU journey](docs/QUICKSTART_PERCEPTION.md).
-See [adapter formats and limitations](docs/DATA_ADAPTERS.md).
-
-Prepare a CPU-only M8 qualification dry plan with `worker plan --task m8-qualification`; follow the
-[external-runtime readiness runbook](docs/m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md). Provider selection,
-qualification and scientific execution require new owner decisions and runtime-specific permissions.
+LaserPerception source is Apache-2.0. Datasets, external weights, engines, and third-party software
+retain their own terms and are not distributed by the core wheel. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Cite v0.4.0 using [CITATION.cff](CITATION.cff) and
+record the exact commit for reproducibility. No DOI is claimed.

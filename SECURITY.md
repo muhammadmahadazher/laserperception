@@ -2,21 +2,24 @@
 
 ## Supported versions
 
-LaserPerception has no stable release. Security fixes are applied to the current `main` branch only.
+Security fixes are applied to the current release line and `main`. v0.4.0 is the current supported
+release. Historical v0.1.0–v0.3.0 tags and their frozen evidence remain available for
+reproducibility but do not receive routine backports.
+
+| Version | Supported |
+|---|---|
+| 0.4.x | Yes |
+| 0.3.x and earlier | No routine backports |
 
 ## Reporting a vulnerability
 
-Use GitHub's private vulnerability reporting form if it is available:
-<https://github.com/muhammadmahadazher/laserperception/security/advisories/new>.
+Do not open a public issue for a suspected vulnerability. Use GitHub's private vulnerability
+reporting for this repository when available, or contact the maintainer through the private
+security contact shown on the repository's Security page.
 
-If GitHub does not present a private reporting option, open a public issue that requests a private
-contact channel **without including vulnerability details, proof-of-concept code, secrets, or user
-data**. A maintainer can then coordinate a safe channel through GitHub.
+Include the affected version or commit, impact, minimal reproduction, and any suggested mitigation.
+Remove credentials, private paths, proprietary data, datasets, checkpoints, and model artifacts.
 
-For ordinary bugs without security impact, use the bug-report issue template.
-
-## Scope
-
-Reports about LaserPerception's original source and workflows are in scope. Dataset access terms,
-upstream package vulnerabilities, and third-party services should also be reported to their
-respective maintainers, with a LaserPerception advisory opened when users are affected.
+Security support covers LaserPerception's own code. Vulnerabilities in optional upstream runtimes,
+models, datasets, CUDA/driver stacks, ROS distributions, and cloud providers should also be
+reported to their maintainers under their policies.

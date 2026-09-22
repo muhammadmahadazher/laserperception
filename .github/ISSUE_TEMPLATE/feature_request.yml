@@ -31,7 +31,7 @@ body:
     attributes:
       label: Scope confirmation
       options:
-        - label: This request is within the current 3D LiDAR semantic-segmentation scope.
+        - label: This request is within the current 3D LiDAR perception and deployment-engineering scope.
           required: true
         - label: The proposal does not require committing dataset or model artifacts.
           required: true

@@ -5,69 +5,57 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ## [Unreleased]
 
-- Preserve an `INCOMPLETE` M8 primary attempt manifest when frozen-source loading or the live
-  pre-inference input gate fails, with the verified receipt bound and zero detector calls recorded.
-
-- Restore the frozen M8 primary requirement for complete live 856-condition revalidation before
-  backend construction. Use bounded worker-local CPU reconstruction while preserving deterministic
-  evidence and the 428-pair primary inference path.
-
-- Add a fail-closed, execution-bound CPU input-gate receipt for M8 Stage R. Each fresh Stage R
-  process now verifies the complete 856-condition gate and freshly reconstructs its 14 consumed
-  inputs; primary and zero-intensity full-corpus replay remains unchanged.
-
-- Add a non-executing M8 qualification readiness plan, frozen artifact availability snapshot,
-  externally reported qualification/capacity records, ordered evidence indexes and external-only
-  M8 GPU CLI guards. Preserve all historical science and runtime-specific authorization barriers.
-
-- Add deterministic data-adapter discovery, existing-reader wrappers, lazy dataset references,
-  truthful input/model compatibility inspection and a complete synthetic CPU developer journey.
-
-- Add immutable semantic point results, versioned ontology descriptions, strict source-row alignment,
-  NumPy confusion/IoU metrics, identity-checked NPY sidecars, SemanticKITTI/DALES helpers and CPU CLI.
-  This adds result/evaluation infrastructure without a production segmentation model.
-
-### CPU tracking P2
-
-- Add real class-aware constant-velocity tracking of precomputed DetectionFrames, immutable results,
-  strict finite serialization, explicit timestamp streaming, CLI, CPU example and lifecycle regressions.
-- Preserve detector scores, boxes, source frames, scientific evidence and GPU authorization gates.
-
-### Perception platform P1
-
-- Add an explicit execution context, zero-copy input envelope, static backend catalog, deterministic
-  dry-run plan, and developer-facing `load_model()` API.
-- Add authorization-first thin PointPillars delegation, a fail-closed accounted-session boundary for
-  M8 DSVT, a typed detection pipeline, and an obviously non-scientific test-only CPU fake.
-- Add `laserperception predict --dry-run`, exact input/resource binding checks, focused CPU tests,
-  and a perception platform quickstart. No model, GPU, or scientific call was executed.
-### External worker tooling
-
-- Add provider-neutral task manifests, safe artifact paths, streamed identities and non-destructive verified transfers.
-- Add CPU-only worker plans and guarded external qualification records; keep scientific authorization separate.
-- Preserve failed transfer/qualification journals and historical cloud helper compatibility.
-
-### Perception platform P0
-
-- Add immutable feature, coordinate, temporal, capability and model manifests with strict JSON loading.
-- Ship reviewed PointPillars and M8 DSVT model metadata, CPU-only registry/validation APIs, and model CLI commands.
-- Preserve historical entry points, model behavior, and frozen scientific evidence.
-
-### Changed
-
-- Adopt local CPU development with separately authorized external GPU compute on demand, retaining
-  GitHub/Drive persistence and all runtime-specific scientific gates.
-- Update current-development chronology through frozen M7 and paused M8 S1; preserve released
-  v0.3.0 claims and all historical evidence.
-- Exclude private engineering handoffs and operational state from source distributions, without
-  traversing excluded directories in a local Drive-backed workspace.
-- Materialize canonical protocol Markdown line endings in the temporary CPU binding-test fixture
-  on Windows; keep the frozen protocol and production byte/hash checks unchanged.
+## [0.4.0] - 2026-09-22
 
 ### Added
 
-- Proposed perception-platform RFC and a bounded follow-up plan for provider-neutral worker
-  tooling reviewed from closed, unmerged PR #32. Neither authorizes new scientific execution.
+- Add P0 immutable model/input manifests, CPU model registry and validation, deterministic planning,
+  and model CLI discovery.
+- Add P1 guarded PointPillars/DSVT backends, authorization-first execution boundaries, typed
+  prediction pipelines, and CPU-safe dry-run support.
+- Add CPU tracking P2: deterministic class-aware constant-velocity tracking over explicitly timed precomputed
+  `DetectionFrame` values, with lifecycle, serialization, CLI, example, and CPU regressions.
+- Add P3 immutable row-aligned semantic results, taxonomy/coordinate descriptions, identity-bound
+  sidecars, confusion/IoU evaluation, CLI, examples, and CPU regressions.
+- Add P4 metadata-first discovery and local inspection for eight reviewed data-adapter paths.
+- Add provider-neutral worker manifests, verified artifact transfer, persistence, qualification
+  records, and fail-closed authorization boundaries.
+
+### Changed
+
+- Adopt local CPU-first development with separately selected external GPU workers and Drive-backed
+  non-Git persistence.
+- Keep the core wheel lightweight while expanding public CPU APIs for data, planning, tracking,
+  semantic evaluation, and worker tooling.
+- Preserve the frozen historical PointPillars/TensorRT/ROS stack and model IDs while updating active
+  package, ROS, citation, security, and release metadata to v0.4.0.
+
+### Research / M8 engineering
+
+- Add guarded M8 external-runtime readiness and exact frozen artifact/input inventory.
+- Add an execution-bound complete CPU input-gate receipt, Stage R consumed-input verification,
+  bounded four-worker live primary revalidation, and frame-major 428-pair primary inference.
+- Preserve fail-closed `INCOMPLETE` attempt evidence before frozen-source loading, gate completion,
+  and backend construction.
+- Record the external A40 Stage R chronology, the incomplete 779-condition primary attempt with zero
+  accepted canonical calls, and capacity-blocked follow-up allocations without claiming a primary
+  scientific result.
+
+### Documentation / evidence
+
+- Add a canonical current-status page, present-day README, architecture, FAQ, roadmap, vision,
+  failure index, and M8 external-runtime status record.
+- Document the independent OmniLink/OmniSim v0.3.0 evaluation, including exact transform/input
+  verification and the negative traffic-cone domain-gap result, without redistributing raw assets.
+- Add sanitized machine-readable M8 operational diagnostics and external-evaluation evidence with
+  focused schema/claim-boundary regressions.
+
+### Known limitations
+
+- M8 primary A2/E2 remains pending; the incomplete 779-condition attempt contributes zero accepted
+  canonical calls. Zero-intensity, S2, and training have not run.
+- Semantic APIs provide result/evaluation infrastructure without a production segmentation model.
+- Tracking operates on precomputed detections; no end-to-end detector/tracker benchmark is claimed.
 
 ## [0.3.0] - 2026-08-26
 

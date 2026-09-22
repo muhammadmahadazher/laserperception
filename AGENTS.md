@@ -6,14 +6,18 @@ modifying the repository. User instructions take precedence when they explicitly
 ## Project and milestone state
 
 LaserPerception is an open-source 3D LiDAR object-detection and deployment-engineering toolkit.
+The canonical current operational summary is `docs/PROJECT_STATUS.md`; use it instead of
+duplicating mutable status across documents.
 M1 through M7 are historical and frozen as applicable. **M8 — Detector V2 is active**, with
 DSVT-Pillar plus TransFusion selected as the modern detector. M8 P1-E is complete, the S1 protocol
 is frozen, and Stage R completed on the retired machine with its raw evidence merged. The retired
 machine received a historical authorization for primary A2/E2, but executed zero primary calls.
 That authorization is hardware- and runtime-bound and is not portable to a cloud worker, rented
-GPU, future laptop, or any other runtime. Zero-intensity remains unauthorized, S2 remains blocked
-and not started, and training has not started. No scientific inference may run without a fresh,
-explicit, runtime-specific owner authorization.
+GPU, future laptop, or any other runtime. Later external A40 work completed a fresh 10-process,
+140-call Stage R; a primary attempt then executed 779 detector conditions but ended incomplete,
+with zero accepted complete processes and zero accepted canonical primary calls. Zero-intensity
+remains unauthorized, S2 remains blocked and not started, and training has not started. No
+scientific inference may run without a fresh, explicit, runtime-specific owner authorization.
 
 Within that frozen history, M6c is complete with a positive final R3 projected-reference ROS
 validation result; preserve the original R2 failure and D1 diagnosis. M5 remains conditional and inactive
@@ -40,13 +44,14 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
 
 - M1–M7: historical and frozen as applicable; preserve their accepted and failed evidence.
 - M8 Detector V2: active. DSVT-Pillar plus TransFusion is selected; P1-E is complete.
-- M8 P1-S1: paused for runtime migration. Its protocol is frozen and the retired-machine Stage R
-  is complete. Primary A2/E2 calls remain zero.
+- M8 P1-S1: its protocol is frozen. External-runtime qualification and a fresh Stage R completed;
+  the accepted three-pass primary A2/E2 measurement remains pending. Preserve the incomplete
+  779-condition attempt separately; its accepted canonical primary-call count is zero.
 - A new runtime must undergo GT-blind qualification, machine-specific policy binding, a repeated
   Stage R, owner review, and a new authorization before primary inference.
 - Zero-intensity, B2/C2/D2/F2, S2, and training are not authorized.
 
-Do not add training, another detector, INT8, tracking, camera fusion, custom CUDA, Jetson tuning
+Do not add training, another detector, INT8, unrelated tracking research, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, unrelated optimization, or unrelated features
 unless the owner explicitly changes scope. Frozen scientific artifacts and historical failures
 must not be modified or reinterpreted.
@@ -57,8 +62,9 @@ must not be modified or reinterpreted.
   optional GPU, import a GPU runtime for discovery, or run GPU integration tests without explicit
   owner/runtime authorization. Missing optional dependencies must fail closed before discovery.
 - GPU workers are separate, explicitly selected external runtimes. Provider selection is an owner
-  decision, not a hard-coded dependency. Codex Cloud is not required or the primary development
-  environment. Use local CPU development plus external GPU compute on demand.
+  decision, not a hard-coded dependency; RunPod has been used operationally, while the tooling
+  remains provider-neutral. Codex Cloud is not required or the primary development environment.
+  Use local CPU development plus external GPU compute on demand.
 - Static GPU-worker editing, syntax checks, and CPU mocks do not authorize execution of the
   worker's GPU paths. GPU discovery and execution belong only inside an explicitly authorized
   GPU runtime. Qualification and scientific execution require their own scoped authorization.

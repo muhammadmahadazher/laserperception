@@ -1,0 +1,18 @@
+{
+  "claim_boundary": "Infrastructure capacity status; not detector or scientific evidence.",
+  "date": "2026-09-22",
+  "detector_calls": 0,
+  "pod_created": false,
+  "requested": {
+    "gpu_count": 1,
+    "gpu_models": [
+      "NVIDIA A40",
+      "NVIDIA RTX A6000"
+    ],
+    "memory_class_gb": 48,
+    "purchase_option": "on-demand"
+  },
+  "result": "capacity_blocked_before_allocation",
+  "schema_version": "laserperception.m8.external-runtime-capacity.v1",
+  "spend_usd": 0.0
+}

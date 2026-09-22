@@ -1,65 +1,57 @@
 # Contributing
 
-LaserPerception welcomes focused, reproducible contributions. The project is a research preview, so
-scientific clarity and small reviewable changes matter more than feature breadth.
+LaserPerception welcomes focused contributions to its CPU perception platform, reviewed data
+adapters, deterministic tracking, semantic-result infrastructure, detector/deployment wrappers,
+documentation, and reproducibility tooling.
+
+Read [AGENTS.md](AGENTS.md), [PROJECT_STATUS.md](docs/PROJECT_STATUS.md), and the relevant protocol
+before changing evidence or M8 code. Historical accepted, failed, rejected, and incomplete records
+must remain intact.
 
 ## Development setup
 
-Use Python 3.10–3.13 and keep large environments off synchronized storage when practical.
-
 ```bash
 python -m venv .venv
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev,laz]"
-pre-commit install
-```
-
-Create branches with descriptive prefixes such as `feat/`, `fix/`, `docs/`, `test/`, or `chore/`.
-Use Conventional Commit-style messages when practical.
-
-## Quality checks
-
-Run before opening a pull request:
-
-```bash
+source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
 ruff check .
 ruff format --check .
 mypy src
 python -m pytest
 python -m build
+git diff --check
 ```
 
-Tests must be deterministic, synthetic, and independent of downloaded datasets. Add malformed-input
-coverage for file readers and test scientific invariants, not only happy paths.
+Normal development is CPU-only. Tests must skip optional GPU/ROS integrations before hardware
+discovery. Do not probe or assume a local GPU. PyTorch, CUDA, OpenMMLab, DSVT/OpenPCDet, TensorRT,
+and ROS environments are optional and separately authorized.
 
-## Dataset adapters and ontology mappings
+## Contribution boundaries
 
-An adapter must preserve raw coordinates and available attributes, keep normalization separate,
-accept an explicit dataset root, and document supported layout/version. Never commit data fixtures
-copied from a public dataset.
+- Keep the core wheel lightweight and importable without GPU or ROS dependencies.
+- Use explicit coordinates, units, feature order, timestamps, taxonomies, and artifact identities.
+- Keep tracking deterministic and based on explicitly timed `DetectionFrame` input.
+- Keep semantic results row-aligned and identity-bound; do not imply a segmentation model exists.
+- Reuse canonical readers and registries when adding an adapter. Document limitations and optional
+  dependencies.
+- Do not change frozen detector, evaluator, protocol, or evidence semantics without an explicitly
+  scoped scientific review.
+- Never commit datasets, point-cloud captures, checkpoints, weights, engines, archives, raw cloud
+  logs, credentials, private paths, or unreviewed visualizations.
 
-Mapping changes require an authoritative source for numeric IDs, a documented grouping rationale,
-explicit ignore behavior, and tests. Do not infer IDs from memory or silently change an experiment's
-label space.
+## Evidence and documentation
 
-## Reproducible experiments
+Measurements require exact commit, configuration, upstream versions, artifact hashes, data
+identity, environment, hardware, timing boundaries, and memory method. Use `Pending measurement`
+for unknown values. Preserve negative and failed evidence with its original status.
 
-Experiment contributions must include an exact configuration and follow
-`docs/REPRODUCIBILITY.md`. Do not add illustrative benchmark values. Unmeasured fields say
-`Pending measurement`. Do not commit outputs, weights, checkpoints, or logs.
+External evaluations must be labeled external, document provenance and claim boundaries, and omit
+raw third-party material unless redistribution rights are established.
 
-## External implementations and licensing
+## Pull requests
 
-Prefer implementing small interfaces from documented specifications. Before incorporating external
-code, verify its license, preserve required notices, cite its source, describe modifications, and
-update `THIRD_PARTY_NOTICES.md`. Dataset terms are separate from Apache-2.0.
-
-## Pull request checklist
-
-- [ ] The change is within current project scope.
-- [ ] Public behavior and configuration are documented.
-- [ ] Tests cover success and failure behavior without dataset downloads.
-- [ ] Ruff, mypy, pytest, and package build pass.
-- [ ] No dataset, secret, checkpoint, environment, or generated output is included.
-- [ ] External sources and licenses are cited where required.
-- [ ] Benchmark values are measured and reproducible, or say `Pending measurement`.
+Use a focused branch and Conventional Commit messages. Describe the final behavior, validation,
+claim boundaries, and any intentionally preserved historical files. Before requesting review,
+inspect the full diff, built wheel and sdist, secrets/private paths, and large files. GPU or ROS
+results require their separately provisioned and authorized environments; CPU pull requests must
+not manufacture them.
