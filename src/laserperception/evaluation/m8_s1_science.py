@@ -351,6 +351,7 @@ def run_scientific_attempt(
         runtime_commit=runtime_commit,
     )
     attempt: AtomicAttempt | None = None
+    primary_gate_in_progress = False
     try:
         stage_r_inputs: dict[str, tuple[np.ndarray, dict[str, object]]] | None = None
         receipt_sha256: str | None = None
@@ -382,19 +383,29 @@ def run_scientific_attempt(
                 "stage_r_freshly_revalidated_conditions": 14,
             }
         elif mode == "primary-pass":
+            evidence_bindings = {"input_gate_receipt_sha256": receipt_sha256}
+            attempt = AtomicAttempt(
+                attempt_root,
+                identity,
+                evidence_bindings=evidence_bindings,
+            )
+            primary_gate_in_progress = True
             revalidation = revalidate_primary_inputs(
                 source,
                 worker_count=input_revalidation_workers,
             )
-            evidence_bindings = {
-                "input_gate_receipt_sha256": receipt_sha256,
-                "primary_preinference_revalidation_sha256": revalidation["result_sha256"],
-                "primary_preinference_revalidation_workers": revalidation["worker_count"],
-                "primary_preinference_revalidated_conditions": revalidation["conditions_exact"],
-            }
+            attempt.evidence_bindings.update(
+                {
+                    "primary_preinference_revalidation_sha256": revalidation["result_sha256"],
+                    "primary_preinference_revalidation_workers": revalidation["worker_count"],
+                    "primary_preinference_revalidated_conditions": revalidation["conditions_exact"],
+                }
+            )
+            evidence_bindings = dict(attempt.evidence_bindings)
         else:
             revalidation = _revalidate_all(source)
-        attempt = AtomicAttempt(attempt_root, identity, evidence_bindings=evidence_bindings)
+        if attempt is None:
+            attempt = AtomicAttempt(attempt_root, identity, evidence_bindings=evidence_bindings)
         revalidation_name = (
             "stage_r_consumed_input_revalidation.json"
             if mode == "stage-r"
@@ -403,6 +414,7 @@ def run_scientific_attempt(
             else "input_revalidation.json"
         )
         atomic_write_json(attempt_root / revalidation_name, revalidation)
+        primary_gate_in_progress = False
         camera, poses_by_frame = _load_gt(date_root)
         backend = DsvtBackend.from_environment(
             manifest_path=repository_root / CANDIDATE_MANIFEST_PATH
@@ -526,5 +538,8 @@ def run_scientific_attempt(
         return {"raw_pass": raw, "final_manifest": final}
     except Exception as error:
         if attempt is not None:
-            attempt.fail(f"{type(error).__name__}: {error}")
+            attempt.fail(
+                f"{type(error).__name__}: {error}",
+                count_failed_call=not primary_gate_in_progress,
+            )
         raise
