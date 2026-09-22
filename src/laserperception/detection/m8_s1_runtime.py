@@ -617,10 +617,16 @@ class AtomicAttempt:
         self.completed.append(condition_id)
         self._write_progress("IN_PROGRESS", None)
 
-    def fail(self, reason: str) -> dict[str, object]:
+    def fail(
+        self,
+        reason: str,
+        *,
+        count_failed_call: bool = True,
+    ) -> dict[str, object]:
         """Freeze this process attempt as noncanonical and nonresumable."""
 
-        self.failed_calls += 1
+        if count_failed_call:
+            self.failed_calls += 1
         record = self._progress("INCOMPLETE", reason)
         self._write_progress("INCOMPLETE", reason)
         return record

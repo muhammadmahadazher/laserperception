@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import threading
 import time
+from concurrent.futures.process import BrokenProcessPool
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -143,6 +144,8 @@ class _Attempt:
 def _install_mock_runtime(
     monkeypatch: pytest.MonkeyPatch,
     source: _Source,
+    *,
+    real_attempt: bool = False,
 ) -> tuple[_Backend, dict[str, int]]:
     backend = _Backend()
     calls = {
@@ -175,7 +178,8 @@ def _install_mock_runtime(
     monkeypatch.setattr(science.FrozenInputSource, "load", lambda **kwargs: source)
     monkeypatch.setattr(science, "_load_gt", load_gt)
     monkeypatch.setattr(science.DsvtBackend, "from_environment", construct)
-    monkeypatch.setattr(science, "AtomicAttempt", _Attempt)
+    if not real_attempt:
+        monkeypatch.setattr(science, "AtomicAttempt", _Attempt)
     monkeypatch.setattr(science, "NvidiaSmiSampler", _Sampler)
     monkeypatch.setattr(science, "summarize_gpu_telemetry", lambda samples: {})
     monkeypatch.setattr(science, "_condition_evidence", lambda *args, **kwargs: {"mock": True})
@@ -319,7 +323,8 @@ def test_late_source_corruption_fails_before_gt_backend_and_detector(
 ) -> None:
     frames = _canonical_frames()
     source = _Source(frames, corrupt_frame=frames[-1])
-    backend, calls = _install_mock_runtime(monkeypatch, source)
+    backend, calls = _install_mock_runtime(monkeypatch, source, real_attempt=True)
+    attempt_root = tmp_path / "primary-pass"
     with pytest.raises(ValueError, match="preflight input identity changed"):
         science.run_scientific_attempt(
             mode="primary-pass",
@@ -327,7 +332,7 @@ def test_late_source_corruption_fails_before_gt_backend_and_detector(
             full_ledger=tmp_path / "ledger.json",
             date_root=tmp_path,
             runtime_commit="a" * 40,
-            attempt_root=tmp_path / "primary-pass",
+            attempt_root=attempt_root,
             logical_pass_id="primary-pass-1",
             attempt_id="attempt-1",
             input_gate_receipt=tmp_path / "receipt.json",
@@ -337,6 +342,90 @@ def test_late_source_corruption_fails_before_gt_backend_and_detector(
     assert calls["gt_loads"] == 0
     assert calls["gate_completions"] == 0
     assert backend.calls == []
+    _assert_failed_gate_manifest(
+        attempt_root,
+        failure_type="ValueError",
+        failure_message="preflight input identity changed",
+    )
+
+
+def _assert_failed_gate_manifest(
+    attempt_root: Path,
+    *,
+    failure_type: str,
+    failure_message: str,
+) -> None:
+    manifest = json.loads((attempt_root / "attempt_manifest.json").read_text())
+    assert manifest["status"] == "INCOMPLETE"
+    assert manifest["attempted_calls"] == 0
+    assert manifest["completed_calls"] == 0
+    assert manifest["accepted_canonical_calls"] == 0
+    assert manifest["failed_calls"] == 0
+    assert manifest["identity"]["mode"] == "primary-pass"
+    assert manifest["identity"]["logical_pass_id"] == "primary-pass-1"
+    assert manifest["identity"]["attempt_id"] == "attempt-1"
+    assert manifest["identity"]["process_uuid"]
+    assert manifest["identity"]["runtime_commit"] == "a" * 40
+    assert failure_type in manifest["failure_reason"]
+    assert failure_message in manifest["failure_reason"]
+    assert manifest["evidence_bindings"] == {
+        "input_gate_receipt_sha256": "f" * 64,
+    }
+    assert not (attempt_root / "primary_preinference_revalidation.json").exists()
+
+
+@pytest.mark.parametrize(
+    ("error", "failure_type", "failure_message"),
+    [
+        (
+            BrokenProcessPool("spawned primary preflight worker exited"),
+            "BrokenProcessPool",
+            "spawned primary preflight worker exited",
+        ),
+        (
+            OSError("failed to reconstruct frozen input"),
+            "OSError",
+            "failed to reconstruct frozen input",
+        ),
+    ],
+)
+def test_primary_gate_runtime_failure_persists_incomplete_before_science(
+    error: Exception,
+    failure_type: str,
+    failure_message: str,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = _Source(_canonical_frames())
+    backend, calls = _install_mock_runtime(monkeypatch, source, real_attempt=True)
+    monkeypatch.setattr(
+        science,
+        "revalidate_primary_inputs",
+        lambda *args, **kwargs: (_ for _ in ()).throw(error),
+    )
+    attempt_root = tmp_path / "primary-pass"
+    with pytest.raises(type(error), match=failure_message):
+        science.run_scientific_attempt(
+            mode="primary-pass",
+            repository_root=tmp_path,
+            full_ledger=tmp_path / "ledger.json",
+            date_root=tmp_path,
+            runtime_commit="a" * 40,
+            attempt_root=attempt_root,
+            logical_pass_id="primary-pass-1",
+            attempt_id="attempt-1",
+            input_gate_receipt=tmp_path / "receipt.json",
+            input_revalidation_workers=4,
+        )
+    assert calls["backend_constructions"] == 0
+    assert calls["gt_loads"] == 0
+    assert calls["gate_completions"] == 0
+    assert backend.calls == []
+    _assert_failed_gate_manifest(
+        attempt_root,
+        failure_type=failure_type,
+        failure_message=failure_message,
+    )
 
 
 def test_valid_receipt_reaches_stage_r_without_full_corpus_revalidation(
