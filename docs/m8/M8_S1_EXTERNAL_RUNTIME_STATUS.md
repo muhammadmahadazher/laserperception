@@ -23,7 +23,9 @@ The prepared final execution capsule is private Drive state. No private path is 
 2. Runtime migration used RunPod A40 workers. Fresh machine qualification was performed on the
    applicable A40 runtimes.
 3. A fresh RunPod A40 Stage R campaign completed 10/10 accepted processes and 140 accepted detector
-   calls. One accepted evidence-tree identity was
+   calls. The [sanitized Stage R summary](../../benchmarks/m8/diagnostics/external_runtime_stage_r_summary.json)
+   records the authorization, runtime, frozen identities, execution timestamps, and reviewed
+   evidence-tree SHA256
    `f96eefc02760040df71da947e8e44fb573e1e61f85c4b9d64d0df112d81697a6`.
 4. A later primary pass ended `INCOMPLETE` after 779 attempted detector conditions. It yielded
    zero accepted complete primary processes and zero accepted canonical primary calls. Primary
@@ -32,8 +34,11 @@ The prepared final execution capsule is private Drive state. No private path is 
    replay, restored the complete live pre-inference revalidation, and made failures before source
    loading, gate completion, or backend construction preserve fail-closed `INCOMPLETE` evidence.
 6. The corrected live input gate measured 479.365 s with one worker, 203.146 s with two, and
-   121.057 s with four. Four workers were selected, a 3.96× speedup over measured serial. These are
-   CPU input-revalidation timings, not DSVT throughput.
+   121.057 s with four. Four workers were selected, a 3.96× speedup over measured serial. The
+   [CPU benchmark record](../../benchmarks/m8/diagnostics/primary_input_revalidation_cpu_benchmark.json)
+   preserves the input identity, environment, timestamps, timing boundary, single-observation
+   policy, and dirty-tree limitation. These are CPU input-revalidation timings, not DSVT
+   throughput or portable hardware guarantees.
 7. Several 2026-09-22 A40/A6000 allocation attempts failed before Pod creation. No GPU billing or
    detector calls resulted, and no Pod remains active.
 

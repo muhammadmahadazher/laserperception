@@ -67,6 +67,12 @@ def test_m8_current_status_keeps_incomplete_accounting_explicit() -> None:
     assert incomplete["execution_commit"] == "c676db28bcb038663752793c02f205ac948e0bae"
     assert incomplete["logical_pass_id"] == "primary-pass-1"
     assert incomplete["process_uuid"] == "c12b4bf5-9475-47bc-89b5-aafb33c43216"
+    assert incomplete["attempt_id"] == "e7cb3bf8-a173-4830-84fe-21b606c891ba-attempt-1-1"
+    assert incomplete["completed_conditions"] == 779
+    assert incomplete["expected_conditions"] == 856
+    assert incomplete["failed_conditions"] == 0
+    assert incomplete["failure_reason"] is None
+    assert incomplete["execution_end_utc"] is None
     assert incomplete["accepted_complete_processes"] == 0
     assert incomplete["accepted_canonical_calls"] == 0
     assert incomplete["pass2_started"] is False
@@ -83,3 +89,26 @@ def test_m8_current_status_keeps_incomplete_accounting_explicit() -> None:
     assert "accepted canonical primary calls: 0" in status
     assert "M8 primary A2/E2" in status
     assert "pending" in status.lower()
+
+
+def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit() -> None:
+    stage_r = _json("benchmarks/m8/diagnostics/external_runtime_stage_r_summary.json")
+    assert stage_r["status"] == "COMPLETE_ACCEPTED"
+    assert stage_r["accepted_processes"] == 10
+    assert stage_r["accepted_calls"] == 140
+    assert stage_r["execution_commit"] == "c676db28bcb038663752793c02f205ac948e0bae"
+    assert stage_r["execution_start_utc"]
+    assert stage_r["execution_end_utc"]
+    assert stage_r["primary_a2_e2_calls"] == 0
+    assert stage_r["zero_intensity_calls"] == 0
+
+    cpu = _json("benchmarks/m8/diagnostics/primary_input_revalidation_cpu_benchmark.json")
+    assert cpu["detector_execution"] is False
+    assert cpu["detector_config_sha256"] is None
+    assert cpu["repetitions_per_worker_count"] == 1
+    assert cpu["selected_worker_count"] == 4
+    assert cpu["working_tree_had_tracked_changes"] is True
+    assert cpu["timing_boundary"]
+    measurements = cpu["measurements"]
+    assert isinstance(measurements, list)
+    assert [value["worker_count"] for value in measurements] == [1, 2, 4]

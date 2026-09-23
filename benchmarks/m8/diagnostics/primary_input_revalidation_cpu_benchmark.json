@@ -1,0 +1,51 @@
+{
+  "canonical_input_sha256": "52dea89d7b8d6186a7051dc5c3c8e3371f13fd31962b81c225b09ebb3a558269",
+  "conditions_per_run": 856,
+  "detector_config_sha256": null,
+  "detector_config_sha256_note": "Not applicable: this benchmark performed CPU input reconstruction and identity checks only; it made no detector calls.",
+  "detector_execution": false,
+  "environment": {
+    "cpu_model": null,
+    "cpu_model_note": "The processor model was not recorded.",
+    "logical_cpu_count": 24,
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "measurements": [
+    {
+      "conditions_per_second": 1.7856955425418843,
+      "generated_at_utc": "2026-09-21T17:14:30.786792+00:00",
+      "revalidation_result_sha256": "aaea3e296ce96e4410a71ab4caf89fa926c162fbb64780c670b5e127b496de95",
+      "speedup_vs_serial": 1.0,
+      "wall_seconds": 479.3650315,
+      "worker_count": 1
+    },
+    {
+      "conditions_per_second": 4.213722139040894,
+      "generated_at_utc": "2026-09-21T17:58:00.238882+00:00",
+      "revalidation_result_sha256": "81156cfcb36ae0279ffd923e597ba468bf61da1ba6908c5452143a30a4b93f49",
+      "speedup_vs_serial": 2.359709165786899,
+      "wall_seconds": 203.14581069999986,
+      "worker_count": 2
+    },
+    {
+      "conditions_per_second": 7.071074478877428,
+      "generated_at_utc": "2026-09-21T18:00:15.559874+00:00",
+      "revalidation_result_sha256": "17f381e8b64d527d0306240f56c99772d554a485a61644ccf584192fa6507970",
+      "speedup_vs_serial": 3.9598432713854255,
+      "wall_seconds": 121.05656679999993,
+      "worker_count": 4
+    }
+  ],
+  "mismatch_count_per_completed_run": 0,
+  "repetitions_per_worker_count": 1,
+  "repository_head_at_measurement": "492cd492b213dc9cc6f6fe4e874719b9f2d51260",
+  "schema_version": "laserperception.m8.primary-input-revalidation-cpu-benchmark.v1",
+  "selected_worker_count": 4,
+  "source_summary_sha256": "5b3b632b850aa4152f3c97ecce9b166ee61635fca68bf684d1b6d2606aa3482c",
+  "statistics_note": "Each worker count has one completed observation; the reported speedups are ratios of those single wall-time observations, not distribution statistics.",
+  "timing_boundary": "time.perf_counter around revalidate_primary_inputs; FrozenInputSource loading and JSON serialization excluded",
+  "warmup_policy": "No explicit warmup was performed.",
+  "working_tree_had_tracked_changes": true,
+  "working_tree_note": "The measurement recorded commit 492cd492 with tracked implementation changes present; use these timings as historical engineering evidence, not portable hardware guarantees."
+}
