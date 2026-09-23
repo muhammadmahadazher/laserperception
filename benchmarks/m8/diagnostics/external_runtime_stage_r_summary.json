@@ -57,5 +57,18 @@
   "schema_version": "laserperception.m8.external-runtime-stage-r-summary.v1",
   "status": "COMPLETE_ACCEPTED",
   "training_runs": 0,
-  "zero_intensity_calls": 0
+  "zero_intensity_calls": 0,
+  "measurement_provenance": {
+    "inference_precision": null,
+    "inference_precision_note": "The raw Stage R evidence did not record an explicit model-parameter or activation dtype. The runtime policy records TF32 flags, but they do not establish a complete precision label.",
+    "warmup_call_count": 0,
+    "warmup_policy": "No separate or excluded warmup calls were executed. Each fresh process initialized the model and then executed exactly its 14 accepted Stage R conditions in frozen order.",
+    "latency_measurement_performed": false,
+    "timing_boundary": null,
+    "timing_boundary_note": "Stage R characterized repeatability rather than latency. The recorded campaign start and end timestamps are an operational execution envelope; no per-call timing boundary or latency statistic was preserved.",
+    "gpu_memory_measurement_method": "NvidiaSmiSampler queried GPU 0 nvidia-smi memory.used in MiB at 1-second intervals during each scientific_attempt block; per-process raw records retain the telemetry summaries.",
+    "gpu_memory_metric": "device memory.used MiB; sampled telemetry, not an allocator peak",
+    "host_memory_measurement_method": null,
+    "host_memory_measurement_note": "No Stage R host-memory measurement method or result was recorded."
+  }
 }

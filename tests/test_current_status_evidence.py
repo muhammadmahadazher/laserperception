@@ -115,6 +115,18 @@ def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit(
     assert stage_r["execution_end_utc"]
     assert stage_r["primary_a2_e2_calls"] == 0
     assert stage_r["zero_intensity_calls"] == 0
+    stage_r_measurement = stage_r["measurement_provenance"]
+    assert isinstance(stage_r_measurement, dict)
+    assert stage_r_measurement["inference_precision"] is None
+    assert stage_r_measurement["inference_precision_note"]
+    assert stage_r_measurement["warmup_call_count"] == 0
+    assert stage_r_measurement["warmup_policy"]
+    assert stage_r_measurement["latency_measurement_performed"] is False
+    assert stage_r_measurement["timing_boundary"] is None
+    assert stage_r_measurement["timing_boundary_note"]
+    assert "NvidiaSmiSampler" in stage_r_measurement["gpu_memory_measurement_method"]
+    assert stage_r_measurement["host_memory_measurement_method"] is None
+    assert stage_r_measurement["host_memory_measurement_note"]
 
     repeatability_relative = "benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json"
     repeatability_path = ROOT / repeatability_relative
