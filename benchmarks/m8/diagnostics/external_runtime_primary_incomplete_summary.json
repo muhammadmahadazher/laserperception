@@ -3,9 +3,11 @@
   "accepted_complete_processes": 0,
   "attempted_conditions": 779,
   "claim_boundary": "Incomplete execution evidence only; not an accepted M8 primary measurement.",
-  "execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+  "execution_commit": "c676db28bcb038663752793c02f205ac948e0bae",
+  "logical_pass_id": "primary-pass-1",
   "pass2_started": false,
   "pass3_started": false,
+  "process_uuid": "c12b4bf5-9475-47bc-89b5-aafb33c43216",
   "result_usable_as_primary_measurement": false,
   "schema_version": "laserperception.m8.external-runtime-primary-incomplete.v1",
   "status": "INCOMPLETE"

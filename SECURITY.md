@@ -13,9 +13,12 @@ reproducibility but do not receive routine backports.
 
 ## Reporting a vulnerability
 
-Do not open a public issue for a suspected vulnerability. Use GitHub's private vulnerability
-reporting for this repository when available, or contact the maintainer through the private
-security contact shown on the repository's Security page.
+Use GitHub's private vulnerability reporting form when it is available:
+<https://github.com/muhammadmahadazher/laserperception/security/advisories/new>.
+
+If GitHub does not present a private reporting option, open a public issue that requests a private
+contact channel without including vulnerability details. Continue privately once the maintainer
+provides that channel.
 
 Include the affected version or commit, impact, minimal reproduction, and any suggested mitigation.
 Remove credentials, private paths, proprietary data, datasets, checkpoints, and model artifacts.

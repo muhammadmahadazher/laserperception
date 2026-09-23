@@ -15,6 +15,15 @@ def test_external_omnilink_summary_preserves_claim_boundary() -> None:
     assert value["external"] is True
     assert value["laserperception_source_commit"] == ("0f93c480acb6c98bc07781db8ed64b8433ec9238")
     assert value["score_threshold"] == 0.25
+    detector = value["detector"]
+    runtime = value["runtime"]
+    assert isinstance(detector, dict) and isinstance(runtime, dict)
+    assert detector["config_sha256"] is None
+    assert runtime["warmup_policy"] is None
+    assert runtime["measurement_timestamp"] is None
+    assert runtime["operating_system"] is None
+    assert runtime["nvidia_driver"] is None
+    assert runtime["cuda_runtime"] is None
     sparse = value["sparse"]
     native = value["native"]
     assert isinstance(sparse, dict) and isinstance(native, dict)
@@ -30,6 +39,12 @@ def test_external_omnilink_summary_preserves_claim_boundary() -> None:
     assert sparse["eleven_sweeps"]["input_points"] == 4070
     assert native["one_sweep"]["input_points"] == 21483
     assert native["eleven_sweeps"]["input_points"] == 233950
+    assert sparse["one_sweep"]["input_sha256"] is None
+    assert sparse["eleven_sweeps"]["input_sha256"] is None
+    assert native["one_sweep"]["input_sha256"] is None
+    assert native["eleven_sweeps"]["input_sha256"] == (
+        "3e8fdddf277e5a173a92f38a4b3d71557a84940153216a4bc5e46054e6b4d107"
+    )
     transform = value["transform_verification"]
     assert isinstance(transform, dict)
     assert transform["rebuilt_value_sha256"] == (
@@ -48,6 +63,9 @@ def test_m8_current_status_keeps_incomplete_accounting_explicit() -> None:
     incomplete = _json("benchmarks/m8/diagnostics/external_runtime_primary_incomplete_summary.json")
     assert incomplete["status"] == "INCOMPLETE"
     assert incomplete["attempted_conditions"] == 779
+    assert incomplete["execution_commit"] == "c676db28bcb038663752793c02f205ac948e0bae"
+    assert incomplete["logical_pass_id"] == "primary-pass-1"
+    assert incomplete["process_uuid"] == "c12b4bf5-9475-47bc-89b5-aafb33c43216"
     assert incomplete["accepted_complete_processes"] == 0
     assert incomplete["accepted_canonical_calls"] == 0
     assert incomplete["pass2_started"] is False
