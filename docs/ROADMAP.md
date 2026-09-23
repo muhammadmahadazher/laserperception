@@ -32,20 +32,12 @@ v0.4.0 releases engineering already merged since v0.3.0:
 - provider-neutral worker and Drive-backed persistence tooling; and
 - M8 external-runtime readiness and fail-closed preflight/evidence improvements.
 
-## M8 current S1 status
+## M8 — active
 
-The implementation is ready for the frozen campaign, but the accepted primary measurement is
-pending. External A40 qualification and a fresh 10-process/140-call Stage R completed. A later
-primary attempt ended incomplete after 779 attempted conditions and contributed zero accepted
-canonical calls. PRs #41–#45 corrected replay, revalidation, and failure-evidence behavior.
-
-Future execution remains bound to commit
-`6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt SHA256
-`bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`. Current attempts are
-blocked by external A40 capacity, not missing scientific code. The v0.4.0 release does not rebind
-the campaign.
-
-Zero-intensity is unauthorized. S2 and training have not started. No dates are promised.
+M8 selected DSVT-Pillar with a TransFusion head through P1-E and froze the P1-S1 protocol. See
+[PROJECT_STATUS.md](PROJECT_STATUS.md) for the current execution state, authorization boundaries,
+frozen identities, and operational blockers. The supporting external-runtime ledger is maintained
+in [M8_S1_EXTERNAL_RUNTIME_STATUS.md](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
 ## Future directions
 
