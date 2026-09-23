@@ -21,6 +21,7 @@ def test_external_omnilink_summary_preserves_claim_boundary() -> None:
     assert detector["config_sha256"] is None
     assert runtime["warmup_policy"] is None
     assert runtime["measurement_timestamp"] is None
+    assert runtime["memory_measurement_method"] is None
     assert runtime["operating_system"] is None
     assert runtime["nvidia_driver"] is None
     assert runtime["cuda_runtime"] is None

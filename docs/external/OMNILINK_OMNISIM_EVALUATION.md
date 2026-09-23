@@ -18,13 +18,13 @@ MMDetection 3.2.0, MMCV 2.1.0, MMEngine 0.10.7, and autocast disabled. Reported 
 on an RTX 3060 Laptop GPU exclude preprocessing and must not be compared with canonical internal
 TensorRT measurements.
 
-The external report did not provide the detector measurement timestamp, warmup policy, operating
-system, NVIDIA driver, installed CUDA runtime, exact detector-config artifact hash, or input hashes
-for the sparse conditions and native one-sweep condition. These values are explicitly null in the
-machine-readable summary. PyTorch's `+cu118` build tag identifies the PyTorch build and is not
-substituted for installed driver or CUDA-runtime evidence. The capture log start below applies only
-to the native capture, not to detector timing. The preserved native eleven-sweep NPY is the sole
-input with a recorded artifact hash.
+The external report did not provide the detector measurement timestamp, warmup policy, memory
+measurement or method, operating system, NVIDIA driver, installed CUDA runtime, exact
+detector-config artifact hash, or input hashes for the sparse conditions and native one-sweep
+condition. These values are explicitly null in the machine-readable summary. PyTorch's `+cu118`
+build tag identifies the PyTorch build and is not substituted for installed driver or CUDA-runtime
+evidence. The capture log start below applies only to the native capture, not to detector timing.
+The preserved native eleven-sweep NPY is the sole input with a recorded artifact hash.
 
 OmniSim is publicly available at <https://github.com/omnilink-tech/omnisim>. No OmniSim source,
 binary, emailed script, or raw capture is redistributed here.

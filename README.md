@@ -60,7 +60,7 @@ python -m pip install -e .
 
 laserperception models list
 laserperception data adapters list
-python examples/perception_cpu_journey.py
+python examples/perception_cpu_journey.py .local/cpu-example
 python examples/tracking_sequence.py
 python examples/semantic_evaluation.py
 ```

@@ -33,6 +33,8 @@
     "warmup_policy_note": "The external report did not state a warmup policy.",
     "measurement_timestamp": null,
     "measurement_timestamp_note": "The detector measurement timestamp was not reported; the native capture log start is not substituted for it.",
+    "memory_measurement_method": null,
+    "memory_measurement_method_note": "The external report did not include a memory measurement or measurement method.",
     "operating_system": null,
     "nvidia_driver": null,
     "cuda_runtime": null,
