@@ -15,6 +15,8 @@
     {
       "conditions_per_second": 1.7856955425418843,
       "generated_at_utc": "2026-09-21T17:14:30.786792+00:00",
+      "observed_combined_peak_working_set_bytes_approximate": null,
+      "parent_process_peak_working_set_bytes": null,
       "revalidation_result_sha256": "aaea3e296ce96e4410a71ab4caf89fa926c162fbb64780c670b5e127b496de95",
       "speedup_vs_serial": 1.0,
       "wall_seconds": 479.3650315,
@@ -23,6 +25,8 @@
     {
       "conditions_per_second": 4.213722139040894,
       "generated_at_utc": "2026-09-21T17:58:00.238882+00:00",
+      "observed_combined_peak_working_set_bytes_approximate": 698400768,
+      "parent_process_peak_working_set_bytes": 55533568,
       "revalidation_result_sha256": "81156cfcb36ae0279ffd923e597ba468bf61da1ba6908c5452143a30a4b93f49",
       "speedup_vs_serial": 2.359709165786899,
       "wall_seconds": 203.14581069999986,
@@ -31,12 +35,20 @@
     {
       "conditions_per_second": 7.071074478877428,
       "generated_at_utc": "2026-09-21T18:00:15.559874+00:00",
+      "observed_combined_peak_working_set_bytes_approximate": 1368961024,
+      "parent_process_peak_working_set_bytes": 55808000,
       "revalidation_result_sha256": "17f381e8b64d527d0306240f56c99772d554a485a61644ccf584192fa6507970",
       "speedup_vs_serial": 3.9598432713854255,
       "wall_seconds": 121.05656679999993,
       "worker_count": 4
     }
   ],
+  "memory_measurement": {
+    "combined_peak_method": null,
+    "combined_peak_method_note": "The preserved summary labels the combined two- and four-worker values as approximate observations but does not record how they were sampled.",
+    "parent_process_method": "Windows psapi GetProcessMemoryInfo PeakWorkingSetSize, sampled after the timed revalidation call",
+    "parent_process_scope_note": "The parent-process value excludes spawned worker-process peaks and must not be treated as total memory use."
+  },
   "mismatch_count_per_completed_run": 0,
   "repetitions_per_worker_count": 1,
   "repository_head_at_measurement": "492cd492b213dc9cc6f6fe4e874719b9f2d51260",

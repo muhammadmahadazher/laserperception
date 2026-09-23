@@ -109,6 +109,11 @@ def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit(
     assert cpu["selected_worker_count"] == 4
     assert cpu["working_tree_had_tracked_changes"] is True
     assert cpu["timing_boundary"]
+    memory = cpu["memory_measurement"]
+    assert isinstance(memory, dict)
+    assert memory["combined_peak_method"] is None
+    assert memory["parent_process_method"]
     measurements = cpu["measurements"]
     assert isinstance(measurements, list)
     assert [value["worker_count"] for value in measurements] == [1, 2, 4]
+    assert measurements[2]["observed_combined_peak_working_set_bytes_approximate"] == 1368961024

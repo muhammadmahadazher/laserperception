@@ -37,8 +37,10 @@ The prepared final execution capsule is private Drive state. No private path is 
    121.057 s with four. Four workers were selected, a 3.96× speedup over measured serial. The
    [CPU benchmark record](../../benchmarks/m8/diagnostics/primary_input_revalidation_cpu_benchmark.json)
    preserves the input identity, environment, timestamps, timing boundary, single-observation
-   policy, and dirty-tree limitation. These are CPU input-revalidation timings, not DSVT
-   throughput or portable hardware guarantees.
+   policy, parent-process memory method, approximate combined working-set observations, and
+   dirty-tree limitation. The combined-memory sampling method was not recorded and remains
+   explicit null provenance. These are CPU input-revalidation timings, not DSVT throughput or
+   portable hardware guarantees.
 7. Several 2026-09-22 A40/A6000 allocation attempts failed before Pod creation. No GPU billing or
    detector calls resulted, and no Pod remains active.
 
