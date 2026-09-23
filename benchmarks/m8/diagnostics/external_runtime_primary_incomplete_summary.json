@@ -55,5 +55,19 @@
   "source_compact_result_sha256": "2027b321ec83f984bcbf112f0147019654e97955b42f386d9814b1daf73456a4",
   "result_usable_as_primary_measurement": false,
   "schema_version": "laserperception.m8.external-runtime-primary-incomplete.v1",
-  "status": "INCOMPLETE"
+  "status": "INCOMPLETE",
+  "execution_provenance": {
+    "inference_precision": null,
+    "inference_precision_note": "The incomplete-attempt evidence did not record an explicit model-parameter or activation dtype. The bound runtime policy records TF32 flags, but they do not establish a complete precision label.",
+    "warmup_call_count": 0,
+    "warmup_policy": "No separate or excluded warmup calls were executed. After model initialization and the input gate, the process began the frozen primary condition order.",
+    "latency_measurement_performed": false,
+    "timing_boundary": null,
+    "timing_boundary_note": "The primary attempt was a scientific execution rather than a latency measurement. It preserved a start timestamp but wrote no canonical end timestamp or per-call timing record.",
+    "gpu_memory_measurement_method": "NvidiaSmiSampler was configured to query GPU 0 nvidia-smi memory.used in MiB at 1-second intervals during the scientific_attempt block.",
+    "gpu_memory_result": null,
+    "gpu_memory_result_note": "The interrupted process did not finalize a raw-pass telemetry summary, so no canonical GPU-memory result is available for this attempt.",
+    "host_memory_measurement_method": null,
+    "host_memory_measurement_note": "No host-memory measurement method or result was recorded for the incomplete attempt."
+  }
 }

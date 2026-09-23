@@ -87,6 +87,20 @@ def test_m8_current_status_keeps_incomplete_accounting_explicit() -> None:
         "01db36c0010b1824f26a7ddee5a5797bf57a257deb8e1f8f79b6403dd6aef41f"
     )
     assert environment["gpu_model"] == "NVIDIA A40"
+    execution = incomplete["execution_provenance"]
+    assert isinstance(execution, dict)
+    assert execution["inference_precision"] is None
+    assert execution["inference_precision_note"]
+    assert execution["warmup_call_count"] == 0
+    assert execution["warmup_policy"]
+    assert execution["latency_measurement_performed"] is False
+    assert execution["timing_boundary"] is None
+    assert execution["timing_boundary_note"]
+    assert "NvidiaSmiSampler" in execution["gpu_memory_measurement_method"]
+    assert execution["gpu_memory_result"] is None
+    assert execution["gpu_memory_result_note"]
+    assert execution["host_memory_measurement_method"] is None
+    assert execution["host_memory_measurement_note"]
     assert incomplete["accepted_complete_processes"] == 0
     assert incomplete["accepted_canonical_calls"] == 0
     assert incomplete["pass2_started"] is False
