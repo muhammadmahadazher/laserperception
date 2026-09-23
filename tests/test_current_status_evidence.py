@@ -73,6 +73,19 @@ def test_m8_current_status_keeps_incomplete_accounting_explicit() -> None:
     assert incomplete["failed_conditions"] == 0
     assert incomplete["failure_reason"] is None
     assert incomplete["execution_end_utc"] is None
+    authorization = incomplete["authorization"]
+    identity = incomplete["identity"]
+    environment = incomplete["environment"]
+    assert isinstance(authorization, dict)
+    assert isinstance(identity, dict)
+    assert isinstance(environment, dict)
+    assert authorization["primary_authorization_sha256"] == (
+        "26b6a5d551354c5dcdfb85976b7185a0bc23d8928fb1740a58a16d94c8ea947d"
+    )
+    assert identity["runtime_policy_sha256"] == (
+        "01db36c0010b1824f26a7ddee5a5797bf57a257deb8e1f8f79b6403dd6aef41f"
+    )
+    assert environment["gpu_model"] == "NVIDIA A40"
     assert incomplete["accepted_complete_processes"] == 0
     assert incomplete["accepted_canonical_calls"] == 0
     assert incomplete["pass2_started"] is False
