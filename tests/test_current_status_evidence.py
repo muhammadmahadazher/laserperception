@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -115,7 +116,16 @@ def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit(
     assert stage_r["primary_a2_e2_calls"] == 0
     assert stage_r["zero_intensity_calls"] == 0
 
-    repeatability = _json("benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json")
+    repeatability_relative = "benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json"
+    repeatability_path = ROOT / repeatability_relative
+    repeatability = _json(repeatability_relative)
+    repeatability_reference = stage_r["repeatability_record"]
+    assert isinstance(repeatability_reference, dict)
+    assert repeatability_reference["path"] == repeatability_relative
+    assert (
+        repeatability_reference["sha256"]
+        == hashlib.sha256(repeatability_path.read_bytes()).hexdigest()
+    )
     assert repeatability["status"] == "COMPLETE_ACCEPTED"
     assert len(repeatability["canonical_processes"]) == 10
     assert len(repeatability["process_order"]) == 10
@@ -135,6 +145,40 @@ def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit(
             assert len(condition["tp_values_by_iou"]["0.30"]) == 10
             assert len(condition["tp_values_by_iou"]["0.50"]) == 10
             assert len(condition["tp_values_by_iou"]["0.70"]) == 10
+
+    gt_audit = repeatability["gt_only_audit_identity"]
+    assert isinstance(gt_audit, dict)
+    assert gt_audit["detector_inference_performed"] is False
+    assert gt_audit["detector_predictions_loaded"] is False
+    assert len(gt_audit["frames"]) == 7
+    assert set(gt_audit["tracklet_sha256"]) == {
+        "2011_09_26_drive_0001",
+        "2011_09_26_drive_0091",
+    }
+
+    outcomes = repeatability["condition_outcomes"]
+    assert isinstance(outcomes, list)
+    assert len(outcomes) == 140
+    assert len({outcome["logical_pass_id"] for outcome in outcomes}) == 10
+    assert all(len(outcome["condition_record_sha256"]) == 64 for outcome in outcomes)
+    for outcome in outcomes:
+        classes = outcome["classes"]
+        assert isinstance(classes, dict)
+        for class_name in ("car", "pedestrian"):
+            class_outcome = classes[class_name]
+            prediction_count = class_outcome["thresholded_prediction_count"]
+            for threshold in ("0.30", "0.50", "0.70"):
+                threshold_outcome = class_outcome["thresholds"][threshold]
+                assert (
+                    len(threshold_outcome["matched_gt_identity_set"])
+                    == threshold_outcome["true_positives"]
+                )
+                assert (
+                    threshold_outcome["true_positives"]
+                    + threshold_outcome["false_positives"]
+                    + threshold_outcome["ignored_predictions"]
+                    == prediction_count
+                )
 
     cpu = _json("benchmarks/m8/diagnostics/primary_input_revalidation_cpu_benchmark.json")
     assert cpu["detector_execution"] is False
