@@ -27,6 +27,10 @@ The prepared final execution capsule is private Drive state. No private path is 
    records the authorization, runtime, frozen identities, execution timestamps, and reviewed
    evidence-tree SHA256
    `f96eefc02760040df71da947e8e44fb573e1e61f85c4b9d64d0df112d81697a6`.
+   The linked [repeatability record](../../benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json)
+   preserves the final 14-condition sentinel order, all ten process identities and artifact hashes,
+   per-condition outcomes for both evaluated classes and all three IoU thresholds, primary discrete
+   outcome distributions, and score-ranked repeatability statistics.
 4. A later primary pass ended `INCOMPLETE` after 779 attempted detector conditions. It yielded
    zero accepted complete primary processes and zero accepted canonical primary calls. Primary
    passes 2 and 3 did not start. Partial output is not a scientific result and may not be spliced.

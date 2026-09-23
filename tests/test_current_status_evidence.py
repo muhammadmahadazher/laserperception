@@ -115,6 +115,27 @@ def test_m8_external_stage_r_and_cpu_timing_provenance_are_compact_and_explicit(
     assert stage_r["primary_a2_e2_calls"] == 0
     assert stage_r["zero_intensity_calls"] == 0
 
+    repeatability = _json("benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json")
+    assert repeatability["status"] == "COMPLETE_ACCEPTED"
+    assert len(repeatability["canonical_processes"]) == 10
+    assert len(repeatability["process_order"]) == 10
+    assert len(repeatability["sentinel_condition_order"]) == 14
+    scope = repeatability["scope"]
+    assert isinstance(scope, dict)
+    assert scope["accepted_processes"] == 10
+    assert scope["accepted_calls"] == 140
+    aggregate = repeatability["aggregate_repeatability"]
+    assert isinstance(aggregate, dict)
+    for class_name in ("car", "pedestrian"):
+        class_record = aggregate[class_name]
+        assert isinstance(class_record, dict)
+        assert len(class_record["per_condition"]) == 14
+        assert len(class_record["primary_iou_0_50"]["tp_values"]) == 10
+        for condition in class_record["per_condition"]:
+            assert len(condition["tp_values_by_iou"]["0.30"]) == 10
+            assert len(condition["tp_values_by_iou"]["0.50"]) == 10
+            assert len(condition["tp_values_by_iou"]["0.70"]) == 10
+
     cpu = _json("benchmarks/m8/diagnostics/primary_input_revalidation_cpu_benchmark.json")
     assert cpu["detector_execution"] is False
     assert cpu["detector_config_sha256"] is None

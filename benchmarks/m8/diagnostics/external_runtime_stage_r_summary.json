@@ -50,6 +50,10 @@
     "scientific_protocol_deviation": false
   },
   "primary_a2_e2_calls": 0,
+  "repeatability_record": {
+    "path": "benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json",
+    "sha256": "51ea12d759b3db87beb2f0870e3f60e0156b97deda4c8aa792b19405343520e7"
+  },
   "schema_version": "laserperception.m8.external-runtime-stage-r-summary.v1",
   "status": "COMPLETE_ACCEPTED",
   "training_runs": 0,
