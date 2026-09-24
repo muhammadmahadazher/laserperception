@@ -140,11 +140,12 @@ that execution identity. See [M8 external-runtime status](docs/m8/M8_S1_EXTERNAL
 
 ## Reproducibility
 
-Every accepted measurement records its commit, configuration, upstream versions, artifact hashes,
+Measurement protocols require commit, configuration, upstream versions, artifact hashes,
 dataset/split/sample, sweep history, precision, thresholds, warmups, timing boundaries, environment,
-hardware, and memory method. Failed and rejected evidence remains visible. Missing measurements say
-`Pending measurement`. See [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) and
-[CLOUD_WORKFLOW.md](docs/CLOUD_WORKFLOW.md).
+hardware, and memory provenance. Preserved evidence records the available values and uses explicit
+nulls with limitation notes when historical fields were not captured. Failed and rejected evidence
+remains visible; measurements that have not occurred say `Pending measurement`. See
+[REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) and [CLOUD_WORKFLOW.md](docs/CLOUD_WORKFLOW.md).
 
 ## Known limitations
 
