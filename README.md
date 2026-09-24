@@ -113,8 +113,8 @@ boundaries. Selected historical facts:
 - M6c closed with a positive projected-reference ROS validation while preserving its earlier R2
   failure. Final ROS integration reproduced 860/860 unique live conditions exactly. M7 preserved
   both corrected results and preflight failures.
-- M8 has no accepted primary A2/E2 result. The current capacity blockers are infrastructure events,
-  not detector outcomes.
+- M8 operational state, authorization boundaries, frozen identities, and blockers are maintained in
+  [PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 Read [BENCHMARKS.md](docs/BENCHMARKS.md) for canonical, diagnostic, rejected, failed, incomplete,
 external, and pending records. Read [FAILURE_INDEX.md](docs/FAILURE_INDEX.md) for preserved negative
@@ -133,10 +133,9 @@ synthetic/domain-gap result, not an accuracy or hardware-performance claim. See 
 
 DSVT-Pillar + TransFusion is the selected M8 candidate. Engineering integration, frozen input
 contracts, external-runtime qualification tooling, and fail-closed evidence handling are in place.
-The pending campaign remains bound to commit
-`6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt file SHA256
-`bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`; v0.4.0 does not replace
-that execution identity. See [M8 external-runtime status](docs/m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
+See [PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for the current campaign binding and execution
+state, and [M8 external-runtime status](docs/m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md) for its supporting
+operational ledger.
 
 ## Reproducibility
 
