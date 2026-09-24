@@ -18,4 +18,6 @@ different meanings and must not be collapsed into a single success/failure label
 | [OmniLink/OmniSim](external/OMNILINK_OMNISIM_EVALUATION.md) | External scientific negative result | No valid intended traffic-cone match at threshold 0.25 |
 
 Historical records remain unchanged. Follow-up repairs or later accepted runs do not erase the
-original failure.
+original failure. The later accepted M8 three-process primary raw measurement is indexed separately
+in [M8_S1_MEASUREMENT_RAW.md](m8/M8_S1_MEASUREMENT_RAW.md); it does not reinterpret the preserved
+779-condition incomplete attempt.

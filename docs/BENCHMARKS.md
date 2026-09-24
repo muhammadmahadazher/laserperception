@@ -12,7 +12,7 @@ must not be treated as interchangeable.
 | M4.5 | Multi-sweep builder and raw ROS boundary | Canonical correctness after preserved W1 failure | CPU plus historical detector runtime | [Contract](m45/UPSTREAM_MULTISWEEP_CONTRACT.md) |
 | M6 | KITTI Raw cross-domain and projected ROS validation | Canonical final records with preserved earlier failures | Historical detector/ROS environments | [M6 index](m6/README.md) |
 | M7 | Controlled history mechanism | Canonical frozen result with preserved preflight failures | Historical detector environment | [M7 result](m7/M7_RESULTS.md) |
-| M8 | DSVT S1 comparison | **Pending**; no accepted A2/E2 primary result | Qualified external runtime required | [Current M8 status](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md) |
+| M8 | DSVT S1 comparison | Accepted three-process raw A2/E2 measurement; interpretation pending | Qualified external A40 runtime | [Raw measurement](m8/M8_S1_MEASUREMENT_RAW.md) |
 | External | OmniLink/OmniSim synthetic replay | External negative domain-gap result | Externally reported RTX 3060 Laptop GPU | [External evaluation](external/OMNILINK_OMNISIM_EVALUATION.md) |
 
 The [failure index](FAILURE_INDEX.md) links rejected methodology, protocol failures, engineering

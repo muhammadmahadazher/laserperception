@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
+
 import pytest
 
 from benchmarks.m8 import aggregate_s1_measurement as publish
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _class_record(*, matched: bool, identity: str, frame: int, band: str) -> dict[str, object]:
@@ -107,3 +113,41 @@ def test_summarize_three_requires_exactly_three_values() -> None:
     }
     with pytest.raises(ValueError, match="exactly three"):
         publish.summarize_three([1, 2])
+
+
+def test_committed_measurement_package_is_identity_bound_and_raw_only() -> None:
+    results = ROOT / "benchmarks" / "m8" / "results"
+    manifest = json.loads((results / "m8_s1_measurement_manifest.json").read_text())
+    primary = json.loads((results / "m8_s1_primary_raw.json").read_text())
+    secondary = json.loads((results / "m8_s1_secondary_raw.json").read_text())
+
+    assert manifest["scientific_execution"] == {
+        "accepted_canonical_calls": 2568,
+        "accepted_processes": 3,
+        "conditions_per_process": 856,
+        "new_detector_calls_during_offline_publication": 0,
+        "runtime_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+        "s2_calls": 0,
+        "training_runs": 0,
+        "zero_intensity_calls": 0,
+    }
+    assert manifest["claim_boundary"]["raw_measurement_only"] is True
+    assert manifest["claim_boundary"]["scientific_interpretation_published"] is False
+    assert primary["boxes_averaged"] is False
+    assert primary["detector_calls_added"] == secondary["detector_calls_added"] == 0
+
+    for key in ("primary_raw", "secondary_raw", "stage_r"):
+        record = manifest["tracked_artifacts"][key]
+        path = ROOT / record["path"]
+        encoded = path.read_bytes()
+        assert len(encoded) == record["bytes"]
+        assert hashlib.sha256(encoded).hexdigest() == record["sha256"]
+
+    process_ids = [record["process_uuid"] for record in manifest["accepted_passes"]]
+    assert len(process_ids) == len(set(process_ids)) == 3
+    assert sum(record["accepted_calls"] for record in manifest["accepted_passes"]) == 2568
+    assert all(record["accepted_canonical_calls"] == 0 for record in manifest["excluded_attempts"])
+
+    serialized = json.dumps({"primary": primary, "secondary": secondary}).lower()
+    for prohibited in ("p_value", "confidence_interval", "standard_error"):
+        assert prohibited not in serialized
