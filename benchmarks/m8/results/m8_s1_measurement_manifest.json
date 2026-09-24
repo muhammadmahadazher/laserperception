@@ -1,0 +1,133 @@
+{
+  "accepted_passes": [
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35585708,
+      "archive_sha256": "fab1db337c41788d38bf2560129494be65e2f98a3e153a130bfd03dc915e26d1",
+      "attempt_id": "attempt-20260924-xv4l0pa78h7127-primary-01-restart-01",
+      "final_manifest_bytes": 100296,
+      "final_manifest_sha256": "15525630705267c061148bb8ebecc3871e2d56ac335245b10069e07038b17c18",
+      "final_result_sha256": "81fde7c108d9c8b7992332f5eb39c1f9127e204de5d5a631488b5a282e5cd28e",
+      "logical_pass_id": "primary-pass-1",
+      "pass": 1,
+      "process_uuid": "3256b511-921e-4456-92c6-1fd5d5a8c380",
+      "raw_pass_bytes": 96505416,
+      "raw_pass_file_sha256": "deb7286ef3857283a362f96523d34e04c0fea422b7e2e41c02c4681d434c74a3",
+      "raw_pass_result_sha256": "1d2289986773c771bc93c85609f4358c01d61133073e08d91a8fb68b1f3c7863"
+    },
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35588003,
+      "archive_sha256": "7df28ade47aacd3dde1a2ab836c6796522df75a242ec52ba0e5e2ab5a67443ee",
+      "attempt_id": "attempt-20260924T104236Z-xv4l0pa78h7127-primary-02",
+      "final_manifest_bytes": 100293,
+      "final_manifest_sha256": "bd3f3fee35c19a3037e69c4099fc7a4a7827690362f083f01452f3652f0a886d",
+      "final_result_sha256": "1169ff2648263ed90ebba0a9e511cba40f55deb24545eca33b65e1b147c49ae3",
+      "logical_pass_id": "primary-pass-2",
+      "pass": 2,
+      "process_uuid": "21f32e37-58c3-42e2-b9c1-2011b20e47b7",
+      "raw_pass_bytes": 96509296,
+      "raw_pass_file_sha256": "8a2850aba316112f7ff91552f52d7e8f1f4d0fd9c62263a4216ec7c5096bee7f",
+      "raw_pass_result_sha256": "5fbefc026d62eb4f66b2f46a7e29ca82d047de17d24bc14677706617263842c5"
+    },
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35587623,
+      "archive_sha256": "5bf95e23058c4e01bbf79a35682df24454342f39ac9398e2da3b70c4e33e33a1",
+      "attempt_id": "attempt-20260924T111445Z-xv4l0pa78h7127-primary-03",
+      "final_manifest_bytes": 100293,
+      "final_manifest_sha256": "97afa49704d7c688c446374cf0a3508cda06da945c66136b4fdf6532f04923f9",
+      "final_result_sha256": "467843e61587ab2b051c485696a468fdc3c851867605da27cde49a5ded7765fd",
+      "logical_pass_id": "primary-pass-3",
+      "pass": 3,
+      "process_uuid": "b9c1ab4b-9ea2-428a-a41e-e70fb8528d87",
+      "raw_pass_bytes": 96507744,
+      "raw_pass_file_sha256": "0681de95b077bda1c98f6c7de7f8a38b74431316bc0ebc4140c4ffceede9ad3e",
+      "raw_pass_result_sha256": "74803bdf79297bc7142e5ef690af2d689be8b0f3abacd9d23a7dfd30afd29fec"
+    }
+  ],
+  "aggregation": {
+    "boxes_averaged": false,
+    "primary_fresh_process_exact_bytes": true,
+    "primary_frozen_command": "scripts/detection/run_m8_s1.py aggregate",
+    "primary_frozen_full_aggregate_sha256": "3962fbe69a2d88b5437b2ea38821b3f80392cd5f30b26711f2f5068f4284ca83",
+    "primary_frozen_implementation_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+    "publication_reducer_implementation_commit": "e3802e4b19410b2ed05828008a5db8c919ef9a92",
+    "secondary_fresh_process_exact_bytes": true
+  },
+  "claim_boundary": {
+    "architecture_causality_claimed": false,
+    "production_readiness_claimed": false,
+    "raw_measurement_only": true,
+    "scientific_interpretation_published": false,
+    "statistical_significance_claimed": false
+  },
+  "excluded_attempts": [
+    {
+      "accepted_canonical_calls": 0,
+      "attempted_calls": 779,
+      "kind": "historical incomplete external attempt",
+      "tracked_summary": "benchmarks/m8/diagnostics/external_runtime_primary_incomplete_summary.json"
+    },
+    {
+      "accepted_canonical_calls": 0,
+      "attempt_id": "attempt-20260924-xv4l0pa78h7127-primary-01",
+      "attempted_calls": 26,
+      "completed_calls": 26,
+      "kind": "preserved interrupted attempt before accepted pass 1 restart",
+      "process_uuid": "0ccd1839-60d9-44f4-a5f8-a1b5b1963058",
+      "status": "IN_PROGRESS in preserved attempt manifest; excluded and replaced from condition 1"
+    }
+  ],
+  "frozen_bindings": {
+    "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "dsvt_config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "full_transform_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa",
+    "input_gate_receipt_file_sha256": "bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d",
+    "ordered_condition_identity_sha256": "34c2c72e1edb20115b8719440f33db322c68591a42901f01b8fd4acda2329fcc",
+    "ordered_frame_identity_sha256": "76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95",
+    "point_order_policy": "frozen source-row order; no test-time shuffle",
+    "primary_authorization_sha256": "9a794546c13c170828fb71163b68935a6cc7ea52d9d31979db48f3ac33d5f603",
+    "protocol_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "upstream_dsvt_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "interpretation_status": "SCIENTIFIC INTERPRETATION NOT YET FROZEN",
+  "offline_safety": {
+    "local_gpu_probe_commands_executed": 0,
+    "local_gpu_touched": false,
+    "runpod_actions": 0,
+    "runpod_resources_created": false,
+    "scientific_detector_calls": 0
+  },
+  "publication_date": "2026-09-24",
+  "schema_version": "laserperception.m8.s1.measurement-manifest.v1",
+  "scientific_execution": {
+    "accepted_canonical_calls": 2568,
+    "accepted_processes": 3,
+    "conditions_per_process": 856,
+    "new_detector_calls_during_offline_publication": 0,
+    "runtime_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+    "s2_calls": 0,
+    "training_runs": 0,
+    "zero_intensity_calls": 0
+  },
+  "status": "M8 S1 PRIMARY COMPLETE \u2014 RAW PREREGISTERED MEASUREMENT ONLY",
+  "tracked_artifacts": {
+    "primary_raw": {
+      "bytes": 48909,
+      "path": "benchmarks/m8/results/m8_s1_primary_raw.json",
+      "sha256": "500f45b80a27f94c2e235840a7edbd76aa5bb620e6a0820baef7b4e7576e9a58"
+    },
+    "secondary_raw": {
+      "bytes": 1045304,
+      "path": "benchmarks/m8/results/m8_s1_secondary_raw.json",
+      "sha256": "299bd8ed734d8153f36f0c5c4892f8c84db6774535130d662d4783167bf5a8dc"
+    },
+    "stage_r": {
+      "bytes": 28402,
+      "path": "benchmarks/m8/results/m8_s1_stage_r.json",
+      "sha256": "1549386c9bc9185c4240082398c5e0e5a64dc066ee5695c462bbfefde873952f"
+    }
+  }
+}

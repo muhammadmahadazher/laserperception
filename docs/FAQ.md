@@ -16,7 +16,8 @@ DSVT/OpenPCDet; optional backends wrap pinned upstream runtimes.
 
 The released historical path uses the official pretrained MMDetection3D PointPillars model on
 nuScenes. M8 integrates official pretrained DSVT-Pillar + TransFusion as an active research
-candidate. No accepted M8 primary comparison exists.
+candidate. Its accepted three-process S1 primary raw measurement is published without a scientific
+interpretation or winner claim.
 
 ## Did LaserPerception train PointPillars or DSVT?
 

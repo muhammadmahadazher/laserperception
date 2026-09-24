@@ -46,10 +46,15 @@ The prepared final execution capsule is private Drive state. No private path is 
    portable hardware guarantees.
 7. Several 2026-09-22 A40/A6000 allocation attempts failed before Pod creation. No GPU billing or
    detector calls resulted, and no Pod remains active.
+8. A later authorized A40 campaign completed three accepted fresh primary processes with 856
+   conditions each and 2,568 accepted canonical calls. The accepted raw measurement and exact
+   evidence identities are published in [M8_S1_MEASUREMENT_RAW.md](M8_S1_MEASUREMENT_RAW.md).
+   The earlier 779-condition attempt remains incomplete with zero accepted calls.
 
 ## Scope boundary
 
 This supporting ledger does not grant scientific execution authority or supersede the canonical
-status page. No DSVT accuracy, PointPillars comparison, training, TensorRT parity, or production
-claim follows from the external-runtime chronology. The frozen readiness planner remains a
+status page. The accepted A2/E2 raw measurement is descriptive; no winner, architecture-causality,
+training, TensorRT parity, statistical-significance, or production claim follows from this
+external-runtime chronology. The frozen readiness planner remains a
 pre-selection planning artifact rather than a live operational ledger.

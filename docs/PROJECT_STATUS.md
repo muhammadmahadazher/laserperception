@@ -35,26 +35,28 @@ controlled-history study and retains its preflight failures.
 ## Active M8 research
 
 M8 selected the official pretrained DSVT-Pillar + TransFusion candidate. P1 engineering and the
-frozen S1 protocol are complete. External RunPod A40 qualification and a fresh ten-process Stage R
-campaign were completed and preserved. A later primary attempt ended `INCOMPLETE` after 779
-attempted detector conditions:
+frozen S1 protocol are complete. External A40 qualification and the fresh ten-process, 140-call
+Stage R campaign are preserved. A later accepted primary campaign completed three fresh processes,
+856 A2/E2 conditions per process, and 2,568 accepted canonical calls at frozen execution commit
+`6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt file SHA256
+`bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`.
+
+The M8 primary A2/E2 [raw measurement](m8/M8_S1_MEASUREMENT_RAW.md), compact primary and secondary results, and
+measurement manifest are published. This changes execution status only: scientific interpretation,
+winner selection, architecture or intensity causality, statistical significance, and production
+readiness are not claimed. Zero-intensity remains unexecuted; S2 and training have not started.
+
+The earlier 779-condition primary attempt remains `INCOMPLETE`, with zero accepted complete
+processes and zero accepted canonical calls. A separate interrupted 26-condition attempt before the
+accepted pass-1 restart is also preserved externally with zero accepted canonical calls. Neither
+partial attempt was spliced into the accepted campaign.
+
+Historical incomplete-attempt accounting remains explicit:
 
 - accepted complete primary processes: 0
 - accepted canonical primary calls: 0
 - pass 2 started: false
 - pass 3 started: false
-
-That partial attempt is not a primary scientific result and cannot be spliced into a future pass.
-PRs #41–#45 subsequently established a complete execution-bound CPU receipt, restored the full
-856-condition live pre-inference gate, selected four bounded CPU revalidation workers, used
-frame-major 428-pair inference, and preserved fail-closed evidence before source loading, gate
-execution, and backend construction.
-
-The pending campaign remains frozen to execution commit
-`6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt file SHA256
-`bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`. The v0.4.0 release
-does not rebind that campaign. See
-[M8 external-runtime status](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
 ## External GPU operational status
 
@@ -72,8 +74,9 @@ dataset-level benchmark. See [the detailed record](external/OMNILINK_OMNISIM_EVA
 
 ## Pending and future work
 
-- Complete the three-pass M8 primary A2/E2 campaign under fresh runtime-specific authorization.
-- Zero-intensity remains unauthorized; S2 and training have not started.
+- Perform the separately gated scientific interpretation of the accepted M8 S1 primary raw
+  measurement when the owner authorizes that work.
+- Zero-intensity remains unexecuted; S2 and training have not started.
 - Production segmentation, camera fusion, broader learned representations, physical-sensor
   validation, and productionization remain future work.
 

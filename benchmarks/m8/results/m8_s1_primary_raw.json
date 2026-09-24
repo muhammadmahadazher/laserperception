@@ -1,0 +1,1555 @@
+{
+  "boxes_averaged": false,
+  "detector_calls_added": 0,
+  "frozen_aggregate_sha256": "3962fbe69a2d88b5437b2ea38821b3f80392cd5f30b26711f2f5068f4284ca83",
+  "frozen_aggregation_schema": "laserperception.m8.s1.aggregate.v1",
+  "operating_points": {
+    "annotation_conditioned_AP_iou_threshold": 0.5,
+    "oriented_bev_iou_thresholds": [
+      0.3,
+      0.5,
+      0.7
+    ],
+    "precision_scope": "annotation-conditioned inside reference-camera FOV",
+    "score_threshold": 0.25
+  },
+  "paired_history_contrast": {
+    "car": {
+      "formula": "history_delta_i = recall(E2_i) - recall(A2_i)",
+      "maximum": 0.3636363636363636,
+      "median": 0.3636363636363636,
+      "minimum": 0.3636363636363636,
+      "pass_values": [
+        0.3636363636363636,
+        0.3636363636363636,
+        0.3636363636363636
+      ],
+      "prohibited_formula_used": false
+    },
+    "pedestrian": {
+      "formula": "history_delta_i = recall(E2_i) - recall(A2_i)",
+      "maximum": 0.0025252525252525255,
+      "median": 0.0025252525252525255,
+      "minimum": 0.0025252525252525255,
+      "pass_values": [
+        0.0025252525252525255,
+        0.0025252525252525255,
+        0.0025252525252525255
+      ],
+      "prohibited_formula_used": false
+    }
+  },
+  "passes": [
+    {
+      "arms": {
+        "A2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.11987159627950453,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2322
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.50": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.70": {
+                  "f1": 0.09195402298850573,
+                  "false_negatives": 58,
+                  "false_positives": 100,
+                  "ignored_predictions": 0,
+                  "precision": 0.07407407407407407,
+                  "recall": 0.12121212121212122,
+                  "true_positives": 8
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.00029648142894901994,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14640
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.50": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H10"
+        },
+        "E2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.2038496433907682,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2003
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.2962962962962963,
+                  "false_negatives": 22,
+                  "false_positives": 187,
+                  "ignored_predictions": 0,
+                  "precision": 0.19047619047619047,
+                  "recall": 0.6666666666666666,
+                  "true_positives": 44
+                },
+                "0.50": {
+                  "f1": 0.2895622895622896,
+                  "false_negatives": 23,
+                  "false_positives": 188,
+                  "ignored_predictions": 0,
+                  "precision": 0.18614718614718614,
+                  "recall": 0.6515151515151515,
+                  "true_positives": 43
+                },
+                "0.70": {
+                  "f1": 0.11447811447811448,
+                  "false_negatives": 49,
+                  "false_positives": 214,
+                  "ignored_predictions": 0,
+                  "precision": 0.0735930735930736,
+                  "recall": 0.25757575757575757,
+                  "true_positives": 17
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.004505068942876486,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14509
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.50": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 9,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H5"
+        }
+      },
+      "attempt_id": "attempt-20260924-xv4l0pa78h7127-primary-01-restart-01",
+      "logical_pass_id": "primary-pass-1",
+      "pass": 1,
+      "process_uuid": "3256b511-921e-4456-92c6-1fd5d5a8c380",
+      "raw_pass_result_sha256": "1d2289986773c771bc93c85609f4358c01d61133073e08d91a8fb68b1f3c7863"
+    },
+    {
+      "arms": {
+        "A2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.12001333009861485,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2322
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.50": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.70": {
+                  "f1": 0.09195402298850573,
+                  "false_negatives": 58,
+                  "false_positives": 100,
+                  "ignored_predictions": 0,
+                  "precision": 0.07407407407407407,
+                  "recall": 0.12121212121212122,
+                  "true_positives": 8
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.000296658658157745,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14639
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.50": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H10"
+        },
+        "E2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.203840909119444,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2003
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.2962962962962963,
+                  "false_negatives": 22,
+                  "false_positives": 187,
+                  "ignored_predictions": 0,
+                  "precision": 0.19047619047619047,
+                  "recall": 0.6666666666666666,
+                  "true_positives": 44
+                },
+                "0.50": {
+                  "f1": 0.2895622895622896,
+                  "false_negatives": 23,
+                  "false_positives": 188,
+                  "ignored_predictions": 0,
+                  "precision": 0.18614718614718614,
+                  "recall": 0.6515151515151515,
+                  "true_positives": 43
+                },
+                "0.70": {
+                  "f1": 0.11447811447811448,
+                  "false_negatives": 49,
+                  "false_positives": 214,
+                  "ignored_predictions": 0,
+                  "precision": 0.0735930735930736,
+                  "recall": 0.25757575757575757,
+                  "true_positives": 17
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.004506390197284403,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14507
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.50": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 9,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H5"
+        }
+      },
+      "attempt_id": "attempt-20260924T104236Z-xv4l0pa78h7127-primary-02",
+      "logical_pass_id": "primary-pass-2",
+      "pass": 2,
+      "process_uuid": "21f32e37-58c3-42e2-b9c1-2011b20e47b7",
+      "raw_pass_result_sha256": "5fbefc026d62eb4f66b2f46a7e29ca82d047de17d24bc14677706617263842c5"
+    },
+    {
+      "arms": {
+        "A2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.11986748193919464,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2322
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.50": {
+                  "f1": 0.21839080459770116,
+                  "false_negatives": 47,
+                  "false_positives": 89,
+                  "ignored_predictions": 0,
+                  "precision": 0.17592592592592593,
+                  "recall": 0.2878787878787879,
+                  "true_positives": 19
+                },
+                "0.70": {
+                  "f1": 0.09195402298850573,
+                  "false_negatives": 58,
+                  "false_positives": 100,
+                  "ignored_predictions": 0,
+                  "precision": 0.07407407407407407,
+                  "recall": 0.12121212121212122,
+                  "true_positives": 8
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.00029665032516698343,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14642
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.50": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 1,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H10"
+        },
+        "E2": {
+          "classes": {
+            "car": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.2038383187081106,
+                "ground_truth_count": 66,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 2003
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.2962962962962963,
+                  "false_negatives": 22,
+                  "false_positives": 187,
+                  "ignored_predictions": 0,
+                  "precision": 0.19047619047619047,
+                  "recall": 0.6666666666666666,
+                  "true_positives": 44
+                },
+                "0.50": {
+                  "f1": 0.2895622895622896,
+                  "false_negatives": 23,
+                  "false_positives": 188,
+                  "ignored_predictions": 0,
+                  "precision": 0.18614718614718614,
+                  "recall": 0.6515151515151515,
+                  "true_positives": 43
+                },
+                "0.70": {
+                  "f1": 0.11447811447811448,
+                  "false_negatives": 49,
+                  "false_positives": 214,
+                  "ignored_predictions": 0,
+                  "precision": 0.0735930735930736,
+                  "recall": 0.25757575757575757,
+                  "true_positives": 17
+                }
+              }
+            },
+            "pedestrian": {
+              "annotation_conditioned_AP_at_iou_0_50": {
+                "average_precision": 0.004505173438942965,
+                "ground_truth_count": 396,
+                "interpretation": "annotation-conditioned descriptive AP",
+                "method": "all_points_monotonic_precision_envelope_area",
+                "prediction_count": 14506
+              },
+              "thresholds": {
+                "0.30": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.50": {
+                  "f1": 0.004938271604938272,
+                  "false_negatives": 395,
+                  "false_positives": 8,
+                  "ignored_predictions": 0,
+                  "precision": 0.1111111111111111,
+                  "recall": 0.0025252525252525255,
+                  "true_positives": 1
+                },
+                "0.70": {
+                  "f1": 0.0,
+                  "false_negatives": 396,
+                  "false_positives": 9,
+                  "ignored_predictions": 0,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "true_positives": 0
+                }
+              }
+            }
+          },
+          "condition_count": 428,
+          "history": "H5"
+        }
+      },
+      "attempt_id": "attempt-20260924T111445Z-xv4l0pa78h7127-primary-03",
+      "logical_pass_id": "primary-pass-3",
+      "pass": 3,
+      "process_uuid": "b9c1ab4b-9ea2-428a-a41e-e70fb8528d87",
+      "raw_pass_result_sha256": "74803bdf79297bc7142e5ef690af2d689be8b0f3abacd9d23a7dfd30afd29fec"
+    }
+  ],
+  "pointpillars_historical_recall_contrast": {
+    "A2": {
+      "classes": {
+        "car": {
+          "formula": "A2_pass_recall - frozen_PointPillars_H10_recall",
+          "frozen_PointPillars_recall": 0.24242424242424243,
+          "maximum": 0.04545454545454547,
+          "median": 0.04545454545454547,
+          "minimum": 0.04545454545454547,
+          "pass_values": [
+            0.04545454545454547,
+            0.04545454545454547,
+            0.04545454545454547
+          ]
+        },
+        "pedestrian": {
+          "formula": "A2_pass_recall - frozen_PointPillars_H10_recall",
+          "frozen_PointPillars_recall": 0.553030303030303,
+          "maximum": -0.553030303030303,
+          "median": -0.553030303030303,
+          "minimum": -0.553030303030303,
+          "pass_values": [
+            -0.553030303030303,
+            -0.553030303030303,
+            -0.553030303030303
+          ]
+        }
+      }
+    },
+    "E2": {
+      "classes": {
+        "car": {
+          "formula": "E2_pass_recall - frozen_PointPillars_H5_recall",
+          "frozen_PointPillars_recall": 0.7272727272727273,
+          "maximum": -0.0757575757575758,
+          "median": -0.0757575757575758,
+          "minimum": -0.0757575757575758,
+          "pass_values": [
+            -0.0757575757575758,
+            -0.0757575757575758,
+            -0.0757575757575758
+          ]
+        },
+        "pedestrian": {
+          "formula": "E2_pass_recall - frozen_PointPillars_H5_recall",
+          "frozen_PointPillars_recall": 0.6767676767676768,
+          "maximum": -0.6742424242424243,
+          "median": -0.6742424242424243,
+          "minimum": -0.6742424242424243,
+          "pass_values": [
+            -0.6742424242424243,
+            -0.6742424242424243,
+            -0.6742424242424243
+          ]
+        }
+      }
+    }
+  },
+  "publication_implementation_commit": "e3802e4b19410b2ed05828008a5db8c919ef9a92",
+  "schema_version": "laserperception.m8.s1.primary-raw.v1",
+  "spread": {
+    "A2": {
+      "classes": {
+        "car": {
+          "annotation_conditioned_AP_at_iou_0_50": {
+            "maximum": 0.12001333009861485,
+            "median": 0.11987159627950453,
+            "minimum": 0.11986748193919464,
+            "pass_values": [
+              0.11987159627950453,
+              0.12001333009861485,
+              0.11986748193919464
+            ]
+          },
+          "thresholds": {
+            "0.30": {
+              "f1": {
+                "maximum": 0.21839080459770116,
+                "median": 0.21839080459770116,
+                "minimum": 0.21839080459770116,
+                "pass_values": [
+                  0.21839080459770116,
+                  0.21839080459770116,
+                  0.21839080459770116
+                ]
+              },
+              "false_negatives": {
+                "maximum": 47,
+                "median": 47,
+                "minimum": 47,
+                "pass_values": [
+                  47,
+                  47,
+                  47
+                ]
+              },
+              "false_positives": {
+                "maximum": 89,
+                "median": 89,
+                "minimum": 89,
+                "pass_values": [
+                  89,
+                  89,
+                  89
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.17592592592592593,
+                "median": 0.17592592592592593,
+                "minimum": 0.17592592592592593,
+                "pass_values": [
+                  0.17592592592592593,
+                  0.17592592592592593,
+                  0.17592592592592593
+                ]
+              },
+              "recall": {
+                "maximum": 0.2878787878787879,
+                "median": 0.2878787878787879,
+                "minimum": 0.2878787878787879,
+                "pass_values": [
+                  0.2878787878787879,
+                  0.2878787878787879,
+                  0.2878787878787879
+                ]
+              },
+              "true_positives": {
+                "maximum": 19,
+                "median": 19,
+                "minimum": 19,
+                "pass_values": [
+                  19,
+                  19,
+                  19
+                ]
+              }
+            },
+            "0.50": {
+              "f1": {
+                "maximum": 0.21839080459770116,
+                "median": 0.21839080459770116,
+                "minimum": 0.21839080459770116,
+                "pass_values": [
+                  0.21839080459770116,
+                  0.21839080459770116,
+                  0.21839080459770116
+                ]
+              },
+              "false_negatives": {
+                "maximum": 47,
+                "median": 47,
+                "minimum": 47,
+                "pass_values": [
+                  47,
+                  47,
+                  47
+                ]
+              },
+              "false_positives": {
+                "maximum": 89,
+                "median": 89,
+                "minimum": 89,
+                "pass_values": [
+                  89,
+                  89,
+                  89
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.17592592592592593,
+                "median": 0.17592592592592593,
+                "minimum": 0.17592592592592593,
+                "pass_values": [
+                  0.17592592592592593,
+                  0.17592592592592593,
+                  0.17592592592592593
+                ]
+              },
+              "recall": {
+                "maximum": 0.2878787878787879,
+                "median": 0.2878787878787879,
+                "minimum": 0.2878787878787879,
+                "pass_values": [
+                  0.2878787878787879,
+                  0.2878787878787879,
+                  0.2878787878787879
+                ]
+              },
+              "true_positives": {
+                "maximum": 19,
+                "median": 19,
+                "minimum": 19,
+                "pass_values": [
+                  19,
+                  19,
+                  19
+                ]
+              }
+            },
+            "0.70": {
+              "f1": {
+                "maximum": 0.09195402298850573,
+                "median": 0.09195402298850573,
+                "minimum": 0.09195402298850573,
+                "pass_values": [
+                  0.09195402298850573,
+                  0.09195402298850573,
+                  0.09195402298850573
+                ]
+              },
+              "false_negatives": {
+                "maximum": 58,
+                "median": 58,
+                "minimum": 58,
+                "pass_values": [
+                  58,
+                  58,
+                  58
+                ]
+              },
+              "false_positives": {
+                "maximum": 100,
+                "median": 100,
+                "minimum": 100,
+                "pass_values": [
+                  100,
+                  100,
+                  100
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.07407407407407407,
+                "median": 0.07407407407407407,
+                "minimum": 0.07407407407407407,
+                "pass_values": [
+                  0.07407407407407407,
+                  0.07407407407407407,
+                  0.07407407407407407
+                ]
+              },
+              "recall": {
+                "maximum": 0.12121212121212122,
+                "median": 0.12121212121212122,
+                "minimum": 0.12121212121212122,
+                "pass_values": [
+                  0.12121212121212122,
+                  0.12121212121212122,
+                  0.12121212121212122
+                ]
+              },
+              "true_positives": {
+                "maximum": 8,
+                "median": 8,
+                "minimum": 8,
+                "pass_values": [
+                  8,
+                  8,
+                  8
+                ]
+              }
+            }
+          }
+        },
+        "pedestrian": {
+          "annotation_conditioned_AP_at_iou_0_50": {
+            "maximum": 0.000296658658157745,
+            "median": 0.00029665032516698343,
+            "minimum": 0.00029648142894901994,
+            "pass_values": [
+              0.00029648142894901994,
+              0.000296658658157745,
+              0.00029665032516698343
+            ]
+          },
+          "thresholds": {
+            "0.30": {
+              "f1": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "false_negatives": {
+                "maximum": 396,
+                "median": 396,
+                "minimum": 396,
+                "pass_values": [
+                  396,
+                  396,
+                  396
+                ]
+              },
+              "false_positives": {
+                "maximum": 1,
+                "median": 1,
+                "minimum": 1,
+                "pass_values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "recall": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "true_positives": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "0.50": {
+              "f1": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "false_negatives": {
+                "maximum": 396,
+                "median": 396,
+                "minimum": 396,
+                "pass_values": [
+                  396,
+                  396,
+                  396
+                ]
+              },
+              "false_positives": {
+                "maximum": 1,
+                "median": 1,
+                "minimum": 1,
+                "pass_values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "recall": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "true_positives": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "0.70": {
+              "f1": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "false_negatives": {
+                "maximum": 396,
+                "median": 396,
+                "minimum": 396,
+                "pass_values": [
+                  396,
+                  396,
+                  396
+                ]
+              },
+              "false_positives": {
+                "maximum": 1,
+                "median": 1,
+                "minimum": 1,
+                "pass_values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "recall": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "true_positives": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "E2": {
+      "classes": {
+        "car": {
+          "annotation_conditioned_AP_at_iou_0_50": {
+            "maximum": 0.2038496433907682,
+            "median": 0.203840909119444,
+            "minimum": 0.2038383187081106,
+            "pass_values": [
+              0.2038496433907682,
+              0.203840909119444,
+              0.2038383187081106
+            ]
+          },
+          "thresholds": {
+            "0.30": {
+              "f1": {
+                "maximum": 0.2962962962962963,
+                "median": 0.2962962962962963,
+                "minimum": 0.2962962962962963,
+                "pass_values": [
+                  0.2962962962962963,
+                  0.2962962962962963,
+                  0.2962962962962963
+                ]
+              },
+              "false_negatives": {
+                "maximum": 22,
+                "median": 22,
+                "minimum": 22,
+                "pass_values": [
+                  22,
+                  22,
+                  22
+                ]
+              },
+              "false_positives": {
+                "maximum": 187,
+                "median": 187,
+                "minimum": 187,
+                "pass_values": [
+                  187,
+                  187,
+                  187
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.19047619047619047,
+                "median": 0.19047619047619047,
+                "minimum": 0.19047619047619047,
+                "pass_values": [
+                  0.19047619047619047,
+                  0.19047619047619047,
+                  0.19047619047619047
+                ]
+              },
+              "recall": {
+                "maximum": 0.6666666666666666,
+                "median": 0.6666666666666666,
+                "minimum": 0.6666666666666666,
+                "pass_values": [
+                  0.6666666666666666,
+                  0.6666666666666666,
+                  0.6666666666666666
+                ]
+              },
+              "true_positives": {
+                "maximum": 44,
+                "median": 44,
+                "minimum": 44,
+                "pass_values": [
+                  44,
+                  44,
+                  44
+                ]
+              }
+            },
+            "0.50": {
+              "f1": {
+                "maximum": 0.2895622895622896,
+                "median": 0.2895622895622896,
+                "minimum": 0.2895622895622896,
+                "pass_values": [
+                  0.2895622895622896,
+                  0.2895622895622896,
+                  0.2895622895622896
+                ]
+              },
+              "false_negatives": {
+                "maximum": 23,
+                "median": 23,
+                "minimum": 23,
+                "pass_values": [
+                  23,
+                  23,
+                  23
+                ]
+              },
+              "false_positives": {
+                "maximum": 188,
+                "median": 188,
+                "minimum": 188,
+                "pass_values": [
+                  188,
+                  188,
+                  188
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.18614718614718614,
+                "median": 0.18614718614718614,
+                "minimum": 0.18614718614718614,
+                "pass_values": [
+                  0.18614718614718614,
+                  0.18614718614718614,
+                  0.18614718614718614
+                ]
+              },
+              "recall": {
+                "maximum": 0.6515151515151515,
+                "median": 0.6515151515151515,
+                "minimum": 0.6515151515151515,
+                "pass_values": [
+                  0.6515151515151515,
+                  0.6515151515151515,
+                  0.6515151515151515
+                ]
+              },
+              "true_positives": {
+                "maximum": 43,
+                "median": 43,
+                "minimum": 43,
+                "pass_values": [
+                  43,
+                  43,
+                  43
+                ]
+              }
+            },
+            "0.70": {
+              "f1": {
+                "maximum": 0.11447811447811448,
+                "median": 0.11447811447811448,
+                "minimum": 0.11447811447811448,
+                "pass_values": [
+                  0.11447811447811448,
+                  0.11447811447811448,
+                  0.11447811447811448
+                ]
+              },
+              "false_negatives": {
+                "maximum": 49,
+                "median": 49,
+                "minimum": 49,
+                "pass_values": [
+                  49,
+                  49,
+                  49
+                ]
+              },
+              "false_positives": {
+                "maximum": 214,
+                "median": 214,
+                "minimum": 214,
+                "pass_values": [
+                  214,
+                  214,
+                  214
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.0735930735930736,
+                "median": 0.0735930735930736,
+                "minimum": 0.0735930735930736,
+                "pass_values": [
+                  0.0735930735930736,
+                  0.0735930735930736,
+                  0.0735930735930736
+                ]
+              },
+              "recall": {
+                "maximum": 0.25757575757575757,
+                "median": 0.25757575757575757,
+                "minimum": 0.25757575757575757,
+                "pass_values": [
+                  0.25757575757575757,
+                  0.25757575757575757,
+                  0.25757575757575757
+                ]
+              },
+              "true_positives": {
+                "maximum": 17,
+                "median": 17,
+                "minimum": 17,
+                "pass_values": [
+                  17,
+                  17,
+                  17
+                ]
+              }
+            }
+          }
+        },
+        "pedestrian": {
+          "annotation_conditioned_AP_at_iou_0_50": {
+            "maximum": 0.004506390197284403,
+            "median": 0.004505173438942965,
+            "minimum": 0.004505068942876486,
+            "pass_values": [
+              0.004505068942876486,
+              0.004506390197284403,
+              0.004505173438942965
+            ]
+          },
+          "thresholds": {
+            "0.30": {
+              "f1": {
+                "maximum": 0.004938271604938272,
+                "median": 0.004938271604938272,
+                "minimum": 0.004938271604938272,
+                "pass_values": [
+                  0.004938271604938272,
+                  0.004938271604938272,
+                  0.004938271604938272
+                ]
+              },
+              "false_negatives": {
+                "maximum": 395,
+                "median": 395,
+                "minimum": 395,
+                "pass_values": [
+                  395,
+                  395,
+                  395
+                ]
+              },
+              "false_positives": {
+                "maximum": 8,
+                "median": 8,
+                "minimum": 8,
+                "pass_values": [
+                  8,
+                  8,
+                  8
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.1111111111111111,
+                "median": 0.1111111111111111,
+                "minimum": 0.1111111111111111,
+                "pass_values": [
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.1111111111111111
+                ]
+              },
+              "recall": {
+                "maximum": 0.0025252525252525255,
+                "median": 0.0025252525252525255,
+                "minimum": 0.0025252525252525255,
+                "pass_values": [
+                  0.0025252525252525255,
+                  0.0025252525252525255,
+                  0.0025252525252525255
+                ]
+              },
+              "true_positives": {
+                "maximum": 1,
+                "median": 1,
+                "minimum": 1,
+                "pass_values": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            },
+            "0.50": {
+              "f1": {
+                "maximum": 0.004938271604938272,
+                "median": 0.004938271604938272,
+                "minimum": 0.004938271604938272,
+                "pass_values": [
+                  0.004938271604938272,
+                  0.004938271604938272,
+                  0.004938271604938272
+                ]
+              },
+              "false_negatives": {
+                "maximum": 395,
+                "median": 395,
+                "minimum": 395,
+                "pass_values": [
+                  395,
+                  395,
+                  395
+                ]
+              },
+              "false_positives": {
+                "maximum": 8,
+                "median": 8,
+                "minimum": 8,
+                "pass_values": [
+                  8,
+                  8,
+                  8
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.1111111111111111,
+                "median": 0.1111111111111111,
+                "minimum": 0.1111111111111111,
+                "pass_values": [
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.1111111111111111
+                ]
+              },
+              "recall": {
+                "maximum": 0.0025252525252525255,
+                "median": 0.0025252525252525255,
+                "minimum": 0.0025252525252525255,
+                "pass_values": [
+                  0.0025252525252525255,
+                  0.0025252525252525255,
+                  0.0025252525252525255
+                ]
+              },
+              "true_positives": {
+                "maximum": 1,
+                "median": 1,
+                "minimum": 1,
+                "pass_values": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            },
+            "0.70": {
+              "f1": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "false_negatives": {
+                "maximum": 396,
+                "median": 396,
+                "minimum": 396,
+                "pass_values": [
+                  396,
+                  396,
+                  396
+                ]
+              },
+              "false_positives": {
+                "maximum": 9,
+                "median": 9,
+                "minimum": 9,
+                "pass_values": [
+                  9,
+                  9,
+                  9
+                ]
+              },
+              "ignored_predictions": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "precision": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "recall": {
+                "maximum": 0.0,
+                "median": 0.0,
+                "minimum": 0.0,
+                "pass_values": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "true_positives": {
+                "maximum": 0,
+                "median": 0,
+                "minimum": 0,
+                "pass_values": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "status": "RAW PREREGISTERED MEASUREMENT; SCIENTIFIC INTERPRETATION NOT FROZEN",
+  "three_pass_interpretation": "observed runtime/numerical spread only"
+}

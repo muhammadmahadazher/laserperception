@@ -19,8 +19,9 @@ runtimes. The released historical path wraps the official pretrained MMDetection
 model, deterministic voxelization, TensorRT FP16, ROS 2 Humble, and time-aware raw PointCloud2
 multi-sweep reconstruction. The platform now also provides reviewed model manifests, input
 adapters, guarded prediction plans, deterministic CPU tracking, immutable semantic results, and
-provider-neutral external-worker tooling. The active M8 DSVT-Pillar + TransFusion work remains a
-research campaign with no accepted primary A2/E2 result yet.
+provider-neutral external-worker tooling. The active M8 DSVT-Pillar + TransFusion work now has
+an accepted three-process S1 primary A2/E2 raw measurement; scientific interpretation remains
+separate and has not been frozen.
 
 [CPU-first quickstart](docs/QUICKSTART_PERCEPTION.md) ·
 [Project status](docs/PROJECT_STATUS.md) ·
@@ -50,10 +51,11 @@ CPU tracking, semantic-result evaluation, unified data adapters, external-worker
 fail-closed readiness work. The [canonical project-status page](docs/PROJECT_STATUS.md) separates
 released capabilities, historical evidence, active research, and future work.
 
-M8 selected the official pretrained DSVT-Pillar + TransFusion candidate. Its S1 protocol is frozen,
-but the three-pass primary A2/E2 comparison is still pending. A prior external primary attempt
-executed 779 detector conditions and ended `INCOMPLETE`; it contributed zero accepted canonical
-primary calls and is not a scientific result. Zero-intensity, S2, and training have not run.
+M8 selected the official pretrained DSVT-Pillar + TransFusion candidate. Its frozen S1 primary
+A2/E2 campaign later completed three accepted fresh processes and 2,568 canonical calls. The
+[raw measurement](docs/m8/M8_S1_MEASUREMENT_RAW.md) is published without scientific interpretation.
+The earlier 779-condition `INCOMPLETE` attempt remains preserved with zero accepted canonical
+calls. Zero-intensity, S2, and training have not run.
 
 ## Quick start — CPU first
 
@@ -79,7 +81,8 @@ Optional detector frameworks remain isolated from the core wheel. See
 - `pointpillars-nuscenes-v0.3` identifies the frozen official pretrained PointPillars path used by
   M1–M7. LaserPerception did not train it.
 - `dsvt-pillar-transfusion-m8` identifies the active official pretrained DSVT research candidate.
-  LaserPerception did not train it, and no accepted M8 primary comparison exists.
+  LaserPerception did not train it. Its accepted S1 primary raw measurement is descriptive and has
+  not received a scientific interpretation.
 - Model execution is guarded by explicit runtime, artifact, input, and authorization contracts.
   Listing models, validating inputs, and producing dry-run plans are CPU-safe.
 
@@ -118,8 +121,8 @@ boundaries. Selected historical facts:
 - M6c closed with a positive projected-reference ROS validation while preserving its earlier R2
   failure. Final ROS integration reproduced 860/860 unique live conditions exactly. M7 preserved
   both corrected results and preflight failures.
-- M8 operational state, authorization boundaries, frozen identities, and blockers are maintained in
-  [PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+- M8 completed three accepted primary A2/E2 processes and 2,568 canonical calls. The
+  [raw measurement](docs/m8/M8_S1_MEASUREMENT_RAW.md) is published without a winner or causal claim.
 
 Read [BENCHMARKS.md](docs/BENCHMARKS.md) for canonical, diagnostic, rejected, failed, incomplete,
 external, and pending records. Read [FAILURE_INDEX.md](docs/FAILURE_INDEX.md) for preserved negative
@@ -155,8 +158,8 @@ remains visible; measurements that have not occurred say `Pending measurement`. 
 
 - The released detector evidence covers one official pretrained PointPillars model and bounded
   datasets/hardware; it does not establish universal LiDAR generalization.
-- M8 primary A2/E2, zero-intensity, S2, DSVT training, and DSVT TensorRT parity are incomplete or
-  unstarted.
+- M8 primary A2/E2 raw measurement is complete; scientific interpretation, zero-intensity, S2,
+  DSVT training, and DSVT TensorRT parity remain incomplete or unstarted.
 - Semantic APIs evaluate saved row-aligned results; no production segmentation model is included.
 - CPU tracking is deterministic infrastructure over precomputed detections, without an end-to-end
   detector/tracker benchmark.
