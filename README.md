@@ -9,6 +9,11 @@
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
+![LaserPerception ROS 2 LiDAR detection replay with predicted 3D boxes in RViz2.](docs/assets/v0_1_ros_demo.png)
+
+*Historical LaserPerception PointPillars/ROS 2 replay showing real predicted 3D boxes in RViz2.
+See the benchmark documentation for the exact frozen runtime and measurement boundaries.*
+
 LaserPerception combines a lightweight, CPU-testable perception platform with optional detector
 runtimes. The released historical path wraps the official pretrained MMDetection3D PointPillars
 model, deterministic voxelization, TensorRT FP16, ROS 2 Humble, and time-aware raw PointCloud2
