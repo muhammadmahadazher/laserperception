@@ -1,18 +1,17 @@
 # M8 S1 external-runtime status
 
-This is the sanitized current operational record for M8 S1. Frozen protocol, Stage R, policy, and
-authorization documents retain their historical meaning and are not superseded here.
+This is the sanitized supporting ledger for M8 S1 external-runtime work. Current execution state,
+authorization boundaries, frozen campaign identities, and blockers are maintained only in
+[PROJECT_STATUS.md](../PROJECT_STATUS.md). Frozen protocol, Stage R, policy, and authorization
+documents retain their historical meaning and are not superseded here.
 
 ## Frozen scientific state
 
 - Selected candidate: official pretrained DSVT-Pillar + TransFusion.
 - S1 protocol: unchanged.
 - Historical retired-machine Stage R: preserved.
-- Current future-execution commit:
-  `6994d72c3e7691a86116d1417ac3ae08256d163f`.
-- Current receipt file SHA256:
-  `bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`.
-- Receipt: 856/856 conditions, mismatch count 0.
+- The live execution commit and receipt identity are recorded in
+  [PROJECT_STATUS.md](../PROJECT_STATUS.md).
 
 The prepared final execution capsule is private Drive state. No private path is published here.
 
@@ -48,17 +47,9 @@ The prepared final execution capsule is private Drive state. No private path is 
 7. Several 2026-09-22 A40/A6000 allocation attempts failed before Pod creation. No GPU billing or
    detector calls resulted, and no Pod remains active.
 
-## Current boundary
+## Scope boundary
 
-The primary A2/E2 campaign is still pending. Capacity failures are infrastructure blockers rather
-than scientific failures. Zero-intensity, S2, and training have not run. No DSVT accuracy,
-PointPillars comparison, training, TensorRT parity, or production claim follows from this record.
-
-The v0.4.0 release advances documentation and platform metadata but does not replace the frozen
-execution commit or regenerate its receipt.
-
-The frozen readiness planner is a pre-selection planning artifact: fields such as
-`provider_selected=false` and its older “primary calls remain 0” missing-gate text are not the
-current operational ledger. Current accounting distinguishes 779 attempted conditions from zero
-accepted canonical primary calls. Correcting runtime-source wording is outside this documentation
-release because the execution commit remains frozen.
+This supporting ledger does not grant scientific execution authority or supersede the canonical
+status page. No DSVT accuracy, PointPillars comparison, training, TensorRT parity, or production
+claim follows from the external-runtime chronology. The frozen readiness planner remains a
+pre-selection planning artifact rather than a live operational ledger.
