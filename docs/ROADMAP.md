@@ -37,14 +37,16 @@ v0.4.0 releases engineering already merged since v0.3.0:
 M8 selected DSVT-Pillar with a TransFusion head through P1-E and froze the P1-S1 protocol. See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current execution state, authorization boundaries,
 frozen identities, and operational blockers. The accepted three-process S1 primary raw
-measurement is published in [M8_S1_MEASUREMENT_RAW.md](m8/M8_S1_MEASUREMENT_RAW.md); scientific
-interpretation remains pending. The supporting external-runtime ledger is maintained in
+measurement is published in [M8_S1_MEASUREMENT_RAW.md](m8/M8_S1_MEASUREMENT_RAW.md), and its
+separate [scientific interpretation](m8/M8_S1_INTERPRETATION.md) is complete. It records the
+positive descriptive Car direction and severe Pedestrian transfer failure without causal or
+winner claims. The supporting external-runtime ledger is maintained in
 [M8_S1_EXTERNAL_RUNTIME_STATUS.md](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
 ## Future directions
 
-Potential future work includes interpreting the completed M8 primary raw measurement under a
-separate evidence gate, segmentation-model integration, broader learned representations, camera
-fusion, physical-sensor validation, deployment optimization on specifically available hardware,
-and productionization. Each requires explicit
+Potential future work includes the separately authorized preregistered zero-intensity intervention,
+prospective S2 preregistration and execution, segmentation-model integration, broader learned
+representations, camera fusion, physical-sensor validation, deployment optimization on
+specifically available hardware, and productionization. Each requires explicit
 scope, evidence gates, and applicable hardware/runtime authorization.
