@@ -1,0 +1,74 @@
+{
+  "accepted_calls": 140,
+  "accepted_processes": 10,
+  "authorization": {
+    "authorization_id": "m8-s1-stage-r-runpod-ood73n0l6aps26-20260920",
+    "authorization_timestamp_utc": "2026-09-20T16:42:45Z",
+    "stage_r_authorization_sha256": "41bb106d1c8c81fd7064be9b42c53d224734ed2296d993709ca5c797965d839b"
+  },
+  "claim_boundary": "Accepted external A40 Stage R prerequisite only; no primary A2/E2, zero-intensity, S2, or training calls are represented.",
+  "environment": {
+    "cuda_runtime": "11.8",
+    "gpu_memory_mib": 46068,
+    "gpu_model": "NVIDIA A40",
+    "gpu_uuid": "GPU-2c5a4e34-eb3c-139f-4a6c-794e308c8f71",
+    "nvidia_driver": "580.159.04",
+    "numpy": "1.23.5",
+    "python": "3.10.12",
+    "spconv": "2.3.8",
+    "torch": "2.1.0+cu118",
+    "torch_scatter": "2.1.2+pt21cu118"
+  },
+  "evidence": {
+    "deterministic_manifest_tree_sha256": "f96eefc02760040df71da947e8e44fb573e1e61f85c4b9d64d0df112d81697a6",
+    "file_count": 190,
+    "owner_review_summary_sha256": "c1286b7e8f5c457df47c78a5faa9ff6b6d207aaacda3bab762e313e7ed822c59",
+    "post_persistence_source_manifest_exact": true,
+    "raw_evidence_bytes": 30070043
+  },
+  "execution_commit": "c676db28bcb038663752793c02f205ac948e0bae",
+  "execution_end_utc": "2026-09-20T16:56:35.094179+00:00",
+  "execution_start_utc": "2026-09-20T16:43:57.283621+00:00",
+  "failed_attempts": 0,
+  "identity": {
+    "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "input_gate_receipt_sha256": "22cb2a1213838658b015517d5d7d9f0135abd59b072791580790219baeb69afd",
+    "input_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
+    "protocol_freeze_commit": "5061d5d2c6a6057fed1f3f537c5857d2d84f6b3f",
+    "protocol_json_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "runtime_policy_sha256": "01db36c0010b1824f26a7ddee5a5797bf57a257deb8e1f8f79b6403dd6aef41f",
+    "upstream_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+  },
+  "incomplete_attempts": 0,
+  "local_gpu_touched": false,
+  "owner_review": {
+    "all_primary_discrete_outcomes_exact_for_both_classes": true,
+    "all_primary_matched_gt_sets_exact_for_both_classes": true,
+    "all_secondary_tp_and_matched_gt_sets_exact": true,
+    "scientific_protocol_deviation": false
+  },
+  "primary_a2_e2_calls": 0,
+  "repeatability_record": {
+    "path": "benchmarks/m8/diagnostics/external_runtime_stage_r_repeatability.json",
+    "sha256": "c6631f2afeb1a429b206f9d5fdff08e2e3fdba5cd9ea43ddcb4cc897a47ec371"
+  },
+  "schema_version": "laserperception.m8.external-runtime-stage-r-summary.v1",
+  "status": "COMPLETE_ACCEPTED",
+  "training_runs": 0,
+  "zero_intensity_calls": 0,
+  "measurement_provenance": {
+    "inference_precision": null,
+    "inference_precision_note": "The raw Stage R evidence did not record an explicit model-parameter or activation dtype. The runtime policy records TF32 flags, but they do not establish a complete precision label.",
+    "warmup_call_count": 0,
+    "warmup_policy": "No separate or excluded warmup calls were executed. Each fresh process initialized the model and then executed exactly its 14 accepted Stage R conditions in frozen order.",
+    "latency_measurement_performed": false,
+    "timing_boundary": null,
+    "timing_boundary_note": "Stage R characterized repeatability rather than latency. The recorded campaign start and end timestamps are an operational execution envelope; no per-call timing boundary or latency statistic was preserved.",
+    "gpu_memory_measurement_method": "NvidiaSmiSampler queried GPU 0 nvidia-smi memory.used in MiB at 1-second intervals during each scientific_attempt block; per-process raw records retain the telemetry summaries.",
+    "gpu_memory_metric": "device memory.used MiB; sampled telemetry, not an allocator peak",
+    "host_memory_measurement_method": null,
+    "host_memory_measurement_note": "No Stage R host-memory measurement method or result was recorded."
+  }
+}

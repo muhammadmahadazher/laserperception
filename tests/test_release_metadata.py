@@ -9,39 +9,41 @@ def _text(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def test_v0_3_release_metadata_is_consistent() -> None:
+def test_v0_4_release_metadata_is_consistent() -> None:
     pyproject = _text("pyproject.toml")
-    assert 'version = "0.3.0"' in pyproject
+    assert 'version = "0.4.0"' in pyproject
     description = (
-        'description = "Reproducible 3D LiDAR detection, raw ROS 2 ingestion, '
-        'and TensorRT deployment."'
+        'description = "CPU-first 3D LiDAR perception contracts, evaluation, tracking, '
+        'and deployment tooling."'
     )
     assert description in pyproject
 
     citation = _text("CITATION.cff")
-    assert "version: 0.3.0" in citation
-    assert "date-released: 2026-08-26" in citation
-    assert "time-aware raw PointCloud2 multi-sweep ingestion" in citation
-    assert "semantic segmentation" not in citation.lower()
+    assert "version: 0.4.0" in citation
+    assert "date-released: 2026-09-22" in citation
+    assert "deterministic tracking" in citation
+    assert "semantic-result evaluation" in citation
     assert "No software release" + " exists yet" not in citation
 
-    assert '__version__ = "0.3.0"' in _text("src/laserperception/__init__.py")
-    assert 'version="0.3.0"' in _text("ros2/laserperception_ros/setup.py")
-    assert "<version>0.3.0</version>" in _text("ros2/laserperception_ros/package.xml")
+    assert '__version__ = "0.4.0"' in _text("src/laserperception/__init__.py")
+    assert 'version="0.4.0"' in _text("ros2/laserperception_ros/setup.py")
+    assert "<version>0.4.0</version>" in _text("ros2/laserperception_ros/package.xml")
 
     changelog = _text("CHANGELOG.md")
     assert "## [Unreleased]" in changelog
-    unreleased, current_release = changelog.split("## [0.3.0] - 2026-08-26", maxsplit=1)
+    unreleased, current_release = changelog.split("## [0.4.0] - 2026-09-22", maxsplit=1)
     assert "M6" not in unreleased
-    assert "856 frozen H10/H5 conditions" in current_release
+    assert "CPU tracking P2" in current_release
+    assert "M8 primary A2/E2 remains pending" in current_release
+    assert "## [0.3.0] - 2026-08-26" in current_release
     assert "## [0.2.0] - 2026-08-20" in current_release
 
-    release_notes = _text("docs/releases/v0.3.0.md")
+    release_notes = _text("docs/releases/v0.4.0.md")
     quickstart = _text("docs/QUICKSTART_V0_2.md")
-    assert "LaserPerception v0.3.0 release notes" in release_notes
-    assert "Release date: 2026-08-26" in release_notes
-    assert "SOURCE_DATE_EPOCH=1787702400" in release_notes
-    assert "860/860 exact" in release_notes
+    assert "LaserPerception v0.4.0 release notes" in release_notes
+    assert "Release date: 2026-09-22" in release_notes
+    assert "M8 primary A2/E2 remains pending" in release_notes
+    assert "LaserPerception v0.3.0 release notes" in _text("docs/releases/v0.3.0.md")
     assert "LaserPerception v0.2.0 quickstart" in quickstart
     assert "LaserPerception v0.2.0 release notes" in _text("docs/releases/v0.2.0.md")
     assert "# LaserPerception v0.1.0 release notes" in _text("docs/releases/v0.1.0.md")

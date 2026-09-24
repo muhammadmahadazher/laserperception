@@ -7,7 +7,9 @@ The canonical private Google Drive binding is `lpdrive:` at folder ID
 
 Normal development takes place on a CPU-capable local workstation. Codex Cloud is not required
 and is no longer the primary development/runtime assumption. External GPU compute remains useful
-and is selected explicitly per authorized task; no provider is chosen by this policy.
+and is selected explicitly per authorized task; no provider is chosen by this policy. RunPod has
+been used in M8 operations, but that history does not make it a package dependency or weaken this
+provider-neutral policy. Current operational state is in [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ```text
 local CPU workstation -> GitHub source/history + Drive private/large state

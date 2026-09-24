@@ -1,0 +1,112 @@
+{
+  "capture": {
+    "archive_sha256": "01575b979a7b7b698e838aa1083a175a132edfc07070f032eb944efadb7693fd",
+    "binary_sha256": null,
+    "binary_sha256_note": "Capture-time executable was replaced before it could be hashed.",
+    "log_start": "2026-09-01T21:47:58+02:00",
+    "omnisim_source_commit": "64a083d652c931d29274ae549957b464852ffff9",
+    "omnisim_version": "8.1.17"
+  },
+  "claim_boundary": "Independent synthetic external evaluation; not a canonical LaserPerception benchmark, dataset-level accuracy result, physical-LiDAR validation, TensorRT result, or M8 evidence.",
+  "evaluator": "OmniLink / OmniSim",
+  "external": true,
+  "laserperception_source_commit": "0f93c480acb6c98bc07781db8ed64b8433ec9238",
+  "package_version": "0.3.0",
+  "detector": {
+    "checkpoint_sha256": "f19d00a38e6b775f38a45a9a3ca3ecaec20a5585a3caf44622423e2d5f75d5d0",
+    "config_sha256": null,
+    "config_sha256_note": "The external report did not provide an exact detector-config artifact identity."
+  },
+  "runtime": {
+    "autocast": false,
+    "cuda_device": "RTX 3060 Laptop GPU",
+    "initialization_seconds": 26.565913873,
+    "mmdetection": "3.2.0",
+    "mmdetection3d": "1.4.0",
+    "mmdetection3d_commit": "fe25f7a51d36e3702f961e198894580d83c4387b",
+    "mmcv": "2.1.0",
+    "mmengine": "0.10.7",
+    "precision": "native PyTorch FP32",
+    "pytorch": "2.1.0+cu118",
+    "timing_boundary": "run_prepared; preprocessing excluded",
+    "warmup_policy": null,
+    "warmup_policy_note": "The external report did not state a warmup policy.",
+    "measurement_timestamp": null,
+    "measurement_timestamp_note": "The detector measurement timestamp was not reported; the native capture log start is not substituted for it.",
+    "memory_measurement_method": null,
+    "memory_measurement_method_note": "The external report did not include a memory measurement or measurement method.",
+    "operating_system": null,
+    "nvidia_driver": null,
+    "cuda_runtime": null,
+    "cuda_runtime_note": "The PyTorch +cu118 build tag is recorded above but is not evidence of the installed CUDA runtime or NVIDIA driver."
+  },
+  "score_threshold": 0.25,
+  "sparse": {
+    "eleven_sweeps": {
+      "detections_at_threshold": 0,
+      "input_points": 4070,
+      "input_sha256": null,
+      "intended_match": null,
+      "raw_proposals": 3,
+      "run_prepared_seconds": {
+        "maximum": 0.116985814,
+        "median": 0.115038864,
+        "minimum": 0.099573329,
+        "repetitions": 5
+      }
+    },
+    "one_sweep": {
+      "detections_at_threshold": 0,
+      "input_points": 370,
+      "input_sha256": null,
+      "intended_match": null,
+      "raw_proposals": 2,
+      "run_prepared_seconds": {
+        "maximum": 0.17331812,
+        "median": 0.133299999,
+        "minimum": 0.103750011,
+        "repetitions": 5
+      }
+    }
+  },
+  "native": {
+    "eleven_sweeps": {
+      "detections_at_threshold": 0,
+      "input_points": 233950,
+      "input_sha256": "3e8fdddf277e5a173a92f38a4b3d71557a84940153216a4bc5e46054e6b4d107",
+      "intended_match": null,
+      "raw_proposals": 28,
+      "run_prepared_seconds": {
+        "maximum": 0.397753021,
+        "median": 0.261350272,
+        "minimum": 0.185615007,
+        "repetitions": 5
+      }
+    },
+    "one_sweep": {
+      "detections_at_threshold": 2,
+      "input_points": 21483,
+      "input_sha256": null,
+      "intended_match": null,
+      "raw_proposals": 23,
+      "run_prepared_seconds": {
+        "maximum": 0.331061805,
+        "median": 0.190670852,
+        "minimum": 0.145792361,
+        "repetitions": 5
+      }
+    }
+  },
+  "schema_version": "laserperception.external-evaluation.omnilink-omnisim.v1",
+  "input_identity_note": "Per-input identities were not reported except for the preserved native eleven-sweep NPY recorded below.",
+  "transform_verification": {
+    "exactly_equal_to_preserved_input": true,
+    "maximum_absolute_difference": 0.0,
+    "preserved_npy_sha256": "3e8fdddf277e5a173a92f38a4b3d71557a84940153216a4bc5e46054e6b4d107",
+    "rebuilt_value_sha256": "e00d05c6562449d52a2ca7d84692e50b6ccc9c512d5cc5f2f4a3551383094472",
+    "shape": [
+      233950,
+      4
+    ]
+  }
+}

@@ -1,159 +1,100 @@
 # Architecture
 
-LaserPerception v0.2.0 keeps a lightweight CPU package separate from an optional, pinned GPU/ROS
-deployment stack. The deployed detector is an official pretrained MMDetection3D PointPillars model;
-LaserPerception did not train or reimplement it. v0.2 supports both the original model-ready input
-and the accepted raw XYZ plus time-aware TF reconstruction boundary.
+LaserPerception separates a lightweight CPU platform from optional detector, deployment, ROS, and
+external-worker environments. The core wheel can inspect metadata, validate contracts, plan work,
+track saved detections, and evaluate saved semantic results without discovering GPU hardware.
 
-## Supported model-ready path (v0.1-compatible)
-
-```mermaid
-flowchart TD
-    A["Model-ready multi-sweep PointCloud2"] --> B["exact_fast deterministic voxelization"]
-    B --> C["Frozen TensorRT FP16 PointPillars network"]
-    C --> D["Unchanged MMDeploy postprocess"]
-    D --> E["LaserPerception DetectionFrame"]
-    E --> F["vision_msgs / Detection3DArray"]
-    E --> G["RViz / Foxglove markers"]
-```
-
-The input contract requires `x`, `y`, `z`, and `time_lag` and preserves the source header. This
-direct path remains model-ready: it does not reconstruct history or perform TF lookup.
-
-## Raw ingestion path (new in v0.2)
-
-v0.2 includes the two accepted M4.5 boundaries before the unchanged model-ready detector:
+## Present-day system
 
 ```mermaid
-flowchart LR
-    C["Current raw sweep"] --> A["M4.5a offline builder"]
-    H["Ordered historical sweeps"] --> A
-    P["Known poses"] --> A
-    R["Raw single-sweep PointCloud2"] --> L["M4.5b live history"]
-    T["Time-indexed tf2 through fixed frame"] --> L
-    A --> M["Model-ready float32 XYZT"]
-    L --> M
-    M --> D["Existing exact_fast + TensorRT detector"]
-    D --> O["Detection3DArray"]
+flowchart TB
+    subgraph CPU[Lightweight CPU core]
+      A[Data adapter registry] --> B[Point/input contracts]
+      B --> C[Model registry and compatibility validation]
+      C --> D[Deterministic execution plan]
+      G[Timed DetectionFrame] --> H[Class-aware constant-velocity tracker]
+      I[SemanticPointFrame] --> J[Confusion and IoU evaluation]
+    end
+    subgraph Optional[Optional isolated environments]
+      D --> E[Historical PointPillars backend]
+      D --> F[M8 DSVT research backend]
+      E --> G
+      F --> G
+      G --> K[ROS 2 / export / visualization]
+    end
+    L[Verified external-worker boundary] -. artifacts, policy, authorization .-> Optional
 ```
 
-M4.5a is the NumPy-only reconstruction core. M4.5b decodes compatible float32 XYZ PointCloud2,
-keeps up to ten earlier acquisitions, obtains source-time-to-current-time transforms with
-`tf2_ros.Buffer.lookup_transform_full`, and delegates exact accumulation semantics to the same
-`MultiSweepBuilder`. The current acquisition frame is the target when `target_frame` is empty.
-A dedicated `TransformListener(..., spin_thread=True)` services TF while the node uses a bounded
-lookup timeout, so waiting in the point callback does not starve TF reception.
+### Data ingestion
 
-The live path exactly matched the accepted M4.5a model-ready input and the complete frozen detector
-chain on 20/20 samples. It accepts compatible streams only; it does not provide calibration,
-localization, odometry, per-point deskew, or a vendor driver. Contracts and evidence are in
-[`docs/MULTISWEEP.md`](MULTISWEEP.md) and [`docs/RAW_LIDAR_ROS2.md`](RAW_LIDAR_ROS2.md).
+The data registry exposes eight manifests without importing readers. Adapters describe features,
+labels, temporal support, calibration, coordinates, optional dependencies, and limitations.
+Inspection dispatches to canonical existing readers; it does not normalize or silently infer model
+compatibility. See [DATA_ADAPTERS.md](DATA_ADAPTERS.md).
 
-The TensorRT network still produces `cls_score`, `bbox_pred`, and `dir_cls_pred`. The existing
-MMDeploy postprocess remains unchanged. LaserPerception converts final predictions into a
-framework-independent `DetectionFrame`, then the ROS package converts that contract to
-`Detection3DArray` and visualization markers.
+### Perception contracts and guarded execution
 
-## Voxelization and provenance policy
+Model manifests bind tasks, input features, coordinates, temporal semantics, runtime targets, and
+artifact requirements. Planning validates the input description and execution context without
+loading an optional backend. Execution requires explicit runtime resources and, where applicable,
+runtime-scoped authorization.
 
-```mermaid
-flowchart LR
-    P["Explicit policy"] -->|"Historical / evidence"| O["official + full"]
-    P -->|"ROS deployment"| X["exact_fast + live"]
-    O --> T["Frozen TensorRT FP16 network"]
-    X --> T
-```
+`DetectionFrame` keeps boxes framework-independent: center XYZ, length-width-height, yaw, class,
+score, and optional velocity with an explicit coordinate frame. Export and visualization filtering
+remain separate from inference.
 
-- `official` is the historical/core evidence default and uses pinned deterministic MMCV hard
-  voxelization.
-- `exact_fast` is the ROS deployment choice. `ExactDeterministicVoxelizer` is a LaserPerception
-  implementation that uses pinned MMCV dynamic coordinates plus PyTorch grouping and was proven
-  bit-exact against official outputs on all 81 validation samples.
-- `full` provenance includes exact tensor hashes and remains the evidence default.
-- `live` provenance records lightweight semantic metadata and is selected explicitly by ROS.
-- Initialization fails closed. The upstream `deterministic=False` shortcut remains rejected and is
-  never a fallback.
+### CPU tracking
 
-No custom CUDA/C++ kernel, voxel geometry change, model change, ONNX re-export, engine rebuild, or
-postprocess replacement was introduced by the accepted exact-fast path.
+P2 consumes explicitly timestamped, precomputed `DetectionFrame` values. Association is
+deterministic and class-aware by default; state uses a constant XY velocity model and explicit
+birth, confirmation, miss, and deletion rules. It neither imports detector frameworks nor claims
+an end-to-end detector/tracker benchmark.
 
-## Detector and evidence boundaries
+### Semantic results and evaluation
 
-M1 preserves the official calibrated nuScenes multi-sweep pipeline and exposes a small
-LaserPerception-owned result contract. nuScenes is not routed through the parked single-scan
-`PointCloud` abstraction.
+P3 represents immutable point-wise class results with strictly increasing source-row indices,
+taxonomy and coordinate descriptions, source identity, and optional confidence. CPU evaluation
+builds confusion matrices and IoU summaries. It is infrastructure for externally produced
+predictions, not a bundled segmentation model.
 
-M2 separates two roles:
+### External workers
 
-- parity reference: MMDeploy-rewritten PyTorch FP32 versus TensorRT FP16;
-- performance baseline: native MMDetection3D PyTorch FP32 versus TensorRT FP16.
+Worker tooling verifies artifacts, plans tasks, binds paths, records qualifications, and persists
+evidence while remaining provider-neutral. GPU discovery and inference occur only inside an
+explicitly selected external runtime. Runtime policies and authorizations are machine-specific and
+fail closed. See [EXTERNAL_WORKERS.md](EXTERNAL_WORKERS.md) and
+[CLOUD_WORKFLOW.md](CLOUD_WORKFLOW.md).
 
-The rewritten eager graph is needed to validate export semantics but is not the runtime speedup
-denominator. Historical scene-start benchmark inputs and representative full-history ROS inputs are
-reported separately.
+## Detector backends
 
-## Dependency boundary
+### Historical released PointPillars path
 
-The wheel packages `src/laserperception` only. Core types, I/O, datasets, transforms, ontology,
-audit, detection contracts, geometry, and offline multi-sweep reconstruction remain CPU-testable.
-PyTorch, CUDA, MMDetection3D, MMDeploy, ONNX, TensorRT, and ROS 2 remain isolated optional
-dependencies and are imported only by optional paths.
+M1–M7 use the official pretrained MMDetection3D PointPillars checkpoint and pinned nuScenes
+preprocessing. The deployment path exports only the network to TensorRT FP16; official preparation,
+voxelization, shared postprocessing, and LaserPerception conversion remain outside the engine.
 
-Standard GitHub CI does not install GPU or ROS dependencies. Manual integration gates validate the
-pinned WSL2 environment, external artifact hashes, CUDA device execution, clean colcon build,
-ROS-native tests, and production-path smoke.
+The production ROS path uses the NumPy-only multi-sweep builder and `exact_fast` deterministic
+voxelizer. Compatible raw PointCloud2 input passes through bounded history and time-aware
+`lookup_transform_full`. The accepted ROS column-vector-to-builder mapping is
+`rotation = R.T`, `translation = -R.T @ t`.
 
-## Detection result boundary
+### Active M8 DSVT research path
 
-Public detections document coordinate frame, XYZ axes, length-width-height order, geometric center,
-yaw, source class, score, and optional velocity. Raw upstream class names are preserved. Display or
-export filtering occurs after model execution and does not redefine the measured detector path.
+M8 uses a lazy, optional DSVT/OpenPCDet backend for the selected DSVT-Pillar + TransFusion
+candidate. The feature contract is `[x, y, z, intensity, time_lag]`; source-row and condition order
+are frozen. The S1 runtime enforces exact artifacts, input receipt, qualification, policy, and
+authorization. No accepted primary A2/E2 result exists. See
+[M8 status](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
-## Parked segmentation architecture
+## Dependency boundaries
 
-```mermaid
-flowchart LR
-    A["SemanticKITTI / DALES"] --> B["Directory adapters"]
-    B --> C["PointCloud"]
-    C --> D["Explicit normalization"]
-    D --> E["Explicit ontology mapping"]
-    E --> F["Dataset audit"]
-```
+The core wheel declares NumPy and laspy only, with small optional extras. PyTorch, CUDA,
+MMDetection3D, MMDeploy, ONNX, TensorRT, DSVT/OpenPCDet, spconv, torch-scatter, and ROS 2 are not
+core dependencies. Heavy environments and artifacts remain external and hash-verified.
 
-This earlier infrastructure remains tested and supported. Readers preserve point-level data and do
-not silently normalize, crop, voxelize, or augment. Its semantic-segmentation model, training, and
-accuracy results remain `Pending measurement` and outside the current detection release line.
+## Evidence boundaries
 
-## CPU tracking — implemented P2
-
-`laserperception.tracking` provides immutable Track3D/TrackFrame results, explicit nanosecond timestamps,
-constant-XY-velocity prediction, class-aware deterministic global greedy association, and configurable
-lifecycle management. `track_sequence()` and `laserperception track` stream precomputed detections.
-No detector is executed. See [tracking documentation](TRACKING.md) for coordinate assumptions and
-limitations. The synthetic example is not benchmark evidence.
-
-## Semantic results and evaluation — implemented P3
-
-`laserperception.semantic` supplies immutable, row-aligned SemanticPointFrame results and a NumPy
-confusion/IoU evaluator. Versioned taxonomy descriptions reuse the Experiment 001 ontology and its
-explicit SemanticKITTI/DALES mapping policy. Evaluation requires identical sample, coordinate, taxonomy,
-source-count and source-row identities. NPY sidecars bind dtype, shape, size and SHA256; small fixtures
-may use bounded inline JSON. `semantic inspect` and `semantic evaluate` run on CPU.
-Production segmentation models are not integrated. See [semantic documentation](SEMANTIC_SEGMENTATION.md).
-
-## Data discovery and ingestion — implemented P4
-
-`laserperception.data` adds eight reviewed metadata adapters, canonical PointCloud reader wrappers,
-lazy sample references and local input inspection. Compatibility uses existing model metadata and
-reports missing preparation and unverified coordinates. `data adapters list/inspect` and `data inspect`
-are CPU-safe. Existing readers and scientific multi-sweep paths retain their behavior. See
-[data adapters](DATA_ADAPTERS.md) and the expanded [CPU quickstart](QUICKSTART_PERCEPTION.md).
-
-## M8 external-runtime readiness — implemented M8-R
-
-CPU-only `worker plan --task m8-qualification` binds exact frozen artifacts and current repository SHA,
-records static availability/missing gates and the 16 GB/24 GB planning envelope, and grants no execution
-permission. Externally reported qualification/capacity records and ordered evidence indexes preserve
-fresh owner/runtime/policy gates. M8 GPU CLIs fail closed without explicit external context. See the
-[external-runtime runbook](m8/M8_EXTERNAL_RUNTIME_RUNBOOK.md). Provider selection and M8 execution have
-not started; retired authorizations remain historical and non-portable.
+Canonical, diagnostic, failed, rejected, incomplete, and external evidence have distinct labels.
+Frozen historical records are never rewritten to match current status. Current navigation starts
+at [PROJECT_STATUS.md](PROJECT_STATUS.md), [BENCHMARKS.md](BENCHMARKS.md), and
+[FAILURE_INDEX.md](FAILURE_INDEX.md).

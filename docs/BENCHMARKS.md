@@ -1,5 +1,24 @@
 # Benchmarks
 
+This page indexes evidence before presenting historical detail. Labels are part of the claim:
+`canonical`, `diagnostic`, `rejected`, `failed`, `external`, `incomplete`, and `pending`
+must not be treated as interchangeable.
+
+| Area | Purpose | Status | Runtime category | Detail |
+|---|---|---|---|---|
+| M1 | Official pretrained PointPillars FP32 | Canonical historical result | RTX 4060 Laptop GPU | [M1 evidence](../benchmarks/m1/README.md) |
+| M2 | PyTorch FP32 vs TensorRT FP16 | Canonical repaired result; earlier benchmark rejected | RTX 4060 Laptop GPU | [M2 evidence](../benchmarks/m2/README.md) |
+| M3 | ROS 2 deployment and voxelization | Canonical 10 Hz result; 20 Hz failed; V1 voxelizer rejected | RTX 4060 Laptop GPU / ROS 2 | [M3 evidence](../benchmarks/m3/README.md) |
+| M4.5 | Multi-sweep builder and raw ROS boundary | Canonical correctness after preserved W1 failure | CPU plus historical detector runtime | [Contract](m45/UPSTREAM_MULTISWEEP_CONTRACT.md) |
+| M6 | KITTI Raw cross-domain and projected ROS validation | Canonical final records with preserved earlier failures | Historical detector/ROS environments | [M6 index](m6/README.md) |
+| M7 | Controlled history mechanism | Canonical frozen result with preserved preflight failures | Historical detector environment | [M7 result](m7/M7_RESULTS.md) |
+| M8 | DSVT S1 comparison | **Pending**; no accepted A2/E2 primary result | Qualified external runtime required | [Current M8 status](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md) |
+| External | OmniLink/OmniSim synthetic replay | External negative domain-gap result | Externally reported RTX 3060 Laptop GPU | [External evaluation](external/OMNILINK_OMNISIM_EVALUATION.md) |
+
+The [failure index](FAILURE_INDEX.md) links rejected methodology, protocol failures, engineering
+failures, infrastructure blockers, incomplete work, and scientific negative results. External
+timings are excluded from canonical internal benchmark tables.
+
 ## Detection workload sweep-history qualification
 
 The pinned nuScenes test pipeline requests 10 historical sweeps in addition to the current

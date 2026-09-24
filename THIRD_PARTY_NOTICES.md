@@ -96,6 +96,14 @@ distribution to an ignored external directory and is not distributed by LaserPer
 recorded SHA256 is `a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb`.
 LaserPerception did not train it, does not claim ownership of it, and does not relicense it.
 
+## Independent OmniSim evaluation provenance
+
+The repository documents an independent synthetic evaluation produced with
+[OmniSim](https://github.com/omnilink-tech/omnisim). LaserPerception does not redistribute OmniSim
+source, binaries, emailed scripts, or raw capture archives. The documentation records public
+upstream provenance and externally reported facts only. No license for unredistributed attachments
+is inferred or invented, and no endorsement by OmniLink is implied.
+
 ## Datasets and specifications
 
 nuScenes, SemanticKITTI, KITTI, DALES, CVGC, their papers, datasets, development kits, and model

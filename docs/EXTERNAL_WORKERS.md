@@ -2,7 +2,13 @@
 
 `laserperception.worker` separates transport integrity, environment qualification and scientific
 authorization. Importing it and generating plans do not select a provider, contact a service,
-inspect hardware, download a model or execute a detector. No provider has been selected.
+inspect hardware, download a model or execute a detector.
+
+Provider neutrality describes the software boundary, not project history. RunPod A40 workers have
+been used for M8 qualification and Stage R, while bounded later allocation attempts were blocked
+before Pod creation. No provider is required by the package. Current operational state is recorded
+in [PROJECT_STATUS.md](PROJECT_STATUS.md) and
+[M8_S1_EXTERNAL_RUNTIME_STATUS.md](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 
 ## CPU-safe commands
 
