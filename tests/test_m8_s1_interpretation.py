@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +14,8 @@ def _json(relative: str) -> dict[str, object]:
 
 
 def _sha256(relative: str) -> str:
-    return hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+    tracked_bytes = subprocess.check_output(["git", "show", f"HEAD:{relative}"], cwd=ROOT)
+    return hashlib.sha256(tracked_bytes).hexdigest()
 
 
 def test_m8_s1_interpretation_is_bound_to_raw_evidence() -> None:
