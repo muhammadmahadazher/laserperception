@@ -1,0 +1,9 @@
+# M8 P1-S1 zero-intensity evidence rebind
+
+This prospective implementation correction was made before any zero-intensity detector inference. Zero-intensity detector calls before the correction: **0**.
+
+At the historical primary execution commit `6994d72c3e7691a86116d1417ac3ae08256d163f`, the zero-intensity path already transformed candidate intensity to float32 positive zero and sent that transformed array to the backend. It computed both the original input SHA256 and the transformed input SHA256, but its condition evidence retained only the transformed SHA256. The original input identity and exact intervention descriptor were lost from the recorded condition envelope.
+
+A CPU-only audit of all 856 frozen conditions found zero XYZ, time-lag, or row-order mismatches and zero non-positive-zero intensity words after transformation. The correction carries the already-computed `primary_input_sha256` and `intervention = "candidate intensity float32 +0"` into each zero-intensity condition record alongside the SHA256 of the transformed array consumed by the backend. Validation requires the complete provenance set for that mode. The frozen intervention, model, evaluator, condition ordering, and detector input bytes are unchanged.
+
+The accepted three-process, 2,568-call primary measurement and its interpretation remain bound to `6994d72c3e7691a86116d1417ac3ae08256d163f`; neither is recomputed or rebound. Future zero-intensity execution will instead bind to the merge commit containing this correction. A new runtime must pass GT-blind qualification, a new input gate and fresh Stage R, followed by a separate runtime-specific owner authorization before zero-intensity inference. This record introduces no zero-intensity result or causal claim.

@@ -206,6 +206,9 @@ def _condition_evidence(
     frame_id: str,
     history: str,
     input_sha256: str,
+    primary_input_sha256: str | None = None,
+    intervention: str | None = None,
+    zero_intensity: bool = False,
     poses: Sequence[KittiTrackletPose],
     camera: KittiReferenceCamera,
 ) -> dict[str, object]:
@@ -275,7 +278,11 @@ def _condition_evidence(
             "annotation_conditioned": True,
         },
     }
-    validate_scientific_condition_payload(payload)
+    if primary_input_sha256 is not None:
+        payload["primary_input_sha256"] = primary_input_sha256
+    if intervention is not None:
+        payload["intervention"] = intervention
+    validate_scientific_condition_payload(payload, zero_intensity=zero_intensity)
     return payload
 
 
@@ -449,6 +456,17 @@ def run_scientific_attempt(
                     frame_id=frame_id,
                     history=history,
                     input_sha256=str(input_identity["input_sha256"]),
+                    primary_input_sha256=(
+                        str(input_identity["primary_input_sha256"])
+                        if mode == "zero-intensity-pass"
+                        else None
+                    ),
+                    intervention=(
+                        str(input_identity["intervention"])
+                        if mode == "zero-intensity-pass"
+                        else None
+                    ),
+                    zero_intensity=mode == "zero-intensity-pass",
                     poses=poses,
                     camera=camera,
                 )
