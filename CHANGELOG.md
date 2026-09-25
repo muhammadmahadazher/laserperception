@@ -7,6 +7,9 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Preserve original and transformed input SHA256 identities plus the exact intervention descriptor
+  in future zero-intensity condition evidence, with fail-closed validation. This prospective
+  evidence correction does not change the frozen intervention or accepted primary measurement.
 - Add the evidence-bound M8 P1-S1 scientific interpretation. It records exact three-process
   threshold-level agreement, a positive descriptive A2/H10-to-E2/H5 Car direction, the severe
   Pedestrian cross-domain failure, annotation-conditioned AP limits, and frozen-stack comparison

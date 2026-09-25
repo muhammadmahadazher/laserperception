@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
@@ -701,7 +702,9 @@ def paired_history_delta(
     }
 
 
-def validate_scientific_condition_payload(payload: Mapping[str, object]) -> None:
+def validate_scientific_condition_payload(
+    payload: Mapping[str, object], *, zero_intensity: bool = False
+) -> None:
     """Validate the future raw evidence envelope without evaluating predictions."""
 
     required = {
@@ -715,6 +718,19 @@ def validate_scientific_condition_payload(payload: Mapping[str, object]) -> None
     }
     if not required.issubset(payload):
         raise M8S1ProtocolViolation("scientific condition payload is incomplete")
+    provenance_keys = {"primary_input_sha256", "intervention"}
+    present = provenance_keys.intersection(payload)
+    if (zero_intensity and present != provenance_keys) or (present and present != provenance_keys):
+        raise M8S1ProtocolViolation("zero-intensity input provenance is incomplete")
+    if present and not zero_intensity:
+        raise M8S1ProtocolViolation("zero-intensity provenance is invalid for this mode")
+    if present:
+        hashes = (payload["primary_input_sha256"], payload["input_sha256"])
+        if payload["intervention"] != "candidate intensity float32 +0" or any(
+            not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None
+            for value in hashes
+        ):
+            raise M8S1ProtocolViolation("zero-intensity input provenance is invalid")
     predictions = payload.get("predictions")
     if not isinstance(predictions, list):
         raise M8S1ProtocolViolation("scientific predictions must be an ordered list")

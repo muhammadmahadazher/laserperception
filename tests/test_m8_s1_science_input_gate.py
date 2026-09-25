@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 import time
@@ -15,6 +16,7 @@ import laserperception.detection.m8_s1_frozen_input as frozen_input
 import laserperception.evaluation.m8_s1_science as science
 from laserperception.detection.m8_s1_input_gate import revalidate_primary_inputs
 from laserperception.detection.m8_s1_runtime import canonical_condition_ids
+from laserperception.detection.types import DetectionFrame
 
 
 def _canonical_frames() -> tuple[str, ...]:
@@ -118,12 +120,14 @@ class _Sampler:
 class _Backend:
     def __init__(self) -> None:
         self.calls: list[str] = []
+        self.consumed: dict[str, np.ndarray] = {}
 
     def runtime_state(self) -> dict[str, object]:
         return {"mock": True}
 
     def infer(self, points: np.ndarray, *, sample_id: str) -> SimpleNamespace:
         self.calls.append(sample_id)
+        self.consumed[sample_id] = points.copy()
         return SimpleNamespace(detections=())
 
 
@@ -138,7 +142,7 @@ class _Attempt:
     def finalize(self) -> dict[str, object]:
         return {"evidence_bindings": self.evidence_bindings, "completed": len(self.completed)}
 
-    def fail(self, reason: str) -> dict[str, object]:
+    def fail(self, reason: str, **kwargs: object) -> dict[str, object]:
         return {"status": "INCOMPLETE", "failure_reason": reason}
 
 
@@ -196,10 +200,13 @@ def _run_mock_attempt(
     *,
     source: _Source | None = None,
     worker_count: int = 1,
+    evidence_builder: Any = None,
 ) -> tuple[_Source, _Backend, dict[str, object], dict[str, int]]:
     frame_ids = science.STAGE_R_FRAMES if mode == "stage-r" else _canonical_frames()
     source = source or _Source(frame_ids)
     backend, calls = _install_mock_runtime(monkeypatch, source)
+    if evidence_builder is not None:
+        monkeypatch.setattr(science, "_condition_evidence", evidence_builder)
     result = science.run_scientific_attempt(
         mode=mode,
         repository_root=tmp_path,
@@ -677,3 +684,97 @@ def test_zero_intensity_retains_full_revalidation_and_existing_pair_calls(
     assert backend.calls == list(canonical_condition_ids())
     assert calls["backend_constructions"] == 1
     assert calls["gt_loads"] == 1
+
+
+def test_zero_intensity_condition_records_source_and_consumed_input(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    class HashedSource(_Source):
+        def pair(self, frame_id: str) -> tuple[tuple[np.ndarray, dict[str, object]], ...]:
+            pair = super().pair(frame_id)
+            result = []
+            for points, identity in pair:
+                points[0, 3] = np.float32(-1.25)
+                identity["input_sha256"] = hashlib.sha256(points.tobytes()).hexdigest()
+                result.append((points, identity))
+            return tuple(result)
+
+    def evidence(_frame: object, **kwargs: object) -> dict[str, object]:
+        return {
+            key: value
+            for key, value in kwargs.items()
+            if key not in {"camera", "poses"} and value is not None
+        }
+
+    source = HashedSource(_canonical_frames())
+    _, backend, result, _ = _run_mock_attempt(
+        monkeypatch,
+        tmp_path,
+        "zero-intensity-pass",
+        source=source,
+        evidence_builder=evidence,
+    )
+    first = result["raw_pass"]["conditions"][0]
+    assert isinstance(first, dict)
+    condition_id = backend.calls[0]
+    original = np.zeros((1, 5), dtype=np.float32)
+    original[0, 3] = np.float32(-1.25)
+    consumed = backend.consumed[condition_id]
+    assert first["frame_id"] == condition_id.rsplit("/", 1)[0]
+    assert first["history"] == "H10"
+    assert first["primary_input_sha256"] == hashlib.sha256(original.tobytes()).hexdigest()
+    assert first["input_sha256"] == hashlib.sha256(consumed.tobytes()).hexdigest()
+    assert first["intervention"] == "candidate intensity float32 +0"
+    assert first["zero_intensity"] is True
+    assert consumed[0, 3].view(np.uint32) == 0
+    assert original[0, 3].view(np.uint32) != 0
+
+
+def test_real_condition_envelope_is_mode_specific() -> None:
+    frame = DetectionFrame(detections=(), sample_id="frame/H10", coordinate_frame="lidar")
+    common = {
+        "frame_id": "frame",
+        "history": "H10",
+        "input_sha256": "a" * 64,
+        "poses": (),
+        "camera": object(),
+    }
+    primary = science._condition_evidence(frame, **common)  # type: ignore[arg-type]
+    assert "primary_input_sha256" not in primary
+    assert "intervention" not in primary
+    zero = science._condition_evidence(
+        frame,
+        **common,
+        primary_input_sha256="b" * 64,
+        intervention="candidate intensity float32 +0",
+        zero_intensity=True,
+    )  # type: ignore[arg-type]
+    assert zero["primary_input_sha256"] == "b" * 64
+    assert zero["input_sha256"] == "a" * 64
+    assert zero["intervention"] == "candidate intensity float32 +0"
+
+
+@pytest.mark.parametrize("mode", ["stage-r", "primary-pass"])
+def test_nonzero_condition_envelope_has_no_intervention_provenance(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mode: str
+) -> None:
+    def evidence(_frame: object, **kwargs: object) -> dict[str, object]:
+        return {
+            key: value
+            for key, value in kwargs.items()
+            if key not in {"camera", "poses"} and value is not None
+        }
+
+    _, backend, result, _ = _run_mock_attempt(
+        monkeypatch,
+        tmp_path,
+        mode,
+        evidence_builder=evidence,
+    )
+    first = result["raw_pass"]["conditions"][0]
+    assert isinstance(first, dict)
+    assert first["input_sha256"]
+    assert first["zero_intensity"] is False
+    assert "primary_input_sha256" not in first
+    assert "intervention" not in first
+    assert backend.calls

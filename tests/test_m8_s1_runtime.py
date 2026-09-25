@@ -553,18 +553,61 @@ def test_stage_r_order_contains_seven_sentinels_and_14_calls() -> None:
 
 def test_zero_intensity_is_positive_zero_and_other_bytes_exact() -> None:
     points = np.asarray(
-        [[1.0, 2.0, 3.0, -0.0, 0.0], [4.0, 5.0, 6.0, 0.75, 0.2]],
+        [
+            [1.0, 2.0, 3.0, -0.0, 0.0],
+            [4.0, 5.0, 6.0, 0.75, 0.2],
+            [7.0, 8.0, 9.0, 0.0, 0.3],
+            [10.0, 11.0, 12.0, -1.25, 0.4],
+        ],
         dtype=np.float32,
     )
+    original_bytes = points.tobytes()
     result = zero_intensity_copy(points)
+    assert result.dtype == np.float32
+    assert result.flags.c_contiguous
     assert result.shape == points.shape
     assert np.array_equal(
         result[:, [0, 1, 2, 4]].view(np.uint32), points[:, [0, 1, 2, 4]].view(np.uint32)
     )
-    assert np.array_equal(result[:, 3].view(np.uint32), np.zeros(2, dtype=np.uint32))
-    assert np.array_equal(
-        points[:, 3].view(np.uint32), np.asarray([0x80000000, 0x3F400000], dtype=np.uint32)
-    )
+    assert np.array_equal(result[:, 3].view(np.uint32), np.zeros(4, dtype=np.uint32))
+    assert points.tobytes() == original_bytes
+
+
+@pytest.mark.parametrize("zero_intensity", [False, True])
+def test_scientific_condition_provenance_validation(zero_intensity: bool) -> None:
+    payload: dict[str, object] = {
+        "frame_id": "frame",
+        "history": "H10",
+        "input_sha256": "a" * 64,
+        "detection_frame_sha256": "b" * 64,
+        "predictions": [],
+        "classes": {},
+        "evaluator_provenance": {},
+    }
+    runtime.validate_scientific_condition_payload(payload, zero_intensity=False)
+    if zero_intensity:
+        with pytest.raises(M8S1ProtocolViolation, match="incomplete"):
+            runtime.validate_scientific_condition_payload(payload, zero_intensity=True)
+    payload["primary_input_sha256"] = "c" * 64
+    with pytest.raises(M8S1ProtocolViolation, match="incomplete"):
+        runtime.validate_scientific_condition_payload(payload)
+    del payload["primary_input_sha256"]
+    payload["intervention"] = "candidate intensity float32 +0"
+    with pytest.raises(M8S1ProtocolViolation, match="incomplete"):
+        runtime.validate_scientific_condition_payload(payload)
+    payload["primary_input_sha256"] = "c" * 64
+    runtime.validate_scientific_condition_payload(payload, zero_intensity=True)
+    with pytest.raises(M8S1ProtocolViolation, match="invalid for this mode"):
+        runtime.validate_scientific_condition_payload(payload)
+    for key, invalid in (
+        ("primary_input_sha256", "bad"),
+        ("input_sha256", "BAD"),
+        ("intervention", "another intervention"),
+    ):
+        changed = dict(payload)
+        changed[key] = invalid
+        with pytest.raises(M8S1ProtocolViolation, match="invalid"):
+            runtime.validate_scientific_condition_payload(changed, zero_intensity=True)
 
 
 def _identity(mode: str, process_uuid: str = "process-1") -> AttemptIdentity:
