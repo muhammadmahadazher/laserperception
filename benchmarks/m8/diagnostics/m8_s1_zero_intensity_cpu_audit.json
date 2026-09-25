@@ -1,0 +1,34 @@
+{
+  "schema_version": "laserperception.m8.s1.zeroi.cpu-audit-descriptor.v1",
+  "scope": "historical frozen-commit CPU transformation audit; no detector inference",
+  "execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+  "audit_result_source": "private Drive-backed _CLOUD_WORK/m8-zero-intensity-prep-20260925-6994d72/zeroi-cpu-input-audit.json",
+  "audit_result_file_sha256": "b749efde2e019fe2d5fa60b45f30217fd2f53939f67eebd270c3327a802d02cf",
+  "audit_script_source": "private Drive-backed _CLOUD_WORK/m8-zero-intensity-prep-20260925-6994d72/audit_zeroi_inputs.py",
+  "audit_script_sha256": "19435e7eabcf2bfaf92505132006dd5b9ab35fc2bfb12593831739ff080f2d2e",
+  "result_file_last_write_utc": "2026-09-25T05:49:44Z",
+  "environment": {
+    "execution": "local CPU-only Windows workstation",
+    "python": "3.12.10",
+    "numpy": "2.2.1",
+    "gpu_probe_count": 0,
+    "detector_call_count": 0
+  },
+  "input_identities": {
+    "dataset_archive_sha256": "b74f86c9271c1ae8a3e8dddbafe4c21da1a8ece6e672e3314a817bf7cf335a37",
+    "accepted_input_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
+    "full_input_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa"
+  },
+  "result": {
+    "status": "COMPLETE_VERIFIED",
+    "conditions_audited": 856,
+    "h10_exact": 428,
+    "h5_exact": 428,
+    "xyz_mismatches": 0,
+    "time_lag_mismatches": 0,
+    "row_order_mismatches": 0,
+    "non_positive_zero_intensity_words": 0,
+    "source_mutations": 0,
+    "ordered_original_and_transformed_hash_ledger_sha256": "18223bd358a2617305d8fb6a2206b45ccccfb035b89c797530d2f80571401997"
+  }
+}
