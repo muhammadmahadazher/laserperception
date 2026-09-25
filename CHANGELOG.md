@@ -7,12 +7,18 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Add the evidence-bound M8 P1-S1 scientific interpretation. It records exact three-process
+  threshold-level agreement, a positive descriptive A2/H10-to-E2/H5 Car direction, the severe
+  Pedestrian cross-domain failure, annotation-conditioned AP limits, and frozen-stack comparison
+  boundaries.
+- Recommend the preregistered zero-intensity intervention for separate owner authorization without
+  asserting intensity causality. Keep S2 blocked on prospective denominator-stability,
+  multi-realization partition, identity, validation, runtime, and authorization rules.
 - Publish the frozen three-process M8 S1 primary A2/E2 raw measurement with 2,568 accepted
   canonical calls, compact primary and secondary characterizations, exact evidence bindings, and
   deterministic CPU-only reducers.
 - Preserve the earlier incomplete 779-condition attempt and interrupted 26-condition attempt as
-  zero-accepted-call evidence. Scientific interpretation, zero-intensity, S2, and training remain
-  outside this publication.
+  zero-accepted-call evidence. Zero-intensity, S2, and training remain unexecuted.
 
 ## [0.4.0] - 2026-09-22
 

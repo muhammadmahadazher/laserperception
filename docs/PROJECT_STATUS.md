@@ -41,10 +41,20 @@ Stage R campaign are preserved. A later accepted primary campaign completed thre
 `6994d72c3e7691a86116d1417ac3ae08256d163f` and receipt file SHA256
 `bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d`.
 
-The M8 primary A2/E2 [raw measurement](m8/M8_S1_MEASUREMENT_RAW.md), compact primary and secondary results, and
-measurement manifest are published. This changes execution status only: scientific interpretation,
-winner selection, architecture or intensity causality, statistical significance, and production
-readiness are not claimed. Zero-intensity remains unexecuted; S2 and training have not started.
+The M8 primary A2/E2 [raw measurement](m8/M8_S1_MEASUREMENT_RAW.md), compact primary and secondary
+results, and measurement manifest are published. Its separate
+[scientific interpretation](m8/M8_S1_INTERPRETATION.md) records exact threshold-level agreement
+across all three processes. Car recall was 19/66 for A2/H10 and 43/66 for E2/H5, satisfying the
+prospective positive-direction criterion. Pedestrian recall was 0/396 and 1/396, a severe
+class-specific cross-domain failure. This is a frozen detector-stack comparison: winner selection,
+architecture or intensity causality, statistical significance, and production readiness are not
+claimed.
+
+The preregistered zero-intensity intervention is scientifically recommended for separate owner
+authorization but remains unexecuted. S2 is not ready: its minimum-gap/denominator-stability rule,
+normalized-recovery eligibility, multi-realization partition rule, frozen V2 partitions and XYZT
+identity proof, protocol, validation, runtime binding, and authorization remain prospective.
+Training has not started.
 
 The earlier 779-condition primary attempt remains `INCOMPLETE`, with zero accepted complete
 processes and zero accepted canonical calls. A separate interrupted 26-condition attempt before the
@@ -74,9 +84,10 @@ dataset-level benchmark. See [the detailed record](external/OMNILINK_OMNISIM_EVA
 
 ## Pending and future work
 
-- Perform the separately gated scientific interpretation of the accepted M8 S1 primary raw
-  measurement when the owner authorizes that work.
-- Zero-intensity remains unexecuted; S2 and training have not started.
+- Decide whether to authorize the preregistered zero-intensity intervention on a specifically
+  qualified runtime; the interpretation recommends the experiment without asserting causality.
+- Preregister the missing S2 denominator, partition, identity, validation, and authorization rules
+  before any B2/C2/D2/F2 execution. S2 and training have not started.
 - Production segmentation, camera fusion, broader learned representations, physical-sensor
   validation, and productionization remain future work.
 

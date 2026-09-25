@@ -12,12 +12,21 @@ must not be treated as interchangeable.
 | M4.5 | Multi-sweep builder and raw ROS boundary | Canonical correctness after preserved W1 failure | CPU plus historical detector runtime | [Contract](m45/UPSTREAM_MULTISWEEP_CONTRACT.md) |
 | M6 | KITTI Raw cross-domain and projected ROS validation | Canonical final records with preserved earlier failures | Historical detector/ROS environments | [M6 index](m6/README.md) |
 | M7 | Controlled history mechanism | Canonical frozen result with preserved preflight failures | Historical detector environment | [M7 result](m7/M7_RESULTS.md) |
-| M8 | DSVT S1 comparison | Accepted three-process raw A2/E2 measurement; interpretation pending | Qualified external A40 runtime | [Raw measurement](m8/M8_S1_MEASUREMENT_RAW.md) |
+| M8 | DSVT S1 comparison | Accepted three-process A2/E2 measurement and scientific interpretation | Qualified external A40 runtime | [Interpretation](m8/M8_S1_INTERPRETATION.md) |
 | External | OmniLink/OmniSim synthetic replay | External negative domain-gap result | Externally reported RTX 3060 Laptop GPU | [External evaluation](external/OMNILINK_OMNISIM_EVALUATION.md) |
 
 The [failure index](FAILURE_INDEX.md) links rejected methodology, protocol failures, engineering
 failures, infrastructure blockers, incomplete work, and scientific negative results. External
 timings are excluded from canonical internal benchmark tables.
+
+The M8 S1 [raw measurement](m8/M8_S1_MEASUREMENT_RAW.md) remains distinct from its
+[scientific interpretation](m8/M8_S1_INTERPRETATION.md). Across three accepted processes, Car
+recall was 19/66 for A2/H10 and 43/66 for E2/H5; the positive direction repeated exactly at the
+threshold level. Pedestrian recall was 0/396 and 1/396, an observed severe class-specific
+cross-domain failure. Precision and AP are annotation-conditioned against incomplete KITTI Raw
+tracklets, and the historical PointPillars contrast is a frozen detector-stack comparison rather
+than an architecture benchmark. Zero-intensity is recommended for separate authorization; S2 is
+not ready and no normalized-recovery result is reported.
 
 ## Detection workload sweep-history qualification
 
