@@ -94,7 +94,7 @@ H5; the corresponding TP counts are 0 versus 0 and 1 versus 0. AP can be positiv
 recall at this fixed score threshold is zero, because AP uses the ranked predictions. These
 population and AP changes remain descriptive, without a statistical-worsening claim.
 
-## What the intervention rules out — and what it does not
+## What the intervention shows — and what it does not
 
 The zero-intensity intervention does not rescue severe Pedestrian transfer failure. It leaves the
 strong positive H5-over-H10 Car recall direction intact, with H5 recall unchanged and a two-TP
