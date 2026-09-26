@@ -43,13 +43,15 @@ positive descriptive Car direction and severe Pedestrian transfer failure withou
 winner claims. The supporting external-runtime ledger is maintained in
 [M8_S1_EXTERNAL_RUNTIME_STATUS.md](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
 The separate [zero-intensity raw measurement](m8/M8_S1_ZERO_INTENSITY_RAW.md) completed three
-accepted processes and 2,568 calls; its scientific interpretation remains pending. S2 has not
-started.
+accepted processes and 2,568 calls. Its
+[scientific interpretation](m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) found no Pedestrian recovery
+and persistence of the positive H5-over-H10 Car direction, without an intensity-causality claim.
+S2 design may begin; S2 execution remains blocked and unstarted.
 
 ## Future directions
 
-Potential future work includes separate zero-intensity scientific interpretation,
-prospective S2 preregistration and execution, segmentation-model integration, broader learned
-representations, camera fusion, physical-sensor validation, deployment optimization on
+Potential future work includes prospective S2 preregistration and, only after its gates and owner
+authorization, execution. Other future work includes segmentation-model integration, broader
+learned representations, camera fusion, physical-sensor validation, deployment optimization on
 specifically available hardware, and productionization. Each requires explicit
 scope, evidence gates, and applicable hardware/runtime authorization.

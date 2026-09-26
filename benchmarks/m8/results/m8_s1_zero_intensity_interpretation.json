@@ -1,0 +1,129 @@
+{
+  "schema_version": "laserperception.m8.s1.zero-intensity-interpretation.v1",
+  "status": "M8 P1-S1 ZERO-INTENSITY SCIENTIFIC INTERPRETATION COMPLETE",
+  "evidence": {
+    "primary_execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+    "zeroi_execution_commit": "95fb66ac1f57c41f06f05bd9ef5dac27b1e3ea54",
+    "protocol_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "primary_raw_sha256": "500f45b80a27f94c2e235840a7edbd76aa5bb620e6a0820baef7b4e7576e9a58",
+    "primary_secondary_sha256": "299bd8ed734d8153f36f0c5c4892f8c84db6774535130d662d4783167bf5a8dc",
+    "primary_manifest_sha256": "cfa66feb2db62b49c113cb2a6fd3576611f3544aab076d432a4203fd34b6a28f",
+    "zeroi_raw_sha256": "d47b269e4ca415ab9069bf6b8546596b66c8fc8f71ee587bbcd534eeb54602f2",
+    "zeroi_secondary_sha256": "393962e2a3c9a2e1db84f3f7dcbf5a164a8f3418135980f5c4026e1f40986894",
+    "zeroi_comparison_sha256": "8f546c3ea2becd568f23938b3f8f1193060acff0ab9a2b775e629a8526d4f7b0",
+    "zeroi_manifest_sha256": "f8be6256c772019c11b13f15bd73eebc407dc880839e9f36b399faa806979536",
+    "zeroi_raw_narrative_sha256": "c3e4ac9bfb7552b0e249cd92fa9af813281510bea06acff2d1a9828f122bed2a",
+    "primary_accepted_processes": 3,
+    "primary_accepted_calls": 2568,
+    "zeroi_accepted_processes": 3,
+    "zeroi_accepted_calls": 2568,
+    "zeroi_fresh_stage_r_processes": 10,
+    "zeroi_fresh_stage_r_accepted_calls": 140,
+    "zeroi_gpu_uuid": "GPU-e43b9709-1c26-6b50-f52b-b32bb621048b",
+    "zeroi_condition_input_mappings_verified": 2568
+  },
+  "operating_point": {
+    "score_gte": 0.25,
+    "oriented_bev_iou_gte": 0.5,
+    "ground_truth_conditioning": "annotation-conditioned KITTI Raw tracklets",
+    "zeroi_candidate_consumed_intensity": "positive float32 +0.0 (0x00000000)"
+  },
+  "observations": {
+    "car": {
+      "primary_h10": {"tp": 19, "fp": 89, "fn": 47, "gt": 66, "recall": 0.2878787878787879},
+      "zeroi_h10": {"tp": 17, "fp": 81, "fn": 49, "gt": 66, "recall": 0.25757575757575757},
+      "primary_h5": {"tp": 43, "fp": 188, "fn": 23, "gt": 66, "recall": 0.6515151515151515},
+      "zeroi_h5": {"tp": 43, "fp": 169, "fn": 23, "gt": 66, "recall": 0.6515151515151515}
+    },
+    "pedestrian": {
+      "primary_h10": {"tp": 0, "fp": 1, "fn": 396, "gt": 396, "recall": 0.0},
+      "zeroi_h10": {"tp": 0, "fp": 2, "fn": 396, "gt": 396, "recall": 0.0},
+      "primary_h5": {"tp": 1, "fp": 8, "fn": 395, "gt": 396, "recall": 0.0025252525252525255},
+      "zeroi_h5": {"tp": 0, "fp": 8, "fn": 396, "gt": 396, "recall": 0.0}
+    },
+    "range_tp": {
+      "0_20_m": {"gt_car": 27, "primary_h10_car": 5, "zeroi_h10_car": 3, "primary_h5_car": 22, "zeroi_h5_car": 22},
+      "20_35_m": {"gt_car": 30, "primary_h10_car": 13, "zeroi_h10_car": 13, "primary_h5_car": 20, "zeroi_h5_car": 20},
+      "35_50_m": {"gt_car": 9, "primary_h10_car": 1, "zeroi_h10_car": 1, "primary_h5_car": 1, "zeroi_h5_car": 1},
+      "zeroi_pedestrian_recall_zero_in_all_bands": true
+    },
+    "annotation_conditioned_ap_iou_0_50": {
+      "primary_h10_car": [0.11987159627950453, 0.12001333009861485, 0.11986748193919464],
+      "zeroi_h10_car": [0.11326007468832544, 0.11326137678004208, 0.11329556928526817],
+      "primary_h5_car": [0.2038496433907682, 0.203840909119444, 0.2038383187081106],
+      "zeroi_h5_car": [0.19984950622947859, 0.19985855707872371, 0.19976173874250422],
+      "primary_h10_pedestrian": [0.00029648142894901994, 0.000296658658157745, 0.00029665032516698343],
+      "zeroi_h10_pedestrian": [0.00015990202751554747, 0.00015991543762698692, 0.0001598870205625053],
+      "primary_h5_pedestrian": [0.004505068942876486, 0.004506390197284403, 0.004505173438942965],
+      "zeroi_h5_pedestrian": [0.0017920660721208106, 0.001817662852254153, 0.0017922196970378487]
+    }
+  },
+  "within_history": {
+    "primary_h5_minus_h10_car_tp": 24,
+    "primary_h5_minus_h10_car_recall": 0.3636363636363636,
+    "zeroi_h5_minus_h10_car_tp": 26,
+    "zeroi_h5_minus_h10_car_recall": 0.3939393939393939,
+    "primary_h5_minus_h10_pedestrian_tp": 1,
+    "zeroi_h5_minus_h10_pedestrian_tp": 0,
+    "h10_h5_paired_within_each_process": true
+  },
+  "primary_vs_zeroi": {
+    "process_indices_paired": false,
+    "comparison": "separately repeated three-process distributions; differences of medians are descriptive only",
+    "median_recall_difference_zeroi_minus_primary": {
+      "h10_car": -0.030303030303030304,
+      "h5_car": 0.0,
+      "h10_pedestrian": 0.0,
+      "h5_pedestrian": -0.0025252525252525255
+    }
+  },
+  "scientific_interpretation": {
+    "pedestrian_recovery_observed": false,
+    "car_h5_direction_persisted_under_zeroi": true,
+    "raw_intensity_sufficient_explanation_supported": false,
+    "pedestrian": "Severe failure persists after candidate-consumed intensity is set to +0.0. This intervention supplies no affirmative evidence that the original raw KITTI reflectance mismatch alone is sufficient to explain the failure; it also cannot rule that hypothesis out, because all-zero intensity may itself be out of distribution.",
+    "car": "The positive H5-over-H10 direction persists; H5 operating-point recall is unchanged. H10 loses two near-range Car TPs at this operating point. Retaining the original raw intensity values is not necessary for the observed positive direction under this frozen intervention.",
+    "scope": "Observed sensitivity only; all-zero replacement is not a matched training-domain intensity control. Neither intensity's involvement nor the cause of Pedestrian failure or H5/H10 component mechanism is identified."
+  },
+  "reproducibility": {
+    "primary_threshold_results_identical_across_three": true,
+    "zeroi_threshold_results_identical_across_three": true,
+    "ap_numerical_spread_present": true,
+    "interpretation": "High discrete evaluator-level repeatability on the same fixed corpus across three processes per campaign; no independent dataset replication or proof of deterministic floating-point inference."
+  },
+  "claim_boundaries": {
+    "primary_zeroi_process_paired": false,
+    "intensity_causality_claimed": false,
+    "architecture_causality_claimed": false,
+    "h5_h10_component_causality_claimed": false,
+    "statistical_significance_claimed": false,
+    "universal_model_winner_claimed": false,
+    "production_readiness_claimed": false
+  },
+  "next_science": {
+    "zeroi_interpretation_complete": true,
+    "s1_interpretation_complete": true,
+    "s2_design_can_begin": true,
+    "s2_ready_to_execute": false,
+    "s2_authorized": false,
+    "b2_c2_d2_f2_calls": 0,
+    "prospective_blockers": [
+      "numeric minimum-gap and denominator-stability rules",
+      "normalized-recovery eligibility and formula",
+      "multi-realization V2 partition-selection rule and frozen V2 partitions",
+      "XYZT identity proof",
+      "S2 protocol, validation, runtime binding, and owner authorization"
+    ]
+  },
+  "safety": {
+    "runpod_actions": 0,
+    "runpod_resources_created": false,
+    "local_gpu_touched": false,
+    "local_gpu_probe_commands_executed": 0,
+    "new_detector_calls": 0,
+    "primary_rerun_calls": 0,
+    "zeroi_rerun_calls": 0,
+    "s2_calls": 0,
+    "training_runs": 0
+  }
+}
