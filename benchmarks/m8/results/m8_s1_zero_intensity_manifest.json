@@ -1,0 +1,142 @@
+{
+  "accepted_canonical_calls": 2568,
+  "accepted_passes": [
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35467951,
+      "archive_name": "zero-intensity-pass-1-zi01-a40-20260926T083114Z.tar.gz",
+      "archive_sha256": "afa685227b604ccf275faf66a651ff0c8b2ee30124d8619db375343b2ae24796",
+      "attempt_id": "zi01-a40-20260926T083114Z",
+      "final_manifest_bytes": 99715,
+      "final_manifest_sha256": "85dfa08934609cec8287232ce50f1bff3d973a447492ebbdcd4c1057137985f6",
+      "final_result_sha256": "d4180382653860cb926fd545e6eed9d65cd1ff45813ad9a7358e7f182a383bad",
+      "logical_pass_id": "zero-intensity-pass-1",
+      "pass": 1,
+      "process_uuid": "8f6f2fcb-8ebb-425b-972c-75f6b4f78869",
+      "raw_pass_bytes": 96156042,
+      "raw_pass_sha256": "ad8283fd850b6f1b3df5f8984cf2fa4fba911c5de36dd45b2258ec57c4db34d3",
+      "status": "COMPLETE"
+    },
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35466382,
+      "archive_name": "zero-intensity-pass-2-zi02-a40-20260926T094058Z.tar.gz",
+      "archive_sha256": "7ee351681786a78c8c2155a3a8f800bb9ff3497af0ed2e5c06353292a752d15b",
+      "attempt_id": "zi02-a40-20260926T094058Z",
+      "final_manifest_bytes": 99715,
+      "final_manifest_sha256": "522aeab21cd98a38bbc10cd8ddca540f9d3c8f96de4c1227e4a7c1c5d9ba9fe4",
+      "final_result_sha256": "784654b280bf1776744998d9b122001472c6afd74bd7585355342d0c552d8a2d",
+      "logical_pass_id": "zero-intensity-pass-2",
+      "pass": 2,
+      "process_uuid": "c658f15e-c8eb-484f-a8f9-73ff0ba0289b",
+      "raw_pass_bytes": 96157141,
+      "raw_pass_sha256": "97fced672aa48ba000621cce23d2c7932a602324b8edcc78ae1f1c3e260abad2",
+      "status": "COMPLETE"
+    },
+    {
+      "accepted_calls": 856,
+      "archive_bytes": 35464671,
+      "archive_name": "zero-intensity-pass-3-evidence.tar.gz",
+      "archive_sha256": "7998980c7584751249959ced10c97e430eba20320fac5eea0c04d62405dcb041",
+      "attempt_id": "zi03-a40-20260926T105947Z",
+      "final_manifest_bytes": 99715,
+      "final_manifest_sha256": "78bc52ec3fa6f949e0be55988aa168c7c333b9eb2d2294c420522681dd50bca8",
+      "final_result_sha256": "c40c0dd5925409a092f180a3c6ffce70c41a9a00039bda52666c98d01472010b",
+      "logical_pass_id": "zero-intensity-pass-3",
+      "pass": 3,
+      "process_uuid": "ffb7d228-7d43-40de-95d8-a56ba6e118f9",
+      "raw_pass_bytes": 96154799,
+      "raw_pass_sha256": "46b095c7c206bbfeb1a1548a5ced5b2e8f9b6bf849a465ef99d4f6a7bea966ac",
+      "status": "COMPLETE"
+    }
+  ],
+  "accepted_processes": 3,
+  "claim_boundary": {
+    "architecture_causality_claimed": false,
+    "intensity_causality_claimed": false,
+    "primary_zeroi_process_indices_paired": false,
+    "raw_measurement_only": true,
+    "scientific_interpretation_pending": true,
+    "statistical_significance_claimed": false,
+    "universal_model_winner_claimed": false
+  },
+  "external_runtime": {
+    "control_archive_sha256": "c0cf2d268417b4047cf92536970cfac85b874f2a381d97f73bc138b2b0daeb3b",
+    "gpu": "NVIDIA A40",
+    "gpu_uuid": "GPU-e43b9709-1c26-6b50-f52b-b32bb621048b",
+    "pod_id": "qrgztdqfenqigv",
+    "provider": "RunPod",
+    "qualification_summary_sha256": "71ef0ad2cbe361c39dccb8776aa08421c4a039f8bbe1840a96fabe105fab1bf6",
+    "runtime_policy_sha256": "18ddf80cfd3159745f069009af02381cba743aa28eed321e52c87ba22b207483",
+    "stage_r_accepted_calls": 140,
+    "stage_r_accepted_processes": 10,
+    "stage_r_authorization_sha256": "dc251ced737debe5910f9a062bc07653c205c153044ec63084959f1b93d73033",
+    "stage_r_reference_sha256": "1549386c9bc9185c4240082398c5e0e5a64dc066ee5695c462bbfefde873952f",
+    "stage_r_review_sha256": "972060173a8a55fe51f0ceff6bbb2eb29aeaf77ab10226e6283fccfc25f93cae",
+    "zeroi_authorization_sha256": "f1b033c2f73d43ba56b2dccea07429a8b3135658c811efcf87e898254fc42b61"
+  },
+  "frozen_bindings": {
+    "candidate_manifest_sha256": "aa456e0386e46e9d089a957b1f1a8a4f74ceae70435c7ad8e6ca5e67bb90f4e7",
+    "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
+    "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
+    "full_transform_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa",
+    "historical_primary_receipt_file_sha256": "bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d",
+    "ordered_frame_identity_sha256": "76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95",
+    "protocol_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
+    "upstream_dsvt_commit": "8cfc2a6f23eed0b10aabcdc4768c60b184357061",
+    "zeroi_input_gate_receipt_file_sha256": "947cb0c764fb8e10e9d480b899821afd6a091f4dd1eb8c949442730063d551aa",
+    "zeroi_transformation_ledger_file_sha256": "6ba3287a381a4b86222e22184dc5065d771757104c72848987f6b6802e592162"
+  },
+  "offline_aggregation": {
+    "core_aggregate_schema": "laserperception.m8.s1.aggregate.v1",
+    "core_aggregate_sha256": "601fb5d9db4cc637c3512d6cdc33e68684ae5a70f4b6f795a0b905390b0c0f60",
+    "core_independent_cpu_processes_exact_bytes": true,
+    "publication_independent_cpu_processes_exact_bytes": true,
+    "reducer_file_sha256": "b0fdd4aae308c1c2269cc9e9d2904283097e2b0a36fde1d46ec06602260ad0fc",
+    "reducer_path": "benchmarks/m8/aggregate_s1_zero_intensity.py"
+  },
+  "offline_safety": {
+    "local_gpu_probe_commands_executed": 0,
+    "local_gpu_touched": false,
+    "new_detector_calls": 0,
+    "primary_rerun_calls": 0,
+    "runpod_actions_during_offline_publication": 0,
+    "runpod_resources_created_during_offline_publication": false,
+    "s2_calls": 0,
+    "training_runs": 0,
+    "zeroi_rerun_calls": 0
+  },
+  "primary_historical_execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+  "provenance_validation": {
+    "all_2568_conditions_have_primary_input_sha256": true,
+    "all_2568_conditions_have_transformed_input_sha256": true,
+    "all_2568_interventions_exact": true,
+    "three_process_input_mapping_identical": true,
+    "transformation_ledger_matches_all_passes": true
+  },
+  "schema_version": "laserperception.m8.s1.zero-intensity-manifest.v1",
+  "status": "RAW MEASUREMENT; SCIENTIFIC INTERPRETATION PENDING",
+  "tracked_artifacts": {
+    "M8_S1_ZERO_INTENSITY_RAW.md": {
+      "bytes": 6505,
+      "path": "docs/m8/M8_S1_ZERO_INTENSITY_RAW.md",
+      "sha256": "c3e4ac9bfb7552b0e249cd92fa9af813281510bea06acff2d1a9828f122bed2a"
+    },
+    "m8_s1_zero_intensity_comparison.json": {
+      "bytes": 3230,
+      "path": "benchmarks/m8/results/m8_s1_zero_intensity_comparison.json",
+      "sha256": "8f546c3ea2becd568f23938b3f8f1193060acff0ab9a2b775e629a8526d4f7b0"
+    },
+    "m8_s1_zero_intensity_raw.json": {
+      "bytes": 55517,
+      "path": "benchmarks/m8/results/m8_s1_zero_intensity_raw.json",
+      "sha256": "d47b269e4ca415ab9069bf6b8546596b66c8fc8f71ee587bbcd534eeb54602f2"
+    },
+    "m8_s1_zero_intensity_secondary.json": {
+      "bytes": 1044333,
+      "path": "benchmarks/m8/results/m8_s1_zero_intensity_secondary.json",
+      "sha256": "393962e2a3c9a2e1db84f3f7dcbf5a164a8f3418135980f5c4026e1f40986894"
+    }
+  },
+  "zeroi_execution_commit": "95fb66ac1f57c41f06f05bd9ef5dac27b1e3ea54"
+}

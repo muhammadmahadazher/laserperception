@@ -7,8 +7,12 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Publish the three-process, 2,568-call M8 S1 zero-intensity raw measurement with verified
+  per-condition source/transformed input provenance, deterministic CPU aggregation, separate
+  primary-versus-zero-intensity distributions, and no causal or significance claim. Scientific
+  interpretation remains pending; S2 and training remain unstarted.
 - Preserve original and transformed input SHA256 identities plus the exact intervention descriptor
-  in future zero-intensity condition evidence, with fail-closed validation. This prospective
+  in zero-intensity condition evidence, with fail-closed validation. This prospective
   evidence correction does not change the frozen intervention or accepted primary measurement.
 - Add the evidence-bound M8 P1-S1 scientific interpretation. It records exact three-process
   threshold-level agreement, a positive descriptive A2/H10-to-E2/H5 Car direction, the severe
@@ -21,7 +25,7 @@ All notable changes to LaserPerception are documented here. The project follows
   canonical calls, compact primary and secondary characterizations, exact evidence bindings, and
   deterministic CPU-only reducers.
 - Preserve the earlier incomplete 779-condition attempt and interrupted 26-condition attempt as
-  zero-accepted-call evidence. Zero-intensity, S2, and training remain unexecuted.
+  zero-accepted-call evidence. S2 and training remain unexecuted.
 
 ## [0.4.0] - 2026-09-22
 

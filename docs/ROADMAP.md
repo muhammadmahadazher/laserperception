@@ -42,10 +42,13 @@ separate [scientific interpretation](m8/M8_S1_INTERPRETATION.md) is complete. It
 positive descriptive Car direction and severe Pedestrian transfer failure without causal or
 winner claims. The supporting external-runtime ledger is maintained in
 [M8_S1_EXTERNAL_RUNTIME_STATUS.md](m8/M8_S1_EXTERNAL_RUNTIME_STATUS.md).
+The separate [zero-intensity raw measurement](m8/M8_S1_ZERO_INTENSITY_RAW.md) completed three
+accepted processes and 2,568 calls; its scientific interpretation remains pending. S2 has not
+started.
 
 ## Future directions
 
-Potential future work includes the separately authorized preregistered zero-intensity intervention,
+Potential future work includes separate zero-intensity scientific interpretation,
 prospective S2 preregistration and execution, segmentation-model integration, broader learned
 representations, camera fusion, physical-sensor validation, deployment optimization on
 specifically available hardware, and productionization. Each requires explicit
