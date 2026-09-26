@@ -63,8 +63,10 @@ attempt remains preserved with zero accepted canonical calls. A separate three-p
 intensity did not rescue Pedestrian detection; the positive H5-over-H10 Car direction persisted.
 This does not establish intensity causality. The prospective
 [S2 scientific protocol](docs/m8/M8_S2_PROTOCOL.md) and S1-derived paired partitions are frozen.
-Its CPU-only input implementation and ledger, 1,712/1,712 M7 XYZT identity proof, runtime binding,
-and separate inference authorization remain pending. S2 execution and training have not started.
+Its [CPU-only input freeze](docs/m8/M8_S2_INPUT_FREEZE.md) records the complete B2/C2/D2/F2
+ledger, 1,712/1,712 exact M7 XYZT projections, and a 28-condition fresh-adapter replay.
+External runtime binding and separate inference authorization remain pending. S2 detector
+execution and training have not started.
 
 ## Quick start — CPU first
 
