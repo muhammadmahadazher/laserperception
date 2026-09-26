@@ -107,10 +107,22 @@ def test_primary_comparison_uses_separate_distributions_without_pairing():
         }
 
     primary = {
+        "schema_version": "laserperception.m8.s1.primary-raw.v1",
         "passes": [
-            {"arms": {**record("A2", x, 0)["arms"], **record("E2", x + 0.1, 0.1)["arms"]}}
-            for x in (0.1, 0.2, 0.3)
-        ]
+            {
+                "process_uuid": uuid,
+                "arms": {**record("A2", x, 0)["arms"], **record("E2", x + 0.1, 0.1)["arms"]},
+            }
+            for x, uuid in zip(
+                (0.1, 0.2, 0.3),
+                (
+                    "3256b511-921e-4456-92c6-1fd5d5a8c380",
+                    "21f32e37-58c3-42e2-b9c1-2011b20e47b7",
+                    "b9c1ab4b-9ea2-428a-a41e-e70fb8528d87",
+                ),
+                strict=True,
+            )
+        ],
     }
     zero = {
         "passes": [
@@ -133,6 +145,10 @@ def test_primary_comparison_uses_separate_distributions_without_pairing():
     assert all(
         word not in str(result) for word in ("p_value", "confidence_interval", "standard_error")
     )
+    wrong_primary = deepcopy(primary)
+    wrong_primary["passes"][0]["process_uuid"] = "wrong"
+    with pytest.raises(ValueError, match="process identities"):
+        zeroi.build_descriptive_comparison(wrong_primary, zero)
 
 
 def test_zeroi_raw_labels_and_offline_boundary(monkeypatch):
@@ -195,6 +211,13 @@ def test_published_zeroi_manifest_binds_compact_artifacts():
     assert manifest["offline_safety"]["local_gpu_probe_commands_executed"] == 0
     assert manifest["offline_safety"]["runpod_actions_during_offline_publication"] == 0
     assert len({row["process_uuid"] for row in manifest["accepted_passes"]}) == 3
+    assert (
+        hashlib.sha256(
+            (ROOT / "benchmarks/m8/results/m8_s1_primary_raw.json").read_bytes()
+        ).hexdigest()
+        == manifest["frozen_bindings"]["historical_primary_raw_file_sha256"]
+        == zeroi.PRIMARY_RAW_SHA256
+    )
     for artifact in manifest["tracked_artifacts"].values():
         path = ROOT / artifact["path"]
         assert len(path.read_bytes()) == artifact["bytes"]

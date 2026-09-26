@@ -174,6 +174,8 @@ machine. Standalone historical engineering scripts still require separately scop
 in their selected external runtime. No new execution command bypasses the existing worker/bootstrap
 or scientific verifier. Historical evidence and algorithms are unchanged.
 
-Zero-intensity remains separately unauthorized. B2/C2/D2/F2 are unauthorized. S2 is not started and
-training is not started. This engineering runbook grants no execution permission by itself; each
+The completed zero-intensity raw measurement had a separate authorization bound to its A40 runtime;
+it grants no permission for new execution. See [Project status](../PROJECT_STATUS.md) for current
+scientific state. B2/C2/D2/F2 are unauthorized. S2 and training have not started. This engineering
+runbook grants no execution permission by itself; each
 external qualification or scientific stage still requires the applicable direct owner scope.

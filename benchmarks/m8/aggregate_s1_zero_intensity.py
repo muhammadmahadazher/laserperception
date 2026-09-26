@@ -29,6 +29,7 @@ INTERVENTION = "candidate intensity float32 +0"
 ZEROI_COMMIT = "95fb66ac1f57c41f06f05bd9ef5dac27b1e3ea54"
 PRIMARY_COMMIT = "6994d72c3e7691a86116d1417ac3ae08256d163f"
 PROTOCOL_SHA256 = "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88"
+PRIMARY_RAW_SHA256 = "500f45b80a27f94c2e235840a7edbd76aa5bb620e6a0820baef7b4e7576e9a58"
 PRIMARY_UUIDS = frozenset(
     {
         "3256b511-921e-4456-92c6-1fd5d5a8c380",
@@ -344,7 +345,15 @@ def build_descriptive_comparison(
 ) -> dict[str, object]:
     """Compare separate realization distributions; never pair process indices."""
 
-    if len(primary.get("passes", [])) != 3 or len(zeroi.get("passes", [])) != 3:
+    if primary.get("schema_version") != "laserperception.m8.s1.primary-raw.v1":
+        raise ValueError("comparison requires the frozen primary result schema")
+    if [row.get("process_uuid") for row in primary.get("passes", [])] != [
+        "3256b511-921e-4456-92c6-1fd5d5a8c380",
+        "21f32e37-58c3-42e2-b9c1-2011b20e47b7",
+        "b9c1ab4b-9ea2-428a-a41e-e70fb8528d87",
+    ]:
+        raise ValueError("comparison requires the frozen primary process identities")
+    if len(zeroi.get("passes", [])) != 3:
         raise ValueError("comparison requires three primary and three zero-intensity passes")
     arms = {}
     for history, zero_arm in ZEROI_ARMS.items():
@@ -392,6 +401,8 @@ def main() -> int:
     passes = [json.loads(path.read_text(encoding="utf-8")) for path in args.pass_input]
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
     reconciliation = json.loads(args.reconciliation.read_text(encoding="utf-8"))
+    if file_sha(args.primary_raw) != PRIMARY_RAW_SHA256:
+        raise ValueError("primary raw artifact does not match the frozen published SHA256")
     primary = json.loads(args.primary_raw.read_text(encoding="utf-8"))
     validate_passes(passes, ledger)
     core = aggregate_three_passes(passes)

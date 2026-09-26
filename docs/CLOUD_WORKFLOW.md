@@ -161,8 +161,10 @@ primary calls. The required order for a new runtime is:
 The retired-machine primary authorization is not portable and must never be reused. No provider is
 selected by this policy.
 
-Zero-intensity remains separately unauthorized. S2 and training have not started. The frozen S1
-corpus, pass counts, feature order, evaluator, and failure accounting remain unchanged. Historical
+The completed zero-intensity raw measurement used a separate, runtime-bound owner authorization;
+it grants no permission for new execution. See [Project status](PROJECT_STATUS.md) for its current
+scientific state. S2 and training have not started. The frozen S1 corpus, pass counts, feature
+order, evaluator, and failure accounting remain unchanged. Historical
 Stage R is preserved and cannot stand in for new-runtime Stage R. A bootstrap, successful transfer,
 or capacity check must never emit or manufacture scientific authorization.
 

@@ -80,6 +80,7 @@
     "checkpoint_sha256": "a675149d095eef8ddc0c137ae46eeac075ccc504c7608162c71e7adf318793fb",
     "config_sha256": "b0832e03ad11d4e0b61f0fb07d977e687763caae472a4f87ed750bdc2d13be0f",
     "full_transform_ledger_sha256": "e25b3d62113cc7e8c1fcf736caa68b1ab698f965f007c758ff91d3e498ca6caa",
+    "historical_primary_raw_file_sha256": "500f45b80a27f94c2e235840a7edbd76aa5bb620e6a0820baef7b4e7576e9a58",
     "historical_primary_receipt_file_sha256": "bef4c55575581aefe8f477e32d1b394f40823a0b0858c66c3ac5c1fae141ec4d",
     "ordered_frame_identity_sha256": "76bd5f7adac3d892ad2fb00cb9cf5f4f73dd475682ee011b7ea9524060c46c95",
     "protocol_sha256": "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88",
@@ -92,7 +93,7 @@
     "core_aggregate_sha256": "601fb5d9db4cc637c3512d6cdc33e68684ae5a70f4b6f795a0b905390b0c0f60",
     "core_independent_cpu_processes_exact_bytes": true,
     "publication_independent_cpu_processes_exact_bytes": true,
-    "reducer_file_sha256": "b0fdd4aae308c1c2269cc9e9d2904283097e2b0a36fde1d46ec06602260ad0fc",
+    "reducer_file_sha256": "88384cb65d93f3d01e63b5548f2647d19a5c7cb7ac881b84e07ecf8e1d8890be",
     "reducer_path": "benchmarks/m8/aggregate_s1_zero_intensity.py"
   },
   "offline_safety": {
