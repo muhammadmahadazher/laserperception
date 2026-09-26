@@ -110,3 +110,5 @@ def test_range_ap_and_claim_boundaries() -> None:
     document = DOCUMENT.read_text(encoding="utf-8")
     assert "Primary and zero-intensity process indices are not paired" in document
     assert "**not ready or authorized to execute**" in document
+    assert "**does not rule out**" in document
+    assert "all-zero replacement can itself remain outside the training distribution" in document

@@ -43,9 +43,10 @@ pass-1 (or corresponding pass-2/pass-3) effects.
 Removing the candidate-consumed raw intensity **did not recover Pedestrian detection** under this
 frozen model, corpus, and evaluator. The severe cross-domain failure persists: H10 remains at zero
 TP and H5 changes from one TP to zero. Zero-intensity Pedestrian range recall is zero in every
-recorded range band. These observations do not support raw KITTI reflectance mismatch as a
-*sufficient* explanation for the Pedestrian failure. They do not establish that intensity is
-irrelevant or identify what caused the failure.
+recorded range band. This intervention supplies no affirmative evidence that raw KITTI reflectance
+mismatch alone is sufficient to explain the failure. It also **does not rule out** that hypothesis:
+an all-zero replacement can itself remain outside the training distribution. The result does not
+establish that intensity is irrelevant or identify what caused the failure.
 
 ## Car result and H5-versus-H10 direction
 
@@ -57,7 +58,8 @@ irrelevant or identify what caused the failure.
 The positive H5-over-H10 Car recall direction survives zeroing intensity. H5 recall remains 43/66,
 while H10 falls by two TPs, from 19/66 to 17/66. These are descriptive differences of campaign
 medians: zero-intensity minus primary is −2/66 for H10 and zero for H5. The persistent positive
-direction does not support an explanation depending *solely* on raw intensity values. H10-versus-H5
+direction shows that retaining the original raw intensity values is not necessary for this
+observed direction under the frozen intervention. H10-versus-H5
 is a compound temporal/density/history intervention; this measurement does not isolate time lag,
 density, cap pressure, or any other component as its mechanism.
 
@@ -96,11 +98,13 @@ population and AP changes remain descriptive, without a statistical-worsening cl
 
 The zero-intensity intervention does not rescue severe Pedestrian transfer failure. It leaves the
 strong positive H5-over-H10 Car recall direction intact, with H5 recall unchanged and a two-TP
-H10 reduction localized to 0–20 m at the operating point. Raw KITTI intensity mismatch is thus
-not supported as a sufficient explanation for either the Pedestrian collapse or the observed
-positive Car direction. This does not establish that intensity cannot matter, identify the cause
-of Pedestrian failure, or isolate a mechanism behind H5/H10. It does not support an architecture
-winner or a result beyond this corpus, model, and evaluator.
+H10 reduction localized to 0–20 m at the operating point. The intervention does not establish
+raw KITTI intensity mismatch as a sufficient explanation for Pedestrian collapse, and the
+original raw intensity values are not necessary for the observed positive Car direction. All-zero
+intensity is not a matched training-domain control, so mismatch could still contribute to or even
+fully explain the Pedestrian failure. The measurement does not establish that intensity cannot
+matter, identify the cause of Pedestrian failure, or isolate a mechanism behind H5/H10. It does
+not support an architecture winner or a result beyond this corpus, model, and evaluator.
 
 ## Reproducibility
 

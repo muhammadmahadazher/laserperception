@@ -81,9 +81,9 @@
     "pedestrian_recovery_observed": false,
     "car_h5_direction_persisted_under_zeroi": true,
     "raw_intensity_sufficient_explanation_supported": false,
-    "pedestrian": "Severe failure persists after candidate-consumed intensity is set to +0.0; raw KITTI reflectance mismatch is not supported as a sufficient explanation under this frozen model, corpus, and evaluator.",
-    "car": "The positive H5-over-H10 direction persists; H5 operating-point recall is unchanged. H10 loses two near-range Car TPs at this operating point. Raw intensity alone is not supported as a sufficient explanation for the positive history direction.",
-    "scope": "Observed sensitivity only; neither intensity's involvement nor the cause of Pedestrian failure or H5/H10 component mechanism is identified."
+    "pedestrian": "Severe failure persists after candidate-consumed intensity is set to +0.0. This intervention supplies no affirmative evidence that the original raw KITTI reflectance mismatch alone is sufficient to explain the failure; it also cannot rule that hypothesis out, because all-zero intensity may itself be out of distribution.",
+    "car": "The positive H5-over-H10 direction persists; H5 operating-point recall is unchanged. H10 loses two near-range Car TPs at this operating point. Retaining the original raw intensity values is not necessary for the observed positive direction under this frozen intervention.",
+    "scope": "Observed sensitivity only; all-zero replacement is not a matched training-domain intensity control. Neither intensity's involvement nor the cause of Pedestrian failure or H5/H10 component mechanism is identified."
   },
   "reproducibility": {
     "primary_threshold_results_identical_across_three": true,

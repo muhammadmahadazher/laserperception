@@ -58,8 +58,11 @@ processes and 2,568 canonical calls at execution commit
 intervention did not rescue severe Pedestrian failure (H10 0/396 to 0/396; H5 1/396 to 0/396),
 while the positive H5-over-H10 Car direction persisted (+24/66 primary; +26/66 zero intensity).
 H10 Car changed from 19/66 to 17/66, with its two-TP difference at 0–20 m; H5 Car stayed 43/66.
-Raw intensity mismatch is not supported as a sufficient explanation for either observation, but
-intensity causality or a unique mechanism is not established. Primary and zero-intensity processes
+The intervention supplies no affirmative evidence that raw intensity mismatch alone is sufficient
+to explain Pedestrian failure, but all-zero intensity may also be out of distribution, so that
+hypothesis is not ruled out. Retaining the original raw values is not necessary for the observed
+positive Car direction. Intensity causality or a unique mechanism is not established. Primary and
+zero-intensity processes
 are separate realizations and are not paired. S2 design may begin, but execution is not ready:
 its minimum-gap/denominator-stability rule,
 normalized-recovery eligibility, multi-realization partition rule, frozen V2 partitions and XYZT
