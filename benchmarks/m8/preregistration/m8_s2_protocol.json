@@ -1,7 +1,6 @@
 {
-  "schema_version": "laserperception.m8.s2.protocol-draft.v1",
-  "status": "HISTORICAL OWNER-REVIEW DRAFT; SUPERSEDED BY FROZEN S2 PROTOCOL; NO INFERENCE AUTHORIZED",
-  "superseded_by": "benchmarks/m8/preregistration/m8_s2_protocol.json",
+  "schema_version": "laserperception.m8.s2.protocol.v1",
+  "status": "FROZEN PROSPECTIVE SCIENTIFIC PROTOCOL; INPUT IMPLEMENTATION AND LEDGER PENDING; NO INFERENCE AUTHORIZED",
   "current_main_at_drafting": "a5a6c6aa04195df1ed70d1bba1ab0d627455acbf",
   "historical_execution_identities": {
     "primary_s1": "6994d72c3e7691a86116d1417ac3ae08256d163f",
@@ -16,12 +15,18 @@
     "zero_intensity_interpretation_sha256": "61aa2e16797d52cf2c38260a3e685680fa933fce8e70f15e0f9d95d1dacba15f",
     "m7_input_manifest_sha256": "8d4f74d783950d24956239f3a67a7a58fe10013e0e83a88d0f8b23e3139ffe90",
     "m8_input_projection_ledger_sha256": "474e87e34c64d669750d4b6f7a64ac46fc9c5c462693fad79ff7c9547a7f1f7c",
-    "m8_s2_partitions_draft": "benchmarks/m8/preregistration/m8_s2_partitions_draft.json"
+    "m8_s2_partitions": "benchmarks/m8/preregistration/m8_s2_partitions.json"
   },
   "scientific_scope": {
     "question": "Characterize encoded-lag magnitude, exact E2-total-point-count matching, their combination, and a natural long-span comparator under the frozen DSVT five-feature stack.",
     "corpus": "frozen ordered 428 KITTI Raw frames used by S1 and M7",
-    "feature_order": ["x", "y", "z", "intensity", "time_lag"],
+    "feature_order": [
+      "x",
+      "y",
+      "z",
+      "intensity",
+      "time_lag"
+    ],
     "dtype_order": "C-contiguous little-endian float32",
     "intensity": "original raw KITTI reflectance preserved byte-for-byte in every S2 arm",
     "zero_intensity_is_an_s2_arm": false,
@@ -41,32 +46,23 @@
     "c2_quota": "N0 current, N1..N10 history, H_target=E2 total-N0, H_total=sum(N1..N10); integer products H_target*Ni, floor quotas and remainders; largest remainders first, lower rank breaks ties",
     "c2_seed": "UTF-8 laserperception-m7-c-v1|<drive>|<10-digit-frame>|<history-rank>; first 8 SHA256 bytes unsigned big-endian seed; frozen SplitMix64 key over seed XOR zero-based sweep-row ordinal; lowest (key,ordinal) selected; restore original global A2 order",
     "d2_selection": "exact C2 selected global row vector, no new seed or resampling",
-    "f2_ranks": [2, 4, 6, 8, 10],
-    "m8_xyzt_projection_columns_zero_based": [0, 1, 2, 4],
+    "f2_ranks": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "m8_xyzt_projection_columns_zero_based": [
+      0,
+      1,
+      2,
+      4
+    ],
     "required_exact_m7_xyzt_hash_matches_per_arm": 428,
     "required_exact_m7_xyzt_hash_matches_total": 1712,
     "xyzt_identity_proven_now": false,
     "mismatch_action": "FAIL CLOSED before inference"
-  },
-  "frozen_s1_reference_proposal": {
-    "score_gte": 0.25,
-    "oriented_bev_iou_gte": 0.5,
-    "eligible_car_gt": 66,
-    "a2_car_tp_by_primary_process": [19, 19, 19],
-    "e2_car_tp_by_primary_process": [43, 43, 43],
-    "car_gap_by_primary_process": [24, 24, 24],
-    "a_ref": 19,
-    "e_ref": 43,
-    "d_ref": 24,
-    "minimum_positive_exactly_stable_gap": 20,
-    "minimum_gap_rationale": "one TP changes unclamped normalized recovery by 1/D, at most 0.05 when D>=20; a measurement-resolution rule, not significance",
-    "denominator_eligible_provisionally": true,
-    "partition_gate": "zero unstable Car GT and exact stable partition reconstruction of A2=19, E2=43, gap=24",
-    "partition_gate_passes_in_draft": true,
-    "normalized_recovery_formula_if_frozen": "G_car(X_i)=(TP_X_i-19)/24",
-    "clamp": false,
-    "allowed_values": ["negative", "zero", "partial", "one", "greater than one"],
-    "on_gate_failure": "report raw per-process TP deltas, all paired counts, unstable identities; do not headline normalized recovery or change consensus rule post hoc"
   },
   "prospective_execution_after_separate_authorization": {
     "repeatability": {
@@ -80,19 +76,39 @@
         "2011_09_26_drive_0091/0000000012"
       ],
       "fresh_processes": 10,
-      "arm_order_per_sentinel": ["B2", "C2", "D2", "F2"],
+      "arm_order_per_sentinel": [
+        "B2",
+        "C2",
+        "D2",
+        "F2"
+      ],
       "conditions_per_process": 28,
       "accepted_calls": 280,
       "diagnostic_only": true,
       "reused_in_corpus": false,
-      "primary_iou_0_50_exact_agreement": ["thresholded prediction count", "TP", "FP", "FN", "ignored prediction count", "matched GT identity set"],
-      "secondary_iou_0_30_0_70_exact_agreement": ["TP", "matched GT identity set"],
+      "primary_iou_0_50_exact_agreement": [
+        "thresholded prediction count",
+        "TP",
+        "FP",
+        "FN",
+        "ignored prediction count",
+        "matched GT identity set"
+      ],
+      "secondary_iou_0_30_0_70_exact_agreement": [
+        "TP",
+        "matched GT identity set"
+      ],
       "gate_failure": "block full corpus and return for owner review and prospective revision"
     },
     "full_corpus": {
       "fresh_processes": 3,
       "frames_per_process": 428,
-      "arm_order_per_frame": ["B2", "C2", "D2", "F2"],
+      "arm_order_per_frame": [
+        "B2",
+        "C2",
+        "D2",
+        "F2"
+      ],
       "conditions_per_process": 1712,
       "accepted_calls": 5136,
       "incomplete_process_accepted_canonical_processes": 0,
@@ -104,28 +120,61 @@
     "actual_s2_calls_now": 0
   },
   "future_input_only_ledger_required_fields": [
-    "source frame identity", "source A2/E2 input SHA256", "arm", "row count", "row-order SHA256",
-    "XYZ SHA256", "raw intensity SHA256", "XYZT projection SHA256", "full XYZIT SHA256",
-    "sweep membership and per-sweep counts", "B2/D2 T10/T5 float32 bits and binary64 scale bits/cast policy",
+    "source frame identity",
+    "source A2/E2 input SHA256",
+    "arm",
+    "row count",
+    "row-order SHA256",
+    "XYZ SHA256",
+    "raw intensity SHA256",
+    "XYZT projection SHA256",
+    "full XYZIT SHA256",
+    "sweep membership and per-sweep counts",
+    "B2/D2 T10/T5 float32 bits and binary64 scale bits/cast policy",
     "C2/D2 N0/N1..N10/H_target/H_total/products/initial quotas/remainders/increments/final quotas/seeds/selected-global-row SHA256",
-    "F2 exact ranks 2,4,6,8,10", "candidate pillar count", "retained pillar count if applicable",
-    "structural coordinate and order identities", "generation implementation and source-evidence identities"
+    "F2 exact ranks 2,4,6,8,10",
+    "candidate pillar count",
+    "retained pillar count if applicable",
+    "structural coordinate and order identities",
+    "generation implementation and source-evidence identities"
   ],
   "outcomes_and_reporting": {
     "primary": "Car recall, score>=0.25, oriented BEV IoU>=0.50, 66 eligible Car GT",
-    "secondary_class": "Pedestrian; no normalized recovery formula proposed",
-    "each_class": ["TP", "FP", "FN", "recall", "annotation-conditioned precision", "F1", "annotation-conditioned AP", "IoU 0.30/0.50/0.70", "range 0-20/20-35/35-50 m", "track continuity", "prediction population", "outside-FOV counts", "neighbour-ignore behavior"],
-    "s2_process_summary": ["pass 1", "pass 2", "pass 3", "minimum", "median", "maximum"],
+    "secondary_class": "Pedestrian; no normalized recovery formula defined",
+    "each_class": [
+      "TP",
+      "FP",
+      "FN",
+      "recall",
+      "annotation-conditioned precision",
+      "F1",
+      "annotation-conditioned AP",
+      "IoU 0.30/0.50/0.70",
+      "range 0-20/20-35/35-50 m",
+      "track continuity",
+      "prediction population",
+      "outside-FOV counts",
+      "neighbour-ignore behavior"
+    ],
+    "s2_process_summary": [
+      "pass 1",
+      "pass 2",
+      "pass 3",
+      "minimum",
+      "median",
+      "maximum"
+    ],
     "annotation_boundary": "KITTI Raw tracklets incomplete; precision and AP are annotation-conditioned, not official KITTI AP or physical-world false-positive rates",
     "population_inference": false
   },
   "paired_recovery_if_eligible": {
     "r_gain": "detected frozen E2_ONLY Car poses / 24",
     "r_shared": "detected frozen SHARED Car poses / 19",
-    "r_aonly": "detected frozen A2_ONLY Car poses / |A2_ONLY|; null/not-applicable when zero",
+    "r_aonly": null,
     "r_neither": "detected frozen NEITHER Car poses / 23",
     "report_exact_gained_and_lost_pose_identities": true,
-    "aggregate_equality_alone_sufficient": false
+    "aggregate_equality_alone_sufficient": false,
+    "r_aonly_reason": "frozen A2_ONLY Car denominator is zero; not applicable"
   },
   "prospective_descriptive_interpretation_gate": {
     "per_process_g_car_gte": 0.5,
@@ -133,12 +182,21 @@
     "per_process_max_frozen_shared_losses": 1,
     "phrase_allowed_only_if_all_three_complete_s2_processes_pass": true,
     "phrase": "substantially accounts for the observed H10-to-H5 Car improvement",
-    "meaning": "descriptive engineering criterion on this fixed corpus; not a causal estimate or significance test"
+    "meaning": "descriptive engineering criterion on this fixed corpus; not a causal estimate or significance test",
+    "required_complete_processes_passing": 3
   },
   "factorial": {
-    "arms": ["A2", "B2", "C2", "D2"],
+    "arms": [
+      "A2",
+      "B2",
+      "C2",
+      "D2"
+    ],
     "f2_excluded": true,
-    "valid_fixed_a_ref_outcomes": ["Car TP at frozen operating point", "Car recall at frozen operating point"],
+    "valid_fixed_a_ref_outcomes": [
+      "Car TP at frozen operating point",
+      "Car recall at frozen operating point"
+    ],
     "lag_contrast": "L_i=((Y_B2_i-Y_A_REF)+(Y_D2_i-Y_C2_i))/2",
     "point_count_contrast": "P_i=((Y_C2_i-Y_A_REF)+(Y_D2_i-Y_B2_i))/2",
     "interaction": "I_i=Y_D2_i-Y_B2_i-Y_C2_i+Y_A_REF",
@@ -155,16 +213,54 @@
     "production_readiness_claimed": false
   },
   "authorization": {
-    "protocol_frozen": false,
-    "implementation_frozen": false,
-    "input_ledger_frozen": false,
-    "runtime_bound": false,
-    "s2_ready_to_execute": false,
-    "s2_authorized": false,
-    "b2_c2_d2_f2_calls": 0,
-    "runpod_actions": 0,
-    "local_gpu_probe_commands_executed": 0,
-    "new_detector_calls": 0,
-    "training_runs": 0
+    "PROTOCOL_FROZEN": true,
+    "IMPLEMENTATION_FROZEN": false,
+    "INPUT_LEDGER_FROZEN": false,
+    "RUNTIME_BOUND": false,
+    "INFERENCE_AUTHORIZED": false,
+    "B2_C2_D2_F2_CALLS": 0,
+    "S2_READY_TO_EXECUTE": false,
+    "RUNPOD_ACTIONS": 0,
+    "LOCAL_GPU_PROBE_COMMANDS_EXECUTED": 0,
+    "NEW_DETECTOR_CALLS": 0,
+    "TRAINING_RUNS": 0
+  },
+  "frozen_s1_reference": {
+    "score_gte": 0.25,
+    "oriented_bev_iou_gte": 0.5,
+    "eligible_car_gt": 66,
+    "a2_car_tp_by_primary_process": [
+      19,
+      19,
+      19
+    ],
+    "e2_car_tp_by_primary_process": [
+      43,
+      43,
+      43
+    ],
+    "car_gap_by_primary_process": [
+      24,
+      24,
+      24
+    ],
+    "a_ref": 19,
+    "e_ref": 43,
+    "d_ref": 24,
+    "minimum_positive_exactly_stable_gap": 20,
+    "minimum_gap_rationale": "one TP changes unclamped normalized recovery by 1/D, at most 0.05 when D>=20; a measurement-resolution rule, not significance",
+    "partition_gate": "zero unstable Car GT and exact stable partition reconstruction of A2=19, E2=43, gap=24",
+    "clamp": false,
+    "allowed_values": [
+      "negative",
+      "zero",
+      "partial",
+      "one",
+      "greater than one"
+    ],
+    "on_gate_failure": "report raw per-process TP deltas, all paired counts, unstable identities; do not headline normalized recovery or change consensus rule post hoc",
+    "denominator_eligible": true,
+    "partition_gate_passes": true,
+    "normalized_recovery_formula": "G_car(X_i)=(TP_X_i-19)/24"
   }
 }

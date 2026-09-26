@@ -21,8 +21,10 @@ raw measurement and separate scientific interpretation are published. The interp
 the positive descriptive Car direction and severe Pedestrian cross-domain failure without causal,
 winner, or significance claims. A separate three-process, 2,568-call zero-intensity measurement
 and scientific interpretation are published. It did not recover severe Pedestrian failure, while
-the positive H5-over-H10 Car direction persisted; intensity causality is not established. S2 design
-may begin, but S2 execution remains blocked and not started, and training has not started. No
+the positive H5-over-H10 Car direction persisted; intensity causality is not established. The
+prospective S2 scientific protocol and S1-derived paired partitions are frozen. Its input
+implementation and ledger, 1,712/1,712 M7 XYZT identity proof, runtime binding, and separate
+inference authorization remain pending; S2 and training have not started. No
 scientific inference may run without a fresh, explicit, runtime-specific owner authorization.
 
 Within that frozen history, M6c is complete with a positive final R3 projected-reference ROS
@@ -55,11 +57,12 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
   Preserve the incomplete 779-condition attempt separately; its accepted canonical primary-call
   count is zero. The separately authorized zero-intensity intervention completed three accepted
   processes and 2,568 calls on a newly qualified A40; its raw result and separate scientific
-  interpretation are published. S2 additionally requires prospective denominator-stability and
-  multi-realization partition rules before B2/C2/D2/F2 execution.
+  interpretation are published. The prospective S2 protocol, denominator-stability and
+  multi-realization partition rules are frozen. Input implementation, ledger, identity proof,
+  runtime binding, and separate owner authorization remain required before B2/C2/D2/F2 execution.
 - A new runtime must undergo GT-blind qualification, machine-specific policy binding, a repeated
   Stage R, owner review, and a new authorization before primary inference.
-- Zero-intensity measurement and interpretation are published. S2 design may begin;
+- Zero-intensity measurement and interpretation are published. S2 protocol is frozen;
   B2/C2/D2/F2 execution, S2, and training are not authorized.
 
 Do not add training, another detector, INT8, unrelated tracking research, camera fusion, custom CUDA, Jetson tuning

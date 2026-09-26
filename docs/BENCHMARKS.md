@@ -31,8 +31,10 @@ than an architecture benchmark. The separately authorized zero-intensity
 [scientific interpretation](m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) are published with three
 accepted processes and 2,568 calls. Pedestrian failure persisted, while the positive H5-over-H10
 Car direction remained under zero intensity. This does not establish intensity causality. Primary
-and zero-intensity process indices are not paired. S2 design may begin; S2 execution is not ready,
-and no normalized-recovery result is reported.
+and zero-intensity process indices are not paired. The prospective
+[S2 scientific protocol](m8/M8_S2_PROTOCOL.md) and paired partitions are frozen; its input
+implementation, ledger, 1,712/1,712 M7 XYZT identity proof, runtime binding, and inference
+authorization remain pending. S2 has not executed, and no normalized-recovery result is reported.
 
 ## Detection workload sweep-history qualification
 

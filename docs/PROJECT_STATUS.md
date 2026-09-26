@@ -63,11 +63,12 @@ to explain Pedestrian failure, but all-zero intensity may also be out of distrib
 hypothesis is not ruled out. Retaining the original raw values is not necessary for the observed
 positive Car direction. Intensity causality or a unique mechanism is not established. Primary and
 zero-intensity processes
-are separate realizations and are not paired. S2 design may begin, but execution is not ready:
-its minimum-gap/denominator-stability rule,
-normalized-recovery eligibility, multi-realization partition rule, frozen V2 partitions and XYZT
-identity proof, protocol, validation, runtime binding, and authorization remain prospective.
-Training has not started.
+are separate realizations and are not paired. The prospective
+[S2 scientific protocol](m8/M8_S2_PROTOCOL.md), minimum-gap/denominator-stability rule,
+normalized-recovery eligibility, multi-realization partition rule, and S1-derived V2 paired
+partitions are frozen. S2 execution is not ready: the CPU-only input implementation and ledger,
+1,712/1,712 M7 XYZT identity proof, implementation review, runtime binding, and separate inference
+authorization remain pending. S2 and training have not started.
 
 The earlier 779-condition primary attempt remains `INCOMPLETE`, with zero accepted complete
 processes and zero accepted canonical calls. A separate interrupted 26-condition attempt before the
@@ -97,8 +98,9 @@ dataset-level benchmark. See [the detailed record](external/OMNILINK_OMNISIM_EVA
 
 ## Pending and future work
 
-- Prospectively design and preregister the missing S2 denominator, partition, identity, validation,
-  and authorization rules before any B2/C2/D2/F2 execution. S2 and training have not started.
+- Implement and review the S2 CPU-only input path and complete input ledger, including the exact
+  1,712-condition M7 XYZT identity proof, before any B2/C2/D2/F2 execution. Runtime binding and
+  separate owner inference authorization are still required. S2 and training have not started.
 - Production segmentation, camera fusion, broader learned representations, physical-sensor
   validation, and productionization remain future work.
 

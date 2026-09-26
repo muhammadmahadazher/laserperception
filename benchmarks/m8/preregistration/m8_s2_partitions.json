@@ -1,6 +1,6 @@
 {
-  "schema_version": "laserperception.m8.s2.partitions-draft.v1",
-  "status": "HISTORICAL OWNER-REVIEW DRAFT; SUPERSEDED BY FROZEN S2 PROTOCOL; NO INFERENCE AUTHORIZED",
+  "schema_version": "laserperception.m8.s2.partitions.v1",
+  "status": "FROZEN S1-DERIVED PAIRED PARTITIONS FOR THE PROSPECTIVE S2 PROTOCOL; NO S2 INFERENCE AUTHORIZED",
   "source": {
     "primary_execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
     "primary_measurement_manifest_sha256": "cfa66feb2db62b49c113cb2a6fd3576611f3544aab076d432a4203fd34b6a28f",
@@ -2436,7 +2436,16 @@
       "eligible_gt_count": 396
     }
   },
-  "car_denominator_proposal": {
+  "pedestrian_role": "descriptive paired partitions only; no normalized Pedestrian recovery defined",
+  "authorization": {
+    "S2_PROTOCOL_FROZEN": true,
+    "S2_IMPLEMENTATION_FROZEN": false,
+    "S2_INPUT_LEDGER_FROZEN": false,
+    "S2_READY_TO_EXECUTE": false,
+    "S2_INFERENCE_AUTHORIZED": false,
+    "B2_C2_D2_F2_CALLS": 0
+  },
+  "car_denominator_rule": {
     "per_process_e2_minus_a2_tp": [
       24,
       24,
@@ -2444,23 +2453,13 @@
     ],
     "all_positive": true,
     "exactly_stable": true,
-    "proposed_minimum_gap": 20,
     "one_tp_normalized_increment_at_common_gap": 0.041666666666666664,
     "denominator_eligible": true,
     "partition_eligible": true,
-    "normalized_recovery_eligible_if_owner_freezes_proposal": true,
     "stable_partitions_reproduce_a2_tp_19": true,
     "stable_partitions_reproduce_e2_tp_43": true,
-    "stable_partitions_reproduce_gap_24": true
-  },
-  "pedestrian_role": "descriptive paired partitions only; no normalized Pedestrian recovery proposed",
-  "authorization": {
-    "s2_protocol_frozen": false,
-    "s2_implementation_frozen": false,
-    "s2_input_ledger_frozen": false,
-    "s2_ready_to_execute": false,
-    "s2_authorized": false,
-    "b2_c2_d2_f2_calls": 0
-  },
-  "superseded_by": "benchmarks/m8/preregistration/m8_s2_partitions.json"
+    "stable_partitions_reproduce_gap_24": true,
+    "minimum_gap": 20,
+    "normalized_recovery_eligible": true
+  }
 }

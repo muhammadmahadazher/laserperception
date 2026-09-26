@@ -61,8 +61,10 @@ attempt remains preserved with zero accepted canonical calls. A separate three-p
 [zero-intensity raw measurement](docs/m8/M8_S1_ZERO_INTENSITY_RAW.md) and
 [scientific interpretation](docs/m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) are published. Zeroing
 intensity did not rescue Pedestrian detection; the positive H5-over-H10 Car direction persisted.
-This does not establish intensity causality. S2 design may begin, but S2 execution remains blocked
-and unstarted; training has not run.
+This does not establish intensity causality. The prospective
+[S2 scientific protocol](docs/m8/M8_S2_PROTOCOL.md) and S1-derived paired partitions are frozen.
+Its CPU-only input implementation and ledger, 1,712/1,712 M7 XYZT identity proof, runtime binding,
+and separate inference authorization remain pending. S2 execution and training have not started.
 
 ## Quick start — CPU first
 
@@ -169,8 +171,9 @@ remains visible; measurements that have not occurred say `Pending measurement`. 
   datasets/hardware; it does not establish universal LiDAR generalization.
 - M8 primary A2/E2 and zero-intensity measurements and their separate interpretations are complete.
   The intervention did not recover Pedestrian detection and left the positive H5-over-H10 Car
-  direction intact; it does not establish intensity causality. S2 design may begin, while S2
-  execution, DSVT training, and DSVT TensorRT parity remain blocked or unstarted.
+  direction intact; it does not establish intensity causality. The S2 scientific protocol is frozen,
+  while input implementation, input identity proof, runtime binding, and authorization are pending.
+  S2 execution, DSVT training, and DSVT TensorRT parity remain blocked or unstarted.
 - Semantic APIs evaluate saved row-aligned results; no production segmentation model is included.
 - CPU tracking is deterministic infrastructure over precomputed detections, without an end-to-end
   detector/tracker benchmark.
