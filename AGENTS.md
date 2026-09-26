@@ -19,8 +19,10 @@ with zero accepted complete processes and zero accepted canonical primary calls.
 campaign completed three accepted fresh primary processes and 2,568 canonical A2/E2 calls. Its
 raw measurement and separate scientific interpretation are published. The interpretation records
 the positive descriptive Car direction and severe Pedestrian cross-domain failure without causal,
-winner, or significance claims. A separate three-process, 2,568-call zero-intensity raw measurement
-is published; its scientific interpretation is pending. S2 remains blocked and not started, and training has not started. No
+winner, or significance claims. A separate three-process, 2,568-call zero-intensity measurement
+and scientific interpretation are published. It did not recover severe Pedestrian failure, while
+the positive H5-over-H10 Car direction persisted; intensity causality is not established. S2 design
+may begin, but S2 execution remains blocked and not started, and training has not started. No
 scientific inference may run without a fresh, explicit, runtime-specific owner authorization.
 
 Within that frozen history, M6c is complete with a positive final R3 projected-reference ROS
@@ -52,12 +54,13 @@ pipeline remain tested, supported, parked experimental infrastructure and must n
   three-pass/2,568-call primary A2/E2 measurement and scientific interpretation completed.
   Preserve the incomplete 779-condition attempt separately; its accepted canonical primary-call
   count is zero. The separately authorized zero-intensity intervention completed three accepted
-  processes and 2,568 calls on a newly qualified A40; its raw result is published, with interpretation
-  pending. S2 additionally requires prospective denominator-stability and multi-realization
-  partition rules before B2/C2/D2/F2 execution.
+  processes and 2,568 calls on a newly qualified A40; its raw result and separate scientific
+  interpretation are published. S2 additionally requires prospective denominator-stability and
+  multi-realization partition rules before B2/C2/D2/F2 execution.
 - A new runtime must undergo GT-blind qualification, machine-specific policy binding, a repeated
   Stage R, owner review, and a new authorization before primary inference.
-- Zero-intensity raw measurement is published; B2/C2/D2/F2, S2, and training are not authorized.
+- Zero-intensity measurement and interpretation are published. S2 design may begin;
+  B2/C2/D2/F2 execution, S2, and training are not authorized.
 
 Do not add training, another detector, INT8, unrelated tracking research, camera fusion, custom CUDA, Jetson tuning
 without hardware, localization, vendor SDK drivers, unrelated optimization, or unrelated features

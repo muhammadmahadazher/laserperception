@@ -58,8 +58,11 @@ A2/E2 campaign later completed three accepted fresh processes and 2,568 canonica
 descriptively from 19/66 under A2/H10 to 43/66 under E2/H5, while Pedestrian recall was 0/396 and
 1/396, a severe class-specific cross-domain failure. The earlier 779-condition `INCOMPLETE`
 attempt remains preserved with zero accepted canonical calls. A separate three-process, 2,568-call
-[zero-intensity raw measurement](docs/m8/M8_S1_ZERO_INTENSITY_RAW.md) is now published; its
-scientific interpretation is pending. S2 and training have not run.
+[zero-intensity raw measurement](docs/m8/M8_S1_ZERO_INTENSITY_RAW.md) and
+[scientific interpretation](docs/m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) are published. Zeroing
+intensity did not rescue Pedestrian detection; the positive H5-over-H10 Car direction persisted.
+This does not establish intensity causality. S2 design may begin, but S2 execution remains blocked
+and unstarted; training has not run.
 
 ## Quick start — CPU first
 
@@ -164,9 +167,10 @@ remains visible; measurements that have not occurred say `Pending measurement`. 
 
 - The released detector evidence covers one official pretrained PointPillars model and bounded
   datasets/hardware; it does not establish universal LiDAR generalization.
-- M8 primary A2/E2 measurement and interpretation are complete. Zero-intensity raw measurement is
-  published without an intensity-causality claim; its interpretation remains pending. S2, DSVT
-  training, and DSVT TensorRT parity remain blocked or unstarted.
+- M8 primary A2/E2 and zero-intensity measurements and their separate interpretations are complete.
+  The intervention did not recover Pedestrian detection and left the positive H5-over-H10 Car
+  direction intact; it does not establish intensity causality. S2 design may begin, while S2
+  execution, DSVT training, and DSVT TensorRT parity remain blocked or unstarted.
 - Semantic APIs evaluate saved row-aligned results; no production segmentation model is included.
 - CPU tracking is deterministic infrastructure over precomputed detections, without an end-to-end
   detector/tracker benchmark.

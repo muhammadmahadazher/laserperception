@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 
@@ -12,6 +13,11 @@ import pytest
 from benchmarks.m8 import aggregate_s1_zero_intensity as zeroi
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _tracked_bytes(relative: str) -> bytes:
+    """Read the published Git blob, independent of checkout line endings."""
+    return subprocess.check_output(["git", "show", f"HEAD:{relative}"], cwd=ROOT)
 
 
 def _evidence():
@@ -219,12 +225,12 @@ def test_published_zeroi_manifest_binds_compact_artifacts():
         == zeroi.PRIMARY_RAW_SHA256
     )
     for artifact in manifest["tracked_artifacts"].values():
-        path = ROOT / artifact["path"]
-        assert len(path.read_bytes()) == artifact["bytes"]
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
-    reducer = ROOT / manifest["offline_aggregation"]["reducer_path"]
+        data = _tracked_bytes(artifact["path"])
+        assert len(data) == artifact["bytes"]
+        assert hashlib.sha256(data).hexdigest() == artifact["sha256"]
+    reducer = _tracked_bytes(manifest["offline_aggregation"]["reducer_path"])
     assert (
-        hashlib.sha256(reducer.read_bytes()).hexdigest()
+        hashlib.sha256(reducer).hexdigest()
         == manifest["offline_aggregation"]["reducer_file_sha256"]
     )
     raw = json.loads((ROOT / "benchmarks/m8/results/m8_s1_zero_intensity_raw.json").read_text())

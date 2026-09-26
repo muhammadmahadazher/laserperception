@@ -7,10 +7,15 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Interpret the frozen three-process M8 S1 zero-intensity measurement separately from the primary:
+  Pedestrian failure persisted, H5-over-H10 Car direction remained positive, and the two-TP H10
+  Car reduction was confined to 0–20 m at the frozen operating point. Primary and zero-intensity
+  processes are not paired; no intensity-causality or significance claim is made. S2 design may
+  begin, while execution remains blocked and unstarted.
 - Publish the three-process, 2,568-call M8 S1 zero-intensity raw measurement with verified
   per-condition source/transformed input provenance, deterministic CPU aggregation, separate
-  primary-versus-zero-intensity distributions, and no causal or significance claim. Scientific
-  interpretation remains pending; S2 and training remain unstarted.
+  primary-versus-zero-intensity distributions, and no causal or significance claim. S2 and training
+  remain unstarted.
 - Preserve original and transformed input SHA256 identities plus the exact intervention descriptor
   in zero-intensity condition evidence, with fail-closed validation. This prospective
   evidence correction does not change the frozen intervention or accepted primary measurement.
