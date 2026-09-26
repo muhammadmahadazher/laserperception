@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -110,3 +111,18 @@ def test_s2_input_path_imports_no_accelerator_or_detector() -> None:
         "or x.endswith('.m8_backend') for x in sys.modules)"
     )
     subprocess.run([sys.executable, "-c", code], cwd=root, check=True)
+
+
+def test_frozen_protocol_and_partitions_are_unchanged() -> None:
+    root = Path(__file__).resolve().parents[1]
+    expected = {
+        "docs/m8/M8_S2_PROTOCOL.md": (
+            "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d"
+        ),
+        "benchmarks/m8/preregistration/m8_s2_partitions.json": (
+            "f52b0013d10d38c4fd91f52cfb42205f52b97ecf4433cd86654872dd70a59d6e"
+        ),
+    }
+    for relative, digest in expected.items():
+        data = (root / relative).read_bytes().replace(b"\r\n", b"\n")
+        assert hashlib.sha256(data).hexdigest() == digest

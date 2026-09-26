@@ -47,13 +47,14 @@ accepted processes and 2,568 calls. Its
 [scientific interpretation](m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) found no Pedestrian recovery
 and persistence of the positive H5-over-H10 Car direction, without an intensity-causality claim.
 The prospective [S2 scientific protocol](m8/M8_S2_PROTOCOL.md) and S1-derived paired partitions
-are frozen. CPU-only input implementation and ledger, exact 1,712/1,712 M7 XYZT identity proof,
-runtime binding, and separate inference authorization remain pending. S2 execution is unstarted.
+are frozen. Its [CPU-only input freeze](m8/M8_S2_INPUT_FREEZE.md) records the complete ledger,
+exact 1,712/1,712 M7 XYZT identity proof, and fresh-adapter replay. Runtime binding and separate
+inference authorization remain pending. S2 detector execution is unstarted.
 
 ## Future directions
 
-The next M8 step is CPU-only S2 input implementation, ledger, and identity proof; execution remains
-subject to its frozen gates and separate owner authorization. Other future work includes segmentation-model integration, broader
+The next M8 step is external-runtime qualification and binding under the frozen S2 gates;
+inference requires separate owner authorization. Other future work includes segmentation-model integration, broader
 learned representations, camera fusion, physical-sensor validation, deployment optimization on
 specifically available hardware, and productionization. Each requires explicit
 scope, evidence gates, and applicable hardware/runtime authorization.
