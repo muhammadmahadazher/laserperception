@@ -7,10 +7,13 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Freeze the CPU-only M8 P1-S2 B2/C2/D2/F2 input implementation and 1,712-condition ledger with
+  exact M7 XYZT identity and a 28-condition fresh-adapter replay. Runtime binding and detector
+  inference remain separately gated; no S2 detector calls occurred.
 - Freeze the prospective M8 P1-S2 scientific protocol and S1-derived paired partitions: Car
   shared/E2-only/A2-only/neither/unstable counts are 19/24/0/23/0, and the three exact Car gaps
-  are 24. Input implementation and ledger, the 1,712-condition M7 XYZT proof, runtime binding,
-  and separate inference authorization remain pending; no S2 detector calls occurred.
+  are 24. This protocol predates and governs the separate input freeze; runtime binding and
+  inference authorization remain pending.
 - Interpret the frozen three-process M8 S1 zero-intensity measurement separately from the primary:
   Pedestrian failure persisted, H5-over-H10 Car direction remained positive, and the two-TP H10
   Car reduction was confined to 0–20 m at the frozen operating point. Primary and zero-intensity

@@ -14,6 +14,7 @@ must not be treated as interchangeable.
 | M7 | Controlled history mechanism | Canonical frozen result with preserved preflight failures | Historical detector environment | [M7 result](m7/M7_RESULTS.md) |
 | M8 | DSVT S1 comparison | Accepted three-process A2/E2 measurement and scientific interpretation | Qualified external A40 runtime | [Interpretation](m8/M8_S1_INTERPRETATION.md) |
 | M8 zero-intensity | DSVT S1 intervention | Accepted three-process measurement and separate interpretation | Separately qualified external A40 runtime | [Interpretation](m8/M8_S1_ZERO_INTENSITY_INTERPRETATION.md) |
+| M8 S2 inputs | B2/C2/D2/F2 input-only freeze | 1,712 exact M7 XYZT projections; no detector calls | Local CPU analytic construction | [Input freeze](m8/M8_S2_INPUT_FREEZE.md) |
 | External | OmniLink/OmniSim synthetic replay | External negative domain-gap result | Externally reported RTX 3060 Laptop GPU | [External evaluation](external/OMNILINK_OMNISIM_EVALUATION.md) |
 
 The [failure index](FAILURE_INDEX.md) links rejected methodology, protocol failures, engineering
@@ -33,8 +34,9 @@ accepted processes and 2,568 calls. Pedestrian failure persisted, while the posi
 Car direction remained under zero intensity. This does not establish intensity causality. Primary
 and zero-intensity process indices are not paired. The prospective
 [S2 scientific protocol](m8/M8_S2_PROTOCOL.md) and paired partitions are frozen; its input
-implementation, ledger, 1,712/1,712 M7 XYZT identity proof, runtime binding, and inference
-authorization remain pending. S2 has not executed, and no normalized-recovery result is reported.
+implementation, ledger, and 1,712/1,712 M7 XYZT identity proof are recorded in the
+[CPU-only input freeze](m8/M8_S2_INPUT_FREEZE.md). Runtime binding and inference authorization
+remain pending. S2 detector execution has not occurred, and no normalized-recovery result is reported.
 
 ## Detection workload sweep-history qualification
 

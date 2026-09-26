@@ -66,9 +66,10 @@ zero-intensity processes
 are separate realizations and are not paired. The prospective
 [S2 scientific protocol](m8/M8_S2_PROTOCOL.md), minimum-gap/denominator-stability rule,
 normalized-recovery eligibility, multi-realization partition rule, and S1-derived V2 paired
-partitions are frozen. S2 execution is not ready: the CPU-only input implementation and ledger,
-1,712/1,712 M7 XYZT identity proof, implementation review, runtime binding, and separate inference
-authorization remain pending. S2 and training have not started.
+partitions are frozen. The CPU-only input implementation and ledger, 1,712/1,712 M7 XYZT identity
+proof, and implementation review are recorded in the
+[S2 CPU-only input freeze](m8/M8_S2_INPUT_FREEZE.md). External runtime binding and separate
+inference authorization remain pending. S2 detector execution and training have not started.
 
 The earlier 779-condition primary attempt remains `INCOMPLETE`, with zero accepted complete
 processes and zero accepted canonical calls. A separate interrupted 26-condition attempt before the
@@ -98,9 +99,10 @@ dataset-level benchmark. See [the detailed record](external/OMNILINK_OMNISIM_EVA
 
 ## Pending and future work
 
-- Implement and review the S2 CPU-only input path and complete input ledger, including the exact
-  1,712-condition M7 XYZT identity proof, before any B2/C2/D2/F2 execution. Runtime binding and
-  separate owner inference authorization are still required. S2 and training have not started.
+- Qualify and bind a future external S2 runtime, including same-runtime CUDA structural preflight,
+  before seeking separate owner inference authorization. The CPU-only input ledger and exact
+  1,712-condition M7 XYZT identity proof are frozen; S2 detector execution and training have not
+  started.
 - Production segmentation, camera fusion, broader learned representations, physical-sensor
   validation, and productionization remain future work.
 
