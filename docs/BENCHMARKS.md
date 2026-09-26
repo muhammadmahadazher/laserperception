@@ -13,6 +13,7 @@ must not be treated as interchangeable.
 | M6 | KITTI Raw cross-domain and projected ROS validation | Canonical final records with preserved earlier failures | Historical detector/ROS environments | [M6 index](m6/README.md) |
 | M7 | Controlled history mechanism | Canonical frozen result with preserved preflight failures | Historical detector environment | [M7 result](m7/M7_RESULTS.md) |
 | M8 | DSVT S1 comparison | Accepted three-process A2/E2 measurement and scientific interpretation | Qualified external A40 runtime | [Interpretation](m8/M8_S1_INTERPRETATION.md) |
+| M8 zero-intensity | DSVT S1 intervention | Accepted three-process raw measurement; interpretation pending | Separately qualified external A40 runtime | [Raw result](m8/M8_S1_ZERO_INTENSITY_RAW.md) |
 | External | OmniLink/OmniSim synthetic replay | External negative domain-gap result | Externally reported RTX 3060 Laptop GPU | [External evaluation](external/OMNILINK_OMNISIM_EVALUATION.md) |
 
 The [failure index](FAILURE_INDEX.md) links rejected methodology, protocol failures, engineering
@@ -25,8 +26,10 @@ recall was 19/66 for A2/H10 and 43/66 for E2/H5; the positive direction repeated
 threshold level. Pedestrian recall was 0/396 and 1/396, an observed severe class-specific
 cross-domain failure. Precision and AP are annotation-conditioned against incomplete KITTI Raw
 tracklets, and the historical PointPillars contrast is a frozen detector-stack comparison rather
-than an architecture benchmark. Zero-intensity is recommended for separate authorization; S2 is
-not ready and no normalized-recovery result is reported.
+than an architecture benchmark. The separately authorized zero-intensity
+[raw measurement](m8/M8_S1_ZERO_INTENSITY_RAW.md) is published with three accepted processes and
+2,568 calls, but its scientific interpretation remains pending. Primary and zero-intensity process
+indices are not paired. S2 is not ready and no normalized-recovery result is reported.
 
 ## Detection workload sweep-history qualification
 

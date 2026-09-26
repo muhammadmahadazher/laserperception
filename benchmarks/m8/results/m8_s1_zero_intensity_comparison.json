@@ -1,0 +1,113 @@
+{
+  "arms": {
+    "A2_zeroI": {
+      "classes": {
+        "car": {
+          "descriptive_difference_of_observed_medians": -0.03030303030303033,
+          "primary_recall": {
+            "maximum": 0.2878787878787879,
+            "median": 0.2878787878787879,
+            "minimum": 0.2878787878787879,
+            "pass_values": [
+              0.2878787878787879,
+              0.2878787878787879,
+              0.2878787878787879
+            ]
+          },
+          "zeroi_recall": {
+            "maximum": 0.25757575757575757,
+            "median": 0.25757575757575757,
+            "minimum": 0.25757575757575757,
+            "pass_values": [
+              0.25757575757575757,
+              0.25757575757575757,
+              0.25757575757575757
+            ]
+          }
+        },
+        "pedestrian": {
+          "descriptive_difference_of_observed_medians": 0.0,
+          "primary_recall": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0,
+            "pass_values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "zeroi_recall": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0,
+            "pass_values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "history": "H10",
+      "primary_arm": "A2"
+    },
+    "E2_zeroI": {
+      "classes": {
+        "car": {
+          "descriptive_difference_of_observed_medians": 0.0,
+          "primary_recall": {
+            "maximum": 0.6515151515151515,
+            "median": 0.6515151515151515,
+            "minimum": 0.6515151515151515,
+            "pass_values": [
+              0.6515151515151515,
+              0.6515151515151515,
+              0.6515151515151515
+            ]
+          },
+          "zeroi_recall": {
+            "maximum": 0.6515151515151515,
+            "median": 0.6515151515151515,
+            "minimum": 0.6515151515151515,
+            "pass_values": [
+              0.6515151515151515,
+              0.6515151515151515,
+              0.6515151515151515
+            ]
+          }
+        },
+        "pedestrian": {
+          "descriptive_difference_of_observed_medians": -0.0025252525252525255,
+          "primary_recall": {
+            "maximum": 0.0025252525252525255,
+            "median": 0.0025252525252525255,
+            "minimum": 0.0025252525252525255,
+            "pass_values": [
+              0.0025252525252525255,
+              0.0025252525252525255,
+              0.0025252525252525255
+            ]
+          },
+          "zeroi_recall": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0,
+            "pass_values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "history": "H5",
+      "primary_arm": "E2"
+    }
+  },
+  "inference": "descriptive distributions only; no causal or significance estimate",
+  "primary_execution_commit": "6994d72c3e7691a86116d1417ac3ae08256d163f",
+  "process_indices_paired": false,
+  "schema_version": "laserperception.m8.s1.zero-intensity-comparison.v1",
+  "zeroi_execution_commit": "95fb66ac1f57c41f06f05bd9ef5dac27b1e3ea54"
+}
