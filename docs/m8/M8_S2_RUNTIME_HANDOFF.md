@@ -8,9 +8,11 @@ the future work. No external worker was contacted for this freeze.
 
 ## Software and input identities
 
-The execution software and synthetic tests were committed first as
-`aa38ae4d9ca291380bf44de2628f9a1a598b96bf` (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The
-future runtime must instead bind the **reviewed merged execution commit** containing this code.
+The execution software and synthetic tests were committed before this handoff, beginning at
+`aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. A prospective evidence correction is included
+in `fd335da65bfb0d7a7de951551612382f7836fd4d`
+(`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
+execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
 commit remains `bf098b319744f1ec1df08207c1cd93853b1f31ae`.
 
