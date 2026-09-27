@@ -254,6 +254,22 @@ def _pose_key(condition: Mapping[str, object], observation: Mapping[str, object]
     return f"{frame_id}/track_{_integer(observation['track_id'], 'track ID')}"
 
 
+def _outside_fov_count(condition: Mapping[str, object], class_name: str) -> int:
+    predictions = _list(condition.get("predictions"), "stable predictions")
+    if any(not isinstance(item, Mapping) for item in predictions):
+        raise M8S2ProtocolViolation("S2 stable prediction record is malformed")
+    outside = [
+        item
+        for item in predictions
+        if isinstance(item, Mapping) and item.get("inside_annotation_fov") is False
+    ]
+    if len(outside) != _integer(
+        condition.get("outside_annotation_fov_prediction_count"), "outside FOV"
+    ):
+        raise M8S2ProtocolViolation("S2 outside-FOV count differs from stable predictions")
+    return sum(item.get("class_name") == class_name for item in outside)
+
+
 def _class_aggregate(
     selected: Sequence[Mapping[str, object]], class_name: str
 ) -> dict[str, object]:
@@ -332,8 +348,7 @@ def _class_aggregate(
             for item in evidence
         ),
         "outside_annotation_fov_prediction_count": sum(
-            _integer(row.get("outside_annotation_fov_prediction_count"), "outside FOV")
-            for row in selected
+            _outside_fov_count(row, class_name) for row in selected
         ),
         "neighbour_ignore_GT_count": sum(
             _integer(item.get("neighbour_ignore_GT_count"), "neighbour GT") for item in evidence

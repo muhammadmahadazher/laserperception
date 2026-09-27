@@ -372,6 +372,7 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
             condition["arm"] = condition["condition_id"].rsplit("/", 1)[1]
             condition["frame_id"] = condition["condition_id"].rsplit("/", 1)[0]
             condition["outside_annotation_fov_prediction_count"] = 0
+            condition["predictions"] = []
             condition["classes"] = {"car": deepcopy(empty), "pedestrian": deepcopy(empty)}
         for item in identity_rows:
             frame_id = f"{item['drive_id']}/{item['frame_index']:010d}"
@@ -406,6 +407,10 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
                             "true_positive": True,
                         }
                     )
+    passes[0]["conditions"][0]["predictions"] = [
+        {"class_name": "car", "inside_annotation_fov": False}
+    ]
+    passes[0]["conditions"][0]["outside_annotation_fov_prediction_count"] = 1
     first = aggregate_three_full_passes(passes, repository_root=ROOT)
     second = aggregate_three_full_passes(passes, repository_root=ROOT)
     assert first == second
@@ -414,6 +419,13 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     assert first["car_recovery_by_pass"][0]["B2"]["R_gain"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_Aonly"] is None
     assert first["interpretation_gate_all_three"]["B2"] is True
+    assert (
+        first["passes"][0]["B2"]["classes"]["car"]["outside_annotation_fov_prediction_count"] == 1
+    )
+    assert (
+        first["passes"][0]["B2"]["classes"]["pedestrian"]["outside_annotation_fov_prediction_count"]
+        == 0
+    )
     assert first["car_factorial_by_pass"][0]["Car_TP"] == {"L": 12.0, "P": 12.0, "I": -24.0}
     assert "confidence_interval" not in json.dumps(first)
     assert "p_value" not in json.dumps(first)

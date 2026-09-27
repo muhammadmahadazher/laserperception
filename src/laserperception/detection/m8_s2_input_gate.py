@@ -193,7 +193,11 @@ def verify_consumed_input(
     if actual["XYZT_projection_sha256"] != expected.get("M7_expected_XYZT_sha256"):
         raise M8S2ProtocolViolation("S2 consumed M7 XYZT identity differs")
     return {
-        "frozen_ledger_record_identity": canonical_json_sha256(expected),
+        "frozen_ledger_record_identity": {
+            "full_ledger_sha256": FULL_LEDGER_SHA256,
+            "compact_record_sha256": canonical_json_sha256(expected),
+            "condition_id": condition_id,
+        },
         "input_sha256": actual["full_XYZIT_sha256"],
         "M7_XYZT_sha256": actual["XYZT_projection_sha256"],
         "selected_global_row_sha256": selected_row_sha256,
