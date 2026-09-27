@@ -28,7 +28,9 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     claim_logical_pass,
     condition_ids,
+    seal_interrupted_attempt,
     verify_authorization,
+    verify_candidate_environment,
     verify_clean_tracked_tree,
     verify_frozen_gt_assets,
     verify_qualification_worker,
@@ -139,6 +141,9 @@ def test_repeatability_requires_ten_exact_processes() -> None:
     assert result["accepted_calls"] == 280
     assert result["owner_reviewed"] is False
     assert len(result["source_attempts"]) == 10
+    assert result["aggregation_commit"] == COMMIT
+    with pytest.raises(M8S2ProtocolViolation, match="aggregation checkout differs"):
+        review_repeatability(passes, aggregation_commit="d" * 40)
     passes[1]["conditions"][0]["classes"]["car"]["thresholds"]["0.50"]["true_positives"] = 1
     with pytest.raises(M8S2ProtocolViolation, match="repeatability differs"):
         review_repeatability(passes)
@@ -346,6 +351,97 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     tracked.write_text("value = 2\n", encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="tracked execution tree"):
         verify_clean_tracked_tree(tmp_path)
+
+
+def test_backend_environment_must_match_checked_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from laserperception.detection.m8_s2_runtime import CANDIDATE_MANIFEST_PATH
+
+    manifest = tmp_path / CANDIDATE_MANIFEST_PATH
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        json.dumps(
+            {
+                "environment": {
+                    "upstream_root_variable": "S2_TEST_UPSTREAM",
+                    "checkpoint_variable": "S2_TEST_CHECKPOINT",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    upstream = tmp_path / "upstream"
+    checkpoint = tmp_path / "checkpoint.pth"
+    monkeypatch.setenv("S2_TEST_UPSTREAM", str(upstream))
+    monkeypatch.setenv("S2_TEST_CHECKPOINT", str(checkpoint))
+    verify_candidate_environment(tmp_path, upstream, checkpoint)
+    monkeypatch.setenv("S2_TEST_UPSTREAM", str(tmp_path / "different"))
+    with pytest.raises(M8S2ProtocolViolation, match="backend environment differs"):
+        verify_candidate_environment(tmp_path, upstream, checkpoint)
+
+
+def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: Path) -> None:
+    common = {
+        "campaign_root": tmp_path,
+        "mode": "repeatability",
+        "logical_pass_id": "s2-repeatability-01",
+        "execution_commit": COMMIT,
+        "runtime_policy_sha256": POLICY,
+        "input_gate_receipt_sha256": RECEIPT,
+    }
+    first = tmp_path / "attempt-1"
+    with claim_logical_pass(attempt_root=first, attempt_id="attempt-1", **common):
+        first.mkdir()
+        (first / "attempt_manifest.json").write_text(
+            json.dumps(
+                {
+                    "status": "IN_PROGRESS",
+                    "mode": "repeatability",
+                    "logical_pass_id": "s2-repeatability-01",
+                    "attempt_id": "attempt-1",
+                    "execution_commit": COMMIT,
+                    "runtime_policy_sha256": POLICY,
+                    "input_gate_receipt_sha256": RECEIPT,
+                }
+            ),
+            encoding="utf-8",
+        )
+    lock = tmp_path / ".s2_pass_claims" / "repeatability-s2-repeatability-01.lock"
+    assert lock.exists()
+    receipt = seal_interrupted_attempt(
+        campaign_root=tmp_path,
+        attempt_root=first,
+        mode="repeatability",
+        logical_pass_id="s2-repeatability-01",
+        attempt_id="attempt-1",
+        execution_commit=COMMIT,
+        recovery_note="synthetic interrupted process",
+        process_alive=lambda _: False,
+    )
+    assert receipt["status"] == "SEALED_INCOMPLETE"
+    assert not lock.exists()
+    assert (first / "attempt_manifest_before_recovery.json").is_file()
+    assert (
+        json.loads((first / "attempt_manifest.json").read_text())["accepted_canonical_calls"] == 0
+    )
+    retry = tmp_path / "attempt-2"
+    with claim_logical_pass(attempt_root=retry, attempt_id="attempt-2", **common):
+        retry.mkdir()
+        (retry / "attempt_manifest.json").write_text(
+            json.dumps(
+                {
+                    "status": "INCOMPLETE",
+                    "mode": "repeatability",
+                    "logical_pass_id": "s2-repeatability-01",
+                    "attempt_id": "attempt-2",
+                    "execution_commit": COMMIT,
+                    "runtime_policy_sha256": POLICY,
+                    "input_gate_receipt_sha256": RECEIPT,
+                }
+            ),
+            encoding="utf-8",
+        )
 
 
 def test_frozen_gt_hashes_are_checked_before_scoring(

@@ -6,7 +6,9 @@ loads ground truth. Scientific work is disabled without exact external records.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import re
 import socket
 import subprocess
@@ -179,6 +181,28 @@ def verify_frozen_gt_assets(root: Path, date_root: Path) -> None:
                 raise M8S2ProtocolViolation(f"S2 frozen GT asset differs: {path.name}")
     except OSError as error:
         raise M8S2ProtocolViolation("S2 frozen GT asset is unavailable") from error
+
+
+def verify_candidate_environment(root: Path, upstream: Path, checkpoint: Path) -> None:
+    """Require the backend's environment paths to be the checked CLI assets."""
+
+    candidate = _mapping(root / CANDIDATE_MANIFEST_PATH)
+    environment = candidate.get("environment")
+    if not isinstance(environment, Mapping):
+        raise M8S2ProtocolViolation("S2 candidate environment contract is malformed")
+    root_var = environment.get("upstream_root_variable")
+    checkpoint_var = environment.get("checkpoint_variable")
+    if not isinstance(root_var, str) or not isinstance(checkpoint_var, str):
+        raise M8S2ProtocolViolation("S2 candidate environment variables are malformed")
+    live_root = os.environ.get(root_var)
+    live_checkpoint = os.environ.get(checkpoint_var)
+    if (
+        not live_root
+        or not live_checkpoint
+        or Path(live_root).resolve() != upstream.resolve()
+        or Path(live_checkpoint).resolve() != checkpoint.resolve()
+    ):
+        raise M8S2ProtocolViolation("S2 backend environment differs from verified candidate")
 
 
 def condition_ids(mode: str) -> tuple[str, ...]:
@@ -375,9 +399,17 @@ def claim_logical_pass(
     lock = claims / f"{stem}.lock"
     try:
         with lock.open("x", encoding="utf-8") as handle:
-            handle.write(attempt_id)
+            json.dump(
+                {
+                    "attempt_id": attempt_id,
+                    "process_id": os.getpid(),
+                    "worker_hostname": socket.gethostname(),
+                },
+                handle,
+            )
     except FileExistsError as error:
         raise M8S2ProtocolViolation("S2 logical pass is already running or locked") from error
+    claimed = False
     try:
         claim_path = claims / f"{stem}.json"
         if claim_path.exists():
@@ -455,9 +487,136 @@ def claim_logical_pass(
                 "attempts": history,
             },
         )
+        claimed = True
         yield
     finally:
-        lock.unlink()
+        state = None
+        manifest_path = attempt_root / "attempt_manifest.json"
+        if manifest_path.exists():
+            try:
+                state = _mapping(manifest_path).get("status")
+            except M8S2ProtocolViolation:
+                pass
+        if not claimed or state == "COMPLETE" or state == "INCOMPLETE":
+            lock.unlink()
+
+
+def _posix_process_alive(process_id: int) -> bool:
+    if os.name == "nt":
+        raise M8S2ProtocolViolation("S2 interrupted recovery requires a POSIX worker")
+    try:
+        os.kill(process_id, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def seal_interrupted_attempt(
+    *,
+    campaign_root: Path,
+    attempt_root: Path,
+    mode: str,
+    logical_pass_id: str,
+    attempt_id: str,
+    execution_commit: str,
+    recovery_note: str,
+    process_alive: Callable[[int], bool] = _posix_process_alive,
+    hostname_provider: Callable[[], str] = socket.gethostname,
+) -> dict[str, object]:
+    """Preserve an interrupted attempt before allowing a fresh authorized retry."""
+
+    campaign_root = campaign_root.resolve()
+    attempt_root = attempt_root.resolve()
+    if (
+        not recovery_note.strip()
+        or logical_pass_id not in logical_pass_ids(mode)
+        or attempt_root.parent != campaign_root
+    ):
+        raise M8S2ProtocolViolation("S2 interrupted recovery identity is malformed")
+    stem = f"{mode}-{logical_pass_id}"
+    claims = campaign_root / ".s2_pass_claims"
+    claim = _mapping(claims / f"{stem}.json")
+    lock_path = claims / f"{stem}.lock"
+    lock_bytes = lock_path.read_bytes()
+    try:
+        lock = json.loads(lock_bytes)
+    except json.JSONDecodeError as error:
+        raise M8S2ProtocolViolation("S2 interrupted lock is malformed") from error
+    history = claim.get("attempts")
+    if (
+        not isinstance(lock, dict)
+        or not isinstance(history, list)
+        or not history
+        or history[-1] != {"attempt_id": attempt_id, "root": str(attempt_root)}
+        or claim.get("mode") != mode
+        or claim.get("logical_pass_id") != logical_pass_id
+        or claim.get("execution_commit") != execution_commit
+        or lock.get("attempt_id") != attempt_id
+        or lock.get("worker_hostname") != hostname_provider()
+        or isinstance(lock.get("process_id"), bool)
+        or not isinstance(lock.get("process_id"), int)
+        or lock["process_id"] <= 0
+    ):
+        raise M8S2ProtocolViolation("S2 interrupted claim or worker identity differs")
+    if process_alive(lock["process_id"]):
+        raise M8S2ProtocolViolation("S2 interrupted process is still alive")
+    if (attempt_root / "final_pass_manifest.json").exists():
+        raise M8S2ProtocolViolation("S2 completed attempt cannot be sealed incomplete")
+    recovery_path = attempt_root / "interrupted_recovery.json"
+    if recovery_path.exists():
+        raise M8S2ProtocolViolation("S2 interrupted recovery already exists")
+    attempt_root.mkdir(exist_ok=True)
+    manifest_path = attempt_root / "attempt_manifest.json"
+    previous_sha: str | None = None
+    if manifest_path.exists():
+        previous_bytes = manifest_path.read_bytes()
+        previous_sha = hashlib.sha256(previous_bytes).hexdigest()
+        manifest = _mapping(manifest_path)
+        if (
+            manifest.get("status") != "IN_PROGRESS"
+            or manifest.get("mode") != mode
+            or manifest.get("logical_pass_id") != logical_pass_id
+            or manifest.get("attempt_id") != attempt_id
+            or manifest.get("execution_commit") != execution_commit
+        ):
+            raise M8S2ProtocolViolation("S2 interrupted attempt manifest differs")
+        with (attempt_root / "attempt_manifest_before_recovery.json").open("xb") as backup:
+            backup.write(previous_bytes)
+    else:
+        manifest = {
+            "schema_version": ATTEMPT_SCHEMA,
+            "mode": mode,
+            "logical_pass_id": logical_pass_id,
+            "attempt_id": attempt_id,
+            "execution_commit": execution_commit,
+            "runtime_policy_sha256": claim.get("runtime_policy_sha256"),
+            "input_gate_receipt_sha256": claim.get("input_gate_receipt_sha256"),
+            "attempted_calls": 0,
+            "completed_calls": 0,
+        }
+    manifest["status"] = "INCOMPLETE"
+    manifest["accepted_canonical_calls"] = 0
+    manifest["failure_reason"] = f"INTERRUPTED: {recovery_note}"
+    manifest["ended_at_utc"] = datetime.now(timezone.utc).isoformat()
+    receipt: dict[str, object] = {
+        "schema_version": "laserperception.m8.s2.interrupted-recovery.v1",
+        "status": "SEALED_INCOMPLETE",
+        "mode": mode,
+        "logical_pass_id": logical_pass_id,
+        "attempt_id": attempt_id,
+        "execution_commit": execution_commit,
+        "worker_hostname": lock["worker_hostname"],
+        "stopped_process_id": lock["process_id"],
+        "lock_sha256": hashlib.sha256(lock_bytes).hexdigest(),
+        "previous_manifest_sha256": previous_sha,
+        "recovery_note": recovery_note,
+    }
+    atomic_write_json(recovery_path, receipt)
+    atomic_write_json(manifest_path, manifest)
+    lock_path.unlink()
+    return receipt
 
 
 def verify_qualification_worker(
@@ -656,6 +815,7 @@ def verify_repeatability_review(
         "calls_per_process": 28,
         "accepted_calls": 280,
         "execution_commit": execution_commit,
+        "aggregation_commit": execution_commit,
         "runtime_policy_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "owner_reviewed": True,

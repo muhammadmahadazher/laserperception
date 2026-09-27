@@ -218,10 +218,16 @@ def _repeatability_signature(
     return tuple(signature)
 
 
-def review_repeatability(passes: Sequence[Mapping[str, object]]) -> dict[str, object]:
+def review_repeatability(
+    passes: Sequence[Mapping[str, object]], *, aggregation_commit: str | None = None
+) -> dict[str, object]:
     """Require exact frozen discrete agreement across ten fresh processes."""
 
     validate_attempts(passes, mode="repeatability")
+    if aggregation_commit is None:
+        aggregation_commit = str(passes[0]["execution_commit"])
+    if aggregation_commit != passes[0]["execution_commit"]:
+        raise M8S2ProtocolViolation("S2 aggregation checkout differs from science commit")
     first = cast(list[Mapping[str, object]], passes[0]["conditions"])
     comparisons = 0
     for later in passes[1:]:
@@ -253,6 +259,7 @@ def review_repeatability(passes: Sequence[Mapping[str, object]]) -> dict[str, ob
             for row in passes
         ],
         "execution_commit": passes[0]["execution_commit"],
+        "aggregation_commit": aggregation_commit,
         "runtime_policy_sha256": passes[0]["runtime_policy_sha256"],
         "input_gate_receipt_sha256": passes[0]["input_gate_receipt_sha256"],
         "owner_reviewed": False,
@@ -455,11 +462,18 @@ def factorial_contrasts(b2: float, c2: float, d2: float, a_ref: float) -> dict[s
 
 
 def aggregate_three_full_passes(
-    passes: Sequence[Mapping[str, object]], *, repository_root: Path
+    passes: Sequence[Mapping[str, object]],
+    *,
+    repository_root: Path,
+    aggregation_commit: str | None = None,
 ) -> dict[str, object]:
     """Report pass 1/2/3 first, then descriptive spread and frozen gates."""
 
     validate_attempts(passes, mode="full-pass")
+    if aggregation_commit is None:
+        aggregation_commit = str(passes[0]["execution_commit"])
+    if aggregation_commit != passes[0]["execution_commit"]:
+        raise M8S2ProtocolViolation("S2 aggregation checkout differs from science commit")
     per_pass = [aggregate_one_full_pass(row) for row in passes]
     partitions = _partitions(repository_root)
     recovery: list[dict[str, object]] = []
@@ -582,6 +596,7 @@ def aggregate_three_full_passes(
     output: dict[str, object] = {
         "schema_version": "laserperception.m8.s2.aggregate.v1",
         "status": "COMPLETE_INPUT_EVIDENCE_AGGREGATION",
+        "aggregation_commit": aggregation_commit,
         "execution_binding": {
             key: passes[0][key]
             for key in (

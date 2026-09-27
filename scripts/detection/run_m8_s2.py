@@ -26,6 +26,7 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     claim_logical_pass,
     require_authorization,
+    verify_candidate_environment,
     verify_clean_tracked_tree,
     verify_frozen_gt_assets,
     verify_qualification_receipt,
@@ -50,6 +51,7 @@ def _parser() -> argparse.ArgumentParser:
             "repeatability",
             "full-pass",
             "aggregate",
+            "seal-interrupted",
         ),
     )
     parser.add_argument("--external-worker", action="store_true")
@@ -71,6 +73,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--attempt-id")
     parser.add_argument("--pass-input", action="append", type=Path, default=[])
     parser.add_argument("--aggregate-mode", choices=("repeatability", "full-pass"))
+    parser.add_argument("--seal-mode", choices=("repeatability", "full-pass"))
+    parser.add_argument("--recovery-note")
     parser.add_argument("--output", type=Path)
     return parser
 
@@ -91,6 +95,7 @@ def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
     # S1's accepted static candidate verifier performs only Git/file checks.
     verify_s1_candidate(root, upstream_root=upstream, checkpoint_path=checkpoint)
     verify_clean_tracked_tree(upstream)
+    verify_candidate_environment(root, upstream, checkpoint)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -101,11 +106,14 @@ def main(argv: list[str] | None = None) -> int:
         "qualification",
         "repeatability",
         "full-pass",
+        "seal-interrupted",
     }:
         require_external_worker(args.external_worker)
     root = args.repository_root.resolve()
 
     if args.mode == "aggregate":
+        commit = _text(args.execution_commit, "--execution-commit")
+        verify_static_bindings(root, commit)
         from laserperception.evaluation.m8_s2_aggregation import (
             aggregate_three_full_passes,
             load_completed_attempt,
@@ -120,15 +128,32 @@ def main(argv: list[str] | None = None) -> int:
             load_completed_attempt(path.resolve(), mode=selected) for path in args.pass_input
         ]
         result = (
-            review_repeatability(records)
+            review_repeatability(records, aggregation_commit=commit)
             if selected == "repeatability"
-            else aggregate_three_full_passes(records, repository_root=root)
+            else aggregate_three_full_passes(
+                records, repository_root=root, aggregation_commit=commit
+            )
         )
         atomic_write_json(_path(args.output, "--output"), result)
         return 0
 
     commit = _text(args.execution_commit, "--execution-commit")
     verify_static_bindings(root, commit)
+    if args.mode == "seal-interrupted":
+        from laserperception.detection.m8_s2_runtime import seal_interrupted_attempt
+
+        receipt = seal_interrupted_attempt(
+            campaign_root=_path(args.campaign_root, "--campaign-root"),
+            attempt_root=_path(args.attempt_root, "--attempt-root"),
+            mode=_text(args.seal_mode, "--seal-mode"),
+            logical_pass_id=_text(args.logical_pass_id, "--logical-pass-id"),
+            attempt_id=_text(args.attempt_id, "--attempt-id"),
+            execution_commit=commit,
+            recovery_note=_text(args.recovery_note, "--recovery-note"),
+        )
+        if args.output is not None:
+            atomic_write_json(args.output.resolve(), receipt)
+        return 0
     if args.mode == "qualification-plan":
         atomic_write_json(_path(args.output, "--output"), qualification_plan(root))
         return 0
