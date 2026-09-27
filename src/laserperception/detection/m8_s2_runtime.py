@@ -36,6 +36,8 @@ INPUT_FREEZE_PATH = Path("benchmarks/m8/preregistration/m8_s2_input_freeze.json"
 INPUT_FREEZE_SHA256 = "c08589bb9600633d5a8b675a16f8be805697a5302296ff52608e5845a3e371db"
 COMPACT_MANIFEST_PATH = Path("benchmarks/m8/inputs/m8_s2_input_manifest.json")
 COMPACT_MANIFEST_SHA256 = "239b563d5f850f2f20809950eca9d56f1a700677766afce8489099e940554ecc"
+S1_PROTOCOL_PATH = Path("benchmarks/m8/preregistration/m8_s1_protocol.json")
+S1_PROTOCOL_SHA256 = "c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88"
 FULL_LEDGER_SHA256 = "a3ed54b276f77fb784035045b079573cd4e4ddfedc9d0f8eb774c1340a59396b"
 FULL_LEDGER_BYTES = 7_728_782
 INPUT_IMPLEMENTATION_COMMIT = "bf098b319744f1ec1df08207c1cd93853b1f31ae"
@@ -145,6 +147,38 @@ def verify_clean_tracked_tree(root: Path) -> None:
     result = subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False)
     if result.returncode != 0:
         raise M8S2ProtocolViolation("S2 tracked execution tree differs from HEAD")
+
+
+def verify_frozen_gt_assets(root: Path, date_root: Path) -> None:
+    """Hash the frozen KITTI tracklets and camera calibration before scoring."""
+
+    protocol_path = root / S1_PROTOCOL_PATH
+    try:
+        if sha256_file(protocol_path) != S1_PROTOCOL_SHA256:
+            raise M8S2ProtocolViolation("S2 frozen S1 GT provenance differs")
+        protocol = _mapping(protocol_path)
+        audit = protocol.get("sentinel_gt_only_audit")
+        if not isinstance(audit, Mapping):
+            raise M8S2ProtocolViolation("S2 frozen GT audit is absent")
+        calibration = audit.get("calibration_sha256")
+        tracklets = audit.get("tracklet_sha256")
+        if (
+            not isinstance(calibration, Mapping)
+            or set(calibration) != {"calib_cam_to_cam.txt", "calib_velo_to_cam.txt"}
+            or not isinstance(tracklets, Mapping)
+            or set(tracklets) != {"2011_09_26_drive_0001", "2011_09_26_drive_0091"}
+        ):
+            raise M8S2ProtocolViolation("S2 frozen GT asset manifest differs")
+        assets = {date_root / str(name): expected for name, expected in calibration.items()} | {
+            date_root / f"{drive}_sync/tracklet_labels.xml": expected
+            for drive, expected in tracklets.items()
+        }
+        for path, expected in assets.items():
+            _sha(expected, "frozen GT asset")
+            if sha256_file(path) != expected:
+                raise M8S2ProtocolViolation(f"S2 frozen GT asset differs: {path.name}")
+    except OSError as error:
+        raise M8S2ProtocolViolation("S2 frozen GT asset is unavailable") from error
 
 
 def condition_ids(mode: str) -> tuple[str, ...]:

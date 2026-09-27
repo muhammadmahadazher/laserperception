@@ -26,6 +26,8 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     claim_logical_pass,
     require_authorization,
+    verify_clean_tracked_tree,
+    verify_frozen_gt_assets,
     verify_qualification_receipt,
     verify_qualification_worker,
     verify_repeatability_review,
@@ -88,6 +90,7 @@ def _text(value: str | None, name: str) -> str:
 def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
     # S1's accepted static candidate verifier performs only Git/file checks.
     verify_s1_candidate(root, upstream_root=upstream, checkpoint_path=checkpoint)
+    verify_clean_tracked_tree(upstream)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -253,6 +256,7 @@ def main(argv: list[str] | None = None) -> int:
         _path(args.upstream_root, "--upstream-root"),
         _path(args.checkpoint, "--checkpoint"),
     )
+    verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
     # First accelerator import occurs after exact owner scope and bindings.
     policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
     live_policy = policy_module.capture_runtime_policy(commit, candidate)

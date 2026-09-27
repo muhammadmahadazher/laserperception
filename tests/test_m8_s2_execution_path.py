@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import runpy
 import subprocess
@@ -29,6 +30,7 @@ from laserperception.detection.m8_s2_runtime import (
     condition_ids,
     verify_authorization,
     verify_clean_tracked_tree,
+    verify_frozen_gt_assets,
     verify_qualification_worker,
 )
 from laserperception.evaluation.m8_s2_aggregation import (
@@ -344,6 +346,51 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     tracked.write_text("value = 2\n", encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="tracked execution tree"):
         verify_clean_tracked_tree(tmp_path)
+
+
+def test_frozen_gt_hashes_are_checked_before_scoring(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from laserperception.detection import m8_s2_runtime
+
+    root = tmp_path / "source"
+    date_root = tmp_path / "date"
+    root.mkdir()
+    date_root.mkdir()
+    calibration = {}
+    for name in ("calib_cam_to_cam.txt", "calib_velo_to_cam.txt"):
+        content = f"synthetic {name}\n".encode()
+        (date_root / name).write_bytes(content)
+        calibration[name] = hashlib.sha256(content).hexdigest()
+    tracklets = {}
+    for drive in ("2011_09_26_drive_0001", "2011_09_26_drive_0091"):
+        content = f"synthetic {drive}\n".encode()
+        path = date_root / f"{drive}_sync" / "tracklet_labels.xml"
+        path.parent.mkdir()
+        path.write_bytes(content)
+        tracklets[drive] = hashlib.sha256(content).hexdigest()
+    protocol_path = root / "frozen_protocol.json"
+    protocol_path.write_text(
+        json.dumps(
+            {
+                "sentinel_gt_only_audit": {
+                    "calibration_sha256": calibration,
+                    "tracklet_sha256": tracklets,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(m8_s2_runtime, "S1_PROTOCOL_PATH", Path("frozen_protocol.json"))
+    monkeypatch.setattr(
+        m8_s2_runtime, "S1_PROTOCOL_SHA256", hashlib.sha256(protocol_path.read_bytes()).hexdigest()
+    )
+    verify_frozen_gt_assets(root, date_root)
+    (date_root / "2011_09_26_drive_0001_sync" / "tracklet_labels.xml").write_text(
+        "changed geometry", encoding="utf-8"
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="frozen GT asset differs"):
+        verify_frozen_gt_assets(root, date_root)
 
 
 def test_static_plan_and_cost_are_input_only() -> None:
