@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import runpy
+import subprocess
 import sys
 import uuid
 from copy import deepcopy
@@ -25,6 +26,7 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     condition_ids,
     verify_authorization,
+    verify_qualification_worker,
 )
 from laserperception.evaluation.m8_s2_aggregation import (
     aggregate_three_full_passes,
@@ -48,6 +50,7 @@ def _pass(mode: str, index: int) -> dict[str, object]:
         "logical_pass_id": logical,
         "process_uuid": str(uuid.UUID(int=index)),
         "attempt_id": f"attempt-{index}",
+        "result_sha256": f"{index:064x}",
         "execution_commit": COMMIT,
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
@@ -130,6 +133,7 @@ def test_repeatability_requires_ten_exact_processes() -> None:
     assert result["status"] == "ACCEPTED"
     assert result["accepted_calls"] == 280
     assert result["owner_reviewed"] is False
+    assert len(result["source_attempts"]) == 10
     passes[1]["conditions"][0]["classes"]["car"]["thresholds"]["0.50"]["true_positives"] = 1
     with pytest.raises(M8S2ProtocolViolation, match="repeatability differs"):
         review_repeatability(passes)
@@ -153,6 +157,8 @@ def test_authorization_scopes_fail_closed() -> None:
         "authorization_id": "synthetic-test-only",
         "authorization_timestamp_utc": "2026-01-01T00:00:00Z",
         "authorization_provenance": "synthetic-test-only",
+        "authorized_gpu_uuid": "GPU-synthetic-test-only",
+        "authorized_worker_hostname": "synthetic-host",
         "execution_commit": COMMIT,
         "protocol_sha256": PROTOCOL_SHA256,
         "partitions_sha256": PARTITIONS_SHA256,
@@ -179,6 +185,34 @@ def test_authorization_scopes_fail_closed() -> None:
     with pytest.raises(M8S2ProtocolViolation, match="binding differs"):
         verify_authorization(
             payload, scope="qualification-only", execution_commit=COMMIT, logical_pass_id=None
+        )
+
+
+def test_qualification_grant_matches_live_external_identity_only_with_mock() -> None:
+    grant = {
+        "authorized_gpu_uuid": "GPU-synthetic-123",
+        "authorized_worker_hostname": "synthetic-host",
+    }
+
+    def matching_runner(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess([], 0, "GPU-synthetic-123\n", "")
+
+    def different_runner(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess([], 0, "GPU-other\n", "")
+
+    assert (
+        verify_qualification_worker(
+            grant, command_runner=matching_runner, hostname_provider=lambda: "synthetic-host"
+        )
+        == "GPU-synthetic-123"
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="GPU UUID differs"):
+        verify_qualification_worker(
+            grant, command_runner=different_runner, hostname_provider=lambda: "synthetic-host"
+        )
+    with pytest.raises(M8S2ProtocolViolation, match="hostname differs"):
+        verify_qualification_worker(
+            grant, command_runner=matching_runner, hostname_provider=lambda: "different-host"
         )
 
 
@@ -415,6 +449,12 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     second = aggregate_three_full_passes(passes, repository_root=ROOT)
     assert first == second
     assert first["accepted_calls"] == 5136
+    assert first["execution_binding"]["runtime_policy_sha256"] == POLICY
+    assert [item["attempt_id"] for item in first["source_attempts"]] == [
+        "attempt-1",
+        "attempt-2",
+        "attempt-3",
+    ]
     assert first["car_recovery_by_pass"][0]["B2"]["G_car"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_gain"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_Aonly"] is None

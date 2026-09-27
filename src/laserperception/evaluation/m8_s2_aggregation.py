@@ -7,6 +7,7 @@ three-pass formulas and paired Car sets are fixed by the frozen S2 protocol.
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -100,6 +101,9 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
         raise M8S2ProtocolViolation("S2 process frozen input or protocol identity differs")
     expected = condition_ids(mode)
     for row in passes:
+        result_sha = row.get("result_sha256")
+        if not isinstance(result_sha, str) or re.fullmatch(r"[0-9a-f]{64}", result_sha) is None:
+            raise M8S2ProtocolViolation("S2 atomic attempt result identity is absent")
         conditions = row.get("conditions")
         if (
             row.get("mode") != mode
@@ -239,6 +243,15 @@ def review_repeatability(passes: Sequence[Mapping[str, object]]) -> dict[str, ob
         "accepted_calls": 280,
         "discrete_comparisons": comparisons,
         "process_uuids": [row["process_uuid"] for row in passes],
+        "source_attempts": [
+            {
+                "logical_pass_id": row["logical_pass_id"],
+                "attempt_id": row["attempt_id"],
+                "process_uuid": row["process_uuid"],
+                "result_sha256": row["result_sha256"],
+            }
+            for row in passes
+        ],
         "execution_commit": passes[0]["execution_commit"],
         "runtime_policy_sha256": passes[0]["runtime_policy_sha256"],
         "input_gate_receipt_sha256": passes[0]["input_gate_receipt_sha256"],
@@ -569,6 +582,25 @@ def aggregate_three_full_passes(
     output: dict[str, object] = {
         "schema_version": "laserperception.m8.s2.aggregate.v1",
         "status": "COMPLETE_INPUT_EVIDENCE_AGGREGATION",
+        "execution_binding": {
+            key: passes[0][key]
+            for key in (
+                "execution_commit",
+                "runtime_policy_sha256",
+                "input_gate_receipt_sha256",
+                "full_ledger_sha256",
+                "protocol_sha256",
+            )
+        },
+        "source_attempts": [
+            {
+                "logical_pass_id": row["logical_pass_id"],
+                "attempt_id": row["attempt_id"],
+                "process_uuid": row["process_uuid"],
+                "result_sha256": row["result_sha256"],
+            }
+            for row in passes
+        ],
         "passes": per_pass,
         "spread": spread,
         "car_recovery_by_pass": recovery,

@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import json
 import re
+import socket
 import subprocess
 import uuid
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -183,6 +184,8 @@ def verify_authorization(
         "authorization_id",
         "authorization_timestamp_utc",
         "authorization_provenance",
+        "authorized_gpu_uuid",
+        "authorized_worker_hostname",
         "execution_commit",
         "protocol_sha256",
         "partitions_sha256",
@@ -219,6 +222,12 @@ def verify_authorization(
     if any(payload.get(key) != value for key, value in fixed.items()):
         raise M8S2ProtocolViolation("S2 authorization binding differs")
     if scope == "qualification-only":
+        worker_uuid = payload.get("authorized_gpu_uuid")
+        if not isinstance(worker_uuid, str) or not worker_uuid.startswith("GPU-"):
+            raise M8S2ProtocolViolation("qualification authorization lacks a GPU UUID")
+        hostname = payload.get("authorized_worker_hostname")
+        if not isinstance(hostname, str) or not hostname.strip():
+            raise M8S2ProtocolViolation("qualification authorization lacks a worker hostname")
         if any(
             value is not None
             for value in (
@@ -230,6 +239,11 @@ def verify_authorization(
         ):
             raise M8S2ProtocolViolation("qualification authorization cannot imply later scope")
     else:
+        if (
+            payload.get("authorized_gpu_uuid") is not None
+            or payload.get("authorized_worker_hostname") is not None
+        ):
+            raise M8S2ProtocolViolation("scientific authorization must bind the policy SHA")
         mode = "repeatability" if scope == "repeatability-only" else "full-pass"
         raw_ids = payload.get("logical_pass_ids")
         if not isinstance(raw_ids, list) or any(not isinstance(item, str) for item in raw_ids):
@@ -267,6 +281,36 @@ def require_authorization(path: Path | None, **expected: object) -> dict[str, ob
     payload = _mapping(path)
     verify_authorization(payload, **expected)  # type: ignore[arg-type]
     return payload
+
+
+def verify_qualification_worker(
+    authorization: Mapping[str, object],
+    *,
+    command_runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+    hostname_provider: Callable[[], str] = socket.gethostname,
+) -> str:
+    """Compare a qualification grant to live external host and GPU before Torch import."""
+
+    expected = authorization.get("authorized_gpu_uuid")
+    if not isinstance(expected, str) or not expected.startswith("GPU-"):
+        raise M8S2ProtocolViolation("qualification authorization lacks a GPU UUID")
+    hostname = authorization.get("authorized_worker_hostname")
+    if not isinstance(hostname, str) or not hostname.strip() or hostname_provider() != hostname:
+        raise M8S2ProtocolViolation("qualification authorization hostname differs from live worker")
+    try:
+        result = command_runner(
+            ["nvidia-smi", "--id=0", "--query-gpu=uuid", "--format=csv,noheader,nounits"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise M8S2ProtocolViolation("external qualification GPU identity query failed") from error
+    values = result.stdout.strip().splitlines()
+    if result.returncode != 0 or len(values) != 1 or values[0].strip() != expected:
+        raise M8S2ProtocolViolation("qualification authorization GPU UUID differs from live worker")
+    return expected
 
 
 def verify_runtime_policy(

@@ -26,6 +26,7 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     require_authorization,
     verify_qualification_receipt,
+    verify_qualification_worker,
     verify_repeatability_review,
     verify_runtime_policy,
     verify_runtime_policy_document,
@@ -133,12 +134,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.mode == "runtime-binding":
-        require_authorization(
+        authorization = require_authorization(
             args.authorization,
             scope="qualification-only",
             execution_commit=commit,
             logical_pass_id=None,
         )
+        verify_qualification_worker(authorization)
         verify_input_gate_receipt(
             _path(args.input_gate_receipt, "--input-gate-receipt"),
             root=root,
@@ -157,12 +159,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.mode == "qualification":
-        require_authorization(
+        authorization = require_authorization(
             args.authorization,
             scope="qualification-only",
             execution_commit=commit,
             logical_pass_id=None,
         )
+        verify_qualification_worker(authorization)
         input_sha = verify_input_gate_receipt(
             _path(args.input_gate_receipt, "--input-gate-receipt"),
             root=root,
