@@ -17,6 +17,7 @@ from laserperception.detection.m8_s2_runtime import (
     PROTOCOL_SHA256,
     RUNTIME_POLICY_SCHEMA,
     M8S2ProtocolViolation,
+    single_visible_gpu_uuid,
 )
 
 
@@ -26,8 +27,11 @@ def capture_runtime_policy(
 ) -> dict[str, object]:
     """Capture a fresh, exact runtime only after the external-worker barrier."""
 
+    visible_uuid = single_visible_gpu_uuid()
     base = capture_s1_policy(execution_commit, candidate_manifest)
     torch: Any = importlib.import_module("torch")
+    if torch.cuda.device_count() != 1 or base.get("gpu_uuid") != visible_uuid:
+        raise M8S2ProtocolViolation("S2 CUDA and NVIDIA-SMI GPU identities are ambiguous")
     vram = int(torch.cuda.get_device_properties(0).total_memory)
     if vram <= 0 or not base.get("gpu_uuid"):
         raise M8S2ProtocolViolation("S2 live GPU identity or VRAM is unavailable")

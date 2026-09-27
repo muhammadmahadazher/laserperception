@@ -297,9 +297,25 @@ def verify_qualification_worker(
     hostname = authorization.get("authorized_worker_hostname")
     if not isinstance(hostname, str) or not hostname.strip() or hostname_provider() != hostname:
         raise M8S2ProtocolViolation("qualification authorization hostname differs from live worker")
+    live_uuid = single_visible_gpu_uuid(command_runner=command_runner)
+    if live_uuid != expected:
+        raise M8S2ProtocolViolation("qualification authorization GPU UUID differs from live worker")
+    return expected
+
+
+def single_visible_gpu_uuid(
+    *, command_runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run
+) -> str:
+    """Fail closed unless the external worker exposes exactly one NVIDIA GPU.
+
+    S2 uses Torch ``cuda:0`` while the inherited policy uses NVIDIA-SMI index 0.
+    A single visible GPU makes those identities unambiguous even when device
+    ordering or CUDA visibility variables are configured.
+    """
+
     try:
         result = command_runner(
-            ["nvidia-smi", "--id=0", "--query-gpu=uuid", "--format=csv,noheader,nounits"],
+            ["nvidia-smi", "--query-gpu=uuid", "--format=csv,noheader,nounits"],
             check=False,
             capture_output=True,
             text=True,
@@ -307,10 +323,10 @@ def verify_qualification_worker(
         )
     except (OSError, subprocess.TimeoutExpired) as error:
         raise M8S2ProtocolViolation("external qualification GPU identity query failed") from error
-    values = result.stdout.strip().splitlines()
-    if result.returncode != 0 or len(values) != 1 or values[0].strip() != expected:
-        raise M8S2ProtocolViolation("qualification authorization GPU UUID differs from live worker")
-    return expected
+    values = [line.strip() for line in result.stdout.splitlines()]
+    if result.returncode != 0 or len(values) != 1 or not values[0].startswith("GPU-"):
+        raise M8S2ProtocolViolation("S2 requires exactly one NVIDIA-SMI-visible GPU")
+    return values[0]
 
 
 def verify_runtime_policy(

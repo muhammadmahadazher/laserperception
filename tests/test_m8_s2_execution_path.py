@@ -9,6 +9,7 @@ import sys
 import uuid
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -200,6 +201,9 @@ def test_qualification_grant_matches_live_external_identity_only_with_mock() -> 
     def different_runner(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess([], 0, "GPU-other\n", "")
 
+    def multiple_runner(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess([], 0, "GPU-synthetic-123\nGPU-other\n", "")
+
     assert (
         verify_qualification_worker(
             grant, command_runner=matching_runner, hostname_provider=lambda: "synthetic-host"
@@ -214,6 +218,33 @@ def test_qualification_grant_matches_live_external_identity_only_with_mock() -> 
         verify_qualification_worker(
             grant, command_runner=matching_runner, hostname_provider=lambda: "different-host"
         )
+    with pytest.raises(M8S2ProtocolViolation, match="exactly one"):
+        verify_qualification_worker(
+            grant, command_runner=multiple_runner, hostname_provider=lambda: "synthetic-host"
+        )
+
+
+def test_policy_rejects_a_different_cuda_visible_gpu_without_importing_torch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from laserperception.detection import m8_s2_runtime_policy as policy_module
+
+    monkeypatch.setattr(policy_module, "single_visible_gpu_uuid", lambda: "GPU-synthetic-123")
+    monkeypatch.setattr(
+        policy_module,
+        "capture_s1_policy",
+        lambda *_: {"gpu_uuid": "GPU-synthetic-123"},
+    )
+    fake_torch = SimpleNamespace(cuda=SimpleNamespace(device_count=lambda: 2))
+    monkeypatch.setattr(
+        policy_module, "importlib", SimpleNamespace(import_module=lambda _: fake_torch)
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="ambiguous"):
+        policy_module.capture_runtime_policy(COMMIT, {})
+    fake_torch.cuda.device_count = lambda: 1
+    monkeypatch.setattr(policy_module, "capture_s1_policy", lambda *_: {"gpu_uuid": "GPU-other"})
+    with pytest.raises(M8S2ProtocolViolation, match="ambiguous"):
+        policy_module.capture_runtime_policy(COMMIT, {})
 
 
 def test_static_plan_and_cost_are_input_only() -> None:
