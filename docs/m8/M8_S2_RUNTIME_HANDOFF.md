@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `015f839748dee21264b6dd92f2cfb647ba04d5c6`
+corrections complete at `01c04a56ad9207ce13b65fb1534e692dd488d02b`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -39,8 +39,11 @@ private Drive and verify their recorded hashes; do not make the worker the sole 
 
 The [S2 runner](../../scripts/detection/run_m8_s2.py) exposes `input-gate`, `runtime-binding`,
 `qualification-plan`, `qualification`, `repeatability`, `full-pass`, and `aggregate` modes.
-`qualification-plan` is static and CPU-only. External modes require `--external-worker` and the
-exact applicable owner authorization. No authorization file is created by this handoff.
+`qualification-plan` is static and CPU-only. Worker modes require `--external-worker`;
+runtime-binding, qualification, and scientific modes additionally require the exact applicable
+owner authorization. No authorization file is created by this handoff.
+The `seal-interrupted` mode is a CPU-only, external-worker recovery operation; it never imports
+the detector or loads GT.
 
 1. Obtain a fresh **qualification-only** owner authorization for the selected worker hostname,
    GPU UUID, and reviewed merged commit. The external worker must compare the grant to its live
@@ -54,6 +57,8 @@ exact applicable owner authorization. No authorization file is created by this h
    checkpoint, plus the S2 protocol/input hashes. A historical S1 or zero-intensity policy cannot
    authorize S2.
    Check that the pinned DSVT upstream checkout has no tracked edits outside the hashed config.
+   The backend's environment-selected upstream and checkpoint paths must resolve to those same
+   verified CLI paths.
 3. Under the same qualification scope, run the GT-blind seven-sentinel structural preflight on
    that bound runtime. Check 28/28 frozen full XYZIT inputs, then compute candidate coordinates
    with the bound DSVT CUDA arithmetic. Require B2/A2 and D2/C2 exact same-runtime coordinate
@@ -73,6 +78,11 @@ exact applicable owner authorization. No authorization file is created by this h
    persist/hash-verify every complete or failed attempt off-worker. The offline
    review requires exact discrete agreement for the frozen per-class/threshold gates. Its
    `ACCEPTED` result alone does not authorize the corpus.
+   If a process stops before sealing its attempt, keep the lock and partial files. On the same
+   worker, after verifying its process is dead, `seal-interrupted` preserves the original manifest,
+   writes a recovery receipt and zero-accepted-call incomplete manifest, then releases the lock.
+   A live or different worker cannot use that recovery path. Persist the recovery evidence before
+   seeking any fresh retry authorization.
 5. After owner review of repeatability and a separate **full-pass-only** authorization, execute
    three fresh complete processes. Each consumes 428 frames in frame-major B2/C2/D2/F2 order:
    1,712 conditions per pass and 5,136 accepted calls in three passes. Each input is reconstructed
@@ -88,6 +98,7 @@ exact applicable owner authorization. No authorization file is created by this h
    shared/E2-only/A2-only/neither=19/24/0/23. Report unclamped G, paired R metrics, frozen
    Car TP/recall factorials (excluding F2), and the all-three descriptive gate. The hashed
    aggregate retains the common runtime/input bindings and ordered attempt/result identities.
+   Aggregation requires the clean reviewed execution commit, which is recorded in its hashed output.
    No p-values,
    confidence intervals, AP factorials, or causal prose are generated.
 

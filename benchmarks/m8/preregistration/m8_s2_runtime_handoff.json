@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "015f839748dee21264b6dd92f2cfb647ba04d5c6",
+  "s2_execution_implementation_commit": "01c04a56ad9207ce13b65fb1534e692dd488d02b",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -38,15 +38,17 @@
     "owner qualification-only authorization bound to the selected worker hostname and sole visible GPU UUID",
     "stream and verify full input ledger; create non-authorizing input receipt",
     "capture fresh live runtime policy binding",
+    "verify backend environment paths equal the checked upstream and checkpoint paths",
     "reject tracked edits in the pinned DSVT upstream checkout",
     "GT-blind same-runtime CUDA structural preflight and qualification receipt",
     "owner review and separate repeatability-only authorization",
     "verify frozen KITTI tracklet and evaluation calibration hashes before GT scoring",
     "bind a durable campaign root and preserve its single-use logical-pass claim ledger",
+    "seal interrupted stale-lock attempts on the stopped original worker with preserved recovery evidence",
     "10 fresh 28-call repeatability processes and exact offline review",
     "owner review and separate full-pass-only authorization",
     "3 fresh 1712-call full-corpus processes with per-process persistence",
-    "CPU-only deterministic three-pass aggregation"
+    "CPU-only deterministic three-pass aggregation from the clean reviewed execution commit"
   ],
   "same_runtime_cuda_gate": {
     "sentinel_frames": 7,
