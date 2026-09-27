@@ -24,6 +24,7 @@ from laserperception.detection.m8_s2_input_gate import (
 from laserperception.detection.m8_s2_planning import qualification_plan
 from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
+    claim_logical_pass,
     require_authorization,
     verify_qualification_receipt,
     verify_qualification_worker,
@@ -63,6 +64,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--upstream-root", type=Path)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--attempt-root", type=Path)
+    parser.add_argument("--campaign-root", type=Path)
     parser.add_argument("--logical-pass-id")
     parser.add_argument("--attempt-id")
     parser.add_argument("--pass-input", action="append", type=Path, default=[])
@@ -202,6 +204,9 @@ def main(argv: list[str] | None = None) -> int:
     # From here, every failure must occur before importing the science module.
     mode = args.mode
     logical_pass_id = _text(args.logical_pass_id, "--logical-pass-id")
+    campaign_root = _path(args.campaign_root, "--campaign-root")
+    attempt_root = _path(args.attempt_root, "--attempt-root")
+    attempt_id = _text(args.attempt_id, "--attempt-id")
     full_ledger = _path(args.full_ledger, "--full-ledger")
     input_receipt_sha = verify_input_gate_receipt(
         _path(args.input_gate_receipt, "--input-gate-receipt"),
@@ -241,6 +246,7 @@ def main(argv: list[str] | None = None) -> int:
         input_gate_receipt_sha256=input_receipt_sha,
         qualification_receipt_sha256=qualification_sha,
         repeatability_review_sha256=review_sha,
+        campaign_root=campaign_root,
     )
     _external_candidate(
         root,
@@ -252,18 +258,28 @@ def main(argv: list[str] | None = None) -> int:
     live_policy = policy_module.capture_runtime_policy(commit, candidate)
     verify_runtime_policy(policy_path, policy_sha, live_policy)
     science = importlib.import_module("laserperception.evaluation.m8_s2_science")
-    science.run_scientific_attempt(
+    with claim_logical_pass(
+        campaign_root=campaign_root,
+        attempt_root=attempt_root,
         mode=mode,
-        repository_root=root,
-        date_root=_path(args.date_root, "--date-root"),
-        m6_ledger=_path(args.m6_ledger, "--m6-ledger"),
+        logical_pass_id=logical_pass_id,
+        attempt_id=attempt_id,
         execution_commit=commit,
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
-        attempt_root=_path(args.attempt_root, "--attempt-root"),
-        logical_pass_id=logical_pass_id,
-        attempt_id=_text(args.attempt_id, "--attempt-id"),
-    )
+    ):
+        science.run_scientific_attempt(
+            mode=mode,
+            repository_root=root,
+            date_root=_path(args.date_root, "--date-root"),
+            m6_ledger=_path(args.m6_ledger, "--m6-ledger"),
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            attempt_root=attempt_root,
+            logical_pass_id=logical_pass_id,
+            attempt_id=attempt_id,
+        )
     return 0
 
 

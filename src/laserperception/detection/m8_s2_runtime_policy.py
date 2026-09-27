@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import socket
 from collections.abc import Mapping
 from typing import Any
 
@@ -38,6 +39,7 @@ def capture_runtime_policy(
     return {
         **base,
         "schema_version": RUNTIME_POLICY_SCHEMA,
+        "worker_hostname": socket.gethostname(),
         "gpu_vram_bytes": vram,
         "s2_protocol_sha256": PROTOCOL_SHA256,
         "s2_partitions_sha256": PARTITIONS_SHA256,

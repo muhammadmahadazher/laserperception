@@ -25,8 +25,10 @@ from laserperception.detection.m8_s2_runtime import (
     AtomicAttempt,
     AttemptIdentity,
     M8S2ProtocolViolation,
+    claim_logical_pass,
     condition_ids,
     verify_authorization,
+    verify_clean_tracked_tree,
     verify_qualification_worker,
 )
 from laserperception.evaluation.m8_s2_aggregation import (
@@ -142,7 +144,7 @@ def test_repeatability_requires_ten_exact_processes() -> None:
         review_repeatability(passes[:9])
 
 
-def test_authorization_scopes_fail_closed() -> None:
+def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
     from laserperception.detection.m8_s2_runtime import (
         COMPACT_MANIFEST_SHA256,
         INPUT_FREEZE_SHA256,
@@ -160,6 +162,7 @@ def test_authorization_scopes_fail_closed() -> None:
         "authorization_provenance": "synthetic-test-only",
         "authorized_gpu_uuid": "GPU-synthetic-test-only",
         "authorized_worker_hostname": "synthetic-host",
+        "authorized_campaign_root": None,
         "execution_commit": COMMIT,
         "protocol_sha256": PROTOCOL_SHA256,
         "partitions_sha256": PARTITIONS_SHA256,
@@ -187,6 +190,29 @@ def test_authorization_scopes_fail_closed() -> None:
         verify_authorization(
             payload, scope="qualification-only", execution_commit=COMMIT, logical_pass_id=None
         )
+    payload.update(
+        scope="repeatability-only",
+        protocol_sha256=PROTOCOL_SHA256,
+        authorized_gpu_uuid=None,
+        authorized_worker_hostname=None,
+        authorized_campaign_root=str(tmp_path.resolve()),
+        logical_pass_ids=["s2-repeatability-01"],
+        runtime_policy_binding_sha256=POLICY,
+        input_gate_receipt_sha256=RECEIPT,
+        qualification_receipt_sha256=RECEIPT,
+    )
+    expected = {
+        "scope": "repeatability-only",
+        "execution_commit": COMMIT,
+        "logical_pass_id": "s2-repeatability-01",
+        "runtime_policy_sha256": POLICY,
+        "input_gate_receipt_sha256": RECEIPT,
+        "qualification_receipt_sha256": RECEIPT,
+        "campaign_root": tmp_path,
+    }
+    verify_authorization(payload, **expected)
+    with pytest.raises(M8S2ProtocolViolation, match="campaign root differs"):
+        verify_authorization(payload, **{**expected, "campaign_root": tmp_path / "other"})
 
 
 def test_qualification_grant_matches_live_external_identity_only_with_mock() -> None:
@@ -245,6 +271,79 @@ def test_policy_rejects_a_different_cuda_visible_gpu_without_importing_torch(
     monkeypatch.setattr(policy_module, "capture_s1_policy", lambda *_: {"gpu_uuid": "GPU-other"})
     with pytest.raises(M8S2ProtocolViolation, match="ambiguous"):
         policy_module.capture_runtime_policy(COMMIT, {})
+    fake_torch.cuda.get_device_properties = lambda _: SimpleNamespace(total_memory=1024)
+    monkeypatch.setattr(policy_module.socket, "gethostname", lambda: "synthetic-host")
+    monkeypatch.setattr(
+        policy_module, "capture_s1_policy", lambda *_: {"gpu_uuid": "GPU-synthetic-123"}
+    )
+    assert policy_module.capture_runtime_policy(COMMIT, {})["worker_hostname"] == "synthetic-host"
+
+
+def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_path: Path) -> None:
+    common = {
+        "campaign_root": tmp_path,
+        "mode": "repeatability",
+        "logical_pass_id": "s2-repeatability-01",
+        "execution_commit": COMMIT,
+        "runtime_policy_sha256": POLICY,
+        "input_gate_receipt_sha256": RECEIPT,
+    }
+    first = tmp_path / "attempt-1"
+    with claim_logical_pass(attempt_root=first, attempt_id="attempt-1", **common):
+        first.mkdir()
+        (first / "attempt_manifest.json").write_text(
+            json.dumps(
+                {
+                    "status": "INCOMPLETE",
+                    "mode": "repeatability",
+                    "logical_pass_id": "s2-repeatability-01",
+                    "attempt_id": "attempt-1",
+                    "execution_commit": COMMIT,
+                    "runtime_policy_sha256": POLICY,
+                    "input_gate_receipt_sha256": RECEIPT,
+                }
+            ),
+            encoding="utf-8",
+        )
+    second = tmp_path / "attempt-2"
+    with claim_logical_pass(attempt_root=second, attempt_id="attempt-2", **common):
+        second.mkdir()
+        (second / "attempt_manifest.json").write_text(
+            json.dumps(
+                {
+                    "status": "COMPLETE",
+                    "mode": "repeatability",
+                    "logical_pass_id": "s2-repeatability-01",
+                    "attempt_id": "attempt-2",
+                    "execution_commit": COMMIT,
+                    "runtime_policy_sha256": POLICY,
+                    "input_gate_receipt_sha256": RECEIPT,
+                }
+            ),
+            encoding="utf-8",
+        )
+    with pytest.raises(M8S2ProtocolViolation, match="already completed"):
+        with claim_logical_pass(
+            attempt_root=tmp_path / "attempt-3", attempt_id="attempt-3", **common
+        ):
+            pass
+
+
+def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> None:
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+
+    git("init")
+    git("config", "user.name", "S2 Test")
+    git("config", "user.email", "s2-test@example.invalid")
+    tracked = tmp_path / "runner.py"
+    tracked.write_text("value = 1\n", encoding="utf-8")
+    git("add", "runner.py")
+    git("commit", "-m", "test fixture")
+    verify_clean_tracked_tree(tmp_path)
+    tracked.write_text("value = 2\n", encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="tracked execution tree"):
+        verify_clean_tracked_tree(tmp_path)
 
 
 def test_static_plan_and_cost_are_input_only() -> None:
@@ -282,6 +381,7 @@ def test_wrong_commit_protocol_and_ledger_fail_cpu_gate(monkeypatch: pytest.Monk
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     with pytest.raises(M8S2ProtocolViolation, match="execution commit differs"):
         m8_s2_runtime.verify_static_bindings(ROOT, "0" * 40)
+    monkeypatch.setattr(m8_s2_runtime, "verify_clean_tracked_tree", lambda _: None)
     monkeypatch.setattr(m8_s2_runtime, "PROTOCOL_SHA256", "0" * 64)
     with pytest.raises(M8S2ProtocolViolation, match="frozen S2 identity"):
         m8_s2_runtime.verify_static_bindings(ROOT, commit)

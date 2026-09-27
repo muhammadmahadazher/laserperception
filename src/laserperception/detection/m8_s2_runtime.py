@@ -11,7 +11,8 @@ import re
 import socket
 import subprocess
 import uuid
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -105,6 +106,7 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     _sha(execution_commit, "execution commit", length=40)
     if git_head(root) != execution_commit:
         raise M8S2ProtocolViolation("S2 execution commit differs from repository HEAD")
+    verify_clean_tracked_tree(root)
     frozen = (
         (PROTOCOL_PATH, PROTOCOL_SHA256),
         (PROTOCOL_JSON_PATH, PROTOCOL_JSON_SHA256),
@@ -135,6 +137,14 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     }:
         raise M8S2ProtocolViolation("S2 full-ledger identity differs")
     return {"execution_commit": execution_commit, "input_freeze": freeze}
+
+
+def verify_clean_tracked_tree(root: Path) -> None:
+    """Reject local changes to any tracked source before binding recorded Git HEAD."""
+
+    result = subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False)
+    if result.returncode != 0:
+        raise M8S2ProtocolViolation("S2 tracked execution tree differs from HEAD")
 
 
 def condition_ids(mode: str) -> tuple[str, ...]:
@@ -171,6 +181,7 @@ def verify_authorization(
     input_gate_receipt_sha256: str | None = None,
     qualification_receipt_sha256: str | None = None,
     repeatability_review_sha256: str | None = None,
+    campaign_root: Path | None = None,
 ) -> None:
     """Require one exact owner-issued scope; scopes never imply one another."""
 
@@ -186,6 +197,7 @@ def verify_authorization(
         "authorization_provenance",
         "authorized_gpu_uuid",
         "authorized_worker_hostname",
+        "authorized_campaign_root",
         "execution_commit",
         "protocol_sha256",
         "partitions_sha256",
@@ -222,6 +234,8 @@ def verify_authorization(
     if any(payload.get(key) != value for key, value in fixed.items()):
         raise M8S2ProtocolViolation("S2 authorization binding differs")
     if scope == "qualification-only":
+        if payload.get("authorized_campaign_root") is not None or campaign_root is not None:
+            raise M8S2ProtocolViolation("qualification authorization cannot bind a campaign")
         worker_uuid = payload.get("authorized_gpu_uuid")
         if not isinstance(worker_uuid, str) or not worker_uuid.startswith("GPU-"):
             raise M8S2ProtocolViolation("qualification authorization lacks a GPU UUID")
@@ -239,6 +253,15 @@ def verify_authorization(
         ):
             raise M8S2ProtocolViolation("qualification authorization cannot imply later scope")
     else:
+        authorized_root = payload.get("authorized_campaign_root")
+        if (
+            not isinstance(authorized_root, str)
+            or not Path(authorized_root).is_absolute()
+            or authorized_root != str(Path(authorized_root).resolve())
+        ):
+            raise M8S2ProtocolViolation("scientific authorization lacks a campaign root")
+        if campaign_root is None or authorized_root != str(campaign_root.resolve()):
+            raise M8S2ProtocolViolation("S2 authorized campaign root differs")
         if (
             payload.get("authorized_gpu_uuid") is not None
             or payload.get("authorized_worker_hostname") is not None
@@ -281,6 +304,126 @@ def require_authorization(path: Path | None, **expected: object) -> dict[str, ob
     payload = _mapping(path)
     verify_authorization(payload, **expected)  # type: ignore[arg-type]
     return payload
+
+
+@contextmanager
+def claim_logical_pass(
+    *,
+    campaign_root: Path,
+    attempt_root: Path,
+    mode: str,
+    logical_pass_id: str,
+    attempt_id: str,
+    execution_commit: str,
+    runtime_policy_sha256: str,
+    input_gate_receipt_sha256: str,
+) -> Iterator[None]:
+    """Serialize attempts and consume a pass after its first complete process.
+
+    The caller must use one owner-bound, durable campaign root and preserve this
+    claim ledger with every attempt. Incomplete attempts may be retried; an
+    unsealed or complete attempt cannot be silently rerun.
+    """
+
+    campaign_root = campaign_root.resolve()
+    attempt_root = attempt_root.resolve()
+    if (
+        logical_pass_id not in logical_pass_ids(mode)
+        or not campaign_root.is_dir()
+        or attempt_root.parent != campaign_root
+        or attempt_root.exists()
+        or not attempt_id.strip()
+    ):
+        raise M8S2ProtocolViolation("S2 campaign or fresh attempt root differs")
+    claims = campaign_root / ".s2_pass_claims"
+    claims.mkdir(exist_ok=True)
+    stem = f"{mode}-{logical_pass_id}"
+    lock = claims / f"{stem}.lock"
+    try:
+        with lock.open("x", encoding="utf-8") as handle:
+            handle.write(attempt_id)
+    except FileExistsError as error:
+        raise M8S2ProtocolViolation("S2 logical pass is already running or locked") from error
+    try:
+        claim_path = claims / f"{stem}.json"
+        if claim_path.exists():
+            claim = _mapping(claim_path)
+            history = claim.get("attempts")
+            if (
+                claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v1"
+                or claim.get("mode") != mode
+                or claim.get("logical_pass_id") != logical_pass_id
+                or claim.get("execution_commit") != execution_commit
+                or claim.get("runtime_policy_sha256") != runtime_policy_sha256
+                or claim.get("input_gate_receipt_sha256") != input_gate_receipt_sha256
+                or not isinstance(history, list)
+                or not history
+            ):
+                raise M8S2ProtocolViolation("S2 pass claim bindings differ")
+            known_roots: set[Path] = set()
+            for previous in history:
+                if not isinstance(previous, dict) or set(previous) != {"attempt_id", "root"}:
+                    raise M8S2ProtocolViolation("S2 pass claim history is malformed")
+                prior_root = Path(str(previous["root"])).resolve()
+                if (
+                    prior_root.parent != campaign_root
+                    or prior_root in known_roots
+                    or previous["attempt_id"] == attempt_id
+                ):
+                    raise M8S2ProtocolViolation("S2 pass claim attempt identity differs")
+                known_roots.add(prior_root)
+                manifest = _mapping(prior_root / "attempt_manifest.json")
+                if (
+                    any(
+                        manifest.get(key) != value
+                        for key, value in {
+                            "mode": mode,
+                            "logical_pass_id": logical_pass_id,
+                            "attempt_id": previous["attempt_id"],
+                            "execution_commit": execution_commit,
+                            "runtime_policy_sha256": runtime_policy_sha256,
+                            "input_gate_receipt_sha256": input_gate_receipt_sha256,
+                        }.items()
+                    )
+                    or manifest.get("status") != "INCOMPLETE"
+                    or (prior_root / "final_pass_manifest.json").exists()
+                ):
+                    raise M8S2ProtocolViolation("S2 logical pass already completed or is unsealed")
+            for child in campaign_root.iterdir():
+                if child.is_dir() and (child / "attempt_manifest.json").exists():
+                    previous = _mapping(child / "attempt_manifest.json")
+                    if (
+                        previous.get("mode") == mode
+                        and previous.get("logical_pass_id") == logical_pass_id
+                        and child.resolve() not in known_roots
+                    ):
+                        raise M8S2ProtocolViolation("S2 previous attempt lacks its pass claim")
+            history.append({"attempt_id": attempt_id, "root": str(attempt_root)})
+        else:
+            for child in campaign_root.iterdir():
+                if child.is_dir() and (child / "attempt_manifest.json").exists():
+                    previous = _mapping(child / "attempt_manifest.json")
+                    if (
+                        previous.get("mode") == mode
+                        and previous.get("logical_pass_id") == logical_pass_id
+                    ):
+                        raise M8S2ProtocolViolation("S2 previous attempt lacks its pass claim")
+            history = [{"attempt_id": attempt_id, "root": str(attempt_root)}]
+        atomic_write_json(
+            claim_path,
+            {
+                "schema_version": "laserperception.m8.s2.pass-claim.v1",
+                "mode": mode,
+                "logical_pass_id": logical_pass_id,
+                "execution_commit": execution_commit,
+                "runtime_policy_sha256": runtime_policy_sha256,
+                "input_gate_receipt_sha256": input_gate_receipt_sha256,
+                "attempts": history,
+            },
+        )
+        yield
+    finally:
+        lock.unlink()
 
 
 def verify_qualification_worker(
@@ -372,6 +515,7 @@ def verify_runtime_policy_document(
     if any(policy.get(key) != value for key, value in exact.items()):
         raise M8S2ProtocolViolation("S2 runtime policy frozen identity differs")
     for key in (
+        "worker_hostname",
         "gpu_name",
         "gpu_uuid",
         "nvidia_driver",
