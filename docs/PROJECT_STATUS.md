@@ -69,7 +69,10 @@ normalized-recovery eligibility, multi-realization partition rule, and S1-derive
 partitions are frozen. The CPU-only input implementation and ledger, 1,712/1,712 M7 XYZT identity
 proof, and implementation review are recorded in the
 [S2 CPU-only input freeze](m8/M8_S2_INPUT_FREEZE.md). External runtime binding and separate
-inference authorization remain pending. S2 detector execution and training have not started.
+inference authorization remain pending. The CPU-only
+[S2 execution-path handoff](m8/M8_S2_RUNTIME_HANDOFF.md) freezes authorization, atomic attempt,
+qualification, sizing-plan, and deterministic aggregation software for a future external runtime;
+it made zero detector calls. S2 detector execution and training have not started.
 
 The earlier 779-condition primary attempt remains `INCOMPLETE`, with zero accepted complete
 processes and zero accepted canonical calls. A separate interrupted 26-condition attempt before the

@@ -1,0 +1,90 @@
+{
+  "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
+  "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
+  "s2_execution_implementation_commit": "aa38ae4d9ca291380bf44de2628f9a1a598b96bf",
+  "reviewed_merged_execution_commit": null,
+  "bindings": {
+    "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
+    "protocol_json_sha256": "341da352f2684d7eb85f3d43112cd88bd4652009463cb59163c67ebd79748720",
+    "partitions_sha256": "f52b0013d10d38c4fd91f52cfb42205f52b97ecf4433cd86654872dd70a59d6e",
+    "input_freeze_sha256": "c08589bb9600633d5a8b675a16f8be805697a5302296ff52608e5845a3e371db",
+    "input_implementation_commit": "bf098b319744f1ec1df08207c1cd93853b1f31ae",
+    "full_ledger_logical_name": "m8_s2_input_ledger.jsonl",
+    "full_ledger_bytes": 7728782,
+    "full_ledger_sha256": "a3ed54b276f77fb784035045b079573cd4e4ddfedc9d0f8eb774c1340a59396b",
+    "full_ledger_records": 1712,
+    "compact_manifest_sha256": "239b563d5f850f2f20809950eca9d56f1a700677766afce8489099e940554ecc",
+    "input_characterization_sha256": "c327dafe6287335c971fa8c5c5f2a15680c08aafcc367e4cdccda4e6e39f86db",
+    "m7_manifest_sha256": "8d4f74d783950d24956239f3a67a7a58fe10013e0e83a88d0f8b23e3139ffe90"
+  },
+  "private_required_inputs": [
+    "frozen full S2 JSONL input ledger",
+    "frozen M8 A2/E2 source input ledger and required dataset files",
+    "frozen M6 transform/result assets and M7 source provenance",
+    "official pinned DSVT upstream checkout/config/checkpoint"
+  ],
+  "execution_environment": {
+    "external_worker_only": true,
+    "local_gpu_prohibited": true,
+    "runtime_policy_must_bind": [
+      "reviewed merged execution commit", "GPU name/UUID/VRAM", "driver", "CUDA", "Python",
+      "PyTorch", "spconv", "torch-scatter", "NumPy", "DSVT upstream commit",
+      "candidate config SHA256", "checkpoint SHA256", "frozen S2 protocol/input identities"
+    ],
+    "runtime_bound": false
+  },
+  "future_order": [
+    "owner authorization for external qualification only",
+    "stream and verify full input ledger; create non-authorizing input receipt",
+    "capture fresh live runtime policy binding",
+    "GT-blind same-runtime CUDA structural preflight and qualification receipt",
+    "owner review and separate repeatability-only authorization",
+    "10 fresh 28-call repeatability processes and exact offline review",
+    "owner review and separate full-pass-only authorization",
+    "3 fresh 1712-call full-corpus processes with per-process persistence",
+    "CPU-only deterministic three-pass aggregation"
+  ],
+  "same_runtime_cuda_gate": {
+    "sentinel_frames": 7,
+    "input_conditions_exact": 28,
+    "B2_A2_coordinate_pairs_exact": 7,
+    "D2_C2_coordinate_pairs_exact": 7,
+    "cpu_cuda_count_equality_required": false,
+    "ground_truth_loaded": false
+  },
+  "gt_blind_sizing": {
+    "static_plan_path": "benchmarks/m8/preregistration/m8_s2_qualification_plan.json",
+    "static_plan_sha256": "f3bb7ca94785ccaed71c821ecfa1e9494c9015b7fa87ded51c33c96c51adda5e",
+    "fresh_processes": 2,
+    "excluded_warmup_calls_per_process": 2,
+    "measured_calls_per_process": 16,
+    "future_warmup_calls": 4,
+    "future_measured_calls": 32,
+    "future_engineering_calls": 36,
+    "executed_calls": 0,
+    "retained_outputs": ["timing", "memory", "input identity", "candidate pillar count", "runtime telemetry"],
+    "semantic_predictions_retained": false
+  },
+  "future_science": {
+    "repeatability_processes": 10,
+    "repeatability_calls_per_process": 28,
+    "repeatability_accepted_calls": 280,
+    "full_processes": 3,
+    "full_calls_per_process": 1712,
+    "full_accepted_calls": 5136,
+    "total_accepted_calls": 5416,
+    "cost_estimator_inputs_available_now": false
+  },
+  "current_state": {
+    "runtime_bound": false,
+    "inference_authorized": false,
+    "real_authorization_created": false,
+    "qualification_executed": false,
+    "sizing_executed": false,
+    "repeatability_executed": false,
+    "full_corpus_executed": false,
+    "engineering_detector_calls": 0,
+    "scientific_detector_calls": 0,
+    "training_runs": 0
+  }
+}
