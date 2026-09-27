@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `653c87348c19f44428fc394a8f2906fb1c1cdeb0`
+corrections complete at `66925ad2da0d634c1a4fd976ba49c1410dda237c`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -45,9 +45,10 @@ exact applicable owner authorization. No authorization file is created by this h
    GPU UUID, and reviewed merged commit. The external worker must compare the grant to its live
    hostname and the sole NVIDIA-SMI-visible GPU UUID before Torch import. Reject multi-GPU
    visibility; policy capture also requires exactly one Torch CUDA device and the same GPU UUID.
-   Verify Git HEAD, all frozen identities, and the streamed full ledger. The
+   Verify Git HEAD, a clean tracked execution tree, all frozen identities, and the streamed full
+   ledger. The
    input-gate receipt is evidence, not inference permission.
-2. Capture a fresh runtime policy for that worker. Bind GPU name, UUID, VRAM, driver, CUDA,
+2. Capture a fresh runtime policy for that worker. Bind its hostname, GPU name, UUID, VRAM, driver, CUDA,
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
    checkpoint, plus the S2 protocol/input hashes. A historical S1 or zero-intensity policy cannot
    authorize S2.
@@ -58,9 +59,13 @@ exact applicable owner authorization. No authorization file is created by this h
    CPU-versus-CUDA count equality is
    **not** a gate: the historical H10 example was 30,623 CPU analytic versus 30,624 CUDA.
 4. Present the fresh qualification receipt to the owner. Only a new **repeatability-only**
-   authorization can permit ten independent processes, each in seven-sentinel frame-major
+   authorization must bind one durable `--campaign-root` and can permit ten independent processes,
+   each in seven-sentinel frame-major
    B2/C2/D2/F2 order (28 calls, 280 accepted calls total). Each process has a fresh UUID and model
-   initialization. Persist/hash-verify every complete or failed attempt off-worker. The offline
+   initialization. Each attempt uses a fresh `--attempt-root` directly under that campaign root.
+   The serialized pass-claim ledger there permits a retry only after the prior attempt is preserved
+   and sealed `INCOMPLETE`; a complete pass consumes its logical ID. Preserve the ledger and
+   persist/hash-verify every complete or failed attempt off-worker. The offline
    review requires exact discrete agreement for the frozen per-class/threshold gates. Its
    `ACCEPTED` result alone does not authorize the corpus.
 5. After owner review of repeatability and a separate **full-pass-only** authorization, execute
@@ -68,7 +73,9 @@ exact applicable owner authorization. No authorization file is created by this h
    1,712 conditions per pass and 5,136 accepted calls in three passes. Each input is reconstructed
    once, verified against the frozen ledger immediately, and that same verified array is passed
    to the detector. An incomplete attempt has zero accepted canonical calls, remains preserved,
-   and cannot be spliced or resumed as a canonical pass. Persist/hash-verify each process before
+   and cannot be spliced or resumed as a canonical pass. The same durable claim rule prevents
+   successful reruns or selection among multiple complete attempts. Persist/hash-verify each
+   process and its claim ledger before
    continuing. Stop the worker when no unique state remains there.
 6. Aggregate on CPU only. Report pass 1/2/3 and min/median/max by arm/class/IoU for TP, FP, FN,
    recall, annotation-conditioned precision/F1/AP, range, track continuity, population, FOV, and

@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "653c87348c19f44428fc394a8f2906fb1c1cdeb0",
+  "s2_execution_implementation_commit": "66925ad2da0d634c1a4fd976ba49c1410dda237c",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -27,7 +27,7 @@
     "external_worker_only": true,
     "local_gpu_prohibited": true,
     "runtime_policy_must_bind": [
-      "reviewed merged execution commit", "GPU name/UUID/VRAM", "driver", "CUDA", "Python",
+      "reviewed merged execution commit", "worker hostname", "GPU name/UUID/VRAM", "driver", "CUDA", "Python",
       "PyTorch", "spconv", "torch-scatter", "NumPy", "DSVT upstream commit",
       "candidate config SHA256", "checkpoint SHA256", "frozen S2 protocol/input identities"
     ],
@@ -39,6 +39,7 @@
     "capture fresh live runtime policy binding",
     "GT-blind same-runtime CUDA structural preflight and qualification receipt",
     "owner review and separate repeatability-only authorization",
+    "bind a durable campaign root and preserve its single-use logical-pass claim ledger",
     "10 fresh 28-call repeatability processes and exact offline review",
     "owner review and separate full-pass-only authorization",
     "3 fresh 1712-call full-corpus processes with per-process persistence",
