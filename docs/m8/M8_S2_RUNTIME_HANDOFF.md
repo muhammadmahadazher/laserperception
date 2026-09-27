@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `66925ad2da0d634c1a4fd976ba49c1410dda237c`
+corrections complete at `015f839748dee21264b6dd92f2cfb647ba04d5c6`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -20,6 +20,7 @@ commit remains `bf098b319744f1ec1df08207c1cd93853b1f31ae`.
 |---|---|
 | S2 protocol Markdown | `218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d` |
 | S2 protocol JSON | `341da352f2684d7eb85f3d43112cd88bd4652009463cb59163c67ebd79748720` |
+| Frozen S1 GT provenance JSON | `c132f60257c6a39debb548461c79bd59c98325484d233db6095b441c638d8e88` |
 | S2 paired partitions | `f52b0013d10d38c4fd91f52cfb42205f52b97ecf4433cd86654872dd70a59d6e` |
 | S2 input-freeze record | `c08589bb9600633d5a8b675a16f8be805697a5302296ff52608e5845a3e371db` |
 | Private full S2 input ledger | `a3ed54b276f77fb784035045b079573cd4e4ddfedc9d0f8eb774c1340a59396b` |
@@ -52,6 +53,7 @@ exact applicable owner authorization. No authorization file is created by this h
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
    checkpoint, plus the S2 protocol/input hashes. A historical S1 or zero-intensity policy cannot
    authorize S2.
+   Check that the pinned DSVT upstream checkout has no tracked edits outside the hashed config.
 3. Under the same qualification scope, run the GT-blind seven-sentinel structural preflight on
    that bound runtime. Check 28/28 frozen full XYZIT inputs, then compute candidate coordinates
    with the bound DSVT CUDA arithmetic. Require B2/A2 and D2/C2 exact same-runtime coordinate
@@ -63,6 +65,9 @@ exact applicable owner authorization. No authorization file is created by this h
    each in seven-sentinel frame-major
    B2/C2/D2/F2 order (28 calls, 280 accepted calls total). Each process has a fresh UUID and model
    initialization. Each attempt uses a fresh `--attempt-root` directly under that campaign root.
+   Before importing the scoring path, verify both frozen KITTI tracklet XML files and both camera
+   calibration files against the recorded S1 protocol SHA256 values. No GT is loaded for the
+   qualification step.
    The serialized pass-claim ledger there permits a retry only after the prior attempt is preserved
    and sealed `INCOMPLETE`; a complete pass consumes its logical ID. Preserve the ledger and
    persist/hash-verify every complete or failed attempt off-worker. The offline
