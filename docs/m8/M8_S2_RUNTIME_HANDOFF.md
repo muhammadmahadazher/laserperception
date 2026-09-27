@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `27c46e9924b0b3af53a27ac86f0fac3db165519f`
+corrections complete at `653c87348c19f44428fc394a8f2906fb1c1cdeb0`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -43,8 +43,9 @@ exact applicable owner authorization. No authorization file is created by this h
 
 1. Obtain a fresh **qualification-only** owner authorization for the selected worker hostname,
    GPU UUID, and reviewed merged commit. The external worker must compare the grant to its live
-   hostname and GPU 0 UUID
-   before Torch import. Verify Git HEAD, all frozen identities, and the streamed full ledger. The
+   hostname and the sole NVIDIA-SMI-visible GPU UUID before Torch import. Reject multi-GPU
+   visibility; policy capture also requires exactly one Torch CUDA device and the same GPU UUID.
+   Verify Git HEAD, all frozen identities, and the streamed full ledger. The
    input-gate receipt is evidence, not inference permission.
 2. Capture a fresh runtime policy for that worker. Bind GPU name, UUID, VRAM, driver, CUDA,
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
