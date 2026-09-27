@@ -9,8 +9,8 @@ the future work. No external worker was contacted for this freeze.
 ## Software and input identities
 
 The execution software and synthetic tests were committed before this handoff, beginning at
-`aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. A prospective evidence correction is included
-in `fd335da65bfb0d7a7de951551612382f7836fd4d`
+`aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
+corrections complete at `27c46e9924b0b3af53a27ac86f0fac3db165519f`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -41,8 +41,10 @@ The [S2 runner](../../scripts/detection/run_m8_s2.py) exposes `input-gate`, `run
 `qualification-plan` is static and CPU-only. External modes require `--external-worker` and the
 exact applicable owner authorization. No authorization file is created by this handoff.
 
-1. Obtain a fresh **qualification-only** owner authorization for the selected worker and reviewed
-   merged commit. Verify Git HEAD, all frozen identities, and the streamed full ledger. The
+1. Obtain a fresh **qualification-only** owner authorization for the selected worker hostname,
+   GPU UUID, and reviewed merged commit. The external worker must compare the grant to its live
+   hostname and GPU 0 UUID
+   before Torch import. Verify Git HEAD, all frozen identities, and the streamed full ledger. The
    input-gate receipt is evidence, not inference permission.
 2. Capture a fresh runtime policy for that worker. Bind GPU name, UUID, VRAM, driver, CUDA,
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
@@ -71,7 +73,9 @@ exact applicable owner authorization. No authorization file is created by this h
    recall, annotation-conditioned precision/F1/AP, range, track continuity, population, FOV, and
    ignore behavior. Frozen Car denominators are A_REF=19, E_REF=43, D_REF=24 and partitions
    shared/E2-only/A2-only/neither=19/24/0/23. Report unclamped G, paired R metrics, frozen
-   Car TP/recall factorials (excluding F2), and the all-three descriptive gate. No p-values,
+   Car TP/recall factorials (excluding F2), and the all-three descriptive gate. The hashed
+   aggregate retains the common runtime/input bindings and ordered attempt/result identities.
+   No p-values,
    confidence intervals, AP factorials, or causal prose are generated.
 
 The future accepted scientific plan totals **5,416 calls**: 280 repeatability plus 5,136 full.
