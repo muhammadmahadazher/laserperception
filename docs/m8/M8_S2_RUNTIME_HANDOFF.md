@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `72906e5a5c0e5076ddb6661eed7052bc651b53dc`
+corrections complete at `5deb8c06090a3a81bd9b1c4b70acf2e913bd596c`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -75,7 +75,11 @@ the detector or loads GT.
    qualification step.
    The serialized pass-claim ledger there permits a retry only after the prior attempt is preserved
    and sealed `INCOMPLETE`; a complete pass consumes its logical ID. Preserve the ledger and
-   persist/hash-verify every complete or failed attempt off-worker. The offline
+   persist/hash-verify every complete or failed attempt off-worker. Offline review verifies each
+   incomplete attempt's sealed file inventory and its original authorization;
+   a retry may bind a separately issued fresh authorization. The seal includes any partial
+   conditions, runtime state, telemetry, and interruption recovery files that were produced.
+   The offline
    review requires exact discrete agreement for the frozen per-class/threshold gates. Its
    `ACCEPTED` result alone does not authorize the corpus.
    If a process stops before sealing its attempt, keep the lock and partial files. On the same
