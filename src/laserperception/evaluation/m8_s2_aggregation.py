@@ -189,6 +189,9 @@ def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
             "execution_commit",
             "runtime_policy_sha256",
             "input_gate_receipt_sha256",
+            "qualification_receipt_sha256",
+            "authorization_id",
+            "authorization_sha256",
             "full_ledger_sha256",
             "protocol_sha256",
         )

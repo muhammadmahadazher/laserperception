@@ -38,6 +38,7 @@ from laserperception.detection.m8_s2_runtime import (
 from laserperception.evaluation.m8_s2_aggregation import (
     aggregate_three_full_passes,
     factorial_contrasts,
+    load_completed_attempt,
     review_repeatability,
     validate_attempts,
 )
@@ -127,6 +128,32 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
     with pytest.raises(M8S2ProtocolViolation, match="incomplete"):
         attempt.finalize()
     assert not (tmp_path / "attempt" / "final_pass_manifest.json").exists()
+
+
+def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) -> None:
+    identity = AttemptIdentity(
+        "repeatability",
+        "s2-repeatability-01",
+        "attempt-complete",
+        str(uuid.uuid4()),
+        123,
+        COMMIT,
+        POLICY,
+        RECEIPT,
+        QUALIFICATION,
+        AUTHORIZATION_ID,
+        AUTHORIZATION,
+    )
+    root = tmp_path / "complete"
+    attempt = AtomicAttempt(root, identity)
+    for condition_id in condition_ids("repeatability"):
+        attempt.record(condition_id, {"condition_id": condition_id})
+    attempt.finalize()
+    loaded = load_completed_attempt(root, mode="repeatability")
+    assert loaded["accepted_canonical_calls"] == 28
+    assert loaded["authorization_id"] == AUTHORIZATION_ID
+    assert loaded["authorization_sha256"] == AUTHORIZATION
+    assert loaded["qualification_receipt_sha256"] == QUALIFICATION
 
 
 def test_repeatability_requires_ten_exact_processes() -> None:
