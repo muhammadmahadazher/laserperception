@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `5dcda04dd0f945866739255391b29292f568f5d1`
+corrections complete at `93dba0a4eab162bbd2a368629f1380e35520b07a`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -90,8 +90,9 @@ the detector or loads GT.
    to the detector. An incomplete attempt has zero accepted canonical calls, remains preserved,
    and cannot be spliced or resumed as a canonical pass. The same durable claim rule prevents
    successful reruns or selection among multiple complete attempts. Persist/hash-verify each
-   process and its claim ledger before
-   continuing. Stop the worker when no unique state remains there.
+   process and its claim ledger before continuing. The completed manifest binds the campaign
+   claim, runtime state, and telemetry by SHA256; CPU aggregation verifies the complete claim
+   history, including prior incomplete attempts. Stop the worker when no unique state remains there.
 6. Aggregate on CPU only. Report pass 1/2/3 and min/median/max by arm/class/IoU for TP, FP, FN,
    recall, annotation-conditioned precision/F1/AP, range, track continuity, population, FOV, and
    ignore behavior. Frozen Car denominators are A_REF=19, E_REF=43, D_REF=24 and partitions
