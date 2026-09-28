@@ -143,6 +143,8 @@ def main(argv: list[str] | None = None) -> int:
         expected_count = 10 if selected == "repeatability" else 3
         if len(args.pass_input) != expected_count:
             raise M8S2ProtocolViolation(f"S2 aggregate requires {expected_count} --pass-input dirs")
+        if len({path.resolve().parent for path in args.pass_input}) != 1:
+            raise M8S2ProtocolViolation("S2 pass inputs span different campaign roots")
         records = [
             load_completed_attempt(path.resolve(), mode=selected) for path in args.pass_input
         ]

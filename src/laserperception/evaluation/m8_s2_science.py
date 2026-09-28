@@ -11,7 +11,11 @@ import uuid
 from pathlib import Path
 
 from laserperception.detection.m8_backend import DsvtBackend
-from laserperception.detection.m8_s1_runtime import CANDIDATE_MANIFEST_PATH, atomic_write_json
+from laserperception.detection.m8_s1_runtime import (
+    CANDIDATE_MANIFEST_PATH,
+    atomic_write_json,
+    sha256_file,
+)
 from laserperception.detection.m8_s2_reconstruction import verified_inputs
 from laserperception.detection.m8_s2_runtime import (
     AtomicAttempt,
@@ -56,6 +60,10 @@ def run_scientific_attempt(
         qualification_receipt_sha256=qualification_receipt_sha256,
         authorization_id=authorization_id,
         authorization_sha256=authorization_sha256,
+        campaign_origin_root=str(attempt_root.parent.resolve()),
+        campaign_claim_sha256=sha256_file(
+            attempt_root.parent / ".s2_pass_claims" / f"{mode}-{logical_pass_id}.json"
+        ),
     )
     attempt = AtomicAttempt(attempt_root, identity)
     sampler: NvidiaSmiSampler | None = None

@@ -905,6 +905,8 @@ class AttemptIdentity:
     qualification_receipt_sha256: str
     authorization_id: str
     authorization_sha256: str
+    campaign_origin_root: str
+    campaign_claim_sha256: str
 
     def __post_init__(self) -> None:
         if self.logical_pass_id not in logical_pass_ids(self.mode):
@@ -913,6 +915,8 @@ class AttemptIdentity:
             raise M8S2ProtocolViolation("S2 attempt identity is incomplete")
         if not self.authorization_id.strip():
             raise M8S2ProtocolViolation("S2 owner authorization identity is absent")
+        if not self.campaign_origin_root.strip():
+            raise M8S2ProtocolViolation("S2 campaign origin is absent")
         uuid.UUID(self.process_uuid)
         for label, value in (
             ("execution commit", self.execution_commit),
@@ -920,6 +924,7 @@ class AttemptIdentity:
             ("input receipt", self.input_gate_receipt_sha256),
             ("qualification receipt", self.qualification_receipt_sha256),
             ("owner authorization", self.authorization_sha256),
+            ("campaign claim", self.campaign_claim_sha256),
         ):
             _sha(value, label, length=40 if label == "execution commit" else 64)
 
@@ -936,6 +941,8 @@ class AttemptIdentity:
             "qualification_receipt_sha256": self.qualification_receipt_sha256,
             "authorization_id": self.authorization_id,
             "authorization_sha256": self.authorization_sha256,
+            "campaign_origin_root": self.campaign_origin_root,
+            "campaign_claim_sha256": self.campaign_claim_sha256,
             "full_ledger_sha256": FULL_LEDGER_SHA256,
             "protocol_sha256": PROTOCOL_SHA256,
         }
@@ -1025,6 +1032,13 @@ class AtomicAttempt:
             raise M8S2ProtocolViolation("S2 condition files are incomplete")
         record = self._payload("COMPLETE", None)
         record["condition_file_sha256"] = [sha256_file(path) for path in files]
+        auxiliary = {}
+        for name in ("runtime_state.json", "telemetry.json"):
+            path = self.root / name
+            if not path.is_file():
+                raise M8S2ProtocolViolation(f"S2 required evidence is absent: {name}")
+            auxiliary[name] = sha256_file(path)
+        record["auxiliary_file_sha256"] = auxiliary
         record["result_sha256"] = canonical_json_sha256(record)
         atomic_write_json(self.root / "final_pass_manifest.json", record)
         self.status = "COMPLETE"

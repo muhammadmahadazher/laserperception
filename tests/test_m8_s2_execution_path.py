@@ -68,6 +68,8 @@ def _pass(mode: str, index: int) -> dict[str, object]:
         "qualification_receipt_sha256": QUALIFICATION,
         "authorization_id": AUTHORIZATION_ID,
         "authorization_sha256": AUTHORIZATION,
+        "campaign_origin_root": "/synthetic/campaign",
+        "campaign_claim_sha256": "f" * 64,
         "full_ledger_sha256": FULL_LEDGER_SHA256,
         "protocol_sha256": PROTOCOL_SHA256,
         "expected_calls": len(order),
@@ -113,6 +115,8 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
         QUALIFICATION,
         AUTHORIZATION_ID,
         AUTHORIZATION,
+        str(tmp_path.resolve()),
+        "f" * 64,
     )
     attempt = AtomicAttempt(tmp_path / "attempt", identity)
     with pytest.raises(M8S2ProtocolViolation, match="order"):
@@ -131,6 +135,49 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
 
 
 def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) -> None:
+    root = tmp_path / "complete"
+    prior = tmp_path / "prior-incomplete"
+    prior.mkdir()
+    (prior / "attempt_manifest.json").write_text(
+        json.dumps(
+            {
+                "status": "INCOMPLETE",
+                "mode": "repeatability",
+                "logical_pass_id": "s2-repeatability-01",
+                "attempt_id": "attempt-incomplete",
+                "execution_commit": COMMIT,
+                "runtime_policy_sha256": POLICY,
+                "input_gate_receipt_sha256": RECEIPT,
+                "qualification_receipt_sha256": QUALIFICATION,
+                "authorization_id": AUTHORIZATION_ID,
+                "authorization_sha256": AUTHORIZATION,
+            }
+        ),
+        encoding="utf-8",
+    )
+    claims = tmp_path / ".s2_pass_claims"
+    claims.mkdir()
+    claim_path = claims / "repeatability-s2-repeatability-01.json"
+    claim_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "laserperception.m8.s2.pass-claim.v1",
+                "mode": "repeatability",
+                "logical_pass_id": "s2-repeatability-01",
+                "execution_commit": COMMIT,
+                "runtime_policy_sha256": POLICY,
+                "input_gate_receipt_sha256": RECEIPT,
+                "qualification_receipt_sha256": QUALIFICATION,
+                "authorization_id": AUTHORIZATION_ID,
+                "authorization_sha256": AUTHORIZATION,
+                "attempts": [
+                    {"attempt_id": "attempt-incomplete", "root": str(prior)},
+                    {"attempt_id": "attempt-complete", "root": str(root)},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     identity = AttemptIdentity(
         "repeatability",
         "s2-repeatability-01",
@@ -143,17 +190,44 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
         QUALIFICATION,
         AUTHORIZATION_ID,
         AUTHORIZATION,
+        str(tmp_path.resolve()),
+        hashlib.sha256(claim_path.read_bytes()).hexdigest(),
     )
-    root = tmp_path / "complete"
     attempt = AtomicAttempt(root, identity)
     for condition_id in condition_ids("repeatability"):
         attempt.record(condition_id, {"condition_id": condition_id})
+    (root / "runtime_state.json").write_text('{"synthetic": true}', encoding="utf-8")
+    (root / "telemetry.json").write_text('{"synthetic": true}', encoding="utf-8")
     attempt.finalize()
     loaded = load_completed_attempt(root, mode="repeatability")
     assert loaded["accepted_canonical_calls"] == 28
     assert loaded["authorization_id"] == AUTHORIZATION_ID
     assert loaded["authorization_sha256"] == AUTHORIZATION
     assert loaded["qualification_receipt_sha256"] == QUALIFICATION
+    assert loaded["campaign_claim_sha256"]
+    (root / "telemetry.json").write_text('{"synthetic": false}', encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="auxiliary evidence differs"):
+        load_completed_attempt(root, mode="repeatability")
+    (root / "telemetry.json").write_text('{"synthetic": true}', encoding="utf-8")
+    original_claim = claim_path.read_bytes()
+    claim = json.loads(claim_path.read_text(encoding="utf-8"))
+    claim["attempts"].pop(0)
+    claim_path.write_text(json.dumps(claim), encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="campaign claim SHA256 differs"):
+        load_completed_attempt(root, mode="repeatability")
+    claim_path.write_bytes(original_claim)
+    assert load_completed_attempt(root, mode="repeatability")["accepted_canonical_calls"] == 28
+    competing = tmp_path / "unclaimed-complete"
+    competing.mkdir()
+    (competing / "attempt_manifest.json").write_text(
+        json.dumps({"mode": "repeatability", "logical_pass_id": "s2-repeatability-01"}),
+        encoding="utf-8",
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="unclaimed competing attempt"):
+        load_completed_attempt(root, mode="repeatability")
+    claim_path.unlink()
+    with pytest.raises(M8S2ProtocolViolation, match="campaign claim evidence is absent"):
+        load_completed_attempt(root, mode="repeatability")
 
 
 def test_repeatability_requires_ten_exact_processes() -> None:

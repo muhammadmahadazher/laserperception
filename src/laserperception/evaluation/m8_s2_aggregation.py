@@ -112,10 +112,14 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
         for row in passes
     ):
         raise M8S2ProtocolViolation("S2 process frozen input or protocol identity differs")
+    origins = {row.get("campaign_origin_root") for row in passes}
+    if len(origins) != 1 or not isinstance(next(iter(origins)), str):
+        raise M8S2ProtocolViolation("S2 passes span different campaign claims")
     expected = condition_ids(mode)
     for row in passes:
         authorization_sha = row.get("authorization_sha256")
         qualification_sha = row.get("qualification_receipt_sha256")
+        claim_sha = row.get("campaign_claim_sha256")
         if (
             not isinstance(row.get("authorization_id"), str)
             or not row["authorization_id"]
@@ -123,6 +127,8 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
             or re.fullmatch(r"[0-9a-f]{64}", authorization_sha) is None
             or not isinstance(qualification_sha, str)
             or re.fullmatch(r"[0-9a-f]{64}", qualification_sha) is None
+            or not isinstance(claim_sha, str)
+            or re.fullmatch(r"[0-9a-f]{64}", claim_sha) is None
         ):
             raise M8S2ProtocolViolation("S2 attempt authorization chain is absent")
         result_sha = row.get("result_sha256")
@@ -142,6 +148,103 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
             raise M8S2ProtocolViolation("S2 incomplete or reordered process is not aggregatable")
 
 
+def _read_claimed_manifest(path: Path) -> Mapping[str, object]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise M8S2ProtocolViolation("S2 campaign claim evidence is absent") from error
+    if not isinstance(payload, dict):
+        raise M8S2ProtocolViolation("S2 campaign claim evidence is malformed")
+    return payload
+
+
+def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str) -> dict[str, str]:
+    campaign_root = root.parent.resolve()
+    logical_pass_id = manifest.get("logical_pass_id")
+    if not isinstance(logical_pass_id, str):
+        raise M8S2ProtocolViolation("S2 campaign logical pass is absent")
+    claim_path = campaign_root / ".s2_pass_claims" / f"{mode}-{logical_pass_id}.json"
+    claim = _read_claimed_manifest(claim_path)
+    claim_sha = sha256_file(claim_path)
+    if manifest.get("campaign_claim_sha256") != claim_sha:
+        raise M8S2ProtocolViolation("S2 campaign claim SHA256 differs")
+    for key in (
+        "mode",
+        "logical_pass_id",
+        "execution_commit",
+        "runtime_policy_sha256",
+        "input_gate_receipt_sha256",
+        "qualification_receipt_sha256",
+        "authorization_id",
+        "authorization_sha256",
+    ):
+        if claim.get(key) != manifest.get(key):
+            raise M8S2ProtocolViolation(f"S2 campaign claim binding differs: {key}")
+    if claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v1":
+        raise M8S2ProtocolViolation("S2 campaign claim schema differs")
+    history = _list(claim.get("attempts"), "campaign claim history")
+    if not history:
+        raise M8S2ProtocolViolation("S2 campaign claim history is empty")
+    origin: Path | None = None
+    names: set[str] = set()
+    for index, previous in enumerate(history):
+        if not isinstance(previous, dict) or set(previous) != {"attempt_id", "root"}:
+            raise M8S2ProtocolViolation("S2 campaign claim entry is malformed")
+        source_root = Path(str(previous["root"]))
+        if origin is None:
+            origin = source_root.parent
+        if source_root.parent != origin or source_root.name in names:
+            raise M8S2ProtocolViolation("S2 campaign claim roots differ")
+        names.add(source_root.name)
+        copied_root = campaign_root / source_root.name
+        prior = _read_claimed_manifest(copied_root / "attempt_manifest.json")
+        if any(
+            prior.get(key) != value
+            for key, value in {
+                "mode": mode,
+                "logical_pass_id": logical_pass_id,
+                "attempt_id": previous["attempt_id"],
+                **{
+                    key: claim[key]
+                    for key in (
+                        "execution_commit",
+                        "runtime_policy_sha256",
+                        "input_gate_receipt_sha256",
+                        "qualification_receipt_sha256",
+                        "authorization_id",
+                        "authorization_sha256",
+                    )
+                },
+            }.items()
+        ):
+            raise M8S2ProtocolViolation("S2 claimed attempt identity differs")
+        terminal = index == len(history) - 1
+        if terminal:
+            if copied_root.resolve() != root.resolve() or prior.get("status") != "COMPLETE":
+                raise M8S2ProtocolViolation("S2 selected attempt is not terminal complete")
+        elif (
+            prior.get("status") != "INCOMPLETE"
+            or (copied_root / "final_pass_manifest.json").exists()
+        ):
+            raise M8S2ProtocolViolation("S2 prior claimed attempt is not preserved incomplete")
+    for child in campaign_root.iterdir():
+        if child.is_dir() and (child / "attempt_manifest.json").exists():
+            candidate = _read_claimed_manifest(child / "attempt_manifest.json")
+            if (
+                candidate.get("mode") == mode
+                and candidate.get("logical_pass_id") == logical_pass_id
+                and child.name not in names
+            ):
+                raise M8S2ProtocolViolation("S2 unclaimed competing attempt exists")
+    assert origin is not None
+    if manifest.get("campaign_origin_root") != str(origin):
+        raise M8S2ProtocolViolation("S2 campaign origin differs")
+    return {
+        "campaign_origin_root": str(origin),
+        "campaign_claim_sha256": claim_sha,
+    }
+
+
 def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
     """Verify every condition file against one atomic final manifest."""
 
@@ -155,10 +258,20 @@ def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
     digest = unsigned.pop("result_sha256", None)
     if digest != canonical_json_sha256(unsigned):
         raise M8S2ProtocolViolation("S2 final attempt identity differs")
+    claim_binding = _verify_campaign_claim(root, manifest, mode)
     expected = condition_ids(mode)
     hashes = manifest.get("condition_file_sha256")
     if not isinstance(hashes, list) or len(hashes) != len(expected):
         raise M8S2ProtocolViolation("S2 condition file hashes are incomplete")
+    auxiliary = manifest.get("auxiliary_file_sha256")
+    if not isinstance(auxiliary, dict) or set(auxiliary) != {
+        "runtime_state.json",
+        "telemetry.json",
+    }:
+        raise M8S2ProtocolViolation("S2 auxiliary evidence hashes are incomplete")
+    for name, expected_sha in auxiliary.items():
+        if sha256_file(root / name) != expected_sha:
+            raise M8S2ProtocolViolation(f"S2 auxiliary evidence differs: {name}")
     if manifest.get("completed_condition_ids") != list(expected):
         raise M8S2ProtocolViolation("S2 final condition order differs")
     records: list[dict[str, object]] = []
@@ -192,6 +305,8 @@ def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
             "qualification_receipt_sha256",
             "authorization_id",
             "authorization_sha256",
+            "campaign_origin_root",
+            "campaign_claim_sha256",
             "full_ledger_sha256",
             "protocol_sha256",
         )
@@ -200,7 +315,7 @@ def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
         records.append(payload)
     if len(list((root / "conditions").glob("*.json"))) != len(expected):
         raise M8S2ProtocolViolation("S2 condition file population differs")
-    return {**manifest, "conditions": records}
+    return {**manifest, **claim_binding, "conditions": records}
 
 
 def _class_record(condition: Mapping[str, object], class_name: str) -> Mapping[str, object]:
@@ -285,6 +400,7 @@ def review_repeatability(
                 "qualification_receipt_sha256": row["qualification_receipt_sha256"],
                 "authorization_id": row["authorization_id"],
                 "authorization_sha256": row["authorization_sha256"],
+                "campaign_claim_sha256": row["campaign_claim_sha256"],
             }
             for row in passes
         ],
@@ -293,6 +409,7 @@ def review_repeatability(
         "runtime_policy_sha256": passes[0]["runtime_policy_sha256"],
         "input_gate_receipt_sha256": passes[0]["input_gate_receipt_sha256"],
         "qualification_receipt_sha256": passes[0]["qualification_receipt_sha256"],
+        "campaign_origin_root": passes[0]["campaign_origin_root"],
         "owner_reviewed": False,
         "full_corpus_authorized": False,
     }
@@ -754,10 +871,12 @@ def aggregate_three_full_passes(
                 "qualification_receipt_sha256": row["qualification_receipt_sha256"],
                 "authorization_id": row["authorization_id"],
                 "authorization_sha256": row["authorization_sha256"],
+                "campaign_claim_sha256": row["campaign_claim_sha256"],
             }
             for row in passes
         ],
         "passes": per_pass,
+        "campaign_origin_root": passes[0]["campaign_origin_root"],
         "spread": spread,
         "car_recovery_by_pass": recovery,
         "car_recovery_spread": recovery_spread,
