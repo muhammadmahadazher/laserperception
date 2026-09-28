@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "0eb9b395c6474fb3434c6d9bb4bdde974e13c884",
+  "s2_execution_implementation_commit": "2379c75c851c2c597c7f0a7cc66382a917f5312a",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",

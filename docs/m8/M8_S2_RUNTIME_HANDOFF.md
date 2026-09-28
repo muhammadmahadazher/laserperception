@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `0eb9b395c6474fb3434c6d9bb4bdde974e13c884`
+corrections complete at `2379c75c851c2c597c7f0a7cc66382a917f5312a`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -97,7 +97,8 @@ the detector or loads GT.
    ignore behavior. Frozen Car denominators are A_REF=19, E_REF=43, D_REF=24 and partitions
    shared/E2-only/A2-only/neither=19/24/0/23. Report unclamped G, paired R metrics, frozen
    Car TP/recall factorials (excluding F2), and the all-three descriptive gate. The hashed
-   aggregate retains the common runtime/input bindings and ordered attempt/result identities.
+   aggregate retains the common runtime/input/qualification bindings and each ordered
+   attempt's owner authorization ID and document SHA256 alongside its result identity.
    Aggregation requires the clean reviewed execution commit, which is recorded in its hashed output.
    No p-values,
    confidence intervals, AP factorials, or causal prose are generated.
