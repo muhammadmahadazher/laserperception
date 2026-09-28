@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "2b7f9d7cc90b45db26186c3591b1e0ed0985a0cb",
+  "s2_execution_implementation_commit": "cd876f022e6d53da8a65ed24e56fc2d2a5d09939",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -40,7 +40,7 @@
     "capture fresh live runtime policy binding",
     "verify backend environment paths equal the checked upstream and checkpoint paths",
     "reject tracked edits in the pinned DSVT upstream checkout",
-    "GT-blind same-runtime CUDA structural preflight and qualification receipt",
+    "GT-blind same-runtime CUDA structural preflight and receipt bound to the preserved qualification-only owner grant",
     "owner review and separate repeatability-only authorization",
     "verify frozen KITTI tracklet and evaluation calibration hashes before GT scoring",
     "bind a durable campaign root and preserve its single-use logical-pass claim ledger",

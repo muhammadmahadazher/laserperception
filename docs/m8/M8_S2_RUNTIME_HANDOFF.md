@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `2b7f9d7cc90b45db26186c3591b1e0ed0985a0cb`
+corrections complete at `cd876f022e6d53da8a65ed24e56fc2d2a5d09939`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -63,6 +63,8 @@ the detector or loads GT.
    that bound runtime. Check 28/28 frozen full XYZIT inputs, then compute candidate coordinates
    with the bound DSVT CUDA arithmetic. Require B2/A2 and D2/C2 exact same-runtime coordinate
    identity in all seven frames. Record CUDA candidate counts and coordinate hashes.
+   The receipt records the qualification-only grant ID and SHA256; preserve that grant and
+   supply it as `--qualification-authorization` when later verifying the receipt for science.
    CPU-versus-CUDA count equality is
    **not** a gate: the historical H10 example was 30,623 CPU analytic versus 30,624 CUDA.
 4. Present the fresh qualification receipt to the owner. Only a new **repeatability-only**
