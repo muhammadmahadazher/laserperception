@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `5deb8c06090a3a81bd9b1c4b70acf2e913bd596c`
+corrections complete at `2b7f9d7cc90b45db26186c3591b1e0ed0985a0cb`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -85,6 +85,8 @@ the detector or loads GT.
    If a process stops before sealing its attempt, keep the lock and partial files. On the same
    worker, after verifying its process is dead, `seal-interrupted` preserves the original manifest,
    writes a recovery receipt and zero-accepted-call incomplete manifest, then releases the lock.
+   If a final pass manifest was already written, validate its complete evidence before restoring
+   terminal bookkeeping and releasing a stale lock; never reclassify it as incomplete.
    A live or different worker cannot use that recovery path. Persist the recovery evidence before
    seeking any fresh retry authorization.
 5. After owner review of repeatability and a separate **full-pass-only** authorization, execute
