@@ -7,6 +7,7 @@ three-pass formulas and paired Car sets are fixed by the frozen S2 protocol.
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
@@ -357,16 +358,26 @@ def _class_aggregate(
             if identity in observed_identities:
                 raise M8S2ProtocolViolation("S2 target identity was counted twice")
             observed_identities.add(identity)
-            band = item.get("range_band_metres")
-            if band not in RANGE_BANDS:
-                raise M8S2ProtocolViolation("S2 range band differs")
+            forward_m = _number(item.get("range_forward_m"), "forward range")
+            if not math.isfinite(forward_m):
+                raise M8S2ProtocolViolation("S2 forward range must be finite")
+            band = (
+                "0_20"
+                if 0.0 <= forward_m < 20.0
+                else "20_35"
+                if forward_m < 35.0 and forward_m >= 20.0
+                else "35_50"
+                if forward_m < 50.0 and forward_m >= 35.0
+                else None
+            )
             for threshold in THRESHOLDS:
                 is_matched = identity in matched_by_iou[threshold]
                 if threshold == "0.50" and item.get("matched") is not is_matched:
                     raise M8S2ProtocolViolation("S2 primary match differs from GT identities")
                 observations_by_iou[threshold][key] = is_matched
-                range_counts[threshold][str(band)]["targets"] += 1
-                range_counts[threshold][str(band)]["matched"] += int(is_matched)
+                if band is not None:
+                    range_counts[threshold][band]["targets"] += 1
+                    range_counts[threshold][band]["matched"] += int(is_matched)
                 tracks[threshold][identity].append(
                     (_integer(item["frame_index"], "frame index"), is_matched)
                 )
@@ -416,6 +427,35 @@ def _class_aggregate(
         "target_pose_detection": observations_by_iou["0.50"],
         "target_pose_detection_by_iou": observations_by_iou,
     }
+
+
+def _continuity_spread(class_results: Sequence[Mapping[str, object]]) -> dict[str, object]:
+    by_pass = [cast(Mapping[str, object], row["track_continuity"]) for row in class_results]
+    spread: dict[str, object] = {}
+    for threshold in THRESHOLDS:
+        tracks = [cast(Mapping[str, object], row[threshold]) for row in by_pass]
+        if any(set(row) != set(tracks[0]) for row in tracks[1:]):
+            raise M8S2ProtocolViolation("S2 continuity track set differs across passes")
+        spread[threshold] = {
+            track: {
+                key: _spread(
+                    [
+                        _integer(
+                            cast(Mapping[str, object], row[track]).get(key),
+                            f"track continuity {key}",
+                        )
+                        for row in tracks
+                    ]
+                )
+                for key in (
+                    "target_poses",
+                    "matched_poses",
+                    "longest_consecutive_matched",
+                )
+            }
+            for track in sorted(tracks[0])
+        }
+    return spread
 
 
 def aggregate_one_full_pass(raw: Mapping[str, object]) -> dict[str, object]:
@@ -630,6 +670,7 @@ def aggregate_three_full_passes(
                 "prediction_population_and_fov": population_spread,
                 "range": range_spread,
                 "track_continuity_by_pass": [item["track_continuity"] for item in class_results],
+                "track_continuity": _continuity_spread(class_results),
             }
         spread[arm] = {"classes": classes}
     gates = {

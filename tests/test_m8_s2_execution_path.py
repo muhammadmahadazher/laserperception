@@ -541,6 +541,21 @@ def test_no_inferential_fields_in_static_outputs() -> None:
     assert all(term not in json.dumps(plan) for term in ("p_value", "confidence_interval"))
 
 
+def test_runner_rejects_imported_code_outside_reviewed_checkout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = runpy.run_path(str(ROOT / "scripts/detection/run_m8_s2.py"))
+    verify = module["_verify_imported_checkout"]
+    verify(ROOT)
+    monkeypatch.setitem(
+        sys.modules,
+        "laserperception.stale_module",
+        SimpleNamespace(__file__=str(tmp_path / "stale_module.py")),
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="imported module differs"):
+        verify(ROOT)
+
+
 def test_unauthorized_cli_never_imports_science_or_torch(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -693,6 +708,7 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
                         "track_id": item["gt_track_id"],
                         "frame_index": item["frame_index"],
                         "gt_identity": f"{item['drive_id']}/track_{item['gt_track_id']}",
+                        "range_forward_m": 10.0,
                         "range_band_metres": "0_20",
                         "matched": matched,
                     }
@@ -729,6 +745,17 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     lower_iou["true_positives"] += 1
     lower_iou["false_negatives"] -= 1
     lower_iou["matched_gt_identity_set"].append(identity)
+    shared = car["shared"]["identities"][0]
+    shared_frame = f"{shared['drive_id']}/{shared['frame_index']:010d}/B2"
+    shared_condition = next(
+        row for row in passes[0]["conditions"] if row["condition_id"] == shared_frame
+    )
+    shared_observation = next(
+        item
+        for item in shared_condition["classes"]["car"]["target_observations"]
+        if item["track_id"] == shared["gt_track_id"]
+    )
+    shared_observation["range_forward_m"] = 55.0
     first = aggregate_three_full_passes(passes, repository_root=ROOT)
     second = aggregate_three_full_passes(passes, repository_root=ROOT)
     assert first == second
@@ -754,9 +781,14 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     assert b2_car["range"]["0.30"]["0_20"]["matched"] == (
         b2_car["range"]["0.50"]["0_20"]["matched"] + 1
     )
+    assert b2_car["range"]["0.50"]["0_20"]["targets"] == len(identity_rows) - 1
     assert b2_car["track_continuity"]["0.30"][identity]["matched_poses"] == (
         b2_car["track_continuity"]["0.50"][identity]["matched_poses"] + 1
     )
+    continuity_values = first["spread"]["B2"]["classes"]["car"]["track_continuity"]["0.30"][
+        identity
+    ]["matched_poses"]["pass_values"]
+    assert continuity_values[0] == continuity_values[1] + 1 == continuity_values[2] + 1
     assert (
         first["spread"]["B2"]["classes"]["car"]["range"]["0.30"]["0_20"]["matched"]["pass_values"][
             0

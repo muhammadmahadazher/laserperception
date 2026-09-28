@@ -6,8 +6,10 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
+import sys
 from pathlib import Path
 
+import laserperception
 from laserperception.detection.m8_s1_runtime import (
     CANDIDATE_MANIFEST_PATH,
     atomic_write_json,
@@ -98,6 +100,22 @@ def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
     verify_candidate_environment(root, upstream, checkpoint)
 
 
+def _verify_imported_checkout(root: Path) -> None:
+    """Reject a stale installed package or a runner outside the reviewed checkout."""
+
+    package_root = (root / "src" / "laserperception").resolve()
+    if Path(__file__).resolve() != (root / "scripts/detection/run_m8_s2.py").resolve():
+        raise M8S2ProtocolViolation("S2 runner differs from repository checkout")
+    if Path(laserperception.__file__).resolve().parent != package_root:
+        raise M8S2ProtocolViolation("S2 imported package differs from repository checkout")
+    for name, module in tuple(sys.modules.items()):
+        if name != "laserperception" and not name.startswith("laserperception."):
+            continue
+        source = getattr(module, "__file__", None)
+        if source is None or not Path(source).resolve().is_relative_to(package_root):
+            raise M8S2ProtocolViolation(f"S2 imported module differs from checkout: {name}")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.mode in {
@@ -110,6 +128,7 @@ def main(argv: list[str] | None = None) -> int:
     }:
         require_external_worker(args.external_worker)
     root = args.repository_root.resolve()
+    _verify_imported_checkout(root)
 
     if args.mode == "aggregate":
         commit = _text(args.execution_commit, "--execution-commit")
