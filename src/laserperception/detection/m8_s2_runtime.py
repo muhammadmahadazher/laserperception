@@ -673,7 +673,21 @@ def seal_interrupted_attempt(
     if process_alive(lock["process_id"]):
         raise M8S2ProtocolViolation("S2 interrupted process is still alive")
     if (attempt_root / "final_pass_manifest.json").exists():
-        raise M8S2ProtocolViolation("S2 completed attempt cannot be sealed incomplete")
+        from laserperception.evaluation.m8_s2_aggregation import load_completed_attempt
+
+        complete = load_completed_attempt(attempt_root, mode=mode, allow_stale_complete=True)
+        if complete.get("execution_commit") != execution_commit:
+            raise M8S2ProtocolViolation("S2 completed recovery commit differs")
+        if _mapping(manifest_path).get("status") != "COMPLETE":
+            atomic_write_json(
+                manifest_path, {k: v for k, v in complete.items() if k != "conditions"}
+            )
+        lock_path.unlink()
+        return {
+            "status": "RECOVERED_COMPLETE",
+            "attempt_id": attempt_id,
+            "result_sha256": complete["result_sha256"],
+        }
     attempt_root.mkdir(exist_ok=True)
     backup_path = attempt_root / "attempt_manifest_before_recovery.json"
     previous_sha: str | None = None

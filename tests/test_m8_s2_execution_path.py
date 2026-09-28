@@ -223,6 +223,30 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
     assert loaded["authorization_sha256"] == AUTHORIZATION
     assert loaded["qualification_receipt_sha256"] == QUALIFICATION
     assert loaded["campaign_claim_sha256"]
+    stale_manifest = json.loads((root / "attempt_manifest.json").read_text(encoding="utf-8"))
+    stale_manifest["status"] = "IN_PROGRESS"
+    (root / "attempt_manifest.json").write_text(json.dumps(stale_manifest), encoding="utf-8")
+    lock = claims / "repeatability-s2-repeatability-01.lock"
+    lock.write_text(
+        json.dumps(
+            {"attempt_id": "attempt-complete", "process_id": 123, "worker_hostname": "test-worker"}
+        ),
+        encoding="utf-8",
+    )
+    recovered = seal_interrupted_attempt(
+        campaign_root=tmp_path,
+        attempt_root=root,
+        mode="repeatability",
+        logical_pass_id="s2-repeatability-01",
+        attempt_id="attempt-complete",
+        execution_commit=COMMIT,
+        recovery_note="synthetic stale complete lock",
+        process_alive=lambda _: False,
+        hostname_provider=lambda: "test-worker",
+    )
+    assert recovered["status"] == "RECOVERED_COMPLETE"
+    assert not lock.exists()
+    assert load_completed_attempt(root, mode="repeatability")["accepted_canonical_calls"] == 28
     (prior / "partial.log").unlink()
     with pytest.raises(M8S2ProtocolViolation, match="incomplete evidence differs"):
         load_completed_attempt(root, mode="repeatability")
@@ -1004,6 +1028,9 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     assert first["car_recovery_by_pass"][0]["B2"]["R_gain"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_Aonly"] is None
     assert first["interpretation_gate_all_three"]["B2"] is True
+    assert first["passes"][0]["B2"]["all_score_all_class_prediction_count"] == 2
+    assert first["passes"][0]["B2"]["classes"]["car"]["all_score_prediction_count"] == 2
+    assert first["spread"]["B2"]["all_score_all_class_prediction_count"]["pass_values"] == [2, 1, 0]
     assert (
         first["passes"][0]["B2"]["classes"]["car"]["outside_annotation_fov_prediction_count"] == 1
     )

@@ -159,7 +159,9 @@ def _read_claimed_manifest(path: Path) -> Mapping[str, object]:
     return payload
 
 
-def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str) -> dict[str, str]:
+def _verify_campaign_claim(
+    root: Path, manifest: Mapping[str, object], mode: str, *, allow_stale_complete: bool = False
+) -> dict[str, str]:
     campaign_root = root.parent.resolve()
     logical_pass_id = manifest.get("logical_pass_id")
     if not isinstance(logical_pass_id, str):
@@ -227,7 +229,9 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
             raise M8S2ProtocolViolation("S2 claimed attempt identity differs")
         terminal = index == len(history) - 1
         if terminal:
-            if copied_root.resolve() != root.resolve() or prior.get("status") != "COMPLETE":
+            if copied_root.resolve() != root.resolve() or prior.get("status") not in (
+                {"COMPLETE", "IN_PROGRESS"} if allow_stale_complete else {"COMPLETE"}
+            ):
                 raise M8S2ProtocolViolation("S2 selected attempt is not terminal complete")
         elif (
             prior.get("status") != "INCOMPLETE"
@@ -265,7 +269,9 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
     }
 
 
-def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
+def load_completed_attempt(
+    root: Path, *, mode: str, allow_stale_complete: bool = False
+) -> dict[str, object]:
     """Verify every condition file against one atomic final manifest."""
 
     try:
@@ -278,7 +284,9 @@ def load_completed_attempt(root: Path, *, mode: str) -> dict[str, object]:
     digest = unsigned.pop("result_sha256", None)
     if digest != canonical_json_sha256(unsigned):
         raise M8S2ProtocolViolation("S2 final attempt identity differs")
-    claim_binding = _verify_campaign_claim(root, manifest, mode)
+    claim_binding = _verify_campaign_claim(
+        root, manifest, mode, allow_stale_complete=allow_stale_complete
+    )
     expected = condition_ids(mode)
     hashes = manifest.get("condition_file_sha256")
     if not isinstance(hashes, list) or len(hashes) != len(expected):
@@ -592,6 +600,12 @@ def _class_aggregate(
             _integer(item.get("thresholded_prediction_count"), "prediction count")
             for item in evidence
         ),
+        "all_score_prediction_count": sum(
+            item.get("class_name") == class_name
+            for row in selected
+            for item in _list(row.get("predictions"), "stable predictions")
+            if isinstance(item, Mapping)
+        ),
         "outside_annotation_fov_prediction_count": sum(
             _outside_fov_count(row, class_name) for row in selected
         ),
@@ -655,6 +669,9 @@ def aggregate_one_full_pass(raw: Mapping[str, object]) -> dict[str, object]:
             raise M8S2ProtocolViolation("S2 arm count differs")
         result[arm] = {
             "condition_count": 428,
+            "all_score_all_class_prediction_count": sum(
+                len(_list(row.get("predictions"), "stable predictions")) for row in selected
+            ),
             "classes": {
                 class_name: _class_aggregate(selected, class_name) for class_name in CLASSES
             },
@@ -809,6 +826,7 @@ def aggregate_three_full_passes(
             population_spread = {
                 key: _spread([_number(item.get(key), key) for item in class_results])
                 for key in (
+                    "all_score_prediction_count",
                     "thresholded_prediction_count",
                     "outside_annotation_fov_prediction_count",
                     "neighbour_ignore_GT_count",
@@ -846,7 +864,20 @@ def aggregate_three_full_passes(
                 "track_continuity_by_pass": [item["track_continuity"] for item in class_results],
                 "track_continuity": _continuity_spread(class_results),
             }
-        spread[arm] = {"classes": classes}
+        spread[arm] = {
+            "classes": classes,
+            "all_score_all_class_prediction_count": _spread(
+                [
+                    _integer(
+                        cast(Mapping[str, object], row[arm])[
+                            "all_score_all_class_prediction_count"
+                        ],
+                        "all-score population",
+                    )
+                    for row in per_pass
+                ]
+            ),
+        }
     recovery_spread = {
         arm: {
             key: _optional_spread(
