@@ -11,7 +11,7 @@ import math
 import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from statistics import median
 from typing import cast
 
@@ -185,12 +185,13 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
     history = _list(claim.get("attempts"), "campaign claim history")
     if not history:
         raise M8S2ProtocolViolation("S2 campaign claim history is empty")
-    origin: Path | None = None
+    origin: PurePosixPath | None = None
     names: set[str] = set()
     for index, previous in enumerate(history):
         if not isinstance(previous, dict) or set(previous) != {"attempt_id", "root"}:
             raise M8S2ProtocolViolation("S2 campaign claim entry is malformed")
-        source_root = Path(str(previous["root"]))
+        # Claims originate on a Linux worker but may be reviewed on Windows.
+        source_root = PurePosixPath(str(previous["root"]).replace("\\", "/"))
         if origin is None:
             origin = source_root.parent
         if source_root.parent != origin or source_root.name in names:
@@ -237,10 +238,11 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
             ):
                 raise M8S2ProtocolViolation("S2 unclaimed competing attempt exists")
     assert origin is not None
-    if manifest.get("campaign_origin_root") != str(origin):
+    manifest_origin = manifest.get("campaign_origin_root")
+    if not isinstance(manifest_origin, str) or manifest_origin.replace("\\", "/") != str(origin):
         raise M8S2ProtocolViolation("S2 campaign origin differs")
     return {
-        "campaign_origin_root": str(origin),
+        "campaign_origin_root": manifest_origin,
         "campaign_claim_sha256": claim_sha,
     }
 
