@@ -756,6 +756,31 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
         if item["track_id"] == shared["gt_track_id"]
     )
     shared_observation["range_forward_m"] = 55.0
+    second_condition = next(
+        row for row in passes[1]["conditions"] if row["condition_id"] == f"{frame_id}/B2"
+    )
+    second_car = second_condition["classes"]["car"]
+    second_observation = next(
+        item for item in second_car["target_observations"] if item["gt_identity"] == identity
+    )
+    second_observation["matched"] = True
+    for threshold in ("0.30", "0.50", "0.70"):
+        second_summary = second_car["thresholds"][threshold]
+        second_summary["true_positives"] += 1
+        second_summary["false_negatives"] -= 1
+        second_summary["matched_gt_identity_set"].append(identity)
+    second_car["thresholded_prediction_count"] += 1
+    second_car["ranked_dispositions"].append(
+        {
+            "score": 0.9,
+            "frame_id": frame_id,
+            "prediction_index": len(second_car["ranked_dispositions"]),
+            "true_positive": True,
+        }
+    )
+    second_condition["predictions"].append(
+        {"class_name": "car", "score": 0.9, "inside_annotation_fov": True}
+    )
     first = aggregate_three_full_passes(passes, repository_root=ROOT)
     second = aggregate_three_full_passes(passes, repository_root=ROOT)
     assert first == second
@@ -782,18 +807,36 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
         b2_car["range"]["0.50"]["0_20"]["matched"] + 1
     )
     assert b2_car["range"]["0.50"]["0_20"]["targets"] == len(identity_rows) - 1
+    range_band = b2_car["range"]["0.50"]["0_20"]
+    assert range_band["false_negatives"] == range_band["targets"] - range_band["matched"]
+    assert range_band["recall"] == range_band["matched"] / range_band["targets"]
+    assert b2_car["range"]["0.50"]["35_50"]["recall"] is None
     assert b2_car["track_continuity"]["0.30"][identity]["matched_poses"] == (
         b2_car["track_continuity"]["0.50"][identity]["matched_poses"] + 1
     )
     continuity_values = first["spread"]["B2"]["classes"]["car"]["track_continuity"]["0.30"][
         identity
     ]["matched_poses"]["pass_values"]
-    assert continuity_values[0] == continuity_values[1] + 1 == continuity_values[2] + 1
+    assert continuity_values[0] == continuity_values[1] == continuity_values[2] + 1
     assert (
         first["spread"]["B2"]["classes"]["car"]["range"]["0.30"]["0_20"]["matched"]["pass_values"][
             0
         ]
         == b2_car["range"]["0.30"]["0_20"]["matched"]
+    )
+    assert (
+        first["spread"]["B2"]["classes"]["car"]["range"]["0.50"]["0_20"]["recall"]["pass_values"][0]
+        == range_band["recall"]
+    )
+    assert first["car_recovery_spread"]["B2"]["G_car"]["pass_values"] == [
+        1.0,
+        25 / 24,
+        1.0,
+    ]
+    assert first["car_recovery_spread"]["B2"]["R_Aonly"]["median"] is None
+    assert (
+        first["spread"]["B2"]["classes"]["car"]["range"]["0.50"]["35_50"]["recall"]["median"]
+        is None
     )
     assert first["car_factorial_by_pass"][0]["Car_TP"] == {"L": 12.0, "P": 12.0, "I": -24.0}
     assert "confidence_interval" not in json.dumps(first)

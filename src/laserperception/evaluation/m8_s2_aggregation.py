@@ -66,6 +66,16 @@ def _spread(values: Sequence[int | float]) -> dict[str, object]:
     }
 
 
+def _optional_spread(values: Sequence[int | float | None]) -> dict[str, object]:
+    if len(values) != 3:
+        raise M8S2ProtocolViolation("S2 spread requires three complete passes")
+    if all(value is None for value in values):
+        return {"pass_values": list(values), "minimum": None, "median": None, "maximum": None}
+    if any(value is None for value in values):
+        raise M8S2ProtocolViolation("S2 denominator availability differs across passes")
+    return _spread(cast(Sequence[int | float], values))
+
+
 def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> None:
     """Reject missing, partial, reordered, spliced, or reused process evidence."""
 
@@ -329,7 +339,7 @@ def _class_aggregate(
         raise M8S2ProtocolViolation("S2 ranked disposition is malformed")
     ranked = cast(list[Mapping[str, object]], raw_ranked)
     observations_by_iou: dict[str, dict[str, bool]] = {value: {} for value in THRESHOLDS}
-    range_counts = {
+    range_counts: dict[str, dict[str, dict[str, int | float | None]]] = {
         value: {band: {"targets": 0, "matched": 0} for band in RANGE_BANDS} for value in THRESHOLDS
     }
     tracks: dict[str, dict[str, list[tuple[int, bool]]]] = {
@@ -376,13 +386,23 @@ def _class_aggregate(
                     raise M8S2ProtocolViolation("S2 primary match differs from GT identities")
                 observations_by_iou[threshold][key] = is_matched
                 if band is not None:
-                    range_counts[threshold][band]["targets"] += 1
-                    range_counts[threshold][band]["matched"] += int(is_matched)
+                    counts = range_counts[threshold][band]
+                    counts["targets"] = _integer(counts["targets"], "range targets") + 1
+                    counts["matched"] = _integer(counts["matched"], "range matches") + int(
+                        is_matched
+                    )
                 tracks[threshold][identity].append(
                     (_integer(item["frame_index"], "frame index"), is_matched)
                 )
         if any(not identities <= observed_identities for identities in matched_by_iou.values()):
             raise M8S2ProtocolViolation("S2 matched GT identity lacks a target observation")
+    for threshold in THRESHOLDS:
+        for band in RANGE_BANDS:
+            counts = range_counts[threshold][band]
+            targets = _integer(counts["targets"], "range targets")
+            matched = _integer(counts["matched"], "range matches")
+            counts["false_negatives"] = targets - matched
+            counts["recall"] = matched / targets if targets else None
     continuity: dict[str, dict[str, dict[str, int]]] = {}
     for threshold in THRESHOLDS:
         if sum(observations_by_iou[threshold].values()) != _integer(
@@ -456,6 +476,16 @@ def _continuity_spread(class_results: Sequence[Mapping[str, object]]) -> dict[st
             for track in sorted(tracks[0])
         }
     return spread
+
+
+def _range_value(
+    class_result: Mapping[str, object], threshold: str, band: str, key: str
+) -> float | None:
+    ranges = cast(Mapping[str, object], class_result["range"])
+    bands = cast(Mapping[str, object], ranges[threshold])
+    counts = cast(Mapping[str, object], bands[band])
+    value = counts.get(key)
+    return None if value is None else _number(value, key)
 
 
 def aggregate_one_full_pass(raw: Mapping[str, object]) -> dict[str, object]:
@@ -643,22 +673,10 @@ def aggregate_three_full_passes(
             range_spread = {
                 threshold: {
                     band: {
-                        key: _spread(
-                            [
-                                _number(
-                                    cast(
-                                        Mapping[str, object],
-                                        cast(
-                                            Mapping[str, object],
-                                            cast(Mapping[str, object], item["range"])[threshold],
-                                        )[band],
-                                    ).get(key),
-                                    key,
-                                )
-                                for item in class_results
-                            ]
+                        key: _optional_spread(
+                            [_range_value(item, threshold, band, key) for item in class_results]
                         )
-                        for key in ("targets", "matched")
+                        for key in ("targets", "matched", "false_negatives", "recall")
                     }
                     for band in RANGE_BANDS
                 }
@@ -673,6 +691,20 @@ def aggregate_three_full_passes(
                 "track_continuity": _continuity_spread(class_results),
             }
         spread[arm] = {"classes": classes}
+    recovery_spread = {
+        arm: {
+            key: _optional_spread(
+                [
+                    None
+                    if (value := cast(Mapping[str, object], row[arm]).get(key)) is None
+                    else _number(value, key)
+                    for row in recovery
+                ]
+            )
+            for key in ("G_car", "R_gain", "R_shared", "R_Aonly", "R_neither")
+        }
+        for arm in ARMS
+    }
     gates = {
         arm: all(
             cast(Mapping[str, object], row[arm])["interpretation_gate"] is True for row in recovery
@@ -705,6 +737,7 @@ def aggregate_three_full_passes(
         "passes": per_pass,
         "spread": spread,
         "car_recovery_by_pass": recovery,
+        "car_recovery_spread": recovery_spread,
         "car_factorial_by_pass": factorial,
         "interpretation_gate_all_three": gates,
         "accepted_processes": 3,
