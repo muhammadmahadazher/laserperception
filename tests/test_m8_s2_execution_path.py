@@ -716,9 +716,19 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
                         }
                     )
     passes[0]["conditions"][0]["predictions"] = [
-        {"class_name": "car", "inside_annotation_fov": False}
+        {"class_name": "car", "score": 0.9, "inside_annotation_fov": False},
+        {"class_name": "car", "score": 0.1, "inside_annotation_fov": False},
     ]
-    passes[0]["conditions"][0]["outside_annotation_fov_prediction_count"] = 1
+    passes[0]["conditions"][0]["outside_annotation_fov_prediction_count"] = 2
+    neither = car["neither"]["identities"][0]
+    frame_id = f"{neither['drive_id']}/{neither['frame_index']:010d}"
+    identity = f"{neither['drive_id']}/track_{neither['gt_track_id']}"
+    lower_iou = next(
+        row for row in passes[0]["conditions"] if row["condition_id"] == f"{frame_id}/B2"
+    )["classes"]["car"]["thresholds"]["0.30"]
+    lower_iou["true_positives"] += 1
+    lower_iou["false_negatives"] -= 1
+    lower_iou["matched_gt_identity_set"].append(identity)
     first = aggregate_three_full_passes(passes, repository_root=ROOT)
     second = aggregate_three_full_passes(passes, repository_root=ROOT)
     assert first == second
@@ -739,6 +749,19 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
     assert (
         first["passes"][0]["B2"]["classes"]["pedestrian"]["outside_annotation_fov_prediction_count"]
         == 0
+    )
+    b2_car = first["passes"][0]["B2"]["classes"]["car"]
+    assert b2_car["range"]["0.30"]["0_20"]["matched"] == (
+        b2_car["range"]["0.50"]["0_20"]["matched"] + 1
+    )
+    assert b2_car["track_continuity"]["0.30"][identity]["matched_poses"] == (
+        b2_car["track_continuity"]["0.50"][identity]["matched_poses"] + 1
+    )
+    assert (
+        first["spread"]["B2"]["classes"]["car"]["range"]["0.30"]["0_20"]["matched"]["pass_values"][
+            0
+        ]
+        == b2_car["range"]["0.30"]["0_20"]["matched"]
     )
     assert first["car_factorial_by_pass"][0]["Car_TP"] == {"L": 12.0, "P": 12.0, "I": -24.0}
     assert "confidence_interval" not in json.dumps(first)

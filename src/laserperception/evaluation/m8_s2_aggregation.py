@@ -33,6 +33,7 @@ from laserperception.evaluation.m8_s1_aggregation import aggregate_ranked_ap
 CLASSES = ("car", "pedestrian")
 THRESHOLDS = ("0.30", "0.50", "0.70")
 RANGE_BANDS = ("0_20", "20_35", "35_50")
+SCORE_THRESHOLD = 0.25
 
 
 def _integer(value: object, label: str) -> int:
@@ -287,7 +288,11 @@ def _outside_fov_count(condition: Mapping[str, object], class_name: str) -> int:
         condition.get("outside_annotation_fov_prediction_count"), "outside FOV"
     ):
         raise M8S2ProtocolViolation("S2 outside-FOV count differs from stable predictions")
-    return sum(item.get("class_name") == class_name for item in outside)
+    return sum(
+        item.get("class_name") == class_name
+        and _number(item.get("score"), "prediction score") >= SCORE_THRESHOLD
+        for item in outside
+    )
 
 
 def _class_aggregate(
@@ -322,40 +327,73 @@ def _class_aggregate(
     if any(not isinstance(item, Mapping) for item in raw_ranked):
         raise M8S2ProtocolViolation("S2 ranked disposition is malformed")
     ranked = cast(list[Mapping[str, object]], raw_ranked)
-    observations: dict[str, bool] = {}
-    range_counts = {band: {"targets": 0, "matched": 0} for band in RANGE_BANDS}
-    tracks: dict[str, list[tuple[int, bool]]] = defaultdict(list)
+    observations_by_iou: dict[str, dict[str, bool]] = {value: {} for value in THRESHOLDS}
+    range_counts = {
+        value: {band: {"targets": 0, "matched": 0} for band in RANGE_BANDS} for value in THRESHOLDS
+    }
+    tracks: dict[str, dict[str, list[tuple[int, bool]]]] = {
+        value: defaultdict(list) for value in THRESHOLDS
+    }
     for condition, record in zip(selected, evidence, strict=True):
+        matched_by_iou = {}
+        for threshold in THRESHOLDS:
+            identities = _list(
+                _threshold(record, threshold).get("matched_gt_identity_set"), "matches"
+            )
+            if any(not isinstance(value, str) or not value for value in identities):
+                raise M8S2ProtocolViolation("S2 matched GT identity is malformed")
+            if len(set(identities)) != len(identities):
+                raise M8S2ProtocolViolation("S2 matched GT identity is duplicated")
+            matched_by_iou[threshold] = set(identities)
+        observed_identities: set[str] = set()
         for raw_item in _list(record.get("target_observations"), "target observations"):
             if not isinstance(raw_item, Mapping):
                 raise M8S2ProtocolViolation("S2 target observation is malformed")
             item = raw_item
             key = _pose_key(condition, item)
-            if key in observations:
+            if key in observations_by_iou["0.50"]:
                 raise M8S2ProtocolViolation("S2 target pose was counted twice")
-            is_matched = item.get("matched") is True
-            observations[key] = is_matched
+            identity = str(item["gt_identity"])
+            if identity in observed_identities:
+                raise M8S2ProtocolViolation("S2 target identity was counted twice")
+            observed_identities.add(identity)
             band = item.get("range_band_metres")
-            if band not in range_counts:
+            if band not in RANGE_BANDS:
                 raise M8S2ProtocolViolation("S2 range band differs")
-            range_counts[str(band)]["targets"] += 1
-            range_counts[str(band)]["matched"] += int(is_matched)
-            track = str(item["gt_identity"])
-            tracks[track].append((_integer(item["frame_index"], "frame index"), is_matched))
-    continuity = {}
-    for track, poses in sorted(tracks.items()):
-        ordered = sorted(poses)
-        longest = current = 0
-        prior = None
-        for frame_index, is_matched in ordered:
-            current = current + 1 if is_matched and prior == frame_index - 1 else int(is_matched)
-            longest = max(longest, current)
-            prior = frame_index
-        continuity[track] = {
-            "target_poses": len(ordered),
-            "matched_poses": sum(item[1] for item in ordered),
-            "longest_consecutive_matched": longest,
-        }
+            for threshold in THRESHOLDS:
+                is_matched = identity in matched_by_iou[threshold]
+                if threshold == "0.50" and item.get("matched") is not is_matched:
+                    raise M8S2ProtocolViolation("S2 primary match differs from GT identities")
+                observations_by_iou[threshold][key] = is_matched
+                range_counts[threshold][str(band)]["targets"] += 1
+                range_counts[threshold][str(band)]["matched"] += int(is_matched)
+                tracks[threshold][identity].append(
+                    (_integer(item["frame_index"], "frame index"), is_matched)
+                )
+        if any(not identities <= observed_identities for identities in matched_by_iou.values()):
+            raise M8S2ProtocolViolation("S2 matched GT identity lacks a target observation")
+    continuity: dict[str, dict[str, dict[str, int]]] = {}
+    for threshold in THRESHOLDS:
+        if sum(observations_by_iou[threshold].values()) != _integer(
+            cast(Mapping[str, object], thresholds[threshold])["true_positives"], "TP"
+        ):
+            raise M8S2ProtocolViolation("S2 matched target count differs from TP")
+        continuity[threshold] = {}
+        for track, poses in sorted(tracks[threshold].items()):
+            ordered = sorted(poses)
+            longest = current = 0
+            prior = None
+            for frame_index, is_matched in ordered:
+                current = (
+                    current + 1 if is_matched and prior == frame_index - 1 else int(is_matched)
+                )
+                longest = max(longest, current)
+                prior = frame_index
+            continuity[threshold][track] = {
+                "target_poses": len(ordered),
+                "matched_poses": sum(item[1] for item in ordered),
+                "longest_consecutive_matched": longest,
+            }
     return {
         "thresholds": thresholds,
         "annotation_conditioned_AP": aggregate_ranked_ap(
@@ -375,7 +413,8 @@ def _class_aggregate(
         ),
         "range": range_counts,
         "track_continuity": continuity,
-        "target_pose_detection": observations,
+        "target_pose_detection": observations_by_iou["0.50"],
+        "target_pose_detection_by_iou": observations_by_iou,
     }
 
 
@@ -562,22 +601,28 @@ def aggregate_three_full_passes(
                 for key in ("average_precision",)
             }
             range_spread = {
-                band: {
-                    key: _spread(
-                        [
-                            _number(
-                                cast(
-                                    Mapping[str, object],
-                                    cast(Mapping[str, object], item["range"])[band],
-                                ).get(key),
-                                key,
-                            )
-                            for item in class_results
-                        ]
-                    )
-                    for key in ("targets", "matched")
+                threshold: {
+                    band: {
+                        key: _spread(
+                            [
+                                _number(
+                                    cast(
+                                        Mapping[str, object],
+                                        cast(
+                                            Mapping[str, object],
+                                            cast(Mapping[str, object], item["range"])[threshold],
+                                        )[band],
+                                    ).get(key),
+                                    key,
+                                )
+                                for item in class_results
+                            ]
+                        )
+                        for key in ("targets", "matched")
+                    }
+                    for band in RANGE_BANDS
                 }
-                for band in RANGE_BANDS
+                for threshold in THRESHOLDS
             }
             classes[class_name] = {
                 "thresholds": threshold_spread,
