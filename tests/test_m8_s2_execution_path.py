@@ -46,6 +46,9 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMIT = "a" * 40
 POLICY = "b" * 64
 RECEIPT = "c" * 64
+QUALIFICATION = "d" * 64
+AUTHORIZATION = "e" * 64
+AUTHORIZATION_ID = "synthetic-test-grant"
 
 
 def _pass(mode: str, index: int) -> dict[str, object]:
@@ -61,6 +64,9 @@ def _pass(mode: str, index: int) -> dict[str, object]:
         "execution_commit": COMMIT,
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
+        "qualification_receipt_sha256": QUALIFICATION,
+        "authorization_id": AUTHORIZATION_ID,
+        "authorization_sha256": AUTHORIZATION,
         "full_ledger_sha256": FULL_LEDGER_SHA256,
         "protocol_sha256": PROTOCOL_SHA256,
         "expected_calls": len(order),
@@ -103,6 +109,9 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
         COMMIT,
         POLICY,
         RECEIPT,
+        QUALIFICATION,
+        AUTHORIZATION_ID,
+        AUTHORIZATION,
     )
     attempt = AtomicAttempt(tmp_path / "attempt", identity)
     with pytest.raises(M8S2ProtocolViolation, match="order"):
@@ -112,6 +121,8 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
     )
     failed = attempt.fail("synthetic failure")
     assert failed["accepted_canonical_calls"] == 0
+    assert failed["qualification_receipt_sha256"] == QUALIFICATION
+    assert failed["authorization_sha256"] == AUTHORIZATION
     assert failed["completed_calls"] == 1
     with pytest.raises(M8S2ProtocolViolation, match="incomplete"):
         attempt.finalize()
@@ -142,6 +153,8 @@ def test_repeatability_requires_ten_exact_processes() -> None:
     assert result["owner_reviewed"] is False
     assert len(result["source_attempts"]) == 10
     assert result["aggregation_commit"] == COMMIT
+    assert result["source_attempts"][0]["authorization_sha256"] == AUTHORIZATION
+    assert result["qualification_receipt_sha256"] == QUALIFICATION
     with pytest.raises(M8S2ProtocolViolation, match="aggregation checkout differs"):
         review_repeatability(passes, aggregation_commit="d" * 40)
     passes[1]["conditions"][0]["classes"]["car"]["thresholds"]["0.50"]["true_positives"] = 1
@@ -294,6 +307,9 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
         "execution_commit": COMMIT,
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
+        "qualification_receipt_sha256": QUALIFICATION,
+        "authorization_id": AUTHORIZATION_ID,
+        "authorization_sha256": AUTHORIZATION,
     }
     first = tmp_path / "attempt-1"
     with claim_logical_pass(attempt_root=first, attempt_id="attempt-1", **common):
@@ -308,6 +324,9 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
                     "execution_commit": COMMIT,
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
+                    "qualification_receipt_sha256": QUALIFICATION,
+                    "authorization_id": AUTHORIZATION_ID,
+                    "authorization_sha256": AUTHORIZATION,
                 }
             ),
             encoding="utf-8",
@@ -325,6 +344,9 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
                     "execution_commit": COMMIT,
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
+                    "qualification_receipt_sha256": QUALIFICATION,
+                    "authorization_id": AUTHORIZATION_ID,
+                    "authorization_sha256": AUTHORIZATION,
                 }
             ),
             encoding="utf-8",
@@ -381,7 +403,11 @@ def test_backend_environment_must_match_checked_paths(
         verify_candidate_environment(tmp_path, upstream, checkpoint)
 
 
-def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: Path) -> None:
+def test_interrupted_lock_can_be_sealed_without_scientific_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from laserperception.detection import m8_s2_runtime
+
     common = {
         "campaign_root": tmp_path,
         "mode": "repeatability",
@@ -389,6 +415,9 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: P
         "execution_commit": COMMIT,
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
+        "qualification_receipt_sha256": QUALIFICATION,
+        "authorization_id": AUTHORIZATION_ID,
+        "authorization_sha256": AUTHORIZATION,
     }
     first = tmp_path / "attempt-1"
     with claim_logical_pass(attempt_root=first, attempt_id="attempt-1", **common):
@@ -403,13 +432,17 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: P
                     "execution_commit": COMMIT,
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
+                    "qualification_receipt_sha256": QUALIFICATION,
+                    "authorization_id": AUTHORIZATION_ID,
+                    "authorization_sha256": AUTHORIZATION,
                 }
             ),
             encoding="utf-8",
         )
     lock = tmp_path / ".s2_pass_claims" / "repeatability-s2-repeatability-01.lock"
     assert lock.exists()
-    receipt = seal_interrupted_attempt(
+    original_lock_bytes = lock.read_bytes()
+    recovery_kwargs = dict(
         campaign_root=tmp_path,
         attempt_root=first,
         mode="repeatability",
@@ -419,7 +452,24 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: P
         recovery_note="synthetic interrupted process",
         process_alive=lambda _: False,
     )
+    original_write = m8_s2_runtime.atomic_write_json
+
+    def interrupted_write(path: Path, payload: dict[str, object]) -> None:
+        if path.name == "interrupted_recovery.json":
+            raise RuntimeError("synthetic recovery interruption")
+        original_write(path, payload)
+
+    monkeypatch.setattr(m8_s2_runtime, "atomic_write_json", interrupted_write)
+    with pytest.raises(RuntimeError, match="synthetic recovery interruption"):
+        seal_interrupted_attempt(**recovery_kwargs)
+    assert lock.exists()
+    assert (first / "attempt_manifest_before_recovery.json").is_file()
+    monkeypatch.setattr(m8_s2_runtime, "atomic_write_json", original_write)
+    receipt = seal_interrupted_attempt(**recovery_kwargs)
     assert receipt["status"] == "SEALED_INCOMPLETE"
+    lock.write_bytes(original_lock_bytes)
+    assert seal_interrupted_attempt(**recovery_kwargs) == receipt
+    assert seal_interrupted_attempt(**recovery_kwargs) == receipt
     assert not lock.exists()
     assert (first / "attempt_manifest_before_recovery.json").is_file()
     assert (
@@ -438,6 +488,9 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(tmp_path: P
                     "execution_commit": COMMIT,
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
+                    "qualification_receipt_sha256": QUALIFICATION,
+                    "authorization_id": AUTHORIZATION_ID,
+                    "authorization_sha256": AUTHORIZATION,
                 }
             ),
             encoding="utf-8",
@@ -791,6 +844,8 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
         "attempt-2",
         "attempt-3",
     ]
+    assert first["execution_binding"]["qualification_receipt_sha256"] == QUALIFICATION
+    assert first["source_attempts"][0]["authorization_sha256"] == AUTHORIZATION
     assert first["car_recovery_by_pass"][0]["B2"]["G_car"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_gain"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_Aonly"] is None

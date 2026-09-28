@@ -35,6 +35,9 @@ def run_scientific_attempt(
     execution_commit: str,
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
+    qualification_receipt_sha256: str,
+    authorization_id: str,
+    authorization_sha256: str,
     attempt_root: Path,
     logical_pass_id: str,
     attempt_id: str,
@@ -50,6 +53,9 @@ def run_scientific_attempt(
         execution_commit=execution_commit,
         runtime_policy_sha256=runtime_policy_sha256,
         input_gate_receipt_sha256=input_gate_receipt_sha256,
+        qualification_receipt_sha256=qualification_receipt_sha256,
+        authorization_id=authorization_id,
+        authorization_sha256=authorization_sha256,
     )
     attempt = AtomicAttempt(attempt_root, identity)
     sampler: NvidiaSmiSampler | None = None

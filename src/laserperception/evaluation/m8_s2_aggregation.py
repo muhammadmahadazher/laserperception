@@ -100,6 +100,7 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
         "execution_commit",
         "runtime_policy_sha256",
         "input_gate_receipt_sha256",
+        "qualification_receipt_sha256",
         "full_ledger_sha256",
         "protocol_sha256",
     ):
@@ -113,6 +114,17 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
         raise M8S2ProtocolViolation("S2 process frozen input or protocol identity differs")
     expected = condition_ids(mode)
     for row in passes:
+        authorization_sha = row.get("authorization_sha256")
+        qualification_sha = row.get("qualification_receipt_sha256")
+        if (
+            not isinstance(row.get("authorization_id"), str)
+            or not row["authorization_id"]
+            or not isinstance(authorization_sha, str)
+            or re.fullmatch(r"[0-9a-f]{64}", authorization_sha) is None
+            or not isinstance(qualification_sha, str)
+            or re.fullmatch(r"[0-9a-f]{64}", qualification_sha) is None
+        ):
+            raise M8S2ProtocolViolation("S2 attempt authorization chain is absent")
         result_sha = row.get("result_sha256")
         if not isinstance(result_sha, str) or re.fullmatch(r"[0-9a-f]{64}", result_sha) is None:
             raise M8S2ProtocolViolation("S2 atomic attempt result identity is absent")
@@ -267,6 +279,9 @@ def review_repeatability(
                 "attempt_id": row["attempt_id"],
                 "process_uuid": row["process_uuid"],
                 "result_sha256": row["result_sha256"],
+                "qualification_receipt_sha256": row["qualification_receipt_sha256"],
+                "authorization_id": row["authorization_id"],
+                "authorization_sha256": row["authorization_sha256"],
             }
             for row in passes
         ],
@@ -274,6 +289,7 @@ def review_repeatability(
         "aggregation_commit": aggregation_commit,
         "runtime_policy_sha256": passes[0]["runtime_policy_sha256"],
         "input_gate_receipt_sha256": passes[0]["input_gate_receipt_sha256"],
+        "qualification_receipt_sha256": passes[0]["qualification_receipt_sha256"],
         "owner_reviewed": False,
         "full_corpus_authorized": False,
     }
@@ -721,6 +737,7 @@ def aggregate_three_full_passes(
                 "execution_commit",
                 "runtime_policy_sha256",
                 "input_gate_receipt_sha256",
+                "qualification_receipt_sha256",
                 "full_ledger_sha256",
                 "protocol_sha256",
             )
@@ -731,6 +748,9 @@ def aggregate_three_full_passes(
                 "attempt_id": row["attempt_id"],
                 "process_uuid": row["process_uuid"],
                 "result_sha256": row["result_sha256"],
+                "qualification_receipt_sha256": row["qualification_receipt_sha256"],
+                "authorization_id": row["authorization_id"],
+                "authorization_sha256": row["authorization_sha256"],
             }
             for row in passes
         ],

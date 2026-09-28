@@ -375,6 +375,9 @@ def claim_logical_pass(
     execution_commit: str,
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
+    qualification_receipt_sha256: str,
+    authorization_id: str,
+    authorization_sha256: str,
 ) -> Iterator[None]:
     """Serialize attempts and consume a pass after its first complete process.
 
@@ -385,12 +388,15 @@ def claim_logical_pass(
 
     campaign_root = campaign_root.resolve()
     attempt_root = attempt_root.resolve()
+    _sha(qualification_receipt_sha256, "qualification receipt", length=64)
+    _sha(authorization_sha256, "owner authorization", length=64)
     if (
         logical_pass_id not in logical_pass_ids(mode)
         or not campaign_root.is_dir()
         or attempt_root.parent != campaign_root
         or attempt_root.exists()
         or not attempt_id.strip()
+        or not authorization_id.strip()
     ):
         raise M8S2ProtocolViolation("S2 campaign or fresh attempt root differs")
     claims = campaign_root / ".s2_pass_claims"
@@ -422,6 +428,9 @@ def claim_logical_pass(
                 or claim.get("execution_commit") != execution_commit
                 or claim.get("runtime_policy_sha256") != runtime_policy_sha256
                 or claim.get("input_gate_receipt_sha256") != input_gate_receipt_sha256
+                or claim.get("qualification_receipt_sha256") != qualification_receipt_sha256
+                or claim.get("authorization_id") != authorization_id
+                or claim.get("authorization_sha256") != authorization_sha256
                 or not isinstance(history, list)
                 or not history
             ):
@@ -449,6 +458,9 @@ def claim_logical_pass(
                             "execution_commit": execution_commit,
                             "runtime_policy_sha256": runtime_policy_sha256,
                             "input_gate_receipt_sha256": input_gate_receipt_sha256,
+                            "qualification_receipt_sha256": qualification_receipt_sha256,
+                            "authorization_id": authorization_id,
+                            "authorization_sha256": authorization_sha256,
                         }.items()
                     )
                     or manifest.get("status") != "INCOMPLETE"
@@ -484,6 +496,9 @@ def claim_logical_pass(
                 "execution_commit": execution_commit,
                 "runtime_policy_sha256": runtime_policy_sha256,
                 "input_gate_receipt_sha256": input_gate_receipt_sha256,
+                "qualification_receipt_sha256": qualification_receipt_sha256,
+                "authorization_id": authorization_id,
+                "authorization_sha256": authorization_sha256,
                 "attempts": history,
             },
         )
@@ -538,21 +553,41 @@ def seal_interrupted_attempt(
     stem = f"{mode}-{logical_pass_id}"
     claims = campaign_root / ".s2_pass_claims"
     claim = _mapping(claims / f"{stem}.json")
-    lock_path = claims / f"{stem}.lock"
-    lock_bytes = lock_path.read_bytes()
-    try:
-        lock = json.loads(lock_bytes)
-    except json.JSONDecodeError as error:
-        raise M8S2ProtocolViolation("S2 interrupted lock is malformed") from error
     history = claim.get("attempts")
     if (
-        not isinstance(lock, dict)
-        or not isinstance(history, list)
+        not isinstance(history, list)
         or not history
         or history[-1] != {"attempt_id": attempt_id, "root": str(attempt_root)}
         or claim.get("mode") != mode
         or claim.get("logical_pass_id") != logical_pass_id
         or claim.get("execution_commit") != execution_commit
+    ):
+        raise M8S2ProtocolViolation("S2 interrupted claim identity differs")
+    lock_path = claims / f"{stem}.lock"
+    recovery_path = attempt_root / "interrupted_recovery.json"
+    manifest_path = attempt_root / "attempt_manifest.json"
+    if not lock_path.exists():
+        recovered = _mapping(recovery_path)
+        sealed = _mapping(manifest_path)
+        if (
+            recovered.get("status") != "SEALED_INCOMPLETE"
+            or recovered.get("mode") != mode
+            or recovered.get("logical_pass_id") != logical_pass_id
+            or recovered.get("attempt_id") != attempt_id
+            or recovered.get("execution_commit") != execution_commit
+            or recovered.get("recovery_note") != recovery_note
+            or sealed.get("status") != "INCOMPLETE"
+            or sealed.get("accepted_canonical_calls") != 0
+        ):
+            raise M8S2ProtocolViolation("S2 interrupted recovery differs")
+        return recovered
+    lock_bytes = lock_path.read_bytes()
+    try:
+        lock = json.loads(lock_bytes)
+    except json.JSONDecodeError as error:
+        raise M8S2ProtocolViolation("S2 interrupted lock is malformed") from error
+    if (
+        not isinstance(lock, dict)
         or lock.get("attempt_id") != attempt_id
         or lock.get("worker_hostname") != hostname_provider()
         or isinstance(lock.get("process_id"), bool)
@@ -564,27 +599,41 @@ def seal_interrupted_attempt(
         raise M8S2ProtocolViolation("S2 interrupted process is still alive")
     if (attempt_root / "final_pass_manifest.json").exists():
         raise M8S2ProtocolViolation("S2 completed attempt cannot be sealed incomplete")
-    recovery_path = attempt_root / "interrupted_recovery.json"
-    if recovery_path.exists():
-        raise M8S2ProtocolViolation("S2 interrupted recovery already exists")
     attempt_root.mkdir(exist_ok=True)
-    manifest_path = attempt_root / "attempt_manifest.json"
+    backup_path = attempt_root / "attempt_manifest_before_recovery.json"
     previous_sha: str | None = None
     if manifest_path.exists():
         previous_bytes = manifest_path.read_bytes()
-        previous_sha = hashlib.sha256(previous_bytes).hexdigest()
         manifest = _mapping(manifest_path)
         if (
-            manifest.get("status") != "IN_PROGRESS"
-            or manifest.get("mode") != mode
+            manifest.get("mode") != mode
             or manifest.get("logical_pass_id") != logical_pass_id
             or manifest.get("attempt_id") != attempt_id
             or manifest.get("execution_commit") != execution_commit
         ):
             raise M8S2ProtocolViolation("S2 interrupted attempt manifest differs")
-        with (attempt_root / "attempt_manifest_before_recovery.json").open("xb") as backup:
-            backup.write(previous_bytes)
+        if manifest.get("status") == "IN_PROGRESS":
+            previous_sha = hashlib.sha256(previous_bytes).hexdigest()
+            if backup_path.exists():
+                if backup_path.read_bytes() != previous_bytes:
+                    raise M8S2ProtocolViolation("S2 interrupted manifest backup differs")
+            else:
+                with backup_path.open("xb") as backup:
+                    backup.write(previous_bytes)
+        elif manifest.get("status") == "INCOMPLETE":
+            if not backup_path.is_file() or not recovery_path.is_file():
+                raise M8S2ProtocolViolation("S2 interrupted recovery is incomplete")
+            previous_sha = hashlib.sha256(backup_path.read_bytes()).hexdigest()
+            if (
+                manifest.get("accepted_canonical_calls") != 0
+                or manifest.get("failure_reason") != f"INTERRUPTED: {recovery_note}"
+            ):
+                raise M8S2ProtocolViolation("S2 sealed attempt differs")
+        else:
+            raise M8S2ProtocolViolation("S2 interrupted attempt status differs")
     else:
+        if backup_path.exists():
+            raise M8S2ProtocolViolation("S2 orphan interrupted manifest backup exists")
         manifest = {
             "schema_version": ATTEMPT_SCHEMA,
             "mode": mode,
@@ -593,13 +642,17 @@ def seal_interrupted_attempt(
             "execution_commit": execution_commit,
             "runtime_policy_sha256": claim.get("runtime_policy_sha256"),
             "input_gate_receipt_sha256": claim.get("input_gate_receipt_sha256"),
+            "qualification_receipt_sha256": claim.get("qualification_receipt_sha256"),
+            "authorization_id": claim.get("authorization_id"),
+            "authorization_sha256": claim.get("authorization_sha256"),
             "attempted_calls": 0,
             "completed_calls": 0,
         }
-    manifest["status"] = "INCOMPLETE"
-    manifest["accepted_canonical_calls"] = 0
-    manifest["failure_reason"] = f"INTERRUPTED: {recovery_note}"
-    manifest["ended_at_utc"] = datetime.now(timezone.utc).isoformat()
+    if manifest.get("status") != "INCOMPLETE":
+        manifest["status"] = "INCOMPLETE"
+        manifest["accepted_canonical_calls"] = 0
+        manifest["failure_reason"] = f"INTERRUPTED: {recovery_note}"
+        manifest["ended_at_utc"] = datetime.now(timezone.utc).isoformat()
     receipt: dict[str, object] = {
         "schema_version": "laserperception.m8.s2.interrupted-recovery.v1",
         "status": "SEALED_INCOMPLETE",
@@ -613,7 +666,11 @@ def seal_interrupted_attempt(
         "previous_manifest_sha256": previous_sha,
         "recovery_note": recovery_note,
     }
-    atomic_write_json(recovery_path, receipt)
+    if recovery_path.exists():
+        if _mapping(recovery_path) != receipt:
+            raise M8S2ProtocolViolation("S2 interrupted recovery receipt differs")
+    else:
+        atomic_write_json(recovery_path, receipt)
     atomic_write_json(manifest_path, manifest)
     lock_path.unlink()
     return receipt
@@ -845,17 +902,24 @@ class AttemptIdentity:
     execution_commit: str
     runtime_policy_sha256: str
     input_gate_receipt_sha256: str
+    qualification_receipt_sha256: str
+    authorization_id: str
+    authorization_sha256: str
 
     def __post_init__(self) -> None:
         if self.logical_pass_id not in logical_pass_ids(self.mode):
             raise M8S2ProtocolViolation("S2 logical pass ID differs")
         if not self.attempt_id or not self.process_uuid or self.process_id <= 0:
             raise M8S2ProtocolViolation("S2 attempt identity is incomplete")
+        if not self.authorization_id.strip():
+            raise M8S2ProtocolViolation("S2 owner authorization identity is absent")
         uuid.UUID(self.process_uuid)
         for label, value in (
             ("execution commit", self.execution_commit),
             ("runtime policy", self.runtime_policy_sha256),
             ("input receipt", self.input_gate_receipt_sha256),
+            ("qualification receipt", self.qualification_receipt_sha256),
+            ("owner authorization", self.authorization_sha256),
         ):
             _sha(value, label, length=40 if label == "execution commit" else 64)
 
@@ -869,6 +933,9 @@ class AttemptIdentity:
             "execution_commit": self.execution_commit,
             "runtime_policy_sha256": self.runtime_policy_sha256,
             "input_gate_receipt_sha256": self.input_gate_receipt_sha256,
+            "qualification_receipt_sha256": self.qualification_receipt_sha256,
+            "authorization_id": self.authorization_id,
+            "authorization_sha256": self.authorization_sha256,
             "full_ledger_sha256": FULL_LEDGER_SHA256,
             "protocol_sha256": PROTOCOL_SHA256,
         }

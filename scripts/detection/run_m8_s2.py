@@ -284,8 +284,9 @@ def main(argv: list[str] | None = None) -> int:
         if mode == "full-pass"
         else None
     )
-    require_authorization(
-        args.authorization,
+    authorization_path = _path(args.authorization, "--authorization")
+    authorization = require_authorization(
+        authorization_path,
         scope="repeatability-only" if mode == "repeatability" else "full-pass-only",
         execution_commit=commit,
         logical_pass_id=logical_pass_id,
@@ -295,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
         repeatability_review_sha256=review_sha,
         campaign_root=campaign_root,
     )
+    authorization_sha = sha256_file(authorization_path)
+    authorization_id = str(authorization["authorization_id"])
     _external_candidate(
         root,
         _path(args.upstream_root, "--upstream-root"),
@@ -315,6 +318,9 @@ def main(argv: list[str] | None = None) -> int:
         execution_commit=commit,
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
+        qualification_receipt_sha256=qualification_sha,
+        authorization_id=authorization_id,
+        authorization_sha256=authorization_sha,
     ):
         science.run_scientific_attempt(
             mode=mode,
@@ -324,6 +330,9 @@ def main(argv: list[str] | None = None) -> int:
             execution_commit=commit,
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+            authorization_id=authorization_id,
+            authorization_sha256=authorization_sha,
             attempt_root=attempt_root,
             logical_pass_id=logical_pass_id,
             attempt_id=attempt_id,
