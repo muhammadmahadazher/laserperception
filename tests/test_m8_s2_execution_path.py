@@ -840,11 +840,19 @@ def test_unauthorized_cli_never_imports_science_or_torch(
     assert guarded.intersection(sys.modules) == present_before
 
 
-def test_structural_coordinate_contract_with_cpu_mock(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_structural_coordinate_contract_with_cpu_mock(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import numpy as np
 
     from laserperception.detection import m8_s2_preflight
-    from laserperception.detection.m8_s2_runtime import SENTINELS
+    from laserperception.detection.m8_s2_runtime import (
+        COMPACT_MANIFEST_SHA256,
+        INPUT_FREEZE_SHA256,
+        PARTITIONS_SHA256,
+        SENTINELS,
+        verify_qualification_receipt,
+    )
 
     monkeypatch.setattr(m8_s2_preflight, "verify_consumed_input", lambda *_, **__: {})
     points = np.zeros((2, 5), dtype=np.float32)
@@ -868,13 +876,68 @@ def test_structural_coordinate_contract_with_cpu_mock(monkeypatch: pytest.Monkey
         result["sentinels"][0]["candidate_coordinate_sha256"]["A2"]
         == result["sentinels"][0]["candidate_coordinate_sha256"]["B2"]
     )
+    grant_path = tmp_path / "synthetic_qualification_grant.json"
+    grant_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "laserperception.m8.s2.authorization.v1",
+                "authorized": True,
+                "scope": "qualification-only",
+                "owner_approval": True,
+                "authorization_id": "synthetic-qualification-grant",
+                "authorization_timestamp_utc": "2026-01-01T00:00:00Z",
+                "authorization_provenance": "synthetic-test-only",
+                "authorized_gpu_uuid": "GPU-synthetic-test-only",
+                "authorized_worker_hostname": "synthetic-host",
+                "authorized_campaign_root": None,
+                "execution_commit": COMMIT,
+                "protocol_sha256": PROTOCOL_SHA256,
+                "partitions_sha256": PARTITIONS_SHA256,
+                "input_freeze_sha256": INPUT_FREEZE_SHA256,
+                "full_ledger_sha256": FULL_LEDGER_SHA256,
+                "compact_manifest_sha256": COMPACT_MANIFEST_SHA256,
+                "logical_pass_ids": [],
+                "runtime_policy_binding_sha256": None,
+                "input_gate_receipt_sha256": None,
+                "qualification_receipt_sha256": None,
+                "repeatability_review_sha256": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    grant_sha = hashlib.sha256(grant_path.read_bytes()).hexdigest()
     receipt = make_qualification_receipt(
         result,
         execution_commit=COMMIT,
         runtime_policy_sha256=POLICY,
         input_gate_receipt_sha256=RECEIPT,
+        qualification_authorization_id="synthetic-qualification-grant",
+        qualification_authorization_sha256=grant_sha,
     )
     assert receipt["ground_truth_loaded"] is False
+    assert receipt["qualification_authorization_sha256"] == grant_sha
+    receipt_path = tmp_path / "synthetic_qualification_receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    assert (
+        verify_qualification_receipt(
+            receipt_path,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+            qualification_authorization_path=grant_path,
+        )
+        == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    )
+    receipt["qualification_authorization_sha256"] = "0" * 64
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="owner grant binding differs"):
+        verify_qualification_receipt(
+            receipt_path,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+            qualification_authorization_path=grant_path,
+        )
     frames[0]["B2"] = (np.ones((2, 5), dtype=np.float32), "synthetic")
 
     def different_coordinates(array: np.ndarray) -> np.ndarray:

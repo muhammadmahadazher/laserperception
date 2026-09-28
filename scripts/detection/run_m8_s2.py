@@ -65,6 +65,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--qualification-receipt", type=Path)
     parser.add_argument("--repeatability-review", type=Path)
     parser.add_argument("--authorization", type=Path)
+    parser.add_argument("--qualification-authorization", type=Path)
     parser.add_argument("--m6-ledger", type=Path)
     parser.add_argument("--date-root", type=Path)
     parser.add_argument("--upstream-root", type=Path)
@@ -246,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
             execution_commit=commit,
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_sha,
+            qualification_authorization_path=_path(args.authorization, "--authorization"),
         )
         atomic_write_json(_path(args.output, "--output"), receipt)
         return 0
@@ -275,6 +277,9 @@ def main(argv: list[str] | None = None) -> int:
         execution_commit=commit,
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
+        qualification_authorization_path=_path(
+            args.qualification_authorization, "--qualification-authorization"
+        ),
     )
     review_sha = (
         verify_repeatability_review(

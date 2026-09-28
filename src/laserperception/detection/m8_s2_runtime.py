@@ -919,7 +919,12 @@ def verify_structural_preflight(structural: Mapping[str, object]) -> None:
 
 
 def verify_qualification_receipt(
-    path: Path, *, execution_commit: str, runtime_policy_sha256: str, input_gate_receipt_sha256: str
+    path: Path,
+    *,
+    execution_commit: str,
+    runtime_policy_sha256: str,
+    input_gate_receipt_sha256: str,
+    qualification_authorization_path: Path,
 ) -> str:
     """Require accepted, GT-blind, same-runtime structural qualification."""
 
@@ -938,6 +943,16 @@ def verify_qualification_receipt(
     }
     if any(record.get(key) != value for key, value in expected.items()):
         raise M8S2ProtocolViolation("S2 runtime qualification receipt differs")
+    grant = require_authorization(
+        qualification_authorization_path,
+        scope="qualification-only",
+        execution_commit=execution_commit,
+        logical_pass_id=None,
+    )
+    if record.get("qualification_authorization_id") != grant["authorization_id"] or record.get(
+        "qualification_authorization_sha256"
+    ) != sha256_file(qualification_authorization_path):
+        raise M8S2ProtocolViolation("S2 qualification owner grant binding differs")
     structural = record.get("structural_preflight")
     if not isinstance(structural, Mapping):
         raise M8S2ProtocolViolation("S2 structural preflight receipt is absent")

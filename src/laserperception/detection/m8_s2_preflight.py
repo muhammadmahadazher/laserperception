@@ -94,6 +94,8 @@ def make_qualification_receipt(
     execution_commit: str,
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
+    qualification_authorization_id: str,
+    qualification_authorization_sha256: str,
 ) -> dict[str, object]:
     """Build a future GT-blind receipt from same-runtime structural evidence."""
 
@@ -104,12 +106,16 @@ def make_qualification_receipt(
     )
 
     verify_structural_preflight(structural)
+    if not qualification_authorization_id.strip() or len(qualification_authorization_sha256) != 64:
+        raise M8S2ProtocolViolation("S2 qualification owner grant binding is absent")
     return {
         "schema_version": QUALIFICATION_RECEIPT_SCHEMA,
         "status": "ACCEPTED",
         "execution_commit": execution_commit,
         "runtime_policy_binding_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
+        "qualification_authorization_id": qualification_authorization_id,
+        "qualification_authorization_sha256": qualification_authorization_sha256,
         "full_ledger_sha256": FULL_LEDGER_SHA256,
         "sentinel_XYZIT_exact": 28,
         "B2_A2_cuda_coordinate_identity": 7,
