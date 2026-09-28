@@ -113,5 +113,8 @@ def run_scientific_attempt(
     except Exception as error:
         if sampler is not None:
             sampler.stop()
+            atomic_write_json(
+                attempt_root / "telemetry.json", summarize_gpu_telemetry(sampler.samples)
+            )
         attempt.fail(f"{type(error).__name__}: {error}", count_failed_call=condition_active)
         raise

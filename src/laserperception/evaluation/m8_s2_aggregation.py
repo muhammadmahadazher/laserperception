@@ -27,6 +27,7 @@ from laserperception.detection.m8_s2_runtime import (
     REPEATABILITY_IDS,
     M8S2ProtocolViolation,
     condition_ids,
+    verify_incomplete_evidence,
 )
 from laserperception.evaluation.m6b_metrics import count_metrics
 from laserperception.evaluation.m8_s1_aggregation import aggregate_ranked_ap
@@ -188,7 +189,12 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
     origin: PurePosixPath | None = None
     names: set[str] = set()
     for index, previous in enumerate(history):
-        if not isinstance(previous, dict) or set(previous) != {"attempt_id", "root"}:
+        if not isinstance(previous, dict) or not {
+            "attempt_id",
+            "root",
+            "authorization_id",
+            "authorization_sha256",
+        } <= set(previous):
             raise M8S2ProtocolViolation("S2 campaign claim entry is malformed")
         # Claims originate on a Linux worker but may be reviewed on Windows.
         source_root = PurePosixPath(str(previous["root"]).replace("\\", "/"))
@@ -212,10 +218,10 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
                         "runtime_policy_sha256",
                         "input_gate_receipt_sha256",
                         "qualification_receipt_sha256",
-                        "authorization_id",
-                        "authorization_sha256",
                     )
                 },
+                "authorization_id": previous["authorization_id"],
+                "authorization_sha256": previous["authorization_sha256"],
             }.items()
         ):
             raise M8S2ProtocolViolation("S2 claimed attempt identity differs")
@@ -228,6 +234,18 @@ def _verify_campaign_claim(root: Path, manifest: Mapping[str, object], mode: str
             or (copied_root / "final_pass_manifest.json").exists()
         ):
             raise M8S2ProtocolViolation("S2 prior claimed attempt is not preserved incomplete")
+        if not terminal:
+            verify_incomplete_evidence(copied_root)
+            evidence = previous.get("evidence_file_sha256")
+            if not isinstance(evidence, dict) or not evidence:
+                raise M8S2ProtocolViolation("S2 prior incomplete evidence inventory is absent")
+            actual = {
+                path.relative_to(copied_root).as_posix(): sha256_file(path)
+                for path in sorted(copied_root.rglob("*"))
+                if path.is_file()
+            }
+            if evidence != actual:
+                raise M8S2ProtocolViolation("S2 prior incomplete evidence differs")
     for child in campaign_root.iterdir():
         if child.is_dir() and (child / "attempt_manifest.json").exists():
             candidate = _read_claimed_manifest(child / "attempt_manifest.json")

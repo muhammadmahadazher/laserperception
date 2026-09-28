@@ -364,6 +364,48 @@ def require_authorization(path: Path | None, **expected: object) -> dict[str, ob
     return payload
 
 
+def verify_incomplete_evidence(root: Path) -> dict[str, str]:
+    """Verify the file inventory sealed at an incomplete attempt's termination."""
+
+    receipt = _mapping(root / "incomplete_evidence.json")
+    manifest = _mapping(root / "attempt_manifest.json")
+    hashes = receipt.get("file_sha256")
+    if (
+        receipt.get("schema_version") != "laserperception.m8.s2.incomplete-evidence.v1"
+        or manifest.get("status") != "INCOMPLETE"
+        or not isinstance(hashes, dict)
+        or "attempt_manifest.json" not in hashes
+    ):
+        raise M8S2ProtocolViolation("S2 incomplete evidence seal is malformed")
+    actual = {
+        path.relative_to(root).as_posix(): sha256_file(path)
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and path.name != "incomplete_evidence.json"
+    }
+    if hashes != actual:
+        raise M8S2ProtocolViolation("S2 incomplete evidence differs from its seal")
+    return actual
+
+
+def seal_incomplete_evidence(root: Path) -> dict[str, str]:
+    """Write a stable inventory once; retries may only verify it."""
+
+    if (root / "incomplete_evidence.json").exists():
+        return verify_incomplete_evidence(root)
+    if _mapping(root / "attempt_manifest.json").get("status") != "INCOMPLETE":
+        raise M8S2ProtocolViolation("S2 attempt is not incomplete")
+    hashes = {
+        path.relative_to(root).as_posix(): sha256_file(path)
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+    atomic_write_json(
+        root / "incomplete_evidence.json",
+        {"schema_version": "laserperception.m8.s2.incomplete-evidence.v1", "file_sha256": hashes},
+    )
+    return hashes
+
+
 @contextmanager
 def claim_logical_pass(
     *,
@@ -429,15 +471,13 @@ def claim_logical_pass(
                 or claim.get("runtime_policy_sha256") != runtime_policy_sha256
                 or claim.get("input_gate_receipt_sha256") != input_gate_receipt_sha256
                 or claim.get("qualification_receipt_sha256") != qualification_receipt_sha256
-                or claim.get("authorization_id") != authorization_id
-                or claim.get("authorization_sha256") != authorization_sha256
                 or not isinstance(history, list)
                 or not history
             ):
                 raise M8S2ProtocolViolation("S2 pass claim bindings differ")
             known_roots: set[Path] = set()
             for previous in history:
-                if not isinstance(previous, dict) or set(previous) != {"attempt_id", "root"}:
+                if not isinstance(previous, dict) or not {"attempt_id", "root"} <= set(previous):
                     raise M8S2ProtocolViolation("S2 pass claim history is malformed")
                 prior_root = Path(str(previous["root"])).resolve()
                 if (
@@ -459,14 +499,25 @@ def claim_logical_pass(
                             "runtime_policy_sha256": runtime_policy_sha256,
                             "input_gate_receipt_sha256": input_gate_receipt_sha256,
                             "qualification_receipt_sha256": qualification_receipt_sha256,
-                            "authorization_id": authorization_id,
-                            "authorization_sha256": authorization_sha256,
                         }.items()
                     )
                     or manifest.get("status") != "INCOMPLETE"
                     or (prior_root / "final_pass_manifest.json").exists()
                 ):
                     raise M8S2ProtocolViolation("S2 logical pass already completed or is unsealed")
+                verify_incomplete_evidence(prior_root)
+                for key in ("authorization_id", "authorization_sha256"):
+                    if key in previous and previous[key] != manifest.get(key):
+                        raise M8S2ProtocolViolation("S2 prior authorization binding differs")
+                    previous[key] = manifest.get(key)
+                evidence = {
+                    path.relative_to(prior_root).as_posix(): sha256_file(path)
+                    for path in sorted(prior_root.rglob("*"))
+                    if path.is_file()
+                }
+                if previous.get("evidence_file_sha256", evidence) != evidence:
+                    raise M8S2ProtocolViolation("S2 prior incomplete evidence differs")
+                previous["evidence_file_sha256"] = evidence
             for child in campaign_root.iterdir():
                 if child.is_dir() and (child / "attempt_manifest.json").exists():
                     previous = _mapping(child / "attempt_manifest.json")
@@ -476,7 +527,14 @@ def claim_logical_pass(
                         and child.resolve() not in known_roots
                     ):
                         raise M8S2ProtocolViolation("S2 previous attempt lacks its pass claim")
-            history.append({"attempt_id": attempt_id, "root": str(attempt_root)})
+            history.append(
+                {
+                    "attempt_id": attempt_id,
+                    "root": str(attempt_root),
+                    "authorization_id": authorization_id,
+                    "authorization_sha256": authorization_sha256,
+                }
+            )
         else:
             for child in campaign_root.iterdir():
                 if child.is_dir() and (child / "attempt_manifest.json").exists():
@@ -486,7 +544,14 @@ def claim_logical_pass(
                         and previous.get("logical_pass_id") == logical_pass_id
                     ):
                         raise M8S2ProtocolViolation("S2 previous attempt lacks its pass claim")
-            history = [{"attempt_id": attempt_id, "root": str(attempt_root)}]
+            history = [
+                {
+                    "attempt_id": attempt_id,
+                    "root": str(attempt_root),
+                    "authorization_id": authorization_id,
+                    "authorization_sha256": authorization_sha256,
+                }
+            ]
         atomic_write_json(
             claim_path,
             {
@@ -512,8 +577,15 @@ def claim_logical_pass(
                 state = _mapping(manifest_path).get("status")
             except M8S2ProtocolViolation:
                 pass
-        if not claimed or state == "COMPLETE" or state == "INCOMPLETE":
+        if not claimed or state == "COMPLETE":
             lock.unlink()
+        elif state == "INCOMPLETE":
+            try:
+                verify_incomplete_evidence(attempt_root)
+            except M8S2ProtocolViolation:
+                pass  # An unsealed attempt keeps its lock for explicit recovery.
+            else:
+                lock.unlink()
 
 
 def _posix_process_alive(process_id: int) -> bool:
@@ -557,7 +629,9 @@ def seal_interrupted_attempt(
     if (
         not isinstance(history, list)
         or not history
-        or history[-1] != {"attempt_id": attempt_id, "root": str(attempt_root)}
+        or not isinstance(history[-1], dict)
+        or history[-1].get("attempt_id") != attempt_id
+        or history[-1].get("root") != str(attempt_root)
         or claim.get("mode") != mode
         or claim.get("logical_pass_id") != logical_pass_id
         or claim.get("execution_commit") != execution_commit
@@ -580,6 +654,7 @@ def seal_interrupted_attempt(
             or sealed.get("accepted_canonical_calls") != 0
         ):
             raise M8S2ProtocolViolation("S2 interrupted recovery differs")
+        verify_incomplete_evidence(attempt_root)
         return recovered
     lock_bytes = lock_path.read_bytes()
     try:
@@ -672,6 +747,7 @@ def seal_interrupted_attempt(
     else:
         atomic_write_json(recovery_path, receipt)
     atomic_write_json(manifest_path, manifest)
+    seal_incomplete_evidence(attempt_root)
     lock_path.unlink()
     return receipt
 
@@ -1018,6 +1094,7 @@ class AtomicAttempt:
             self.failed_calls += 1
         self.status = "INCOMPLETE"
         self._write("INCOMPLETE", reason)
+        seal_incomplete_evidence(self.root)
         return self._payload("INCOMPLETE", reason)
 
     def finalize(self) -> dict[str, object]:

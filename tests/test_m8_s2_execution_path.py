@@ -28,6 +28,7 @@ from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     claim_logical_pass,
     condition_ids,
+    seal_incomplete_evidence,
     seal_interrupted_attempt,
     verify_authorization,
     verify_candidate_environment,
@@ -155,6 +156,8 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
         ),
         encoding="utf-8",
     )
+    (prior / "partial.log").write_text("preserved failed-attempt evidence", encoding="utf-8")
+    seal_incomplete_evidence(prior)
     claims = tmp_path / ".s2_pass_claims"
     claims.mkdir()
     claim_path = claims / "repeatability-s2-repeatability-01.json"
@@ -171,8 +174,23 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
                 "authorization_id": AUTHORIZATION_ID,
                 "authorization_sha256": AUTHORIZATION,
                 "attempts": [
-                    {"attempt_id": "attempt-incomplete", "root": str(prior)},
-                    {"attempt_id": "attempt-complete", "root": str(root)},
+                    {
+                        "attempt_id": "attempt-incomplete",
+                        "root": str(prior),
+                        "authorization_id": AUTHORIZATION_ID,
+                        "authorization_sha256": AUTHORIZATION,
+                        "evidence_file_sha256": {
+                            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                            for path in prior.iterdir()
+                            if path.is_file()
+                        },
+                    },
+                    {
+                        "attempt_id": "attempt-complete",
+                        "root": str(root),
+                        "authorization_id": AUTHORIZATION_ID,
+                        "authorization_sha256": AUTHORIZATION,
+                    },
                 ],
             }
         ),
@@ -205,6 +223,30 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
     assert loaded["authorization_sha256"] == AUTHORIZATION
     assert loaded["qualification_receipt_sha256"] == QUALIFICATION
     assert loaded["campaign_claim_sha256"]
+    (prior / "partial.log").unlink()
+    with pytest.raises(M8S2ProtocolViolation, match="incomplete evidence differs"):
+        load_completed_attempt(root, mode="repeatability")
+    (prior / "partial.log").write_text("preserved failed-attempt evidence", encoding="utf-8")
+    (prior / "attempt_manifest.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="claimed attempt identity differs"):
+        load_completed_attempt(root, mode="repeatability")
+    (prior / "attempt_manifest.json").write_text(
+        json.dumps(
+            {
+                "status": "INCOMPLETE",
+                "mode": "repeatability",
+                "logical_pass_id": "s2-repeatability-01",
+                "attempt_id": "attempt-incomplete",
+                "execution_commit": COMMIT,
+                "runtime_policy_sha256": POLICY,
+                "input_gate_receipt_sha256": RECEIPT,
+                "qualification_receipt_sha256": QUALIFICATION,
+                "authorization_id": AUTHORIZATION_ID,
+                "authorization_sha256": AUTHORIZATION,
+            }
+        ),
+        encoding="utf-8",
+    )
     (root / "telemetry.json").write_text('{"synthetic": false}', encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="auxiliary evidence differs"):
         load_completed_attempt(root, mode="repeatability")
@@ -432,8 +474,14 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
             ),
             encoding="utf-8",
         )
+        seal_incomplete_evidence(first)
     second = tmp_path / "attempt-2"
-    with claim_logical_pass(attempt_root=second, attempt_id="attempt-2", **common):
+    retry_auth = {
+        **common,
+        "authorization_id": "fresh-retry-grant",
+        "authorization_sha256": "e" * 64,
+    }
+    with claim_logical_pass(attempt_root=second, attempt_id="attempt-2", **retry_auth):
         second.mkdir()
         (second / "attempt_manifest.json").write_text(
             json.dumps(
@@ -446,15 +494,20 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
                     "qualification_receipt_sha256": QUALIFICATION,
-                    "authorization_id": AUTHORIZATION_ID,
-                    "authorization_sha256": AUTHORIZATION,
+                    "authorization_id": "fresh-retry-grant",
+                    "authorization_sha256": "e" * 64,
                 }
             ),
             encoding="utf-8",
         )
+    claim = json.loads(
+        (tmp_path / ".s2_pass_claims" / "repeatability-s2-repeatability-01.json").read_text()
+    )
+    assert claim["attempts"][0]["authorization_id"] == AUTHORIZATION_ID
+    assert claim["attempts"][1]["authorization_id"] == "fresh-retry-grant"
     with pytest.raises(M8S2ProtocolViolation, match="already completed"):
         with claim_logical_pass(
-            attempt_root=tmp_path / "attempt-3", attempt_id="attempt-3", **common
+            attempt_root=tmp_path / "attempt-3", attempt_id="attempt-3", **retry_auth
         ):
             pass
 
