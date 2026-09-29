@@ -135,6 +135,40 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
     with pytest.raises(M8S2ProtocolViolation, match="incomplete"):
         attempt.finalize()
     assert not (tmp_path / "attempt" / "final_pass_manifest.json").exists()
+    claims = tmp_path / ".s2_pass_claims"
+    claims.mkdir()
+    (claims / "repeatability-s2-repeatability-01.json").write_text(
+        json.dumps(
+            {
+                "mode": "repeatability",
+                "logical_pass_id": "s2-repeatability-01",
+                "execution_commit": COMMIT,
+                "attempts": [{"attempt_id": "attempt-1", "root": str(attempt.root.resolve())}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    lock = claims / "repeatability-s2-repeatability-01.lock"
+    lock.write_text(
+        json.dumps(
+            {"attempt_id": "attempt-1", "process_id": 123, "worker_hostname": "test-worker"}
+        ),
+        encoding="utf-8",
+    )
+    recovered = seal_interrupted_attempt(
+        campaign_root=tmp_path,
+        attempt_root=attempt.root,
+        mode="repeatability",
+        logical_pass_id="s2-repeatability-01",
+        attempt_id="attempt-1",
+        execution_commit=COMMIT,
+        recovery_note="stale lock after ordinary failure",
+        process_alive=lambda _: False,
+        hostname_provider=lambda: "test-worker",
+    )
+    assert recovered["status"] == "RECOVERED_SEALED_INCOMPLETE"
+    assert not lock.exists()
+    assert not (attempt.root / "interrupted_recovery.json").exists()
 
 
 def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) -> None:

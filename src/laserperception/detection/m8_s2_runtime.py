@@ -681,6 +681,33 @@ def seal_interrupted_attempt(
         raise M8S2ProtocolViolation("S2 interrupted claim or worker identity differs")
     if process_alive(lock["process_id"]):
         raise M8S2ProtocolViolation("S2 interrupted process is still alive")
+    if manifest_path.exists() and _mapping(manifest_path).get("status") == "INCOMPLETE":
+        if (attempt_root / "incomplete_evidence.json").exists():
+            if (attempt_root / "final_pass_manifest.json").exists():
+                raise M8S2ProtocolViolation("S2 sealed incomplete attempt has a final manifest")
+            sealed = _mapping(manifest_path)
+            if (
+                sealed.get("mode") != mode
+                or sealed.get("logical_pass_id") != logical_pass_id
+                or sealed.get("attempt_id") != attempt_id
+                or sealed.get("execution_commit") != execution_commit
+                or sealed.get("accepted_canonical_calls") != 0
+            ):
+                raise M8S2ProtocolViolation("S2 sealed incomplete attempt differs")
+            verify_incomplete_evidence(attempt_root)
+            recovered_receipt = _mapping(recovery_path) if recovery_path.exists() else None
+            if recovered_receipt is not None and (
+                recovered_receipt.get("status") != "SEALED_INCOMPLETE"
+                or recovered_receipt.get("attempt_id") != attempt_id
+                or recovered_receipt.get("recovery_note") != recovery_note
+            ):
+                raise M8S2ProtocolViolation("S2 interrupted recovery receipt differs")
+            lock_path.unlink()
+            return (
+                dict(recovered_receipt)
+                if recovered_receipt is not None
+                else {"status": "RECOVERED_SEALED_INCOMPLETE", "attempt_id": attempt_id}
+            )
     if (attempt_root / "final_pass_manifest.json").exists():
         from laserperception.evaluation.m8_s2_aggregation import load_completed_attempt
 
