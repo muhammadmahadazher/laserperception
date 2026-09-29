@@ -633,7 +633,44 @@ def seal_interrupted_attempt(
         raise M8S2ProtocolViolation("S2 interrupted recovery identity is malformed")
     stem = f"{mode}-{logical_pass_id}"
     claims = campaign_root / ".s2_pass_claims"
-    claim = _mapping(claims / f"{stem}.json")
+    claim_path = claims / f"{stem}.json"
+    lock_path = claims / f"{stem}.lock"
+    if lock_path.exists():
+        current_claim = _mapping(claim_path) if claim_path.exists() else None
+        current_history = current_claim.get("attempts") if current_claim is not None else None
+        if current_claim is None or (
+            isinstance(current_history, list)
+            and all(
+                not isinstance(item, dict) or item.get("attempt_id") != attempt_id
+                for item in current_history
+            )
+        ):
+            if attempt_root.exists():
+                raise M8S2ProtocolViolation("S2 unclaimed attempt has preserved files")
+            if current_claim is not None and (
+                current_claim.get("mode") != mode
+                or current_claim.get("logical_pass_id") != logical_pass_id
+                or current_claim.get("execution_commit") != execution_commit
+            ):
+                raise M8S2ProtocolViolation("S2 pre-claim campaign identity differs")
+            try:
+                preclaim_lock = json.loads(lock_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as error:
+                raise M8S2ProtocolViolation("S2 pre-claim lock is malformed") from error
+            if (
+                not isinstance(preclaim_lock, dict)
+                or preclaim_lock.get("attempt_id") != attempt_id
+                or preclaim_lock.get("worker_hostname") != hostname_provider()
+                or isinstance(preclaim_lock.get("process_id"), bool)
+                or not isinstance(preclaim_lock.get("process_id"), int)
+                or preclaim_lock["process_id"] <= 0
+            ):
+                raise M8S2ProtocolViolation("S2 pre-claim lock identity differs")
+            if process_alive(preclaim_lock["process_id"]):
+                raise M8S2ProtocolViolation("S2 pre-claim process is still alive")
+            lock_path.unlink()
+            return {"status": "RECOVERED_PRECLAIM", "attempt_id": attempt_id}
+    claim = _mapping(claim_path)
     history = claim.get("attempts")
     if (
         not isinstance(history, list)
@@ -646,7 +683,6 @@ def seal_interrupted_attempt(
         or claim.get("execution_commit") != execution_commit
     ):
         raise M8S2ProtocolViolation("S2 interrupted claim identity differs")
-    lock_path = claims / f"{stem}.lock"
     recovery_path = attempt_root / "interrupted_recovery.json"
     manifest_path = attempt_root / "attempt_manifest.json"
     if not lock_path.exists():

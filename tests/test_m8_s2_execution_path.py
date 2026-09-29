@@ -801,6 +801,35 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(
         )
 
 
+def test_preclaim_stale_lock_recovery_has_no_attempt_or_science(tmp_path: Path) -> None:
+    claims = tmp_path / ".s2_pass_claims"
+    claims.mkdir()
+    lock = claims / "repeatability-s2-repeatability-01.lock"
+    lock.write_text(
+        json.dumps(
+            {"attempt_id": "attempt-preclaim", "process_id": 123, "worker_hostname": "test-worker"}
+        ),
+        encoding="utf-8",
+    )
+    kwargs = dict(
+        campaign_root=tmp_path,
+        attempt_root=tmp_path / "attempt-preclaim",
+        mode="repeatability",
+        logical_pass_id="s2-repeatability-01",
+        attempt_id="attempt-preclaim",
+        execution_commit=COMMIT,
+        recovery_note="synthetic pre-claim crash",
+        hostname_provider=lambda: "test-worker",
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="still alive"):
+        seal_interrupted_attempt(**kwargs, process_alive=lambda _: True)
+    assert lock.exists()
+    result = seal_interrupted_attempt(**kwargs, process_alive=lambda _: False)
+    assert result["status"] == "RECOVERED_PRECLAIM"
+    assert not lock.exists()
+    assert not (tmp_path / "attempt-preclaim").exists()
+
+
 def test_frozen_gt_hashes_are_checked_before_scoring(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
