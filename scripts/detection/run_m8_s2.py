@@ -33,6 +33,7 @@ from laserperception.detection.m8_s2_runtime import (
     verify_frozen_gt_assets,
     verify_qualification_receipt,
     verify_qualification_worker,
+    verify_repeatability_owner_attestation,
     verify_repeatability_review,
     verify_runtime_policy,
     verify_runtime_policy_document,
@@ -64,6 +65,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-policy-binding", type=Path)
     parser.add_argument("--qualification-receipt", type=Path)
     parser.add_argument("--repeatability-review", type=Path)
+    parser.add_argument("--repeatability-owner-attestation", type=Path)
     parser.add_argument("--authorization", type=Path)
     parser.add_argument("--qualification-authorization", type=Path)
     parser.add_argument("--m6-ledger", type=Path)
@@ -291,6 +293,18 @@ def main(argv: list[str] | None = None) -> int:
         if mode == "full-pass"
         else None
     )
+    attestation_sha = (
+        verify_repeatability_owner_attestation(
+            _path(args.repeatability_owner_attestation, "--repeatability-owner-attestation"),
+            review_sha256=review_sha,
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+        )
+        if mode == "full-pass" and review_sha is not None
+        else None
+    )
     authorization_path = _path(args.authorization, "--authorization")
     authorization = require_authorization(
         authorization_path,
@@ -301,6 +315,7 @@ def main(argv: list[str] | None = None) -> int:
         input_gate_receipt_sha256=input_receipt_sha,
         qualification_receipt_sha256=qualification_sha,
         repeatability_review_sha256=review_sha,
+        repeatability_owner_attestation_sha256=attestation_sha,
         campaign_root=campaign_root,
     )
     authorization_sha = sha256_file(authorization_path)

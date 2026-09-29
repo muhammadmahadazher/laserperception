@@ -239,6 +239,7 @@ def verify_authorization(
     input_gate_receipt_sha256: str | None = None,
     qualification_receipt_sha256: str | None = None,
     repeatability_review_sha256: str | None = None,
+    repeatability_owner_attestation_sha256: str | None = None,
     campaign_root: Path | None = None,
 ) -> None:
     """Require one exact owner-issued scope; scopes never imply one another."""
@@ -267,6 +268,7 @@ def verify_authorization(
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
         "repeatability_review_sha256",
+        "repeatability_owner_attestation_sha256",
     }
     if set(payload) != required or payload.get("schema_version") != AUTHORIZATION_SCHEMA:
         raise M8S2ProtocolViolation("S2 authorization schema differs")
@@ -288,6 +290,7 @@ def verify_authorization(
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "qualification_receipt_sha256": qualification_receipt_sha256,
         "repeatability_review_sha256": repeatability_review_sha256,
+        "repeatability_owner_attestation_sha256": repeatability_owner_attestation_sha256,
     }
     if any(payload.get(key) != value for key, value in fixed.items()):
         raise M8S2ProtocolViolation("S2 authorization binding differs")
@@ -307,6 +310,7 @@ def verify_authorization(
                 input_gate_receipt_sha256,
                 qualification_receipt_sha256,
                 repeatability_review_sha256,
+                repeatability_owner_attestation_sha256,
             )
         ):
             raise M8S2ProtocolViolation("qualification authorization cannot imply later scope")
@@ -344,9 +348,14 @@ def verify_authorization(
             or qualification_receipt_sha256 is None
         ):
             raise M8S2ProtocolViolation("S2 runtime qualification binding is absent")
-        if scope == "full-pass" and repeatability_review_sha256 is None:
+        if scope == "full-pass-only" and (
+            repeatability_review_sha256 is None or repeatability_owner_attestation_sha256 is None
+        ):
             raise M8S2ProtocolViolation("accepted owner-reviewed repeatability binding is absent")
-        if scope == "repeatability-only" and repeatability_review_sha256 is not None:
+        if scope == "repeatability-only" and (
+            repeatability_review_sha256 is not None
+            or repeatability_owner_attestation_sha256 is not None
+        ):
             raise M8S2ProtocolViolation("repeatability authorization cannot bind full-pass review")
     if scope == "qualification-only" and (
         payload.get("logical_pass_ids") != [] or logical_pass_id is not None
@@ -967,7 +976,7 @@ def verify_repeatability_review(
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
 ) -> str:
-    """Require ten accepted processes and an explicit owner review for full-pass scope."""
+    """Verify the unchanged machine-generated ten-process review."""
 
     record = _mapping(path)
     expected = {
@@ -980,7 +989,7 @@ def verify_repeatability_review(
         "aggregation_commit": execution_commit,
         "runtime_policy_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
-        "owner_reviewed": True,
+        "owner_reviewed": False,
         "full_corpus_authorized": False,
     }
     if any(record.get(key) != value for key, value in expected.items()):
@@ -992,6 +1001,39 @@ def verify_repeatability_review(
         or len(set(process_uuids)) != 10
     ):
         raise M8S2ProtocolViolation("S2 repeatability process identities differ")
+    unsigned = dict(record)
+    digest = unsigned.pop("result_sha256", None)
+    if digest != canonical_json_sha256(unsigned):
+        raise M8S2ProtocolViolation("S2 repeatability review self-hash differs")
+    return sha256_file(path)
+
+
+def verify_repeatability_owner_attestation(
+    path: Path,
+    *,
+    review_sha256: str,
+    execution_commit: str,
+    runtime_policy_sha256: str,
+    input_gate_receipt_sha256: str,
+    qualification_receipt_sha256: str,
+) -> str:
+    """Require a separate owner decision bound to the immutable machine review."""
+
+    record = _mapping(path)
+    expected = {
+        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v1",
+        "owner_approved": True,
+        "repeatability_review_sha256": review_sha256,
+        "execution_commit": execution_commit,
+        "runtime_policy_sha256": runtime_policy_sha256,
+        "input_gate_receipt_sha256": input_gate_receipt_sha256,
+        "qualification_receipt_sha256": qualification_receipt_sha256,
+    }
+    if any(record.get(key) != value for key, value in expected.items()):
+        raise M8S2ProtocolViolation("S2 repeatability owner attestation binding differs")
+    for key in ("approval_id", "approval_timestamp_utc", "approval_provenance"):
+        if not isinstance(record.get(key), str) or not str(record[key]).strip():
+            raise M8S2ProtocolViolation(f"S2 repeatability owner attestation {key} is absent")
     return sha256_file(path)
 
 

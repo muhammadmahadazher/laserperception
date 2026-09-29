@@ -35,6 +35,8 @@ from laserperception.detection.m8_s2_runtime import (
     verify_clean_tracked_tree,
     verify_frozen_gt_assets,
     verify_qualification_worker,
+    verify_repeatability_owner_attestation,
+    verify_repeatability_review,
 )
 from laserperception.evaluation.m8_s2_aggregation import (
     aggregate_three_full_passes,
@@ -296,7 +298,7 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
         load_completed_attempt(root, mode="repeatability")
 
 
-def test_repeatability_requires_ten_exact_processes() -> None:
+def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
     passes = [_pass("repeatability", index) for index in range(1, 11)]
     for row in passes:
         for condition in row["conditions"]:
@@ -322,6 +324,58 @@ def test_repeatability_requires_ten_exact_processes() -> None:
     assert result["aggregation_commit"] == COMMIT
     assert result["source_attempts"][0]["authorization_sha256"] == AUTHORIZATION
     assert result["qualification_receipt_sha256"] == QUALIFICATION
+    review_path = tmp_path / "machine_review.json"
+    review_path.write_text(json.dumps(result), encoding="utf-8")
+    review_sha = verify_repeatability_review(
+        review_path,
+        execution_commit=COMMIT,
+        runtime_policy_sha256=POLICY,
+        input_gate_receipt_sha256=RECEIPT,
+    )
+    attestation_path = tmp_path / "owner_attestation.json"
+    attestation = {
+        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v1",
+        "owner_approved": True,
+        "approval_id": "synthetic-owner-review",
+        "approval_timestamp_utc": "2026-01-01T00:00:00Z",
+        "approval_provenance": "synthetic-test-only",
+        "repeatability_review_sha256": review_sha,
+        "execution_commit": COMMIT,
+        "runtime_policy_sha256": POLICY,
+        "input_gate_receipt_sha256": RECEIPT,
+        "qualification_receipt_sha256": QUALIFICATION,
+    }
+    attestation_path.write_text(json.dumps(attestation), encoding="utf-8")
+    assert (
+        verify_repeatability_owner_attestation(
+            attestation_path,
+            review_sha256=review_sha,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+            qualification_receipt_sha256=QUALIFICATION,
+        )
+        == hashlib.sha256(attestation_path.read_bytes()).hexdigest()
+    )
+    result["owner_reviewed"] = True
+    review_path.write_text(json.dumps(result), encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="receipt differs"):
+        verify_repeatability_review(
+            review_path,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+        )
+    result["owner_reviewed"] = False
+    result["source_attempts"][0]["authorization_id"] = "tampered"
+    review_path.write_text(json.dumps(result), encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="self-hash differs"):
+        verify_repeatability_review(
+            review_path,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+        )
     with pytest.raises(M8S2ProtocolViolation, match="aggregation checkout differs"):
         review_repeatability(passes, aggregation_commit="d" * 40)
     passes[1]["conditions"][0]["classes"]["car"]["thresholds"]["0.50"]["true_positives"] = 1
@@ -361,6 +415,7 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
         "input_gate_receipt_sha256": None,
         "qualification_receipt_sha256": None,
         "repeatability_review_sha256": None,
+        "repeatability_owner_attestation_sha256": None,
     }
     verify_authorization(
         payload, scope="qualification-only", execution_commit=COMMIT, logical_pass_id=None
@@ -400,6 +455,32 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
     verify_authorization(payload, **expected)
     with pytest.raises(M8S2ProtocolViolation, match="campaign root differs"):
         verify_authorization(payload, **{**expected, "campaign_root": tmp_path / "other"})
+    payload.update(
+        scope="full-pass-only",
+        logical_pass_ids=["s2-pass-1"],
+        repeatability_review_sha256="a" * 64,
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="owner-reviewed repeatability binding"):
+        verify_authorization(
+            payload,
+            **{
+                **expected,
+                "scope": "full-pass-only",
+                "logical_pass_id": "s2-pass-1",
+                "repeatability_review_sha256": "a" * 64,
+            },
+        )
+    payload["repeatability_owner_attestation_sha256"] = "b" * 64
+    verify_authorization(
+        payload,
+        **{
+            **expected,
+            "scope": "full-pass-only",
+            "logical_pass_id": "s2-pass-1",
+            "repeatability_review_sha256": "a" * 64,
+            "repeatability_owner_attestation_sha256": "b" * 64,
+        },
+    )
 
 
 def test_qualification_grant_matches_live_external_identity_only_with_mock() -> None:
@@ -901,6 +982,7 @@ def test_structural_coordinate_contract_with_cpu_mock(
                 "input_gate_receipt_sha256": None,
                 "qualification_receipt_sha256": None,
                 "repeatability_review_sha256": None,
+                "repeatability_owner_attestation_sha256": None,
             }
         ),
         encoding="utf-8",
