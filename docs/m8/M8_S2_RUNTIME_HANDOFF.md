@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `cd876f022e6d53da8a65ed24e56fc2d2a5d09939`
+corrections complete at `d8ff4f2e2cb81f6934f287f80158c794926e60ba`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -83,7 +83,9 @@ the detector or loads GT.
    conditions, runtime state, telemetry, and interruption recovery files that were produced.
    The offline
    review requires exact discrete agreement for the frozen per-class/threshold gates. Its
-   `ACCEPTED` result alone does not authorize the corpus.
+   `ACCEPTED` result alone does not authorize the corpus. Keep the machine-generated review
+   unchanged. Record the owner's decision in a separate attestation bound to that review's
+   SHA256, and supply it as `--repeatability-owner-attestation` for full-pass preflight.
    If a process stops before sealing its attempt, keep the lock and partial files. On the same
    worker, after verifying its process is dead, `seal-interrupted` preserves the original manifest,
    writes a recovery receipt and zero-accepted-call incomplete manifest, then releases the lock.
@@ -91,7 +93,8 @@ the detector or loads GT.
    terminal bookkeeping and releasing a stale lock; never reclassify it as incomplete.
    A live or different worker cannot use that recovery path. Persist the recovery evidence before
    seeking any fresh retry authorization.
-5. After owner review of repeatability and a separate **full-pass-only** authorization, execute
+5. After owner review of repeatability and a separate **full-pass-only** authorization that binds
+   both the review and owner-attestation hashes, execute
    three fresh complete processes. Each consumes 428 frames in frame-major B2/C2/D2/F2 order:
    1,712 conditions per pass and 5,136 accepted calls in three passes. Each input is reconstructed
    once, verified against the frozen ledger immediately, and that same verified array is passed

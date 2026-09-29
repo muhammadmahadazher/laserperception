@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "cd876f022e6d53da8a65ed24e56fc2d2a5d09939",
+  "s2_execution_implementation_commit": "d8ff4f2e2cb81f6934f287f80158c794926e60ba",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -46,7 +46,7 @@
     "bind a durable campaign root and preserve its single-use logical-pass claim ledger",
     "seal interrupted stale-lock attempts on the stopped original worker with preserved recovery evidence",
     "10 fresh 28-call repeatability processes and exact offline review",
-    "owner review and separate full-pass-only authorization",
+    "owner attestation bound to unchanged repeatability review and separate full-pass-only authorization bound to both hashes",
     "3 fresh 1712-call full-corpus processes with per-process persistence",
     "CPU-only deterministic three-pass aggregation from the clean reviewed execution commit"
   ],
