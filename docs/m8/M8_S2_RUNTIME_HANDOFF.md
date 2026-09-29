@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `88eb98428e214dc1085749558fa4a464a6b73974`
+corrections complete at `bed24ff1c034802880208bbbda624def94ef8bce`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -95,6 +95,8 @@ the detector or loads GT.
    terminal bookkeeping and releasing a stale lock; never reclassify it as incomplete.
    A stale lock after a normally failed, already sealed incomplete attempt is released only after
    verifying that attempt's complete sealed file inventory and zero accepted calls.
+   A lock left before the pass claim was written can be released on the original worker only after
+   verifying the process is dead, the lock identity matches, and no attempt directory exists.
    A live or different worker cannot use that recovery path. Persist the recovery evidence before
    seeking any fresh retry authorization.
 5. After owner review of repeatability and a separate **full-pass-only** authorization that binds
