@@ -289,6 +289,7 @@ def main(argv: list[str] | None = None) -> int:
             execution_commit=commit,
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
         )
         if mode == "full-pass"
         else None

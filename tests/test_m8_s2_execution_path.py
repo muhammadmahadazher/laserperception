@@ -331,7 +331,16 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
         execution_commit=COMMIT,
         runtime_policy_sha256=POLICY,
         input_gate_receipt_sha256=RECEIPT,
+        qualification_receipt_sha256=QUALIFICATION,
     )
+    with pytest.raises(M8S2ProtocolViolation, match="receipt differs"):
+        verify_repeatability_review(
+            review_path,
+            execution_commit=COMMIT,
+            runtime_policy_sha256=POLICY,
+            input_gate_receipt_sha256=RECEIPT,
+            qualification_receipt_sha256="0" * 64,
+        )
     attestation_path = tmp_path / "owner_attestation.json"
     attestation = {
         "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v1",
@@ -365,6 +374,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             execution_commit=COMMIT,
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
+            qualification_receipt_sha256=QUALIFICATION,
         )
     result["owner_reviewed"] = False
     result["source_attempts"][0]["authorization_id"] = "tampered"
@@ -375,6 +385,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             execution_commit=COMMIT,
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
+            qualification_receipt_sha256=QUALIFICATION,
         )
     with pytest.raises(M8S2ProtocolViolation, match="aggregation checkout differs"):
         review_repeatability(passes, aggregation_commit="d" * 40)

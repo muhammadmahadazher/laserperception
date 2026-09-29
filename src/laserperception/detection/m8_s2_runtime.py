@@ -975,6 +975,7 @@ def verify_repeatability_review(
     execution_commit: str,
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
+    qualification_receipt_sha256: str,
 ) -> str:
     """Verify the unchanged machine-generated ten-process review."""
 
@@ -989,6 +990,7 @@ def verify_repeatability_review(
         "aggregation_commit": execution_commit,
         "runtime_policy_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
+        "qualification_receipt_sha256": qualification_receipt_sha256,
         "owner_reviewed": False,
         "full_corpus_authorized": False,
     }
