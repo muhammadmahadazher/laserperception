@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `d8ff4f2e2cb81f6934f287f80158c794926e60ba`
+corrections complete at `dd9590beb98ab1752c594165469c4d7a1362dd93`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -86,6 +86,8 @@ the detector or loads GT.
    `ACCEPTED` result alone does not authorize the corpus. Keep the machine-generated review
    unchanged. Record the owner's decision in a separate attestation bound to that review's
    SHA256, and supply it as `--repeatability-owner-attestation` for full-pass preflight.
+   Full-pass preflight also requires that review to name the currently verified qualification
+   receipt, preserving the same qualification chain across both phases.
    If a process stops before sealing its attempt, keep the lock and partial files. On the same
    worker, after verifying its process is dead, `seal-interrupted` preserves the original manifest,
    writes a recovery receipt and zero-accepted-call incomplete manifest, then releases the lock.
