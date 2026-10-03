@@ -427,13 +427,25 @@ def test_live_array_identity_and_mismatch_before_detector(monkeypatch: pytest.Mo
         load(condition)
 
 
-@pytest.mark.parametrize("state", ["live", "different-worker", "dead", "wrong-commit"])
+@pytest.mark.parametrize(
+    "state",
+    [
+        "live",
+        "different-worker",
+        "dead",
+        "wrong-commit",
+        "owned-temporaries",
+        "foreign-temporary",
+        "complete-with-temporary",
+    ],
+)
 def test_interrupted_recovery_requires_dead_original_process(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, state: str
 ) -> None:
     path = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 999)
     manifest = json.loads((path / "manifest.json").read_text())
-    manifest.update(status="RUNNING", accepted_engineering_calls=0, files={})
+    if state != "complete-with-temporary":
+        manifest.update(status="RUNNING", accepted_engineering_calls=0, files={})
     atomic_write_json(path / "manifest.json", manifest)
     claims = json.loads((tmp_path / "sizing-claims.json").read_text())
     claims["attempts"][0].update(status="RUNNING", manifest_sha256=None)
@@ -452,9 +464,31 @@ def test_interrupted_recovery_requires_dead_original_process(
             raise ProcessLookupError
 
     monkeypatch.setattr(sizing.os, "kill", dead)
-    if state == "dead":
+    monkeypatch.setattr(sizing.os, "getpid", lambda: 1002)
+    if state in {"owned-temporaries", "complete-with-temporary"}:
+        (path / ".calls.json.999.tmp").write_bytes(b'{"calls":[')
+        (path / ".manifest.json.999.tmp").write_bytes(b'{"status":')
+        (tmp_path / ".sizing-claims.json.999.tmp").write_bytes(b'{"attempts":[')
+    if state == "foreign-temporary":
+        (path / ".calls.json.998.tmp").write_bytes(b'{"calls":[')
+    if state in {"dead", "owned-temporaries", "complete-with-temporary"}:
         receipt = sizing.seal_interrupted_sizing(tmp_path, path, execution_commit=COMMIT)
-        assert receipt["status"] == "INCOMPLETE" and receipt["accepted_engineering_calls"] == 0
+        if state == "complete-with-temporary":
+            assert receipt["status"] == "COMPLETE" and receipt["accepted_engineering_calls"] == 18
+        else:
+            assert receipt["status"] == "INCOMPLETE" and receipt["accepted_engineering_calls"] == 0
+        if state != "dead":
+            assert len(receipt["files"]) == 5
+            assert (path / ".calls.json.999.tmp").read_bytes() == b'{"calls":['
+            assert (path / ".sizing-claims.json.999.tmp").read_bytes() == b'{"attempts":['
+            assert (tmp_path / ".sizing-claims.json.999.tmp").exists()
+            sizing._verify_files(path, receipt)
+            p2 = attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 1000)
+            if state == "owned-temporaries":
+                p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 1001, "retry")
+            else:
+                p1 = path
+            assert aggregate([p1, p2])["engineering_calls"] == 36
         assert not (tmp_path / ".sizing.lock").exists()
     else:
         with pytest.raises(M8S2ProtocolViolation):

@@ -81,7 +81,9 @@ A hard-killed process leaves a lock and RUNNING claim. Do not delete the lock ma
 original worker, `sizing-seal-interrupted --external-worker --execution-commit <merge>
 --campaign-root <root> --attempt-root <attempt>` verifies hostname and process death before sealing
 INCOMPLETE. A manifest already COMPLETE remains COMPLETE. A live or different worker cannot recover
-that claim. Persist the recovery before retry. An unrecoverable pre-claim/setup failure must fail
+that claim. Exact atomic-write temporaries belonging to the verified dead PID are retained and
+hash-accounted without promoting uncommitted bytes into canonical evidence; foreign temporaries
+remain rejected. Persist the recovery before retry. An unrecoverable pre-claim/setup failure must fail
 closed and return for owner review.
 
 Mode `sizing-aggregate` is CPU-only. Supply the same reviewed `--execution-commit`, exactly two

@@ -427,9 +427,18 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
     }
     if set(manifest) != allowed or (root / "manifest.json").is_symlink():
         raise M8S2ProtocolViolation("sizing manifest schema differs")
-    if set(manifest["files"]) != {"calls.json", "authorization.json"}:
+    required_files = {"calls.json", "authorization.json"}
+    owned_temporaries = {
+        f".{name}.{manifest['process_id']}.tmp"
+        for name in ("calls.json", "manifest.json", "sizing-claims.json")
+    }
+    recorded_files = set(manifest["files"])
+    if (
+        not required_files <= recorded_files
+        or not recorded_files <= required_files | owned_temporaries
+    ):
         raise M8S2ProtocolViolation("sizing sealed file inventory differs")
-    if {p.name for p in root.iterdir()} != {"calls.json", "authorization.json", "manifest.json"}:
+    if {p.name for p in root.iterdir()} != recorded_files | {"manifest.json"}:
         raise M8S2ProtocolViolation("sizing attempt has unexpected retained files")
     for name, expected in manifest["files"].items():
         if (root / name).is_symlink() or sha256_file(root / name) != expected:
@@ -476,6 +485,27 @@ def seal_interrupted_sizing(
         or manifest["process_uuid"] != entry["process_uuid"]
     ):
         raise M8S2ProtocolViolation("interrupted sizing process identity differs")
+    # Preserve the verified dead writer's uncommitted bytes, never promote them
+    # to canonical calls/manifests. An atomic campaign-ledger temp is copied into
+    # the sealed attempt too, without deleting its original valuable state.
+    owned: dict[str, str] = {}
+    for name in ("calls.json", "manifest.json", "sizing-claims.json"):
+        temporary_name = f".{name}.{lock['process_id']}.tmp"
+        source = (campaign if name == "sizing-claims.json" else attempt) / temporary_name
+        if not source.exists() and not source.is_symlink():
+            continue
+        if source.is_symlink() or not source.is_file():
+            raise M8S2ProtocolViolation("sizing owned atomic temporary is not a regular file")
+        target = attempt / temporary_name
+        if source != target:
+            if target.is_symlink():
+                raise M8S2ProtocolViolation("sizing recovery temporary copy is a symlink")
+            if target.exists() and (
+                target.is_symlink() or sha256_file(target) != sha256_file(source)
+            ):
+                raise M8S2ProtocolViolation("sizing recovery temporary copy differs")
+            target.write_bytes(source.read_bytes())
+        owned[temporary_name] = sha256_file(target)
     if manifest["status"] == "RUNNING":
         calls = _json(attempt / "calls.json")["calls"]
         manifest.update(
@@ -483,11 +513,19 @@ def seal_interrupted_sizing(
             accepted_engineering_calls=0,
             engineering_calls_completed=len(calls),
             failure_type="Interrupted",
-            files={n: sha256_file(attempt / n) for n in ("calls.json", "authorization.json")},
+            files={
+                **{n: sha256_file(attempt / n) for n in ("calls.json", "authorization.json")},
+                **owned,
+            },
         )
         atomic_write_json(attempt / "manifest.json", manifest)
     elif manifest["status"] not in {"COMPLETE", "INCOMPLETE"}:
         raise M8S2ProtocolViolation("sizing recovery status differs")
+    elif owned:
+        # A committed COMPLETE manifest keeps its status; only preservation
+        # inventory is extended with the dead writer's exact temporary bytes.
+        manifest["files"].update(owned)
+        atomic_write_json(attempt / "manifest.json", manifest)
     _verify_files(attempt, manifest)
     entry.update(status=manifest["status"], manifest_sha256=sha256_file(attempt / "manifest.json"))
     atomic_write_json(campaign / "sizing-claims.json", ledger)
