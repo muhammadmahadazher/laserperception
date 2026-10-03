@@ -43,6 +43,7 @@ def _preimport_source_guard(root: Path) -> None:
 if __name__ == "__main__":
     checkout = Path(__file__).resolve().parents[2]
     _preimport_source_guard(checkout)
+    sys.path.insert(0, str(checkout))
     sys.path.insert(0, str(checkout / "src"))
 
 import laserperception
