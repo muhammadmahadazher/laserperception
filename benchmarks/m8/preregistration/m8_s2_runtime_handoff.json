@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "be93b9df68d362a5c670dea1b9488dddb93394c9",
+  "s2_execution_implementation_commit": "f99017e60a85eba180b84d41df9dbdeebbd3ffe9",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -30,7 +30,7 @@
     "runtime_policy_must_bind": [
       "reviewed merged execution commit", "worker hostname", "GPU name/UUID/VRAM", "driver", "CUDA", "Python",
       "PyTorch", "spconv", "torch-scatter", "NumPy", "DSVT upstream commit",
-      "candidate config SHA256", "checkpoint SHA256", "frozen S2 protocol/input identities"
+      "candidate config SHA256", "checkpoint SHA256", "upstream native extension SHA256 inventory", "frozen S2 protocol/input identities"
     ],
     "runtime_bound": false
   },

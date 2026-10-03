@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `be93b9df68d362a5c670dea1b9488dddb93394c9`
+corrections complete at `f99017e60a85eba180b84d41df9dbdeebbd3ffe9`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -56,9 +56,12 @@ the detector or loads GT.
    input-gate receipt is evidence, not inference permission.
 2. Capture a fresh runtime policy for that worker. Bind its hostname, GPU name, UUID, VRAM, driver, CUDA,
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
-   checkpoint, plus the S2 protocol/input hashes. A historical S1 or zero-intensity policy cannot
+   checkpoint, plus SHA256 hashes of in-checkout upstream native extensions and the S2
+   protocol/input hashes. A historical S1 or zero-intensity policy cannot
    authorize S2.
    Check that the pinned DSVT upstream checkout has no tracked edits outside the hashed config.
+   Reject local native extensions and upstream extensions that shadow Python source; rehash each
+   permitted upstream build product against the fresh live policy before qualification or science.
    The backend's environment-selected upstream and checkpoint paths must resolve to those same
    verified CLI paths.
 3. Under the same qualification scope, run the GT-blind seven-sentinel structural preflight on
