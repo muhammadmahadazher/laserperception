@@ -111,6 +111,7 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     if git_head(root) != execution_commit:
         raise M8S2ProtocolViolation("S2 execution commit differs from repository HEAD")
     verify_clean_tracked_tree(root, source_subtree="src/laserperception")
+    verify_clean_tracked_tree(root, source_subtree="benchmarks/m7")
     frozen = (
         (PROTOCOL_PATH, PROTOCOL_SHA256),
         (PROTOCOL_JSON_PATH, PROTOCOL_JSON_SHA256),
