@@ -1,0 +1,150 @@
+{
+  "engineering_calls_executed": 0,
+  "excluded_warmup_calls_per_process": 2,
+  "fresh_processes": 2,
+  "future_engineering_calls": 36,
+  "future_measured_calls": 32,
+  "future_warmup_calls": 4,
+  "ground_truth_loaded": false,
+  "measured_calls_per_process": 16,
+  "measured_conditions_per_process": [
+    {
+      "arm": "B2",
+      "condition_id": "2011_09_26_drive_0091/0000000322/B2",
+      "cpu_analytic_candidate_pillar_count": 14163,
+      "full_XYZIT_sha256": "ae0adb32b282579db47919593443a896a7f2ae353e56f5f66d5505b20fb26798",
+      "point_count": 1340512,
+      "stratum": "low_pillars"
+    },
+    {
+      "arm": "B2",
+      "condition_id": "2011_09_26_drive_0091/0000000125/B2",
+      "cpu_analytic_candidate_pillar_count": 22964,
+      "full_XYZIT_sha256": "87aa4470aa2993056707bbfb719ba260aafaeca12b6159629dfb32cf7367cd1b",
+      "point_count": 1335860,
+      "stratum": "median_pillars"
+    },
+    {
+      "arm": "B2",
+      "condition_id": "2011_09_26_drive_0091/0000000069/B2",
+      "cpu_analytic_candidate_pillar_count": 32774,
+      "full_XYZIT_sha256": "7065628c73eb9d8ddee47a0340481dc3cf731661ca14fc731627116501e97c71",
+      "point_count": 1339216,
+      "stratum": "high_pillars"
+    },
+    {
+      "arm": "B2",
+      "condition_id": "2011_09_26_drive_0091/0000000301/B2",
+      "cpu_analytic_candidate_pillar_count": 15086,
+      "full_XYZIT_sha256": "6ff909d81b031863d32a2d9bceb03fd10ef20352768bc4417b4d077780de0a51",
+      "point_count": 1354031,
+      "stratum": "high_point_count"
+    },
+    {
+      "arm": "C2",
+      "condition_id": "2011_09_26_drive_0091/0000000259/C2",
+      "cpu_analytic_candidate_pillar_count": 13172,
+      "full_XYZIT_sha256": "251ca624f4f3834a6cb28c5cdca2bddf0dff2c01368be136023a3e4e34f3eb15",
+      "point_count": 734746,
+      "stratum": "low_pillars"
+    },
+    {
+      "arm": "C2",
+      "condition_id": "2011_09_26_drive_0091/0000000125/C2",
+      "cpu_analytic_candidate_pillar_count": 21230,
+      "full_XYZIT_sha256": "6d54a6da49fe40bfe2efc1e26eec2751400115a5214b15ff0169da2e6a065396",
+      "point_count": 729919,
+      "stratum": "median_pillars"
+    },
+    {
+      "arm": "C2",
+      "condition_id": "2011_09_26_drive_0091/0000000069/C2",
+      "cpu_analytic_candidate_pillar_count": 30070,
+      "full_XYZIT_sha256": "6307508d55388b44ee2f0c1d145154afe8093da3b522cf8659f1990ddc6104cd",
+      "point_count": 731827,
+      "stratum": "high_pillars"
+    },
+    {
+      "arm": "C2",
+      "condition_id": "2011_09_26_drive_0091/0000000302/C2",
+      "cpu_analytic_candidate_pillar_count": 14038,
+      "full_XYZIT_sha256": "47efeb02e170bc359379a87676b4252af77f4043e08b42a8a3ca355374d652e4",
+      "point_count": 739547,
+      "stratum": "high_point_count"
+    },
+    {
+      "arm": "D2",
+      "condition_id": "2011_09_26_drive_0091/0000000259/D2",
+      "cpu_analytic_candidate_pillar_count": 13172,
+      "full_XYZIT_sha256": "291f723af38758051f37eb37192e97d98852e9aaf05b793befacd9488f0d0b1d",
+      "point_count": 734746,
+      "stratum": "low_pillars"
+    },
+    {
+      "arm": "D2",
+      "condition_id": "2011_09_26_drive_0091/0000000125/D2",
+      "cpu_analytic_candidate_pillar_count": 21230,
+      "full_XYZIT_sha256": "d3ba3f652177dfbf30eb4574e719f17975afc354cc42484480c3576c85f7cca7",
+      "point_count": 729919,
+      "stratum": "median_pillars"
+    },
+    {
+      "arm": "D2",
+      "condition_id": "2011_09_26_drive_0091/0000000069/D2",
+      "cpu_analytic_candidate_pillar_count": 30070,
+      "full_XYZIT_sha256": "48d6782d101e517593c6f61d53bff22e20d5999c2dad6ce3749bd24438f797c6",
+      "point_count": 731827,
+      "stratum": "high_pillars"
+    },
+    {
+      "arm": "D2",
+      "condition_id": "2011_09_26_drive_0091/0000000302/D2",
+      "cpu_analytic_candidate_pillar_count": 14038,
+      "full_XYZIT_sha256": "26342b47e734b58d37451b2db60e413316984b45bf2da01ae73241b244302aae",
+      "point_count": 739547,
+      "stratum": "high_point_count"
+    },
+    {
+      "arm": "F2",
+      "condition_id": "2011_09_26_drive_0091/0000000258/F2",
+      "cpu_analytic_candidate_pillar_count": 12394,
+      "full_XYZIT_sha256": "c94c59062ce590d0b772fefd35e5b3ba9aae412a8bf20963591b2789857e7d3a",
+      "point_count": 732057,
+      "stratum": "low_pillars"
+    },
+    {
+      "arm": "F2",
+      "condition_id": "2011_09_26_drive_0091/0000000126/F2",
+      "cpu_analytic_candidate_pillar_count": 20260,
+      "full_XYZIT_sha256": "33517b7d2be1e78eee00c8a0a48d8dff37faa0e1c9457718162fe325cbff82bf",
+      "point_count": 729035,
+      "stratum": "median_pillars"
+    },
+    {
+      "arm": "F2",
+      "condition_id": "2011_09_26_drive_0091/0000000062/F2",
+      "cpu_analytic_candidate_pillar_count": 28098,
+      "full_XYZIT_sha256": "80a98986be20d4157dafab18248d16403402edd44c04d2c6b21f6d351f238574",
+      "point_count": 729292,
+      "stratum": "high_pillars"
+    },
+    {
+      "arm": "F2",
+      "condition_id": "2011_09_26_drive_0091/0000000302/F2",
+      "cpu_analytic_candidate_pillar_count": 13346,
+      "full_XYZIT_sha256": "2ed7a89a023b02d1c1b4589fe009f5531376a99e8d1849139c1d6c34dee2324e",
+      "point_count": 738539,
+      "stratum": "high_point_count"
+    }
+  ],
+  "outputs_discarded_immediately": true,
+  "schema_version": "laserperception.m8.s2.qualification-plan.v1",
+  "scientific_calls_executed": 0,
+  "selection_basis": "frozen CPU-only point and candidate-pillar identities; no GT or detector output",
+  "semantic_predictions_retained": false,
+  "status": "STATIC PLAN ONLY; NOT EXECUTED OR AUTHORIZED",
+  "warmup_condition_ids_per_process": [
+    "2011_09_26_drive_0091/0000000322/B2",
+    "2011_09_26_drive_0091/0000000302/F2"
+  ]
+}

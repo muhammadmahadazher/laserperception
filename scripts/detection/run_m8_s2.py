@@ -1,0 +1,420 @@
+#!/usr/bin/env python3
+"""Future M8 S2 runner with a fail-closed authorization-before-import boundary."""
+# ruff: noqa: E402 -- bytecode writes must be disabled before project imports.
+
+from __future__ import annotations
+
+import sys
+
+if __name__ == "__main__" and not sys.flags.isolated:
+    raise RuntimeError("S2 runner requires isolated Python (-I) before any project imports")
+
+import argparse
+import importlib
+import json
+import subprocess
+from pathlib import Path
+
+sys.dont_write_bytecode = True
+
+
+def _preimport_source_guard(root: Path) -> None:
+    """Fail before package import if local source or bytecode could override HEAD."""
+
+    if subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False).returncode:
+        raise RuntimeError("S2 preimport tracked source differs from HEAD")
+    files = subprocess.run(
+        ["git", "ls-files", "--others", "-z", "--"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if files.returncode:
+        raise RuntimeError("S2 preimport source inventory failed")
+    for name in files.stdout.split("\0"):
+        if name and ((root / name).is_symlink() or (root / name).is_dir()):
+            raise RuntimeError("S2 preimport untracked directory or symlink exists")
+    if any(
+        Path(name).suffix in {".py", ".pyc", ".so", ".pyd", ".dll"}
+        for name in files.stdout.split("\0")
+        if name
+    ):
+        raise RuntimeError("S2 preimport untracked executable source or cache exists")
+
+
+if __name__ == "__main__":
+    checkout = Path(__file__).resolve().parents[2]
+    _preimport_source_guard(checkout)
+    sys.path.insert(0, str(checkout))
+    sys.path.insert(0, str(checkout / "src"))
+
+import laserperception
+from laserperception.detection.m8_s1_runtime import (
+    CANDIDATE_MANIFEST_PATH,
+    atomic_write_json,
+    sha256_file,
+)
+from laserperception.detection.m8_s1_runtime import (
+    verify_static_bindings as verify_s1_candidate,
+)
+from laserperception.detection.m8_s2_input_gate import (
+    make_input_gate_receipt,
+    verify_input_gate_receipt,
+    write_input_gate_receipt,
+)
+from laserperception.detection.m8_s2_planning import qualification_plan
+from laserperception.detection.m8_s2_runtime import (
+    M8S2ProtocolViolation,
+    claim_logical_pass,
+    native_extension_hashes,
+    require_authorization,
+    verify_candidate_environment,
+    verify_clean_tracked_tree,
+    verify_frozen_gt_assets,
+    verify_qualification_receipt,
+    verify_qualification_worker,
+    verify_repeatability_owner_attestation,
+    verify_repeatability_review,
+    verify_runtime_policy,
+    verify_runtime_policy_document,
+    verify_static_bindings,
+)
+from laserperception.worker.guards import require_external_worker
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "mode",
+        choices=(
+            "input-gate",
+            "runtime-binding",
+            "qualification-plan",
+            "qualification",
+            "repeatability",
+            "full-pass",
+            "aggregate",
+            "seal-interrupted",
+        ),
+    )
+    parser.add_argument("--external-worker", action="store_true")
+    parser.add_argument("--repository-root", type=Path, default=Path.cwd())
+    parser.add_argument("--execution-commit")
+    parser.add_argument("--full-ledger", type=Path)
+    parser.add_argument("--input-gate-receipt", type=Path)
+    parser.add_argument("--runtime-policy-binding", type=Path)
+    parser.add_argument("--qualification-receipt", type=Path)
+    parser.add_argument("--repeatability-review", type=Path)
+    parser.add_argument("--repeatability-owner-attestation", type=Path)
+    parser.add_argument("--authorization", type=Path)
+    parser.add_argument("--qualification-authorization", type=Path)
+    parser.add_argument("--m6-ledger", type=Path)
+    parser.add_argument("--date-root", type=Path)
+    parser.add_argument("--upstream-root", type=Path)
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--attempt-root", type=Path)
+    parser.add_argument("--campaign-root", type=Path)
+    parser.add_argument("--logical-pass-id")
+    parser.add_argument("--attempt-id")
+    parser.add_argument("--pass-input", action="append", type=Path, default=[])
+    parser.add_argument("--aggregate-mode", choices=("repeatability", "full-pass"))
+    parser.add_argument("--seal-mode", choices=("repeatability", "full-pass"))
+    parser.add_argument("--recovery-note")
+    parser.add_argument("--output", type=Path)
+    return parser
+
+
+def _path(value: Path | None, name: str) -> Path:
+    if value is None:
+        raise M8S2ProtocolViolation(f"{name} is required")
+    return value.resolve()
+
+
+def _text(value: str | None, name: str) -> str:
+    if value is None or not value.strip():
+        raise M8S2ProtocolViolation(f"{name} is required")
+    return value
+
+
+def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
+    # S1's accepted static candidate verifier performs only Git/file checks.
+    verify_s1_candidate(root, upstream_root=upstream, checkpoint_path=checkpoint)
+    verify_clean_tracked_tree(upstream, allow_native_extensions=True)
+    verify_candidate_environment(root, upstream, checkpoint)
+
+
+def _capture_bound_policy(
+    commit: str, candidate: dict[str, object], upstream: Path
+) -> dict[str, object]:
+    policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
+    policy: dict[str, object] = policy_module.capture_runtime_policy(commit, candidate)
+    policy["upstream_native_extensions"] = native_extension_hashes(upstream)
+    return policy
+
+
+def _verify_imported_checkout(root: Path) -> None:
+    """Reject a stale installed package or a runner outside the reviewed checkout."""
+
+    package_root = (root / "src" / "laserperception").resolve()
+    if Path(__file__).resolve() != (root / "scripts/detection/run_m8_s2.py").resolve():
+        raise M8S2ProtocolViolation("S2 runner differs from repository checkout")
+    if Path(laserperception.__file__).resolve().parent != package_root:
+        raise M8S2ProtocolViolation("S2 imported package differs from repository checkout")
+    for name, module in tuple(sys.modules.items()):
+        if name != "laserperception" and not name.startswith("laserperception."):
+            continue
+        source = getattr(module, "__file__", None)
+        if source is None or not Path(source).resolve().is_relative_to(package_root):
+            raise M8S2ProtocolViolation(f"S2 imported module differs from checkout: {name}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    if args.mode in {
+        "input-gate",
+        "runtime-binding",
+        "qualification",
+        "repeatability",
+        "full-pass",
+        "seal-interrupted",
+    }:
+        require_external_worker(args.external_worker)
+    root = args.repository_root.resolve()
+    _verify_imported_checkout(root)
+
+    if args.mode == "aggregate":
+        commit = _text(args.execution_commit, "--execution-commit")
+        verify_static_bindings(root, commit)
+        from laserperception.evaluation.m8_s2_aggregation import (
+            aggregate_three_full_passes,
+            load_completed_attempt,
+            review_repeatability,
+        )
+
+        selected = _text(args.aggregate_mode, "--aggregate-mode")
+        expected_count = 10 if selected == "repeatability" else 3
+        if len(args.pass_input) != expected_count:
+            raise M8S2ProtocolViolation(f"S2 aggregate requires {expected_count} --pass-input dirs")
+        if len({path.resolve().parent for path in args.pass_input}) != 1:
+            raise M8S2ProtocolViolation("S2 pass inputs span different campaign roots")
+        records = [
+            load_completed_attempt(path.resolve(), mode=selected) for path in args.pass_input
+        ]
+        result = (
+            review_repeatability(records, aggregation_commit=commit)
+            if selected == "repeatability"
+            else aggregate_three_full_passes(
+                records, repository_root=root, aggregation_commit=commit
+            )
+        )
+        atomic_write_json(_path(args.output, "--output"), result)
+        return 0
+
+    commit = _text(args.execution_commit, "--execution-commit")
+    verify_static_bindings(root, commit)
+    if args.mode == "seal-interrupted":
+        from laserperception.detection.m8_s2_runtime import seal_interrupted_attempt
+
+        receipt = seal_interrupted_attempt(
+            campaign_root=_path(args.campaign_root, "--campaign-root"),
+            attempt_root=_path(args.attempt_root, "--attempt-root"),
+            mode=_text(args.seal_mode, "--seal-mode"),
+            logical_pass_id=_text(args.logical_pass_id, "--logical-pass-id"),
+            attempt_id=_text(args.attempt_id, "--attempt-id"),
+            execution_commit=commit,
+            recovery_note=_text(args.recovery_note, "--recovery-note"),
+        )
+        if args.output is not None:
+            atomic_write_json(args.output.resolve(), receipt)
+        return 0
+    if args.mode == "qualification-plan":
+        atomic_write_json(_path(args.output, "--output"), qualification_plan(root))
+        return 0
+
+    if args.mode == "input-gate":
+        receipt = make_input_gate_receipt(root, _path(args.full_ledger, "--full-ledger"), commit)
+        write_input_gate_receipt(_path(args.output, "--output"), receipt)
+        return 0
+
+    if args.mode == "runtime-binding":
+        authorization = require_authorization(
+            args.authorization,
+            scope="qualification-only",
+            execution_commit=commit,
+            logical_pass_id=None,
+        )
+        verify_qualification_worker(authorization)
+        verify_input_gate_receipt(
+            _path(args.input_gate_receipt, "--input-gate-receipt"),
+            root=root,
+            ledger=_path(args.full_ledger, "--full-ledger"),
+            execution_commit=commit,
+        )
+        _external_candidate(
+            root,
+            _path(args.upstream_root, "--upstream-root"),
+            _path(args.checkpoint, "--checkpoint"),
+        )
+        candidate = json.loads((root / CANDIDATE_MANIFEST_PATH).read_text(encoding="utf-8"))
+        policy = _capture_bound_policy(
+            commit, candidate, _path(args.upstream_root, "--upstream-root")
+        )
+        atomic_write_json(_path(args.output, "--output"), policy)
+        return 0
+
+    if args.mode == "qualification":
+        authorization = require_authorization(
+            args.authorization,
+            scope="qualification-only",
+            execution_commit=commit,
+            logical_pass_id=None,
+        )
+        verify_qualification_worker(authorization)
+        input_sha = verify_input_gate_receipt(
+            _path(args.input_gate_receipt, "--input-gate-receipt"),
+            root=root,
+            ledger=_path(args.full_ledger, "--full-ledger"),
+            execution_commit=commit,
+        )
+        policy_path = _path(args.runtime_policy_binding, "--runtime-policy-binding")
+        policy_sha = sha256_file(policy_path)
+        bound_policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        candidate = json.loads((root / CANDIDATE_MANIFEST_PATH).read_text(encoding="utf-8"))
+        if not isinstance(bound_policy, dict):
+            raise M8S2ProtocolViolation("S2 qualification runtime policy is malformed")
+        verify_runtime_policy_document(bound_policy, execution_commit=commit, candidate=candidate)
+        _external_candidate(
+            root,
+            _path(args.upstream_root, "--upstream-root"),
+            _path(args.checkpoint, "--checkpoint"),
+        )
+        live_policy = _capture_bound_policy(
+            commit, candidate, _path(args.upstream_root, "--upstream-root")
+        )
+        verify_runtime_policy(policy_path, policy_sha, live_policy)
+        qualification = importlib.import_module("laserperception.detection.m8_s2_qualification")
+        receipt = qualification.run_future_qualification(
+            repository_root=root,
+            date_root=_path(args.date_root, "--date-root"),
+            m6_ledger=_path(args.m6_ledger, "--m6-ledger"),
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_sha,
+            qualification_authorization_path=_path(args.authorization, "--authorization"),
+        )
+        atomic_write_json(_path(args.output, "--output"), receipt)
+        return 0
+
+    # From here, every failure must occur before importing the science module.
+    mode = args.mode
+    logical_pass_id = _text(args.logical_pass_id, "--logical-pass-id")
+    campaign_root = _path(args.campaign_root, "--campaign-root")
+    attempt_root = _path(args.attempt_root, "--attempt-root")
+    attempt_id = _text(args.attempt_id, "--attempt-id")
+    full_ledger = _path(args.full_ledger, "--full-ledger")
+    input_receipt_sha = verify_input_gate_receipt(
+        _path(args.input_gate_receipt, "--input-gate-receipt"),
+        root=root,
+        ledger=full_ledger,
+        execution_commit=commit,
+    )
+    policy_path = _path(args.runtime_policy_binding, "--runtime-policy-binding")
+    policy_sha = sha256_file(policy_path)
+    bound_policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    if not isinstance(bound_policy, dict):
+        raise M8S2ProtocolViolation("S2 runtime policy is malformed or bound to another commit")
+    candidate = json.loads((root / CANDIDATE_MANIFEST_PATH).read_text(encoding="utf-8"))
+    verify_runtime_policy_document(bound_policy, execution_commit=commit, candidate=candidate)
+    qualification_sha = verify_qualification_receipt(
+        _path(args.qualification_receipt, "--qualification-receipt"),
+        execution_commit=commit,
+        runtime_policy_sha256=policy_sha,
+        input_gate_receipt_sha256=input_receipt_sha,
+        qualification_authorization_path=_path(
+            args.qualification_authorization, "--qualification-authorization"
+        ),
+    )
+    review_sha = (
+        verify_repeatability_review(
+            _path(args.repeatability_review, "--repeatability-review"),
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+        )
+        if mode == "full-pass"
+        else None
+    )
+    attestation_sha = (
+        verify_repeatability_owner_attestation(
+            _path(args.repeatability_owner_attestation, "--repeatability-owner-attestation"),
+            review_sha256=review_sha,
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+        )
+        if mode == "full-pass" and review_sha is not None
+        else None
+    )
+    authorization_path = _path(args.authorization, "--authorization")
+    authorization = require_authorization(
+        authorization_path,
+        scope="repeatability-only" if mode == "repeatability" else "full-pass-only",
+        execution_commit=commit,
+        logical_pass_id=logical_pass_id,
+        runtime_policy_sha256=policy_sha,
+        input_gate_receipt_sha256=input_receipt_sha,
+        qualification_receipt_sha256=qualification_sha,
+        repeatability_review_sha256=review_sha,
+        repeatability_owner_attestation_sha256=attestation_sha,
+        campaign_root=campaign_root,
+    )
+    authorization_sha = sha256_file(authorization_path)
+    authorization_id = str(authorization["authorization_id"])
+    _external_candidate(
+        root,
+        _path(args.upstream_root, "--upstream-root"),
+        _path(args.checkpoint, "--checkpoint"),
+    )
+    verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
+    # First accelerator import occurs after exact owner scope and bindings.
+    live_policy = _capture_bound_policy(
+        commit, candidate, _path(args.upstream_root, "--upstream-root")
+    )
+    verify_runtime_policy(policy_path, policy_sha, live_policy)
+    science = importlib.import_module("laserperception.evaluation.m8_s2_science")
+    with claim_logical_pass(
+        campaign_root=campaign_root,
+        attempt_root=attempt_root,
+        mode=mode,
+        logical_pass_id=logical_pass_id,
+        attempt_id=attempt_id,
+        execution_commit=commit,
+        runtime_policy_sha256=policy_sha,
+        input_gate_receipt_sha256=input_receipt_sha,
+        qualification_receipt_sha256=qualification_sha,
+        authorization_id=authorization_id,
+        authorization_sha256=authorization_sha,
+    ):
+        science.run_scientific_attempt(
+            mode=mode,
+            repository_root=root,
+            date_root=_path(args.date_root, "--date-root"),
+            m6_ledger=_path(args.m6_ledger, "--m6-ledger"),
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+            authorization_id=authorization_id,
+            authorization_sha256=authorization_sha,
+            attempt_root=attempt_root,
+            logical_pass_id=logical_pass_id,
+            attempt_id=attempt_id,
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

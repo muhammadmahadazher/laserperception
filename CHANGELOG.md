@@ -7,6 +7,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Freeze the CPU-only M8 P1-S2 scientific execution path, scoped authorization and runtime-policy
+  checks, streamed input gate, atomic attempts, same-runtime CUDA preflight contract, fixed GT-blind
+  sizing plan, and deterministic repeatability/full aggregation. No runtime was bound, owner
+  inference authorization issued, or S2 detector call made.
 - Freeze the CPU-only M8 P1-S2 B2/C2/D2/F2 input implementation and 1,712-condition ledger with
   exact M7 XYZT identity and a 28-condition fresh-adapter replay. Runtime binding and detector
   inference remain separately gated; no S2 detector calls occurred.
