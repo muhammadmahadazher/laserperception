@@ -7,6 +7,11 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Record the accepted historical S2 qualification on a now-deleted A40 and freeze a separate
+  GT-blind sizing-only execution/authorization path for two fresh processes and 36 engineering
+  calls, with prediction discard, atomic accounting and existing cost projections. This CPU-only
+  change executes no sizing or scientific calls and changes no frozen plan or scientific inputs.
+
 - Repair S2 external qualification compatibility: narrowly verify the pinned DSVT-generated
   version file, add a CPU-testable CUDA 11.8 development pre-build gate, and preserve the first
   blocked qualification attempt. Frozen inputs/science are unchanged; no S2 detector calls occurred.

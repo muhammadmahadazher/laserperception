@@ -8,6 +8,10 @@ the future work. No external worker was contacted for the original freeze. The l
 [first external qualification attempt](M8_S2_QUALIFICATION_ATTEMPT_1.md) passed the input gate
 but stopped before runtime-policy capture and qualification; it made zero scientific calls.
 The prospective CPU-only compatibility repair below does not run an external worker.
+The later [second qualification attempt](M8_S2_QUALIFICATION_ATTEMPT_2.md) was accepted on a
+temporary A40 that was deleted afterward. Its runtime identity is historical and not portable.
+The [separate sizing execution freeze](M8_S2_SIZING_EXECUTION.md) adds the prospective scoped
+36-call engineering path; no active worker, sizing execution or scientific authorization exists.
 
 ## Software and input identities
 
@@ -221,6 +225,7 @@ and combined 5,416-call accepted workload with initialization overhead. It repor
 observed minimum/maximum envelopes, not a confidence interval. No future duration or cost is
 measured yet.
 
-Current state: runtime bound **false**; S2 inference authorized **false**; first qualification
-attempt **blocked**, with no accepted qualification; sizing, repeatability, full-corpus inference,
+Current state: no active runtime; S2 inference authorized **false**; first qualification
+attempt **blocked**, second qualification **accepted historically on a terminated A40**;
+sizing, repeatability, full-corpus inference,
 and training **unexecuted**. Current S2 detector calls **0**.
