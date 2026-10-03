@@ -498,7 +498,9 @@ def test_interrupted_recovery_requires_dead_original_process(
         assert (tmp_path / ".sizing.lock").exists()
 
 
-@pytest.mark.parametrize("missing", ["ledger", "manifest", "calls", "directory", "executed"])
+@pytest.mark.parametrize(
+    "missing", ["ledger", "manifest", "calls", "authorization", "directory", "executed"]
+)
 def test_initial_atomic_writes_recover_only_zero_call_snapshot(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, missing: str
 ) -> None:
@@ -520,8 +522,8 @@ def test_initial_atomic_writes_recover_only_zero_call_snapshot(
     if missing == "ledger":
         (tmp_path / "sizing-claims.json").unlink()
         (tmp_path / ".sizing-claims.json.999.tmp").write_bytes(b'{"attempts":[')
-    elif missing in {"manifest", "calls", "executed"}:
-        name = "manifest" if missing == "manifest" else "calls"
+    elif missing in {"manifest", "calls", "authorization", "executed"}:
+        name = "calls" if missing == "executed" else missing
         (path / f"{name}.json").unlink()
         (path / f".{name}.json.999.tmp").write_bytes(b'{"partial":')
         if missing == "executed":
@@ -585,7 +587,9 @@ def test_result_output_cannot_damage_evidence(
         assert existing.read_text() == "preserved"
 
 
-@pytest.mark.parametrize("stage", ["manifest", "ledger", "bootstrap", "live-recovery"])
+@pytest.mark.parametrize(
+    "stage", ["manifest", "ledger", "bootstrap", "retained-copy", "live-recovery"]
+)
 def test_interrupted_recovery_can_itself_be_recovered(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
 ) -> None:
@@ -608,6 +612,8 @@ def test_interrupted_recovery_can_itself_be_recovered(
     claims["attempts"][0].update(status="RUNNING", manifest_sha256=None)
     atomic_write_json(tmp_path / "sizing-claims.json", claims)
     atomic_write_json(tmp_path / ".sizing.lock", lock)
+    if stage == "retained-copy":
+        (tmp_path / ".sizing-claims.json.999.tmp").write_bytes(b'{"original":')
     monkeypatch.setattr(sizing.os, "getpid", lambda: 1002)
     monkeypatch.setattr(sizing.os, "kill", lambda *a: (_ for _ in ()).throw(ProcessLookupError()))
     target = tmp_path / "sizing-claims.json" if stage == "ledger" else path / "manifest.json"
@@ -619,10 +625,22 @@ def test_interrupted_recovery_can_itself_be_recovered(
         atomic_write_json(destination, payload)
 
     monkeypatch.setattr(sizing, "atomic_write_json", interrupted_write)
+    original_replace = sizing.os.replace
+    if stage == "retained-copy":
+        monkeypatch.setattr(sizing, "atomic_write_json", atomic_write_json)
+
+        def interrupted_copy(source: Path, destination: Path) -> None:
+            if destination == path / ".sizing-claims.json.999.tmp":
+                Path(source).write_bytes(b'{"partial-copy":')
+                raise SystemExit("synthetic interrupted retained byte copy")
+            original_replace(source, destination)
+
+        monkeypatch.setattr(sizing.os, "replace", interrupted_copy)
     with pytest.raises(SystemExit):
         sizing.seal_interrupted_sizing(tmp_path, path, execution_commit=COMMIT)
     assert json.loads((tmp_path / ".sizing.lock").read_text())["recovery_process_ids"] == [1002]
     monkeypatch.setattr(sizing, "atomic_write_json", atomic_write_json)
+    monkeypatch.setattr(sizing.os, "replace", original_replace)
     monkeypatch.setattr(sizing.os, "getpid", lambda: 1003)
     if stage == "live-recovery":
 
@@ -642,3 +660,44 @@ def test_interrupted_recovery_can_itself_be_recovered(
     p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 1004, "retry")
     p2 = attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 1005)
     assert aggregate([p1, p2])["engineering_calls"] == 36
+
+
+@pytest.mark.parametrize("target", ["calls", "claims", "attempt-extra", "safe"])
+def test_recovery_cli_output_uses_evidence_guard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, target: str
+) -> None:
+    path = tmp_path / "attempt"
+    path.mkdir()
+    (path / "calls.json").write_text("preserved calls")
+    (tmp_path / "sizing-claims.json").write_text("preserved claims")
+    output = {
+        "calls": path / "calls.json",
+        "claims": tmp_path / "sizing-claims.json",
+        "attempt-extra": path / "extra.json",
+        "safe": tmp_path / "recovery-receipt.json",
+    }[target]
+    main = runpy.run_path(str(ROOT / "scripts/detection/run_m8_s2.py"))["main"]
+    monkeypatch.setitem(main.__globals__, "verify_static_bindings", lambda *a: None)
+    monkeypatch.setattr(sizing, "seal_interrupted_sizing", lambda *a, **k: {"status": "INCOMPLETE"})
+    args = [
+        "sizing-seal-interrupted",
+        "--external-worker",
+        "--repository-root",
+        str(ROOT),
+        "--execution-commit",
+        COMMIT,
+        "--campaign-root",
+        str(tmp_path),
+        "--attempt-root",
+        str(path),
+        "--output",
+        str(output),
+    ]
+    if target == "safe":
+        assert main(args) == 0
+        assert json.loads(output.read_text()) == {"status": "INCOMPLETE"}
+    else:
+        with pytest.raises(M8S2ProtocolViolation):
+            main(args)
+        assert (path / "calls.json").read_text() == "preserved calls"
+        assert (tmp_path / "sizing-claims.json").read_text() == "preserved claims"

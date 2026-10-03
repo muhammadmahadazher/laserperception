@@ -214,6 +214,19 @@ def _bindings(commit: str, policy: str, input_sha: str, qualification: str) -> d
     }
 
 
+def _atomic_write_bytes(target: Path, data: bytes, *, retained_copy: bool = False) -> None:
+    """Keep canonical bytes intact until a flushed sibling copy is complete."""
+    name = "sizing-retained-copy" if retained_copy else target.name
+    temporary = target.with_name(f".{name}.{os.getpid()}.tmp")
+    if temporary.is_symlink():
+        raise M8S2ProtocolViolation("sizing byte-copy temporary is a symlink")
+    with temporary.open("wb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, target)
+
+
 def run_sizing_attempt(
     *,
     repository_root: Path,
@@ -324,7 +337,7 @@ def run_sizing_attempt(
             if entry["status"] == "COMPLETE" and entry["process_id"] == os.getpid():
                 raise M8S2ProtocolViolation("sizing requires a fresh OS process")
         attempt_root.mkdir()
-        (attempt_root / "authorization.json").write_bytes(authorization_bytes)
+        _atomic_write_bytes(attempt_root / "authorization.json", authorization_bytes)
         entry = {
             "attempt": attempt_root.name,
             "attempt_id": attempt_id,
@@ -444,7 +457,13 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
     owned_temporaries = {
         f".{name}.{pid}.tmp"
         for pid in writers
-        for name in ("calls.json", "manifest.json", "sizing-claims.json")
+        for name in (
+            "calls.json",
+            "manifest.json",
+            "sizing-claims.json",
+            "authorization.json",
+            "sizing-retained-copy",
+        )
     }
     recorded_files = set(manifest["files"])
     if (
@@ -510,7 +529,9 @@ def _recover_initial_claim(
         _json(ledger_path) if ledger_path.exists() else {"bindings": bindings, "attempts": []}
     )
     entries = [e for e in ledger["attempts"] if e["attempt"] == attempt.name]
-    missing = any(not (attempt / n).exists() for n in ("manifest.json", "calls.json"))
+    missing = any(
+        not (attempt / n).exists() for n in ("manifest.json", "calls.json", "authorization.json")
+    )
     if not missing and entries:
         return
     if ledger["bindings"] != bindings or len(entries) > 1:
@@ -541,7 +562,7 @@ def _recover_initial_claim(
     if auth_path.exists() and (auth_path.is_symlink() or auth_path.read_bytes() != authorization):
         raise M8S2ProtocolViolation("sizing bootstrap authorization copy differs")
     if not auth_path.exists():
-        auth_path.write_bytes(authorization)
+        _atomic_write_bytes(auth_path, authorization)
     if not (attempt / "manifest.json").exists():
         atomic_write_json(attempt / "manifest.json", initial)
     if not (attempt / "calls.json").exists():
@@ -616,7 +637,13 @@ def seal_interrupted_sizing(
     # the sealed attempt too, without deleting its original valuable state.
     owned: dict[str, str] = {}
     for pid in dead_writers:
-        for name in ("calls.json", "manifest.json", "sizing-claims.json"):
+        for name in (
+            "calls.json",
+            "manifest.json",
+            "sizing-claims.json",
+            "authorization.json",
+            "sizing-retained-copy",
+        ):
             temporary_name = f".{name}.{pid}.tmp"
             source = (campaign if name == "sizing-claims.json" else attempt) / temporary_name
             if not source.exists() and not source.is_symlink():
@@ -629,7 +656,7 @@ def seal_interrupted_sizing(
                     raise M8S2ProtocolViolation("sizing recovery temporary copy is a symlink")
                 if target.exists() and sha256_file(target) != sha256_file(source):
                     raise M8S2ProtocolViolation("sizing recovery temporary copy differs")
-                target.write_bytes(source.read_bytes())
+                _atomic_write_bytes(target, source.read_bytes(), retained_copy=True)
             owned[temporary_name] = sha256_file(target)
     manifest["recovery_process_ids"] = recovery_pids
     if manifest["status"] == "RUNNING":

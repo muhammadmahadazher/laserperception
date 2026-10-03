@@ -87,6 +87,7 @@ remain rejected. The lock retains a zero-call bootstrap snapshot so missing firs
 files can be reconstructed after verified process death; uncommitted timings are never promoted.
 Recovery writer PIDs are registered in the retained lock before evidence writes. If recovery is
 interrupted, a later recovery requires those writers to be dead and retains their temporaries too.
+Authorization bytes and retained temporary copies use flushed sibling files and atomic replacement.
 Persist the recovery before retry. An unreadable initial lock or conflicting bootstrap state must fail
 closed and return for owner review.
 
@@ -95,9 +96,9 @@ Mode `sizing-aggregate` is CPU-only. Supply the same reviewed `--execution-commi
 worker's CPU at the original authorized campaign path before the final off-worker archive. It checks
 the complete claim history including sealed failures, matching bindings/hashes, distinct PIDs/UUIDs,
 fixed call order, strict nonsemantic schemas and exactly two complete logical processes. Input order
-does not affect deterministic output. Failed attempts contribute no timings. The output must be a
-new file outside attempt directories; existing files, hidden campaign metadata and the claim ledger
-are rejected before writing, preserving sealed evidence.
+does not affect deterministic output. Failed attempts contribute no timings. Aggregate and optional
+recovery output must be new files outside attempt directories; existing files, hidden campaign
+metadata and the claim ledger are rejected before writing, preserving sealed evidence.
 
 The `laserperception.m8.s2.sizing-result.v1` result retains two initialization durations, all 32
 measured observations, observed min/median/max, allocator summaries, and estimator results.

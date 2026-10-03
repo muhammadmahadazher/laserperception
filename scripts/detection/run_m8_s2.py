@@ -239,7 +239,10 @@ def main(argv: list[str] | None = None) -> int:
     commit = _text(args.execution_commit, "--execution-commit")
     verify_static_bindings(root, commit)
     if args.mode == "sizing-seal-interrupted":
-        from laserperception.detection.m8_s2_sizing import seal_interrupted_sizing
+        from laserperception.detection.m8_s2_sizing import (
+            seal_interrupted_sizing,
+            write_sizing_result,
+        )
 
         receipt = seal_interrupted_sizing(
             _path(args.campaign_root, "--campaign-root"),
@@ -247,7 +250,7 @@ def main(argv: list[str] | None = None) -> int:
             execution_commit=commit,
         )
         if args.output is not None:
-            atomic_write_json(args.output.resolve(), receipt)
+            write_sizing_result(args.output, [_path(args.attempt_root, "--attempt-root")], receipt)
         return 0
     if args.mode == "seal-interrupted":
         from laserperception.detection.m8_s2_runtime import seal_interrupted_attempt
