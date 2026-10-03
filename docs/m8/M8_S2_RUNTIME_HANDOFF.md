@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `2e74e41c37fc336d6de013f90b494ffa8ecfc198`
+corrections complete at `20cbef6113c694e9b85508caafbb9ad6e35c13d2`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -41,7 +41,7 @@ The [S2 runner](../../scripts/detection/run_m8_s2.py) exposes `input-gate`, `run
 `qualification-plan`, `qualification`, `repeatability`, `full-pass`, and `aggregate` modes.
 Invoke it with isolated Python (`python -I scripts/detection/run_m8_s2.py ...`); the runner
 checks this before shadowable imports, performs its source inventory, and only then adds the
-reviewed `src` checkout to the import path.
+reviewed repository and `src` checkout to the import path.
 `qualification-plan` is static and CPU-only. Worker modes require `--external-worker`;
 runtime-binding, qualification, and scientific modes additionally require the exact applicable
 owner authorization. No authorization file is created by this handoff.
