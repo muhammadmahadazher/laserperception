@@ -87,6 +87,8 @@ remain rejected. The lock retains a zero-call bootstrap snapshot so missing firs
 files can be reconstructed after verified process death; uncommitted timings are never promoted.
 Recovery writer PIDs are registered in the retained lock before evidence writes. If recovery is
 interrupted, a later recovery requires those writers to be dead and retains their temporaries too.
+Recovery commands hold a non-blocking OS file lock before reading or replacing claims. Concurrent
+recovery is rejected; process death releases ownership. Its guard file stays at the same path.
 Authorization bytes and retained temporary copies use flushed sibling files and atomic replacement.
 Persist the recovery before retry. An unreadable initial lock or conflicting bootstrap state must fail
 closed and return for owner review.

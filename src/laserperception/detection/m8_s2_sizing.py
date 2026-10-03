@@ -14,7 +14,8 @@ import os
 import socket
 import time
 import uuid
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from pathlib import Path
 from statistics import median
 from typing import Any
@@ -602,7 +603,55 @@ def _recover_initial_claim(
         atomic_write_json(ledger_path, ledger)
 
 
+@contextmanager
+def _recovery_guard(campaign: Path) -> Iterator[None]:
+    """Kernel-owned exclusive recovery lock; process death releases ownership."""
+    path = campaign / ".sizing-recovery-guard"
+    if path.is_symlink():
+        raise M8S2ProtocolViolation("sizing recovery guard cannot be a symlink")
+    # Keep the same inode/path permanently: unlinking an advisory-lock file
+    # could let another process lock a new inode while this one remains held.
+    with path.open("a+b") as stream:
+        if stream.seek(0, os.SEEK_END) == 0:
+            stream.write(b"\0")
+            stream.flush()
+        stream.seek(0)
+        if os.name == "nt":
+            windows_lock: Any = importlib.import_module("msvcrt")
+
+            try:
+                windows_lock.locking(stream.fileno(), windows_lock.LK_NBLCK, 1)
+            except OSError as error:
+                raise M8S2ProtocolViolation("another sizing recovery owns the guard") from error
+            try:
+                yield
+            finally:
+                stream.seek(0)
+                windows_lock.locking(stream.fileno(), windows_lock.LK_UNLCK, 1)
+        else:
+            unix_lock: Any = importlib.import_module("fcntl")
+
+            try:
+                unix_lock.flock(stream.fileno(), unix_lock.LOCK_EX | unix_lock.LOCK_NB)
+            except OSError as error:
+                raise M8S2ProtocolViolation("another sizing recovery owns the guard") from error
+            try:
+                yield
+            finally:
+                unix_lock.flock(stream.fileno(), unix_lock.LOCK_UN)
+
+
 def seal_interrupted_sizing(
+    campaign_root: Path, attempt_root: Path, *, execution_commit: str
+) -> dict[str, Any]:
+    """Serialize original-worker recovery without a read/replace claim race."""
+    with _recovery_guard(campaign_root.resolve()):
+        return _seal_interrupted_sizing_owned(
+            campaign_root, attempt_root, execution_commit=execution_commit
+        )
+
+
+def _seal_interrupted_sizing_owned(
     campaign_root: Path, attempt_root: Path, *, execution_commit: str
 ) -> dict[str, Any]:
     """Seal a dead process on its original worker; never resume partial calls."""

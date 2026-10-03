@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import runpy
+import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -780,3 +781,54 @@ def test_caught_write_interrupt_seals_only_persisted_calls(
     p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 1001, "retry")
     p2 = attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 1002)
     assert aggregate([p1, p2])["engineering_calls"] == 36
+
+
+def test_recovery_guard_excludes_another_os_process(tmp_path: Path) -> None:
+    script = """
+import sys
+from pathlib import Path
+from laserperception.detection.m8_s2_sizing import _recovery_guard, M8S2ProtocolViolation
+try:
+    with _recovery_guard(Path(sys.argv[1])):
+        sys.exit(3)
+except M8S2ProtocolViolation:
+    print("blocked")
+"""
+    with sizing._recovery_guard(tmp_path):
+        child = subprocess.run(
+            [sys.executable, "-c", script, str(tmp_path)],
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        assert child.returncode == 0 and child.stdout.strip() == "blocked", child.stderr
+    with sizing._recovery_guard(tmp_path):
+        assert (tmp_path / ".sizing-recovery-guard").exists()
+
+
+def test_recovery_guard_releases_when_owner_is_killed(tmp_path: Path) -> None:
+    script = """
+import sys
+from pathlib import Path
+from laserperception.detection.m8_s2_sizing import _recovery_guard
+with _recovery_guard(Path(sys.argv[1])):
+    print("owned", flush=True)
+    sys.stdin.read()
+"""
+    child = subprocess.Popen(
+        [sys.executable, "-c", script, str(tmp_path)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        assert child.stdout is not None and child.stdout.readline().strip() == "owned"
+        with pytest.raises(M8S2ProtocolViolation):
+            with sizing._recovery_guard(tmp_path):
+                pytest.fail("concurrent recovery acquired ownership")
+    finally:
+        child.kill()
+        child.communicate(timeout=20)
+    with sizing._recovery_guard(tmp_path):
+        assert (tmp_path / ".sizing-recovery-guard").exists()
