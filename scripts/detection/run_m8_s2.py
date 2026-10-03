@@ -32,6 +32,9 @@ def _preimport_source_guard(root: Path) -> None:
     )
     if files.returncode:
         raise RuntimeError("S2 preimport source inventory failed")
+    for name in files.stdout.split("\0"):
+        if name and ((root / name).is_symlink() or (root / name).is_dir()):
+            raise RuntimeError("S2 preimport untracked directory or symlink exists")
     if any(
         Path(name).suffix in {".py", ".pyc", ".so", ".pyd", ".dll"}
         for name in files.stdout.split("\0")

@@ -165,6 +165,10 @@ def verify_clean_tracked_tree(
         if not name:
             continue
         path = Path(name)
+        if (root / path).is_symlink() or (root / path).is_dir():
+            raise M8S2ProtocolViolation(
+                f"S2 untracked directory or symlink differs from HEAD: {name}"
+            )
         if path.suffix in {".py", ".pyc"}:
             raise M8S2ProtocolViolation(f"S2 untracked importable source differs from HEAD: {name}")
         if path.suffix in {".so", ".pyd", ".dll"}:

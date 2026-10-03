@@ -746,6 +746,36 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
         verify_clean_tracked_tree(upstream, allow_native_extensions=True)
 
 
+def test_source_guards_reject_directory_symlinks(tmp_path: Path) -> None:
+    root = tmp_path / "checkout"
+    root.mkdir()
+    subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "S2 Test"], cwd=root, check=True)
+    subprocess.run(["git", "config", "user.email", "s2-test@example.invalid"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "commit", "--allow-empty", "-m", "fixture"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+    target = tmp_path / "external-package"
+    target.mkdir()
+    (target / "__init__.py").write_text("unreviewed = True\n", encoding="utf-8")
+    link = root / "benchmarks" / "m7" / "interventions"
+    link.parent.mkdir(parents=True)
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError:
+        pytest.skip("directory symlink creation unavailable on this host")
+    with pytest.raises(M8S2ProtocolViolation, match="directory or symlink"):
+        verify_clean_tracked_tree(root)
+    preimport = runpy.run_path(str(ROOT / "scripts/detection/run_m8_s2.py"))[
+        "_preimport_source_guard"
+    ]
+    with pytest.raises(RuntimeError, match="directory or symlink"):
+        preimport(root)
+
+
 def test_backend_environment_must_match_checked_paths(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
