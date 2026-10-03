@@ -10,7 +10,7 @@ the future work. No external worker was contacted for this freeze.
 
 The execution software and synthetic tests were committed before this handoff, beginning at
 `aa38ae4d9ca291380bf44de2628f9a1a598b96bf`. Subsequent prospective evidence and review
-corrections complete at `bac3e8f3dcfb205bf02b43142b9cf954aa3758d4`
+corrections complete at `be93b9df68d362a5c670dea1b9488dddb93394c9`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
 That merged identity is not known in this prebilling record. The original S2 input implementation
@@ -50,7 +50,9 @@ the detector or loads GT.
    hostname and the sole NVIDIA-SMI-visible GPU UUID before Torch import. Reject multi-GPU
    visibility; policy capture also requires exactly one Torch CUDA device and the same GPU UUID.
    Verify Git HEAD, a clean tracked execution tree, no untracked importable Python source in the
-   repository or pinned upstream checkout, all frozen identities, and the streamed full ledger. The
+   repository or pinned upstream checkout, and no project bytecode caches; the runner disables
+   new bytecode writes before importing project modules. Verify all frozen identities and the
+   streamed full ledger. The
    input-gate receipt is evidence, not inference permission.
 2. Capture a fresh runtime policy for that worker. Bind its hostname, GPU name, UUID, VRAM, driver, CUDA,
    Python, PyTorch, spconv, torch-scatter, NumPy, DSVT upstream commit, candidate config, and
