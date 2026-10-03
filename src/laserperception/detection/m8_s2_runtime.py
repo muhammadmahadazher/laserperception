@@ -163,7 +163,7 @@ def verify_clean_tracked_tree(root: Path, *, source_subtree: str = ".") -> None:
         if not name:
             continue
         path = Path(name)
-        if path.suffix == ".py" or (path.suffix == ".pyc" and "__pycache__" not in path.parts):
+        if path.suffix in {".py", ".pyc"}:
             raise M8S2ProtocolViolation(f"S2 untracked importable source differs from HEAD: {name}")
 
 

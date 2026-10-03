@@ -701,6 +701,12 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     benchmark_initializer.write_text("value = 'unreviewed'\n", encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
         verify_clean_tracked_tree(tmp_path)
+    benchmark_initializer.unlink()
+    bytecode = tmp_path / "src" / "laserperception" / "__pycache__" / "module.cpython-312.pyc"
+    bytecode.parent.mkdir(parents=True)
+    bytecode.write_bytes(b"untrusted bytecode")
+    with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
+        verify_clean_tracked_tree(tmp_path)
 
 
 def test_backend_environment_must_match_checked_paths(

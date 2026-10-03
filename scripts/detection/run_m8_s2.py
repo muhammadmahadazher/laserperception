@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Future M8 S2 runner with a fail-closed authorization-before-import boundary."""
+# ruff: noqa: E402 -- bytecode writes must be disabled before project imports.
 
 from __future__ import annotations
 
@@ -8,6 +9,9 @@ import importlib
 import json
 import sys
 from pathlib import Path
+
+# Refuse pre-existing project bytecode at the binding gate without creating new caches.
+sys.dont_write_bytecode = True
 
 import laserperception
 from laserperception.detection.m8_s1_runtime import (
