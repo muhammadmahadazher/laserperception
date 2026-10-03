@@ -696,6 +696,11 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     benchmark_shadow.write_text("value = 'unreviewed'\n", encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
         verify_clean_tracked_tree(tmp_path, source_subtree="benchmarks/m7")
+    benchmark_shadow.unlink()
+    benchmark_initializer = tmp_path / "benchmarks" / "__init__.py"
+    benchmark_initializer.write_text("value = 'unreviewed'\n", encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
+        verify_clean_tracked_tree(tmp_path)
 
 
 def test_backend_environment_must_match_checked_paths(
