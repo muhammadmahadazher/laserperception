@@ -707,6 +707,43 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     bytecode.write_bytes(b"untrusted bytecode")
     with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
         verify_clean_tracked_tree(tmp_path)
+    preimport = runpy.run_path(str(ROOT / "scripts/detection/run_m8_s2.py"))[
+        "_preimport_source_guard"
+    ]
+    with pytest.raises(RuntimeError, match="preimport untracked"):
+        preimport(tmp_path)
+    bytecode.unlink()
+    native = tmp_path / "src" / "laserperception" / "shadow.cpython-312-x86_64-linux-gnu.so"
+    native.write_bytes(b"synthetic extension")
+    with pytest.raises(M8S2ProtocolViolation, match="untracked native extension"):
+        verify_clean_tracked_tree(tmp_path)
+    native.unlink()
+    upstream = tmp_path / "upstream"
+    upstream.mkdir()
+    subprocess.run(["git", "init"], cwd=upstream, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "S2 Test"], cwd=upstream, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "s2-test@example.invalid"], cwd=upstream, check=True
+    )
+    (upstream / "README.md").write_text("upstream\n", encoding="utf-8")
+    subprocess.run(["git", "add", "README.md"], cwd=upstream, check=True)
+    subprocess.run(
+        ["git", "commit", "-m", "fixture"], cwd=upstream, check=True, capture_output=True
+    )
+    extension = upstream / "pcdet" / "ops" / "cuda_op.cpython-312-x86_64-linux-gnu.so"
+    extension.parent.mkdir(parents=True)
+    extension.write_bytes(b"synthetic upstream extension")
+    verify_clean_tracked_tree(upstream, allow_native_extensions=True)
+    from laserperception.detection.m8_s2_runtime import native_extension_hashes
+
+    assert native_extension_hashes(upstream) == {
+        extension.relative_to(upstream).as_posix(): hashlib.sha256(
+            extension.read_bytes()
+        ).hexdigest()
+    }
+    extension.with_name("cuda_op.py").write_text("shadowed = True\n", encoding="utf-8")
+    with pytest.raises(M8S2ProtocolViolation, match="untracked native extension"):
+        verify_clean_tracked_tree(upstream, allow_native_extensions=True)
 
 
 def test_backend_environment_must_match_checked_paths(

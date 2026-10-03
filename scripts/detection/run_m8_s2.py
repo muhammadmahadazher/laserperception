@@ -7,11 +7,37 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
-# Refuse pre-existing project bytecode at the binding gate without creating new caches.
 sys.dont_write_bytecode = True
+
+
+def _preimport_source_guard(root: Path) -> None:
+    """Fail before package import if local source or bytecode could override HEAD."""
+
+    if subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False).returncode:
+        raise RuntimeError("S2 preimport tracked source differs from HEAD")
+    files = subprocess.run(
+        ["git", "ls-files", "--others", "-z", "--"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if files.returncode:
+        raise RuntimeError("S2 preimport source inventory failed")
+    if any(
+        Path(name).suffix in {".py", ".pyc", ".so", ".pyd", ".dll"}
+        for name in files.stdout.split("\0")
+        if name
+    ):
+        raise RuntimeError("S2 preimport untracked executable source or cache exists")
+
+
+if __name__ == "__main__":
+    _preimport_source_guard(Path(__file__).resolve().parents[2])
 
 import laserperception
 from laserperception.detection.m8_s1_runtime import (
@@ -31,6 +57,7 @@ from laserperception.detection.m8_s2_planning import qualification_plan
 from laserperception.detection.m8_s2_runtime import (
     M8S2ProtocolViolation,
     claim_logical_pass,
+    native_extension_hashes,
     require_authorization,
     verify_candidate_environment,
     verify_clean_tracked_tree,
@@ -103,8 +130,17 @@ def _text(value: str | None, name: str) -> str:
 def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
     # S1's accepted static candidate verifier performs only Git/file checks.
     verify_s1_candidate(root, upstream_root=upstream, checkpoint_path=checkpoint)
-    verify_clean_tracked_tree(upstream)
+    verify_clean_tracked_tree(upstream, allow_native_extensions=True)
     verify_candidate_environment(root, upstream, checkpoint)
+
+
+def _capture_bound_policy(
+    commit: str, candidate: dict[str, object], upstream: Path
+) -> dict[str, object]:
+    policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
+    policy: dict[str, object] = policy_module.capture_runtime_policy(commit, candidate)
+    policy["upstream_native_extensions"] = native_extension_hashes(upstream)
+    return policy
 
 
 def _verify_imported_checkout(root: Path) -> None:
@@ -211,8 +247,9 @@ def main(argv: list[str] | None = None) -> int:
             _path(args.checkpoint, "--checkpoint"),
         )
         candidate = json.loads((root / CANDIDATE_MANIFEST_PATH).read_text(encoding="utf-8"))
-        policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
-        policy = policy_module.capture_runtime_policy(commit, candidate)
+        policy = _capture_bound_policy(
+            commit, candidate, _path(args.upstream_root, "--upstream-root")
+        )
         atomic_write_json(_path(args.output, "--output"), policy)
         return 0
 
@@ -242,8 +279,9 @@ def main(argv: list[str] | None = None) -> int:
             _path(args.upstream_root, "--upstream-root"),
             _path(args.checkpoint, "--checkpoint"),
         )
-        policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
-        live_policy = policy_module.capture_runtime_policy(commit, candidate)
+        live_policy = _capture_bound_policy(
+            commit, candidate, _path(args.upstream_root, "--upstream-root")
+        )
         verify_runtime_policy(policy_path, policy_sha, live_policy)
         qualification = importlib.import_module("laserperception.detection.m8_s2_qualification")
         receipt = qualification.run_future_qualification(
@@ -332,8 +370,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
     # First accelerator import occurs after exact owner scope and bindings.
-    policy_module = importlib.import_module("laserperception.detection.m8_s2_runtime_policy")
-    live_policy = policy_module.capture_runtime_policy(commit, candidate)
+    live_policy = _capture_bound_policy(
+        commit, candidate, _path(args.upstream_root, "--upstream-root")
+    )
     verify_runtime_policy(policy_path, policy_sha, live_policy)
     science = importlib.import_module("laserperception.evaluation.m8_s2_science")
     with claim_logical_pass(

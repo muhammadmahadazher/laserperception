@@ -143,7 +143,9 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     return {"execution_commit": execution_commit, "input_freeze": freeze}
 
 
-def verify_clean_tracked_tree(root: Path, *, source_subtree: str = ".") -> None:
+def verify_clean_tracked_tree(
+    root: Path, *, source_subtree: str = ".", allow_native_extensions: bool = False
+) -> None:
     """Reject changed tracked files and untracked importable Python source."""
 
     result = subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False)
@@ -165,6 +167,33 @@ def verify_clean_tracked_tree(root: Path, *, source_subtree: str = ".") -> None:
         path = Path(name)
         if path.suffix in {".py", ".pyc"}:
             raise M8S2ProtocolViolation(f"S2 untracked importable source differs from HEAD: {name}")
+        if path.suffix in {".so", ".pyd", ".dll"}:
+            if (
+                not allow_native_extensions
+                or (root / path.with_name(path.name.split(".", 1)[0] + ".py")).exists()
+            ):
+                raise M8S2ProtocolViolation(
+                    f"S2 untracked native extension differs from HEAD: {name}"
+                )
+
+
+def native_extension_hashes(root: Path) -> dict[str, str]:
+    """Bind every in-checkout native build product by path and exact bytes."""
+
+    files = subprocess.run(
+        ["git", "ls-files", "--others", "-z", "--"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if files.returncode:
+        raise M8S2ProtocolViolation("S2 native extension inventory failed")
+    result: dict[str, str] = {}
+    for name in files.stdout.split("\0"):
+        if name and Path(name).suffix in {".so", ".pyd", ".dll"}:
+            result[name] = sha256_file(root / name)
+    return result
 
 
 def verify_frozen_gt_assets(root: Path, date_root: Path) -> None:
@@ -976,6 +1005,18 @@ def verify_runtime_policy_document(
     vram = policy.get("gpu_vram_bytes")
     if isinstance(vram, bool) or not isinstance(vram, int) or vram <= 0:
         raise M8S2ProtocolViolation("S2 runtime policy VRAM is absent")
+    extensions = policy.get("upstream_native_extensions")
+    if not isinstance(extensions, dict) or any(
+        not isinstance(name, str)
+        or not name
+        or Path(name).is_absolute()
+        or ".." in Path(name).parts
+        or Path(name).suffix not in {".so", ".pyd", ".dll"}
+        or not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+        for name, digest in extensions.items()
+    ):
+        raise M8S2ProtocolViolation("S2 upstream native extension binding is malformed")
 
 
 def verify_structural_preflight(structural: Mapping[str, object]) -> None:
