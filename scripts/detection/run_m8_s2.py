@@ -65,6 +65,7 @@ from laserperception.detection.m8_s2_input_gate import (
 )
 from laserperception.detection.m8_s2_planning import qualification_plan
 from laserperception.detection.m8_s2_runtime import (
+    SIZING_PLAN_SHA256,
     M8S2ProtocolViolation,
     claim_logical_pass,
     native_extension_hashes,
@@ -92,6 +93,9 @@ def _parser() -> argparse.ArgumentParser:
             "runtime-binding",
             "qualification-plan",
             "qualification",
+            "sizing",
+            "sizing-aggregate",
+            "sizing-seal-interrupted",
             "repeatability",
             "full-pass",
             "aggregate",
@@ -122,6 +126,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seal-mode", choices=("repeatability", "full-pass"))
     parser.add_argument("--recovery-note")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--usd-per-hour", type=float)
     return parser
 
 
@@ -177,6 +182,8 @@ def main(argv: list[str] | None = None) -> int:
         "input-gate",
         "runtime-binding",
         "qualification",
+        "sizing",
+        "sizing-seal-interrupted",
         "repeatability",
         "full-pass",
         "seal-interrupted",
@@ -184,6 +191,22 @@ def main(argv: list[str] | None = None) -> int:
         require_external_worker(args.external_worker)
     root = args.repository_root.resolve()
     _verify_imported_checkout(root)
+
+    if args.mode == "sizing-aggregate":
+        commit = _text(args.execution_commit, "--execution-commit")
+        verify_static_bindings(root, commit)
+        if args.usd_per_hour is None:
+            raise M8S2ProtocolViolation("sizing aggregation requires actual --usd-per-hour")
+        from laserperception.detection.m8_s2_sizing import aggregate_sizing, write_sizing_result
+
+        result = aggregate_sizing(
+            args.pass_input,
+            repository_root=root,
+            execution_commit=commit,
+            usd_per_hour=args.usd_per_hour,
+        )
+        write_sizing_result(_path(args.output, "--output"), args.pass_input, result)
+        return 0
 
     if args.mode == "aggregate":
         commit = _text(args.execution_commit, "--execution-commit")
@@ -215,6 +238,20 @@ def main(argv: list[str] | None = None) -> int:
 
     commit = _text(args.execution_commit, "--execution-commit")
     verify_static_bindings(root, commit)
+    if args.mode == "sizing-seal-interrupted":
+        from laserperception.detection.m8_s2_sizing import (
+            seal_interrupted_sizing,
+            write_sizing_result,
+        )
+
+        receipt = seal_interrupted_sizing(
+            _path(args.campaign_root, "--campaign-root"),
+            _path(args.attempt_root, "--attempt-root"),
+            execution_commit=commit,
+        )
+        if args.output is not None:
+            write_sizing_result(args.output, [_path(args.attempt_root, "--attempt-root")], receipt)
+        return 0
     if args.mode == "seal-interrupted":
         from laserperception.detection.m8_s2_runtime import seal_interrupted_attempt
 
@@ -363,7 +400,13 @@ def main(argv: list[str] | None = None) -> int:
     authorization_path = _path(args.authorization, "--authorization")
     authorization = require_authorization(
         authorization_path,
-        scope="repeatability-only" if mode == "repeatability" else "full-pass-only",
+        scope=(
+            "sizing-only"
+            if mode == "sizing"
+            else "repeatability-only"
+            if mode == "repeatability"
+            else "full-pass-only"
+        ),
         execution_commit=commit,
         logical_pass_id=logical_pass_id,
         runtime_policy_sha256=policy_sha,
@@ -372,20 +415,58 @@ def main(argv: list[str] | None = None) -> int:
         repeatability_review_sha256=review_sha,
         repeatability_owner_attestation_sha256=attestation_sha,
         campaign_root=campaign_root,
+        sizing_plan_sha256=SIZING_PLAN_SHA256 if mode == "sizing" else None,
     )
     authorization_sha = sha256_file(authorization_path)
     authorization_id = str(authorization["authorization_id"])
+    if mode == "sizing":
+        qualification_grant = require_authorization(
+            _path(args.qualification_authorization, "--qualification-authorization"),
+            scope="qualification-only",
+            execution_commit=commit,
+            logical_pass_id=None,
+        )
+        verify_qualification_worker(qualification_grant)
+        if (
+            bound_policy.get("worker_hostname") != qualification_grant["authorized_worker_hostname"]
+            or bound_policy.get("gpu_uuid") != qualification_grant["authorized_gpu_uuid"]
+        ):
+            raise M8S2ProtocolViolation("sizing qualification grant/live policy identity differs")
     _external_candidate(
         root,
         _path(args.upstream_root, "--upstream-root"),
         _path(args.checkpoint, "--checkpoint"),
     )
-    verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
+    if mode != "sizing":
+        verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
+    else:
+        from laserperception.detection.m8_s2_sizing import sizing_plan
+
+        sizing_plan(root)  # exact frozen selection before any accelerator import
+        _path(args.date_root, "--date-root")
+        _path(args.m6_ledger, "--m6-ledger")
     # First accelerator import occurs after exact owner scope and bindings.
     live_policy = _capture_bound_policy(
         commit, candidate, _path(args.upstream_root, "--upstream-root")
     )
     verify_runtime_policy(policy_path, policy_sha, live_policy)
+    if mode == "sizing":
+        sizing = importlib.import_module("laserperception.detection.m8_s2_sizing")
+        sizing.run_sizing_attempt(
+            repository_root=root,
+            date_root=_path(args.date_root, "--date-root"),
+            m6_ledger=_path(args.m6_ledger, "--m6-ledger"),
+            campaign_root=campaign_root,
+            attempt_root=attempt_root,
+            logical_process_id=logical_pass_id,
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_receipt_sha,
+            qualification_receipt_sha256=qualification_sha,
+            authorization_path=authorization_path,
+            attempt_id=attempt_id,
+        )
+        return 0
     science = importlib.import_module("laserperception.evaluation.m8_s2_science")
     with claim_logical_pass(
         campaign_root=campaign_root,

@@ -61,7 +61,10 @@ ATTEMPT_SCHEMA = "laserperception.m8.s2.attempt.v1"
 CONDITION_SCHEMA = "laserperception.m8.s2.condition.v1"
 REPEATABILITY_IDS = tuple(f"s2-repeatability-{index:02d}" for index in range(1, 11))
 FULL_PASS_IDS = ("s2-pass-1", "s2-pass-2", "s2-pass-3")
-SCOPES = frozenset({"qualification-only", "repeatability-only", "full-pass-only"})
+SCOPES = frozenset({"qualification-only", "sizing-only", "repeatability-only", "full-pass-only"})
+SIZING_PLAN_PATH = Path("benchmarks/m8/preregistration/m8_s2_qualification_plan.json")
+SIZING_PLAN_SHA256 = "f3bb7ca94785ccaed71c821ecfa1e9494c9015b7fa87ded51c33c96c51adda5e"
+SIZING_PROCESS_IDS = ("s2-sizing-01", "s2-sizing-02")
 DSVT_GENERATED_VERSION_COMMIT = "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
 DSVT_GENERATED_VERSION = "0.6.0+" + DSVT_GENERATED_VERSION_COMMIT[:7]
 DSVT_GENERATED_FILES = {
@@ -317,6 +320,7 @@ def verify_authorization(
     repeatability_review_sha256: str | None = None,
     repeatability_owner_attestation_sha256: str | None = None,
     campaign_root: Path | None = None,
+    sizing_plan_sha256: str | None = None,
 ) -> None:
     """Require one exact owner-issued scope; scopes never imply one another."""
 
@@ -346,6 +350,12 @@ def verify_authorization(
         "repeatability_review_sha256",
         "repeatability_owner_attestation_sha256",
     }
+    if scope == "sizing-only":
+        required.add("sizing_plan_sha256")
+        if sizing_plan_sha256 != SIZING_PLAN_SHA256:
+            raise M8S2ProtocolViolation("S2 sizing plan binding is absent or differs")
+    elif sizing_plan_sha256 is not None:
+        raise M8S2ProtocolViolation("non-sizing scope cannot bind sizing plan")
     if set(payload) != required or payload.get("schema_version") != AUTHORIZATION_SCHEMA:
         raise M8S2ProtocolViolation("S2 authorization schema differs")
     if payload.get("authorized") is not True or payload.get("owner_approval") is not True:
@@ -368,6 +378,8 @@ def verify_authorization(
         "repeatability_review_sha256": repeatability_review_sha256,
         "repeatability_owner_attestation_sha256": repeatability_owner_attestation_sha256,
     }
+    if scope == "sizing-only":
+        fixed["sizing_plan_sha256"] = sizing_plan_sha256
     if any(payload.get(key) != value for key, value in fixed.items()):
         raise M8S2ProtocolViolation("S2 authorization binding differs")
     if scope == "qualification-only":
@@ -413,7 +425,9 @@ def verify_authorization(
         if (
             not expected_ids
             or len(expected_ids) != len(set(expected_ids))
-            or not set(expected_ids).issubset(logical_pass_ids(mode))
+            or not set(expected_ids).issubset(
+                SIZING_PROCESS_IDS if scope == "sizing-only" else logical_pass_ids(mode)
+            )
         ):
             raise M8S2ProtocolViolation("S2 authorized logical passes differ")
         if logical_pass_id not in expected_ids:
@@ -428,7 +442,7 @@ def verify_authorization(
             repeatability_review_sha256 is None or repeatability_owner_attestation_sha256 is None
         ):
             raise M8S2ProtocolViolation("accepted owner-reviewed repeatability binding is absent")
-        if scope == "repeatability-only" and (
+        if scope in {"repeatability-only", "sizing-only"} and (
             repeatability_review_sha256 is not None
             or repeatability_owner_attestation_sha256 is not None
         ):
