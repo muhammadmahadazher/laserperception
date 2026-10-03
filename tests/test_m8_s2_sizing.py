@@ -268,6 +268,8 @@ def test_incomplete_retry_cannot_splice_or_rerun_complete(
     manifest = json.loads((tmp_path / "failed/manifest.json").read_text())
     assert manifest["status"] == "INCOMPLETE" and manifest["accepted_engineering_calls"] == 0
     assert not (tmp_path / ".sizing.lock").exists()
+    with pytest.raises(M8S2ProtocolViolation, match="fresh OS process"):
+        attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 200, "same-failed-process")
     p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 201, "retry")
     with pytest.raises(M8S2ProtocolViolation, match="fresh OS process"):
         attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 201, "same-process")
@@ -277,6 +279,16 @@ def test_incomplete_retry_cannot_splice_or_rerun_complete(
         aggregate([tmp_path / "failed", p2])
     with pytest.raises(M8S2ProtocolViolation, match="cannot be rerun"):
         attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 203, "rerun")
+    # Even a re-sealed history cannot bless a completed retry using a failed PID.
+    completed = json.loads((p1 / "manifest.json").read_text())
+    completed["process_id"] = 200
+    atomic_write_json(p1 / "manifest.json", completed)
+    claims = json.loads((tmp_path / "sizing-claims.json").read_text())
+    entry = next(e for e in claims["attempts"] if e["attempt"] == p1.name)
+    entry.update(process_id=200, manifest_sha256=sizing.sha256_file(p1 / "manifest.json"))
+    atomic_write_json(tmp_path / "sizing-claims.json", claims)
+    with pytest.raises(M8S2ProtocolViolation, match="history reused"):
+        aggregate([p1, p2])
 
 
 @pytest.mark.parametrize("mutate", ["semantic", "reorder", "truncate", "extra-file", "same-uuid"])

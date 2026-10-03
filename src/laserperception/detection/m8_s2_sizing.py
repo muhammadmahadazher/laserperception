@@ -344,7 +344,7 @@ def run_sizing_attempt(
             _verify_files(old, _json(old / "manifest.json"))
             if entry["status"] == "COMPLETE" and entry["logical_process_id"] == logical_process_id:
                 raise M8S2ProtocolViolation("complete sizing logical process cannot be rerun")
-            if entry["status"] == "COMPLETE" and entry["process_id"] == os.getpid():
+            if entry["process_id"] == os.getpid():
                 raise M8S2ProtocolViolation("sizing requires a fresh OS process")
         attempt_root.mkdir()
         prepared = True
@@ -566,6 +566,7 @@ def _recover_initial_claim(
         or calls != []
         or any(
             e["attempt_id"] == initial["attempt_id"]
+            or e["process_id"] == initial["process_id"]
             or e["status"] not in {"COMPLETE", "INCOMPLETE"}
             or (
                 e["status"] == "COMPLETE"
@@ -796,10 +797,14 @@ def aggregate_sizing(
     records: list[dict[str, Any]] = []
     all_calls: list[dict[str, Any]] = []
     accepted_timed_seconds = 0.0
+    seen_process_ids: set[int] = set()
     for entry in ledger["attempts"]:
         root = _attempt_path(campaign, entry["attempt"])
         manifest = _json(root / "manifest.json")
         _verify_files(root, manifest)
+        if manifest["process_id"] in seen_process_ids:
+            raise M8S2ProtocolViolation("sizing attempt history reused an OS process")
+        seen_process_ids.add(manifest["process_id"])
         if (
             sha256_file(root / "manifest.json") != entry["manifest_sha256"]
             or manifest["status"] != entry["status"]
