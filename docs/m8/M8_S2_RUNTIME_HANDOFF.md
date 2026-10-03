@@ -4,7 +4,10 @@ This is a CPU-only software and planning freeze for future B2/C2/D2/F2 execution
 runtime binding, qualification, inference authorization, detector output, or scientific result.
 The [frozen S2 protocol](M8_S2_PROTOCOL.md), [CPU input freeze](M8_S2_INPUT_FREEZE.md), and
 [machine-readable handoff](../../benchmarks/m8/preregistration/m8_s2_runtime_handoff.json) govern
-the future work. No external worker was contacted for this freeze.
+the future work. No external worker was contacted for the original freeze. The later
+[first external qualification attempt](M8_S2_QUALIFICATION_ATTEMPT_1.md) passed the input gate
+but stopped before runtime-policy capture and qualification; it made zero scientific calls.
+The prospective CPU-only compatibility repair below does not run an external worker.
 
 ## Software and input identities
 
@@ -13,7 +16,10 @@ The execution software and synthetic tests were committed before this handoff, b
 corrections complete at `f62e81be2fa831c28408859e5cc9bf7c2708e891`
 (`S2_EXECUTION_IMPLEMENTATION_COMMIT`). The future runtime must instead bind the **reviewed merged
 execution commit** containing this code.
-That merged identity is not known in this prebilling record. The original S2 input implementation
+The first attempt used merge `b62f4dacc466790257031b3c15fcae4e39254e25`. After the compatibility
+repair is reviewed and merged, future external execution and its fresh qualification-only grant
+must bind that **new reviewed merge**, not the first attempt's commit or grant. The historical
+machine-readable prebilling record is retained unchanged. The original S2 input implementation
 commit remains `bf098b319744f1ec1df08207c1cd93853b1f31ae`.
 
 | Frozen artifact | SHA256 |
@@ -37,6 +43,67 @@ private Drive and verify their recorded hashes; do not make the worker the sole 
 
 ## Future fail-closed sequence
 
+### Setup before billed compilation
+
+Capture the live hostname and sole GPU UUID only inside an owner-authorized external runtime,
+then obtain its fresh qualification-only authorization. Clone the exact reviewed execution merge,
+hydrate/hash the frozen assets, and prepare the pinned Python 3.10 / Torch 2.1.0+cu118 /
+NumPy 1.23.5 / spconv 2.3.8 / torch-scatter 2.1.2+pt21cu118 environment.
+
+Install a **complete CUDA 11.8 development toolkit**, with GCC and G++ 11, before compiling.
+Use NVIDIA's [official CUDA 11.8 installation guidance](https://docs.nvidia.com/cuda/archive/11.8.0/cuda-installation-guide-linux/index.html),
+for example the full `cuda` package from the `nvidia/label/cuda-11.8.0` channel, or the
+official `cuda-toolkit-11-8` package on a supported distribution. These are future installation
+choices, not actions performed by this repair. Compiler-only `cuda-nvcc` plus `cuda-cudart-dev`
+was insufficient. Do not use the base container's CUDA 12.8 headers or silently change Torch.
+
+Set `CUDA_HOME` to that toolkit and `CC=gcc-11`, `CXX=g++-11`. Run the
+[external-only pre-build checker](../../scripts/detection/check_m8_s2_development.py)
+using the same isolated environment Python that will build the extensions:
+
+```sh
+python -I scripts/detection/check_m8_s2_development.py --external-worker \
+  --cuda-home "$CUDA_HOME" --cc "$CC" --cxx "$CXX"
+```
+
+Require exit zero before `setup.py build_ext --inplace`. Preserve the checker JSON or failure
+output. It checks Python/package metadata without importing Torch, nvcc release 11.8,
+matching GCC/G++ 11, readable `cuda.h` with `CUDA_VERSION 11080`, `cuda_runtime.h`,
+`cuda_runtime_api.h`, `cusparse.h`, `cublas_v2.h`, `cusolverDn.h`, and `curand.h`, plus
+readable development-link names `libcudart.so`, `libcusparse.so`, `libcublas.so`,
+`libcusolver.so`, and `libcurand.so` under that toolkit's `lib64` or `lib`.
+Use the toolkit's include/library paths for compilation and loading. The fast static check
+rejects file links that resolve outside the selected toolkit, preventing accidental mixing of
+installation roots. It does not prove ABI compatibility or replace the full build/import gate.
+It performs no
+GPU discovery, model initialization, GT loading, or inference. Never invoke its external
+probe mode on the local CPU workstation; CI uses supplied filesystem/version fixtures.
+
+Build **all seven** pinned upstream extensions and verify their normal imports:
+`iou3d_nms_cuda`, `ioubev_nms_cuda`, `roiaware_pool3d_cuda`, `roipoint_pool3d_cuda`,
+`pointnet2_stack_cuda`, `pointnet2_batch_cuda`, and `ingroup_inds_cuda` in their existing
+`pcdet.ops` locations. Incomplete or failed build products cannot qualify a runtime.
+Disable bytecode writes during setup/import checks, and keep generated build bookkeeping
+outside importable source where appropriate; all arbitrary untracked Python and caches
+remain rejected.
+
+The only permitted generated Python is the regular, non-symlink `pcdet/version.py` in the
+exact pinned DSVT checkout `8cfc2a6f23eed0b10aabcdc4768c60b184357061`. Require exact bytes
+`__version__ = "0.6.0+8cfc2a6"` plus one LF and SHA256
+`e5fcccc8123cb08c0a709b59d7ae2991a662ee9579e4fb9a04a953a857353cdd`.
+The source verifier checks the fixed commit and frozen hash; no moving Git value or arbitrary
+generated Python exception is accepted. Hash every permitted native extension into the live
+policy and reverify that policy before qualification. Native source-shadowing checks remain.
+
+The next-worker order is: live identity → fresh qualification-only grant → exact reviewed
+checkout → hydrate/hash frozen assets → complete development toolkit → pre-build gate →
+complete extension build/import checks → exact generated-version check → native inventory
+hashes → input receipt → fresh runtime policy → GT-blind 28-condition qualification →
+off-worker receipt/hash persistence → **STOP for owner review**. No repeatability, engineering
+sizing, or full pass is included in that qualification-only sequence.
+
+### Qualification and separately authorized later phases
+
 The [S2 runner](../../scripts/detection/run_m8_s2.py) exposes `input-gate`, `runtime-binding`,
 `qualification-plan`, `qualification`, `repeatability`, `full-pass`, and `aggregate` modes.
 Invoke it with isolated Python (`python -I scripts/detection/run_m8_s2.py ...`); the runner
@@ -53,7 +120,8 @@ the detector or loads GT.
    hostname and the sole NVIDIA-SMI-visible GPU UUID before Torch import. Reject multi-GPU
    visibility; policy capture also requires exactly one Torch CUDA device and the same GPU UUID.
    Verify Git HEAD, a clean tracked execution tree, no untracked importable Python source in the
-   repository or pinned upstream checkout, and no project bytecode caches; the runner disables
+   repository or pinned upstream checkout except the exact generated-version contract above,
+   and no project bytecode caches; the runner disables
    new bytecode writes before importing project modules. Verify all frozen identities and the
    streamed full ledger. The
    input-gate receipt is evidence, not inference permission.
@@ -153,5 +221,6 @@ and combined 5,416-call accepted workload with initialization overhead. It repor
 observed minimum/maximum envelopes, not a confidence interval. No future duration or cost is
 measured yet.
 
-Current state: runtime bound **false**; S2 inference authorized **false**; qualification, sizing,
-repeatability, full-corpus inference, and training **unexecuted**. Current S2 detector calls **0**.
+Current state: runtime bound **false**; S2 inference authorized **false**; first qualification
+attempt **blocked**, with no accepted qualification; sizing, repeatability, full-corpus inference,
+and training **unexecuted**. Current S2 detector calls **0**.

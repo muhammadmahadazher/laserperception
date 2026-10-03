@@ -7,6 +7,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Repair S2 external qualification compatibility: narrowly verify the pinned DSVT-generated
+  version file, add a CPU-testable CUDA 11.8 development pre-build gate, and preserve the first
+  blocked qualification attempt. Frozen inputs/science are unchanged; no S2 detector calls occurred.
+
 - Freeze the CPU-only M8 P1-S2 scientific execution path, scoped authorization and runtime-policy
   checks, streamed input gate, atomic attempts, same-runtime CUDA preflight contract, fixed GT-blind
   sizing plan, and deterministic repeatability/full aggregation. No runtime was bound, owner
