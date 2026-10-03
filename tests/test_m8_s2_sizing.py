@@ -496,3 +496,90 @@ def test_interrupted_recovery_requires_dead_original_process(
                 tmp_path, path, execution_commit="f" * 40 if state == "wrong-commit" else COMMIT
             )
         assert (tmp_path / ".sizing.lock").exists()
+
+
+@pytest.mark.parametrize("missing", ["ledger", "manifest", "calls", "directory", "executed"])
+def test_initial_atomic_writes_recover_only_zero_call_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, missing: str
+) -> None:
+    snapshots = []
+
+    def capture(**kwargs: object) -> float:
+        snapshots.append(json.loads((tmp_path / ".sizing.lock").read_text()))
+        return worker(**kwargs)
+
+    path = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 999, work=capture)
+    lock = snapshots[0]
+    initial = lock["bootstrap"]["manifest"]
+    atomic_write_json(path / "manifest.json", initial)
+    atomic_write_json(path / "calls.json", {"calls": []})
+    claims = json.loads((tmp_path / "sizing-claims.json").read_text())
+    claims["attempts"][0].update(status="RUNNING", manifest_sha256=None)
+    atomic_write_json(tmp_path / "sizing-claims.json", claims)
+    atomic_write_json(tmp_path / ".sizing.lock", lock)
+    if missing == "ledger":
+        (tmp_path / "sizing-claims.json").unlink()
+        (tmp_path / ".sizing-claims.json.999.tmp").write_bytes(b'{"attempts":[')
+    elif missing in {"manifest", "calls", "executed"}:
+        name = "manifest" if missing == "manifest" else "calls"
+        (path / f"{name}.json").unlink()
+        (path / f".{name}.json.999.tmp").write_bytes(b'{"partial":')
+        if missing == "executed":
+            atomic_write_json(path / "manifest.json", {**initial, "engineering_calls_started": 1})
+    else:
+        for name in ("manifest.json", "calls.json", "authorization.json"):
+            (path / name).unlink()
+        path.rmdir()
+        claims["attempts"] = []
+        atomic_write_json(tmp_path / "sizing-claims.json", claims)
+    monkeypatch.setattr(sizing.os, "getpid", lambda: 1002)
+    monkeypatch.setattr(sizing.os, "kill", lambda *a: (_ for _ in ()).throw(ProcessLookupError()))
+    if missing == "executed":
+        with pytest.raises(M8S2ProtocolViolation):
+            sizing.seal_interrupted_sizing(tmp_path, path, execution_commit=COMMIT)
+        assert (tmp_path / ".sizing.lock").exists()
+        return
+    receipt = sizing.seal_interrupted_sizing(tmp_path, path, execution_commit=COMMIT)
+    assert receipt["status"] == "INCOMPLETE" and receipt["engineering_calls_completed"] == 0
+    assert receipt["accepted_engineering_calls"] == 0
+    sizing._verify_files(path, receipt)
+    p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 1003, "retry")
+    p2 = attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 1004)
+    assert aggregate([p1, p2])["engineering_calls"] == 36
+
+
+@pytest.mark.parametrize(
+    "target",
+    ["calls", "manifest", "claims", "attempt-extra", "failed-extra", "lock", "existing", "safe"],
+)
+def test_result_output_cannot_damage_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, target: str
+) -> None:
+    paths = [
+        attempt(tmp_path, logical, monkeypatch, 800 + i)
+        for i, logical in enumerate(SIZING_PROCESS_IDS)
+    ]
+    failed = tmp_path / "failed-attempt"
+    failed.mkdir()
+    existing = tmp_path.parent / "existing.json"
+    existing.write_text("preserved")
+    output = {
+        "calls": paths[0] / "calls.json",
+        "manifest": paths[1] / "manifest.json",
+        "claims": tmp_path / "sizing-claims.json",
+        "attempt-extra": paths[0] / "extra.json",
+        "failed-extra": failed / "extra.json",
+        "lock": tmp_path / ".sizing.lock",
+        "existing": existing,
+        "safe": tmp_path / "sizing-result.json",
+    }[target]
+    before = {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    result = aggregate(paths)
+    if target == "safe":
+        sizing.write_sizing_result(output, paths, result)
+        assert json.loads(output.read_text())["engineering_calls"] == 36
+    else:
+        with pytest.raises(M8S2ProtocolViolation):
+            sizing.write_sizing_result(output, paths, result)
+        assert all(p.read_bytes() == data for p, data in before.items())
+        assert existing.read_text() == "preserved"

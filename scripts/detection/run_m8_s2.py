@@ -197,7 +197,7 @@ def main(argv: list[str] | None = None) -> int:
         verify_static_bindings(root, commit)
         if args.usd_per_hour is None:
             raise M8S2ProtocolViolation("sizing aggregation requires actual --usd-per-hour")
-        from laserperception.detection.m8_s2_sizing import aggregate_sizing
+        from laserperception.detection.m8_s2_sizing import aggregate_sizing, write_sizing_result
 
         result = aggregate_sizing(
             args.pass_input,
@@ -205,7 +205,7 @@ def main(argv: list[str] | None = None) -> int:
             execution_commit=commit,
             usd_per_hour=args.usd_per_hour,
         )
-        atomic_write_json(_path(args.output, "--output"), result)
+        write_sizing_result(_path(args.output, "--output"), args.pass_input, result)
         return 0
 
     if args.mode == "aggregate":

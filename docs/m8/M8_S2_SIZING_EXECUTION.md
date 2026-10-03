@@ -83,7 +83,9 @@ original worker, `sizing-seal-interrupted --external-worker --execution-commit <
 INCOMPLETE. A manifest already COMPLETE remains COMPLETE. A live or different worker cannot recover
 that claim. Exact atomic-write temporaries belonging to the verified dead PID are retained and
 hash-accounted without promoting uncommitted bytes into canonical evidence; foreign temporaries
-remain rejected. Persist the recovery before retry. An unrecoverable pre-claim/setup failure must fail
+remain rejected. The lock retains a zero-call bootstrap snapshot so missing first-write canonical
+files can be reconstructed after verified process death; uncommitted timings are never promoted.
+Persist the recovery before retry. An unreadable initial lock or conflicting bootstrap state must fail
 closed and return for owner review.
 
 Mode `sizing-aggregate` is CPU-only. Supply the same reviewed `--execution-commit`, exactly two
@@ -91,7 +93,9 @@ Mode `sizing-aggregate` is CPU-only. Supply the same reviewed `--execution-commi
 worker's CPU at the original authorized campaign path before the final off-worker archive. It checks
 the complete claim history including sealed failures, matching bindings/hashes, distinct PIDs/UUIDs,
 fixed call order, strict nonsemantic schemas and exactly two complete logical processes. Input order
-does not affect deterministic output. Failed attempts contribute no timings.
+does not affect deterministic output. Failed attempts contribute no timings. The output must be a
+new file outside attempt directories; existing files, hidden campaign metadata and the claim ledger
+are rejected before writing, preserving sealed evidence.
 
 The `laserperception.m8.s2.sizing-result.v1` result retains two initialization durations, all 32
 measured observations, observed min/median/max, allocator summaries, and estimator results.

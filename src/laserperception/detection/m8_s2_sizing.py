@@ -6,6 +6,7 @@ runtime and backend doubles. Prediction objects never enter evidence builders.
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 import math
@@ -39,6 +40,7 @@ from laserperception.detection.m8_s2_runtime import (
     SIZING_PROCESS_IDS,
     M8S2ProtocolViolation,
     require_authorization,
+    verify_authorization,
 )
 
 ATTEMPT_SCHEMA = "laserperception.m8.s2.sizing-attempt.v1"
@@ -257,6 +259,29 @@ def run_sizing_attempt(
     if attempt_root.parent != campaign_root or attempt_root.exists() or campaign_root.is_symlink():
         raise M8S2ProtocolViolation("sizing attempt must be new and directly under campaign")
     campaign_root.mkdir(parents=True, exist_ok=True)
+    process_uuid = str(uuid.uuid4())
+    authorization_bytes = authorization_path.read_bytes()
+    manifest: dict[str, Any] = {
+        "schema_version": ATTEMPT_SCHEMA,
+        **bindings,
+        "status": "RUNNING",
+        "logical_process_id": logical_process_id,
+        "attempt_id": attempt_id,
+        "process_uuid": process_uuid,
+        "process_id": os.getpid(),
+        "worker_hostname": socket.gethostname(),
+        "authorization_id": grant["authorization_id"],
+        "authorization_sha256": hashlib.sha256(authorization_bytes).hexdigest(),
+        "initialization_seconds": None,
+        "engineering_calls_completed": 0,
+        "engineering_calls_started": 0,
+        "accepted_engineering_calls": 0,
+        "scientific_calls": 0,
+        "ground_truth_loaded": False,
+        "semantic_predictions_retained": False,
+        "files": {},
+        "failure_type": None,
+    }
     lock = campaign_root / ".sizing.lock"
     lock_fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     os.write(
@@ -266,6 +291,10 @@ def run_sizing_attempt(
                 "process_id": os.getpid(),
                 "hostname": socket.gethostname(),
                 "attempt": attempt_root.name,
+                "bootstrap": {
+                    "manifest": manifest,
+                    "authorization_text": authorization_bytes.decode("utf-8"),
+                },
             }
         ).encode("utf-8"),
     )
@@ -275,7 +304,6 @@ def run_sizing_attempt(
     sealed = False
     claimed = False
     calls: list[dict[str, Any]] = []
-    manifest: dict[str, Any] = {}
     try:
         if ledger_path.exists():
             ledger = _json(ledger_path)
@@ -295,29 +323,7 @@ def run_sizing_attempt(
             if entry["status"] == "COMPLETE" and entry["process_id"] == os.getpid():
                 raise M8S2ProtocolViolation("sizing requires a fresh OS process")
         attempt_root.mkdir()
-        (attempt_root / "authorization.json").write_bytes(authorization_path.read_bytes())
-        process_uuid = str(uuid.uuid4())
-        manifest = {
-            "schema_version": ATTEMPT_SCHEMA,
-            **bindings,
-            "status": "RUNNING",
-            "logical_process_id": logical_process_id,
-            "attempt_id": attempt_id,
-            "process_uuid": process_uuid,
-            "process_id": os.getpid(),
-            "worker_hostname": socket.gethostname(),
-            "authorization_id": grant["authorization_id"],
-            "authorization_sha256": sha256_file(authorization_path),
-            "initialization_seconds": None,
-            "engineering_calls_completed": 0,
-            "engineering_calls_started": 0,
-            "accepted_engineering_calls": 0,
-            "scientific_calls": 0,
-            "ground_truth_loaded": False,
-            "semantic_predictions_retained": False,
-            "files": {},
-            "failure_type": None,
-        }
+        (attempt_root / "authorization.json").write_bytes(authorization_bytes)
         entry = {
             "attempt": attempt_root.name,
             "attempt_id": attempt_id,
@@ -454,6 +460,99 @@ def _attempt_path(campaign: Path, name: str) -> Path:
     return path
 
 
+def _recover_initial_claim(
+    campaign: Path, attempt: Path, lock: Mapping[str, Any], execution_commit: str
+) -> None:
+    """Restore only zero-call bootstrap records, never uncommitted measurements."""
+    bootstrap = lock.get("bootstrap")
+    if bootstrap is None:
+        return  # Older locks require their existing canonical files.
+    initial = bootstrap["manifest"]
+    authorization = bootstrap["authorization_text"].encode("utf-8")
+    bindings = _bindings(
+        execution_commit,
+        initial["runtime_policy_binding_sha256"],
+        initial["input_gate_receipt_sha256"],
+        initial["qualification_receipt_sha256"],
+    )
+    if (
+        any(initial.get(k) != v for k, v in bindings.items())
+        or initial["process_id"] != lock["process_id"]
+        or initial["worker_hostname"] != lock["hostname"]
+        or initial["status"] != "RUNNING"
+        or initial["initialization_seconds"] is not None
+        or initial["engineering_calls_started"] != 0
+        or initial["engineering_calls_completed"] != 0
+        or hashlib.sha256(authorization).hexdigest() != initial["authorization_sha256"]
+    ):
+        raise M8S2ProtocolViolation("sizing initial claim snapshot differs")
+    verify_authorization(
+        json.loads(authorization),
+        scope="sizing-only",
+        execution_commit=execution_commit,
+        logical_pass_id=initial["logical_process_id"],
+        campaign_root=campaign,
+        runtime_policy_sha256=initial["runtime_policy_binding_sha256"],
+        input_gate_receipt_sha256=initial["input_gate_receipt_sha256"],
+        qualification_receipt_sha256=initial["qualification_receipt_sha256"],
+        sizing_plan_sha256=SIZING_PLAN_SHA256,
+    )
+    ledger_path = campaign / "sizing-claims.json"
+    ledger: dict[str, Any] = (
+        _json(ledger_path) if ledger_path.exists() else {"bindings": bindings, "attempts": []}
+    )
+    entries = [e for e in ledger["attempts"] if e["attempt"] == attempt.name]
+    missing = any(not (attempt / n).exists() for n in ("manifest.json", "calls.json"))
+    if not missing and entries:
+        return
+    if ledger["bindings"] != bindings or len(entries) > 1:
+        raise M8S2ProtocolViolation("sizing bootstrap campaign differs")
+    if not ledger_path.exists() and any(p.is_dir() and p != attempt for p in campaign.iterdir()):
+        raise M8S2ProtocolViolation("sizing missing ledger has other attempts")
+    current = _json(attempt / "manifest.json") if (attempt / "manifest.json").exists() else initial
+    calls = _json(attempt / "calls.json")["calls"] if (attempt / "calls.json").exists() else []
+    if (
+        current != initial
+        or calls != []
+        or any(
+            e["attempt_id"] == initial["attempt_id"]
+            or e["status"] not in {"COMPLETE", "INCOMPLETE"}
+            or (
+                e["status"] == "COMPLETE"
+                and e["logical_process_id"] == initial["logical_process_id"]
+            )
+            for e in ledger["attempts"]
+            if e not in entries
+        )
+    ):
+        raise M8S2ProtocolViolation(
+            "sizing bootstrap cannot reconstruct executed or conflicting claim"
+        )
+    attempt.mkdir(exist_ok=True)
+    auth_path = attempt / "authorization.json"
+    if auth_path.exists() and (auth_path.is_symlink() or auth_path.read_bytes() != authorization):
+        raise M8S2ProtocolViolation("sizing bootstrap authorization copy differs")
+    if not auth_path.exists():
+        auth_path.write_bytes(authorization)
+    if not (attempt / "manifest.json").exists():
+        atomic_write_json(attempt / "manifest.json", initial)
+    if not (attempt / "calls.json").exists():
+        atomic_write_json(attempt / "calls.json", {"calls": []})
+    if not entries:
+        ledger["attempts"].append(
+            {
+                "attempt": attempt.name,
+                "attempt_id": initial["attempt_id"],
+                "logical_process_id": initial["logical_process_id"],
+                "process_uuid": initial["process_uuid"],
+                "process_id": initial["process_id"],
+                "status": "RUNNING",
+                "manifest_sha256": None,
+            }
+        )
+        atomic_write_json(ledger_path, ledger)
+
+
 def seal_interrupted_sizing(
     campaign_root: Path, attempt_root: Path, *, execution_commit: str
 ) -> dict[str, Any]:
@@ -472,6 +571,7 @@ def seal_interrupted_sizing(
         pass
     else:
         raise M8S2ProtocolViolation("sizing process remains live or cannot be proven dead")
+    _recover_initial_claim(campaign, attempt, lock, execution_commit)
     ledger = _json(campaign / "sizing-claims.json")
     entries = [e for e in ledger["attempts"] if e["attempt"] == attempt.name]
     if len(entries) != 1:
@@ -531,6 +631,27 @@ def seal_interrupted_sizing(
     atomic_write_json(campaign / "sizing-claims.json", ledger)
     lock_path.unlink()
     return manifest
+
+
+def write_sizing_result(output: Path, roots: Sequence[Path], result: Mapping[str, Any]) -> None:
+    """Write a new result without overwriting any retained campaign evidence."""
+    destination = output.resolve()
+    campaigns = {root.resolve().parent for root in roots}
+    if (
+        output.is_symlink()
+        or destination.exists()
+        or any(
+            destination.is_relative_to(campaign)
+            and (
+                destination.parent != campaign
+                or destination.name.startswith(".")
+                or destination.name == "sizing-claims.json"
+            )
+            for campaign in campaigns
+        )
+    ):
+        raise M8S2ProtocolViolation("sizing output overlaps retained evidence or already exists")
+    atomic_write_json(destination, result)
 
 
 def aggregate_sizing(
