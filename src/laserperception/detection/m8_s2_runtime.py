@@ -166,6 +166,12 @@ def verify_clean_tracked_tree(
         expected = f'__version__ = "{DSVT_GENERATED_VERSION}"\n'.encode("ascii")
         if hashlib.sha256(expected).hexdigest() != DSVT_GENERATED_FILES["pcdet/version.py"]:
             raise M8S2ProtocolViolation("S2 generated-version contract differs")
+        for relative, required_sha in DSVT_GENERATED_FILES.items():
+            generated = root / relative
+            if generated.is_symlink() or generated.parent.is_symlink():
+                raise M8S2ProtocolViolation("S2 generated-version directory or symlink differs")
+            if not generated.is_file() or sha256_file(generated) != required_sha:
+                raise M8S2ProtocolViolation("S2 generated-version bytes differ or file is absent")
     # Include ignored files: an ignored .py can shadow tracked code just as easily.
     untracked = subprocess.run(
         ["git", "ls-files", "--others", "-z", "--", source_subtree],

@@ -92,6 +92,20 @@ def test_wrong_upstream_commit_fails(upstream: Path, monkeypatch: pytest.MonkeyP
         verify_upstream(upstream)
 
 
+def test_missing_generated_version_fails_before_inventory(upstream: Path) -> None:
+    (upstream / "pcdet/version.py").unlink()
+    with pytest.raises(runtime.M8S2ProtocolViolation, match="file is absent"):
+        verify_upstream(upstream)
+
+
+def test_generated_version_must_be_regular_file(upstream: Path) -> None:
+    generated = upstream / "pcdet/version.py"
+    generated.unlink()
+    generated.mkdir()
+    with pytest.raises(runtime.M8S2ProtocolViolation, match="generated-version bytes"):
+        verify_upstream(upstream)
+
+
 def test_tracked_source_change_still_fails(upstream: Path) -> None:
     (upstream / "pcdet/__init__.py").write_bytes(b"changed\n")
     with pytest.raises(runtime.M8S2ProtocolViolation, match="tracked execution tree"):
