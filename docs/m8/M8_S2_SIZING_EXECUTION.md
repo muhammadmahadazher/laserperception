@@ -85,6 +85,8 @@ that claim. Exact atomic-write temporaries belonging to the verified dead PID ar
 hash-accounted without promoting uncommitted bytes into canonical evidence; foreign temporaries
 remain rejected. The lock retains a zero-call bootstrap snapshot so missing first-write canonical
 files can be reconstructed after verified process death; uncommitted timings are never promoted.
+Recovery writer PIDs are registered in the retained lock before evidence writes. If recovery is
+interrupted, a later recovery requires those writers to be dead and retains their temporaries too.
 Persist the recovery before retry. An unreadable initial lock or conflicting bootstrap state must fail
 closed and return for owner review.
 

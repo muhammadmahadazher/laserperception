@@ -269,6 +269,7 @@ def run_sizing_attempt(
         "attempt_id": attempt_id,
         "process_uuid": process_uuid,
         "process_id": os.getpid(),
+        "recovery_process_ids": [],
         "worker_hostname": socket.gethostname(),
         "authorization_id": grant["authorization_id"],
         "authorization_sha256": hashlib.sha256(authorization_bytes).hexdigest(),
@@ -417,6 +418,7 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
         "attempt_id",
         "process_uuid",
         "process_id",
+        "recovery_process_ids",
         "worker_hostname",
         "authorization_id",
         "authorization_sha256",
@@ -434,8 +436,14 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
     if set(manifest) != allowed or (root / "manifest.json").is_symlink():
         raise M8S2ProtocolViolation("sizing manifest schema differs")
     required_files = {"calls.json", "authorization.json"}
+    writers = [manifest["process_id"], *manifest["recovery_process_ids"]]
+    if any(type(pid) is not int or pid <= 0 for pid in writers) or len(set(writers)) != len(
+        writers
+    ):
+        raise M8S2ProtocolViolation("sizing writer identities differ")
     owned_temporaries = {
-        f".{name}.{manifest['process_id']}.tmp"
+        f".{name}.{pid}.tmp"
+        for pid in writers
         for name in ("calls.json", "manifest.json", "sizing-claims.json")
     }
     recorded_files = set(manifest["files"])
@@ -512,7 +520,7 @@ def _recover_initial_claim(
     current = _json(attempt / "manifest.json") if (attempt / "manifest.json").exists() else initial
     calls = _json(attempt / "calls.json")["calls"] if (attempt / "calls.json").exists() else []
     if (
-        current != initial
+        {**current, "recovery_process_ids": []} != initial
         or calls != []
         or any(
             e["attempt_id"] == initial["attempt_id"]
@@ -571,6 +579,24 @@ def seal_interrupted_sizing(
         pass
     else:
         raise M8S2ProtocolViolation("sizing process remains live or cannot be proven dead")
+    recovery_pids = lock.get("recovery_process_ids", [])
+    if not isinstance(recovery_pids, list) or any(
+        type(pid) is not int or pid <= 0 for pid in recovery_pids
+    ):
+        raise M8S2ProtocolViolation("sizing recovery writer inventory differs")
+    for pid in recovery_pids:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise M8S2ProtocolViolation("a sizing recovery writer remains live")
+    # Register the recovery writer before it can create attempt/ledger temporaries.
+    # If this registration write itself is killed, canonical evidence is untouched.
+    dead_writers = [lock["process_id"], *recovery_pids]
+    recovery_pids.append(os.getpid())
+    lock["recovery_process_ids"] = recovery_pids
+    atomic_write_json(lock_path, lock)
     _recover_initial_claim(campaign, attempt, lock, execution_commit)
     ledger = _json(campaign / "sizing-claims.json")
     entries = [e for e in ledger["attempts"] if e["attempt"] == attempt.name]
@@ -589,23 +615,23 @@ def seal_interrupted_sizing(
     # to canonical calls/manifests. An atomic campaign-ledger temp is copied into
     # the sealed attempt too, without deleting its original valuable state.
     owned: dict[str, str] = {}
-    for name in ("calls.json", "manifest.json", "sizing-claims.json"):
-        temporary_name = f".{name}.{lock['process_id']}.tmp"
-        source = (campaign if name == "sizing-claims.json" else attempt) / temporary_name
-        if not source.exists() and not source.is_symlink():
-            continue
-        if source.is_symlink() or not source.is_file():
-            raise M8S2ProtocolViolation("sizing owned atomic temporary is not a regular file")
-        target = attempt / temporary_name
-        if source != target:
-            if target.is_symlink():
-                raise M8S2ProtocolViolation("sizing recovery temporary copy is a symlink")
-            if target.exists() and (
-                target.is_symlink() or sha256_file(target) != sha256_file(source)
-            ):
-                raise M8S2ProtocolViolation("sizing recovery temporary copy differs")
-            target.write_bytes(source.read_bytes())
-        owned[temporary_name] = sha256_file(target)
+    for pid in dead_writers:
+        for name in ("calls.json", "manifest.json", "sizing-claims.json"):
+            temporary_name = f".{name}.{pid}.tmp"
+            source = (campaign if name == "sizing-claims.json" else attempt) / temporary_name
+            if not source.exists() and not source.is_symlink():
+                continue
+            if source.is_symlink() or not source.is_file():
+                raise M8S2ProtocolViolation("sizing owned atomic temporary is not a regular file")
+            target = attempt / temporary_name
+            if source != target:
+                if target.is_symlink():
+                    raise M8S2ProtocolViolation("sizing recovery temporary copy is a symlink")
+                if target.exists() and sha256_file(target) != sha256_file(source):
+                    raise M8S2ProtocolViolation("sizing recovery temporary copy differs")
+                target.write_bytes(source.read_bytes())
+            owned[temporary_name] = sha256_file(target)
+    manifest["recovery_process_ids"] = recovery_pids
     if manifest["status"] == "RUNNING":
         calls = _json(attempt / "calls.json")["calls"]
         manifest.update(
@@ -621,7 +647,7 @@ def seal_interrupted_sizing(
         atomic_write_json(attempt / "manifest.json", manifest)
     elif manifest["status"] not in {"COMPLETE", "INCOMPLETE"}:
         raise M8S2ProtocolViolation("sizing recovery status differs")
-    elif owned:
+    else:
         # A committed COMPLETE manifest keeps its status; only preservation
         # inventory is extended with the dead writer's exact temporary bytes.
         manifest["files"].update(owned)
