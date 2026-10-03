@@ -140,7 +140,9 @@ def _text(value: str | None, name: str) -> str:
 def _external_candidate(root: Path, upstream: Path, checkpoint: Path) -> None:
     # S1's accepted static candidate verifier performs only Git/file checks.
     verify_s1_candidate(root, upstream_root=upstream, checkpoint_path=checkpoint)
-    verify_clean_tracked_tree(upstream, allow_native_extensions=True)
+    verify_clean_tracked_tree(
+        upstream, allow_native_extensions=True, allow_pinned_dsvt_generated_files=True
+    )
     verify_candidate_environment(root, upstream, checkpoint)
 
 

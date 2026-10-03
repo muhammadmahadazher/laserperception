@@ -62,6 +62,11 @@ CONDITION_SCHEMA = "laserperception.m8.s2.condition.v1"
 REPEATABILITY_IDS = tuple(f"s2-repeatability-{index:02d}" for index in range(1, 11))
 FULL_PASS_IDS = ("s2-pass-1", "s2-pass-2", "s2-pass-3")
 SCOPES = frozenset({"qualification-only", "repeatability-only", "full-pass-only"})
+DSVT_GENERATED_VERSION_COMMIT = "8cfc2a6f23eed0b10aabcdc4768c60b184357061"
+DSVT_GENERATED_VERSION = "0.6.0+" + DSVT_GENERATED_VERSION_COMMIT[:7]
+DSVT_GENERATED_FILES = {
+    "pcdet/version.py": "e5fcccc8123cb08c0a709b59d7ae2991a662ee9579e4fb9a04a953a857353cdd"
+}
 
 
 class M8S2ProtocolViolation(ValueError):
@@ -144,13 +149,23 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
 
 
 def verify_clean_tracked_tree(
-    root: Path, *, source_subtree: str = ".", allow_native_extensions: bool = False
+    root: Path,
+    *,
+    source_subtree: str = ".",
+    allow_native_extensions: bool = False,
+    allow_pinned_dsvt_generated_files: bool = False,
 ) -> None:
     """Reject changed tracked files and untracked importable Python source."""
 
     result = subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False)
     if result.returncode != 0:
         raise M8S2ProtocolViolation("S2 tracked execution tree differs from HEAD")
+    if allow_pinned_dsvt_generated_files:
+        if git_head(root) != DSVT_GENERATED_VERSION_COMMIT:
+            raise M8S2ProtocolViolation("S2 generated-file upstream commit differs")
+        expected = f'__version__ = "{DSVT_GENERATED_VERSION}"\n'.encode("ascii")
+        if hashlib.sha256(expected).hexdigest() != DSVT_GENERATED_FILES["pcdet/version.py"]:
+            raise M8S2ProtocolViolation("S2 generated-version contract differs")
     # Include ignored files: an ignored .py can shadow tracked code just as easily.
     untracked = subprocess.run(
         ["git", "ls-files", "--others", "-z", "--", source_subtree],
@@ -170,6 +185,12 @@ def verify_clean_tracked_tree(
                 f"S2 untracked directory or symlink differs from HEAD: {name}"
             )
         if path.suffix in {".py", ".pyc"}:
+            expected_sha = DSVT_GENERATED_FILES.get(path.as_posix())
+            if allow_pinned_dsvt_generated_files and expected_sha is not None:
+                generated = root / path
+                if not generated.is_file() or sha256_file(generated) != expected_sha:
+                    raise M8S2ProtocolViolation("S2 generated-version bytes differ")
+                continue
             raise M8S2ProtocolViolation(f"S2 untracked importable source differs from HEAD: {name}")
         if path.suffix in {".so", ".pyd", ".dll"}:
             if (
