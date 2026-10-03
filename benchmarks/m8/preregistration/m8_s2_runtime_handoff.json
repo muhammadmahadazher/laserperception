@@ -1,7 +1,7 @@
 {
   "schema_version": "laserperception.m8.s2.runtime-handoff.v1",
   "status": "PREBILLING_CPU_ONLY_EXECUTION_SOFTWARE_FROZEN",
-  "s2_execution_implementation_commit": "f99017e60a85eba180b84d41df9dbdeebbd3ffe9",
+  "s2_execution_implementation_commit": "2e74e41c37fc336d6de013f90b494ffa8ecfc198",
   "reviewed_merged_execution_commit": null,
   "bindings": {
     "protocol_sha256": "218ef2dcc03fa4ff75562e02f368f7624f16a4c768b1758147c1d46ac1d9c53d",
@@ -27,6 +27,7 @@
   "execution_environment": {
     "external_worker_only": true,
     "local_gpu_prohibited": true,
+    "isolated_python_required": true,
     "runtime_policy_must_bind": [
       "reviewed merged execution commit", "worker hostname", "GPU name/UUID/VRAM", "driver", "CUDA", "Python",
       "PyTorch", "spconv", "torch-scatter", "NumPy", "DSVT upstream commit",
