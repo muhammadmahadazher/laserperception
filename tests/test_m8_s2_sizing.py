@@ -701,3 +701,82 @@ def test_recovery_cli_output_uses_evidence_guard(
             main(args)
         assert (path / "calls.json").read_text() == "preserved calls"
         assert (tmp_path / "sizing-claims.json").read_text() == "preserved claims"
+
+
+@pytest.mark.parametrize(
+    "failure",
+    ["call-before-replace", "call-after-replace", "manifest", "initial-auth", "initial-ledger"],
+)
+def test_caught_write_interrupt_seals_only_persisted_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    fired = False
+    path = tmp_path / SIZING_PROCESS_IDS[0]
+
+    def write(destination: Path, payload: dict) -> None:
+        nonlocal fired
+        selected = (
+            (
+                destination == path / "calls.json"
+                and payload["calls"]
+                and failure.startswith("call-")
+            )
+            or (
+                destination == path / "manifest.json"
+                and payload.get("initialization_seconds") == 4.0
+                and failure == "manifest"
+            )
+            or (destination == tmp_path / "sizing-claims.json" and failure == "initial-ledger")
+        )
+        if selected and not fired:
+            fired = True
+            if failure == "call-after-replace":
+                atomic_write_json(destination, payload)
+            else:
+                destination.with_name(f".{destination.name}.999.tmp").write_bytes(b'{"partial":')
+            raise KeyboardInterrupt("synthetic caught persistence interruption")
+        atomic_write_json(destination, payload)
+
+    def work(**kwargs: object) -> float:
+        kwargs["on_initialized"](4.0)
+        record = kwargs["record"]
+
+        def started_record(call: dict) -> None:
+            kwargs["on_call_start"]()
+            record(call)
+
+        kwargs["record"] = started_record
+        return worker(**kwargs)
+
+    monkeypatch.setattr(sizing, "atomic_write_json", write)
+    original_replace = sizing.os.replace
+
+    def replace(source: Path, destination: Path) -> None:
+        if destination == path / "authorization.json" and failure == "initial-auth":
+            Path(source).write_bytes(b'{"partial-authorization":')
+            raise KeyboardInterrupt("synthetic initial authorization interruption")
+        original_replace(source, destination)
+
+    monkeypatch.setattr(sizing.os, "replace", replace)
+    with pytest.raises(KeyboardInterrupt):
+        attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 999, work=work)
+    monkeypatch.setattr(sizing, "atomic_write_json", atomic_write_json)
+    monkeypatch.setattr(sizing.os, "replace", original_replace)
+    if failure.startswith("initial-"):
+        assert (tmp_path / ".sizing.lock").exists()
+        monkeypatch.setattr(sizing.os, "getpid", lambda: 1000)
+        monkeypatch.setattr(
+            sizing.os, "kill", lambda *a: (_ for _ in ()).throw(ProcessLookupError())
+        )
+        manifest = sizing.seal_interrupted_sizing(tmp_path, path, execution_commit=COMMIT)
+    else:
+        assert not (tmp_path / ".sizing.lock").exists()
+        manifest = json.loads((path / "manifest.json").read_text())
+    expected_count = 1 if failure == "call-after-replace" else 0
+    assert manifest["status"] == "INCOMPLETE" and manifest["accepted_engineering_calls"] == 0
+    assert manifest["engineering_calls_completed"] == expected_count
+    assert len(json.loads((path / "calls.json").read_text())["calls"]) == expected_count
+    sizing._verify_files(path, manifest)
+    p1 = attempt(tmp_path, SIZING_PROCESS_IDS[0], monkeypatch, 1001, "retry")
+    p2 = attempt(tmp_path, SIZING_PROCESS_IDS[1], monkeypatch, 1002)
+    assert aggregate([p1, p2])["engineering_calls"] == 36

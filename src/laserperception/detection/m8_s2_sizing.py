@@ -63,6 +63,14 @@ CALL_KEYS = frozenset(
 MEMORY_KEYS = frozenset(
     {"torch_allocated_before_bytes", "torch_peak_allocated_bytes", "torch_reserved_after_bytes"}
 )
+TEMPORARY_NAMES = (
+    "calls.json",
+    "manifest.json",
+    "sizing-claims.json",
+    "authorization.json",
+    "sizing-retained-copy",
+    "sizing-failed-manifest",
+)
 
 
 def sizing_plan(root: Path) -> dict[str, Any]:
@@ -317,6 +325,7 @@ def run_sizing_attempt(
     ledger: dict[str, Any] = {"bindings": bindings, "attempts": []}
     sealed = False
     claimed = False
+    prepared = False
     calls: list[dict[str, Any]] = []
     try:
         if ledger_path.exists():
@@ -337,6 +346,7 @@ def run_sizing_attempt(
             if entry["status"] == "COMPLETE" and entry["process_id"] == os.getpid():
                 raise M8S2ProtocolViolation("sizing requires a fresh OS process")
         attempt_root.mkdir()
+        prepared = True
         _atomic_write_bytes(attempt_root / "authorization.json", authorization_bytes)
         entry = {
             "attempt": attempt_root.name,
@@ -355,8 +365,8 @@ def run_sizing_attempt(
 
         def record(call: dict[str, Any]) -> None:
             verify_call(call, len(calls), planned_ids(plan), process_uuid)
+            atomic_write_json(attempt_root / "calls.json", {"calls": [*calls, call]})
             calls.append(call)
-            atomic_write_json(attempt_root / "calls.json", {"calls": calls})
 
         def initialized(seconds: float) -> None:
             manifest["initialization_seconds"] = _number(seconds)
@@ -388,6 +398,9 @@ def run_sizing_attempt(
         raise
     finally:
         if claimed:
+            # Replacement may complete immediately before an interrupt. Count
+            # only the canonical document, never an uncommitted in-memory row.
+            calls = _json(attempt_root / "calls.json")["calls"]
             manifest["engineering_calls_completed"] = len(calls)
             manifest["engineering_calls_started"] = max(
                 manifest["engineering_calls_started"], len(calls)
@@ -395,6 +408,23 @@ def run_sizing_attempt(
             manifest["files"] = {
                 n: sha256_file(attempt_root / n) for n in ("calls.json", "authorization.json")
             }
+            own_manifest_temp = attempt_root / f".manifest.json.{os.getpid()}.tmp"
+            if own_manifest_temp.exists():
+                if own_manifest_temp.is_symlink():
+                    raise M8S2ProtocolViolation("sizing failed manifest temporary is a symlink")
+                # The final canonical-manifest write uses this same PID's temp
+                # name, so preserve its prior bytes under a distinct exact name.
+                _atomic_write_bytes(
+                    attempt_root / f".sizing-failed-manifest.{os.getpid()}.tmp",
+                    own_manifest_temp.read_bytes(),
+                    retained_copy=True,
+                )
+            for name in TEMPORARY_NAMES:
+                temporary = attempt_root / f".{name}.{os.getpid()}.tmp"
+                if name != "manifest.json" and temporary.exists():
+                    if temporary.is_symlink():
+                        raise M8S2ProtocolViolation("sizing failed writer temporary is a symlink")
+                    manifest["files"][temporary.name] = sha256_file(temporary)
             atomic_write_json(attempt_root / "manifest.json", manifest)
             entry.update(
                 status=manifest["status"],
@@ -402,7 +432,7 @@ def run_sizing_attempt(
             )
             atomic_write_json(ledger_path, ledger)
             sealed = True
-        if not claimed or sealed:
+        if (not claimed and not prepared) or sealed:
             lock.unlink()
     return manifest
 
@@ -454,17 +484,7 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
         writers
     ):
         raise M8S2ProtocolViolation("sizing writer identities differ")
-    owned_temporaries = {
-        f".{name}.{pid}.tmp"
-        for pid in writers
-        for name in (
-            "calls.json",
-            "manifest.json",
-            "sizing-claims.json",
-            "authorization.json",
-            "sizing-retained-copy",
-        )
-    }
+    owned_temporaries = {f".{name}.{pid}.tmp" for pid in writers for name in TEMPORARY_NAMES}
     recorded_files = set(manifest["files"])
     if (
         not required_files <= recorded_files
@@ -637,13 +657,7 @@ def seal_interrupted_sizing(
     # the sealed attempt too, without deleting its original valuable state.
     owned: dict[str, str] = {}
     for pid in dead_writers:
-        for name in (
-            "calls.json",
-            "manifest.json",
-            "sizing-claims.json",
-            "authorization.json",
-            "sizing-retained-copy",
-        ):
+        for name in TEMPORARY_NAMES:
             temporary_name = f".{name}.{pid}.tmp"
             source = (campaign if name == "sizing-claims.json" else attempt) / temporary_name
             if not source.exists() and not source.is_symlink():
