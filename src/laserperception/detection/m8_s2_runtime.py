@@ -110,7 +110,7 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     _sha(execution_commit, "execution commit", length=40)
     if git_head(root) != execution_commit:
         raise M8S2ProtocolViolation("S2 execution commit differs from repository HEAD")
-    verify_clean_tracked_tree(root)
+    verify_clean_tracked_tree(root, source_subtree="src/laserperception")
     frozen = (
         (PROTOCOL_PATH, PROTOCOL_SHA256),
         (PROTOCOL_JSON_PATH, PROTOCOL_JSON_SHA256),
@@ -143,12 +143,28 @@ def verify_static_bindings(root: Path, execution_commit: str) -> dict[str, objec
     return {"execution_commit": execution_commit, "input_freeze": freeze}
 
 
-def verify_clean_tracked_tree(root: Path) -> None:
-    """Reject local changes to any tracked source before binding recorded Git HEAD."""
+def verify_clean_tracked_tree(root: Path, *, source_subtree: str = ".") -> None:
+    """Reject changed tracked files and untracked importable Python source."""
 
     result = subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=root, check=False)
     if result.returncode != 0:
         raise M8S2ProtocolViolation("S2 tracked execution tree differs from HEAD")
+    # Include ignored files: an ignored .py can shadow tracked code just as easily.
+    untracked = subprocess.run(
+        ["git", "ls-files", "--others", "-z", "--", source_subtree],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if untracked.returncode != 0:
+        raise M8S2ProtocolViolation("S2 untracked source inventory failed")
+    for name in untracked.stdout.split("\0"):
+        if not name:
+            continue
+        path = Path(name)
+        if path.suffix == ".py" or (path.suffix == ".pyc" and "__pycache__" not in path.parts):
+            raise M8S2ProtocolViolation(f"S2 untracked importable source differs from HEAD: {name}")
 
 
 def verify_frozen_gt_assets(root: Path, date_root: Path) -> None:
@@ -685,6 +701,7 @@ def seal_interrupted_attempt(
         raise M8S2ProtocolViolation("S2 interrupted claim identity differs")
     recovery_path = attempt_root / "interrupted_recovery.json"
     manifest_path = attempt_root / "attempt_manifest.json"
+    backup_path = attempt_root / "attempt_manifest_before_recovery.json"
     if not lock_path.exists():
         recovered = _mapping(recovery_path)
         sealed = _mapping(manifest_path)
@@ -744,6 +761,23 @@ def seal_interrupted_attempt(
                 if recovered_receipt is not None
                 else {"status": "RECOVERED_SEALED_INCOMPLETE", "attempt_id": attempt_id}
             )
+        if not backup_path.exists() and not recovery_path.exists():
+            failed = _mapping(manifest_path)
+            failure_reason = failed.get("failure_reason")
+            if (
+                (attempt_root / "final_pass_manifest.json").exists()
+                or failed.get("mode") != mode
+                or failed.get("logical_pass_id") != logical_pass_id
+                or failed.get("attempt_id") != attempt_id
+                or failed.get("execution_commit") != execution_commit
+                or failed.get("accepted_canonical_calls") != 0
+                or not isinstance(failure_reason, str)
+                or not failure_reason.strip()
+            ):
+                raise M8S2ProtocolViolation("S2 unsealed incomplete attempt differs")
+            seal_incomplete_evidence(attempt_root)
+            lock_path.unlink()
+            return {"status": "RECOVERED_SEALED_INCOMPLETE", "attempt_id": attempt_id}
     if (attempt_root / "final_pass_manifest.json").exists():
         from laserperception.evaluation.m8_s2_aggregation import load_completed_attempt
 
@@ -761,7 +795,6 @@ def seal_interrupted_attempt(
             "result_sha256": complete["result_sha256"],
         }
     attempt_root.mkdir(exist_ok=True)
-    backup_path = attempt_root / "attempt_manifest_before_recovery.json"
     previous_sha: str | None = None
     if manifest_path.exists():
         previous_bytes = manifest_path.read_bytes()

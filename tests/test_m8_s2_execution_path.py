@@ -128,6 +128,8 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
         condition_ids("repeatability")[0], {"condition_id": condition_ids("repeatability")[0]}
     )
     failed = attempt.fail("synthetic failure")
+    # Model a worker exit after the INCOMPLETE manifest write, before its seal.
+    (attempt.root / "incomplete_evidence.json").unlink()
     assert failed["accepted_canonical_calls"] == 0
     assert failed["qualification_receipt_sha256"] == QUALIFICATION
     assert failed["authorization_sha256"] == AUTHORIZATION
@@ -169,6 +171,7 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
     assert recovered["status"] == "RECOVERED_SEALED_INCOMPLETE"
     assert not lock.exists()
     assert not (attempt.root / "interrupted_recovery.json").exists()
+    assert (attempt.root / "incomplete_evidence.json").is_file()
 
 
 def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) -> None:
@@ -677,6 +680,16 @@ def test_tracked_tree_changes_are_rejected_before_binding(tmp_path: Path) -> Non
     tracked.write_text("value = 2\n", encoding="utf-8")
     with pytest.raises(M8S2ProtocolViolation, match="tracked execution tree"):
         verify_clean_tracked_tree(tmp_path)
+    tracked.write_text("value = 1\n", encoding="utf-8")
+    source = tmp_path / "src" / "laserperception"
+    shadow = source / "module" / "__init__.py"
+    shadow.parent.mkdir(parents=True)
+    shadow.write_text("value = 'unreviewed'\n", encoding="utf-8")
+    (tmp_path / ".git" / "info" / "exclude").write_text(
+        "src/laserperception/module/\n", encoding="utf-8"
+    )
+    with pytest.raises(M8S2ProtocolViolation, match="untracked importable source"):
+        verify_clean_tracked_tree(tmp_path, source_subtree="src/laserperception")
 
 
 def test_backend_environment_must_match_checked_paths(
@@ -910,7 +923,7 @@ def test_wrong_commit_protocol_and_ledger_fail_cpu_gate(monkeypatch: pytest.Monk
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     with pytest.raises(M8S2ProtocolViolation, match="execution commit differs"):
         m8_s2_runtime.verify_static_bindings(ROOT, "0" * 40)
-    monkeypatch.setattr(m8_s2_runtime, "verify_clean_tracked_tree", lambda _: None)
+    monkeypatch.setattr(m8_s2_runtime, "verify_clean_tracked_tree", lambda *_, **__: None)
     monkeypatch.setattr(m8_s2_runtime, "PROTOCOL_SHA256", "0" * 64)
     with pytest.raises(M8S2ProtocolViolation, match="frozen S2 identity"):
         m8_s2_runtime.verify_static_bindings(ROOT, commit)
