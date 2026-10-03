@@ -4,11 +4,15 @@
 
 from __future__ import annotations
 
+import sys
+
+if __name__ == "__main__" and not sys.flags.isolated:
+    raise RuntimeError("S2 runner requires isolated Python (-I) before any project imports")
+
 import argparse
 import importlib
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -37,7 +41,9 @@ def _preimport_source_guard(root: Path) -> None:
 
 
 if __name__ == "__main__":
-    _preimport_source_guard(Path(__file__).resolve().parents[2])
+    checkout = Path(__file__).resolve().parents[2]
+    _preimport_source_guard(checkout)
+    sys.path.insert(0, str(checkout / "src"))
 
 import laserperception
 from laserperception.detection.m8_s1_runtime import (

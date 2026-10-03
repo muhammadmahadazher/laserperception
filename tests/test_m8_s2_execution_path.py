@@ -1009,6 +1009,17 @@ def test_runner_rejects_imported_code_outside_reviewed_checkout(
         verify(ROOT)
 
 
+def test_runner_requires_isolated_python_before_project_imports() -> None:
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/detection/run_m8_s2.py"), "qualification-plan"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "requires isolated Python (-I)" in result.stderr
+
+
 def test_unauthorized_cli_never_imports_science_or_torch(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
