@@ -5,11 +5,13 @@ from __future__ import annotations
 import importlib
 import socket
 from collections.abc import Mapping
+from importlib import metadata
 from typing import Any
 
 from laserperception.detection.m8_s1_runtime_policy import (
     capture_runtime_policy as capture_s1_policy,
 )
+from laserperception.detection.m8_s2_bootstrap import REQUIRED_PACKAGES
 from laserperception.detection.m8_s2_runtime import (
     COMPACT_MANIFEST_SHA256,
     FULL_LEDGER_SHA256,
@@ -28,6 +30,12 @@ def capture_runtime_policy(
 ) -> dict[str, object]:
     """Capture a fresh, exact runtime only after the external-worker barrier."""
 
+    try:
+        packages = {name: metadata.version(name) for name in REQUIRED_PACKAGES}
+    except metadata.PackageNotFoundError as error:
+        raise M8S2ProtocolViolation("S2 candidate import package is absent") from error
+    if packages != REQUIRED_PACKAGES:
+        raise M8S2ProtocolViolation("S2 candidate import package versions differ")
     visible_uuid = single_visible_gpu_uuid()
     base = capture_s1_policy(execution_commit, candidate_manifest)
     torch: Any = importlib.import_module("torch")
@@ -39,6 +47,8 @@ def capture_runtime_policy(
     return {
         **base,
         "schema_version": RUNTIME_POLICY_SCHEMA,
+        "torchvision": packages["torchvision"],
+        "candidate_import_packages": packages,
         "worker_hostname": socket.gethostname(),
         "gpu_vram_bytes": vram,
         "s2_protocol_sha256": PROTOCOL_SHA256,

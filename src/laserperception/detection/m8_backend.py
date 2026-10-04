@@ -173,6 +173,20 @@ class DsvtBackend:
 
         return dict(self._identity)
 
+    def initialization_state(self) -> dict[str, object]:
+        """Synchronize and inspect initialized model state without a forward call.
+
+        External runtime only, just like construction. This grants no inference.
+        """
+        model, torch = self._model, self._torch
+        tensors = [*model.parameters(), *model.buffers()]
+        if not tensors or any(t.device != torch.device("cuda:0") for t in tensors):
+            raise RuntimeError("DSVT model tensors are not all on cuda:0")
+        if any(module.training for module in model.modules()):
+            raise RuntimeError("DSVT model is not entirely in eval state")
+        torch.cuda.synchronize(0)
+        return {"model_device": "cuda:0", "model_eval": True, "initialization_complete": True}
+
     def infer(self, points_xyzit: M8PointCloud | np.ndarray, *, sample_id: str) -> DetectionFrame:
         """Run batch-one FP32 inference and return framework-independent detections."""
 

@@ -54,9 +54,9 @@ SENTINELS = (
     "2011_09_26_drive_0091/0000000011",
     "2011_09_26_drive_0091/0000000012",
 )
-AUTHORIZATION_SCHEMA = "laserperception.m8.s2.authorization.v1"
+AUTHORIZATION_SCHEMA = "laserperception.m8.s2.authorization.v2"
 QUALIFICATION_RECEIPT_SCHEMA = "laserperception.m8.s2.qualification-receipt.v1"
-RUNTIME_POLICY_SCHEMA = "laserperception.m8.s2.runtime-policy-binding.v1"
+RUNTIME_POLICY_SCHEMA = "laserperception.m8.s2.runtime-policy-binding.v2"
 ATTEMPT_SCHEMA = "laserperception.m8.s2.attempt.v1"
 CONDITION_SCHEMA = "laserperception.m8.s2.condition.v1"
 REPEATABILITY_IDS = tuple(f"s2-repeatability-{index:02d}" for index in range(1, 11))
@@ -317,6 +317,7 @@ def verify_authorization(
     runtime_policy_sha256: str | None = None,
     input_gate_receipt_sha256: str | None = None,
     qualification_receipt_sha256: str | None = None,
+    candidate_readiness_receipt_sha256: str | None = None,
     repeatability_review_sha256: str | None = None,
     repeatability_owner_attestation_sha256: str | None = None,
     campaign_root: Path | None = None,
@@ -347,6 +348,7 @@ def verify_authorization(
         "runtime_policy_binding_sha256",
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
+        "candidate_readiness_receipt_sha256",
         "repeatability_review_sha256",
         "repeatability_owner_attestation_sha256",
     }
@@ -375,6 +377,7 @@ def verify_authorization(
         "runtime_policy_binding_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "qualification_receipt_sha256": qualification_receipt_sha256,
+        "candidate_readiness_receipt_sha256": candidate_readiness_receipt_sha256,
         "repeatability_review_sha256": repeatability_review_sha256,
         "repeatability_owner_attestation_sha256": repeatability_owner_attestation_sha256,
     }
@@ -397,6 +400,7 @@ def verify_authorization(
                 runtime_policy_sha256,
                 input_gate_receipt_sha256,
                 qualification_receipt_sha256,
+                candidate_readiness_receipt_sha256,
                 repeatability_review_sha256,
                 repeatability_owner_attestation_sha256,
             )
@@ -436,8 +440,10 @@ def verify_authorization(
             runtime_policy_sha256 is None
             or input_gate_receipt_sha256 is None
             or qualification_receipt_sha256 is None
+            or candidate_readiness_receipt_sha256 is None
         ):
             raise M8S2ProtocolViolation("S2 runtime qualification binding is absent")
+        _sha(candidate_readiness_receipt_sha256, "candidate readiness receipt")
         if scope == "full-pass-only" and (
             repeatability_review_sha256 is None or repeatability_owner_attestation_sha256 is None
         ):
@@ -1010,6 +1016,8 @@ def verify_runtime_policy_document(
 ) -> None:
     """Check all frozen and required policy fields before science import."""
 
+    from laserperception.detection.m8_s2_bootstrap import REQUIRED_PACKAGES
+
     upstream = candidate.get("upstream")
     checkpoint = candidate.get("checkpoint")
     if not isinstance(upstream, Mapping) or not isinstance(checkpoint, Mapping):
@@ -1030,6 +1038,13 @@ def verify_runtime_policy_document(
         "s2_input_freeze_sha256": INPUT_FREEZE_SHA256,
         "s2_full_ledger_sha256": FULL_LEDGER_SHA256,
         "s2_compact_manifest_sha256": COMPACT_MANIFEST_SHA256,
+        "torchvision": "0.16.0+cu118",
+        "pytorch_exact_version": "2.1.0+cu118",
+        "cuda_runtime": "11.8",
+        "numpy": "1.23.5",
+        "spconv": "2.3.8",
+        "torch_scatter": "2.1.2+pt21cu118",
+        "candidate_import_packages": REQUIRED_PACKAGES,
     }
     if any(policy.get(key) != value for key, value in exact.items()):
         raise M8S2ProtocolViolation("S2 runtime policy frozen identity differs")

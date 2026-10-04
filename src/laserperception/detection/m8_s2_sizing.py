@@ -249,6 +249,7 @@ def run_sizing_attempt(
     input_gate_receipt_sha256: str,
     qualification_receipt_sha256: str,
     authorization_path: Path,
+    candidate_readiness_receipt_sha256: str,
     attempt_id: str | None = None,
     worker: Callable[..., float] | None = None,
 ) -> dict[str, Any]:
@@ -268,6 +269,7 @@ def run_sizing_attempt(
         runtime_policy_sha256=runtime_policy_sha256,
         input_gate_receipt_sha256=input_gate_receipt_sha256,
         qualification_receipt_sha256=qualification_receipt_sha256,
+        candidate_readiness_receipt_sha256=candidate_readiness_receipt_sha256,
         campaign_root=campaign_root,
         sizing_plan_sha256=SIZING_PLAN_SHA256,
     )
@@ -543,6 +545,9 @@ def _recover_initial_claim(
         runtime_policy_sha256=initial["runtime_policy_binding_sha256"],
         input_gate_receipt_sha256=initial["input_gate_receipt_sha256"],
         qualification_receipt_sha256=initial["qualification_receipt_sha256"],
+        candidate_readiness_receipt_sha256=json.loads(authorization).get(
+            "candidate_readiness_receipt_sha256"
+        ),
         sizing_plan_sha256=SIZING_PLAN_SHA256,
     )
     ledger_path = campaign / "sizing-claims.json"
@@ -833,6 +838,9 @@ def aggregate_sizing(
             runtime_policy_sha256=bindings["runtime_policy_binding_sha256"],
             input_gate_receipt_sha256=bindings["input_gate_receipt_sha256"],
             qualification_receipt_sha256=bindings["qualification_receipt_sha256"],
+            candidate_readiness_receipt_sha256=_json(root / "authorization.json").get(
+                "candidate_readiness_receipt_sha256"
+            ),
             sizing_plan_sha256=SIZING_PLAN_SHA256,
         )
         if manifest["authorization_id"] != grant["authorization_id"] or manifest[

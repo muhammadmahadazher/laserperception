@@ -442,7 +442,7 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
     )
 
     payload = {
-        "schema_version": "laserperception.m8.s2.authorization.v1",
+        "schema_version": "laserperception.m8.s2.authorization.v2",
         "authorized": True,
         "scope": "qualification-only",
         "owner_approval": True,
@@ -462,6 +462,7 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
         "runtime_policy_binding_sha256": None,
         "input_gate_receipt_sha256": None,
         "qualification_receipt_sha256": None,
+        "candidate_readiness_receipt_sha256": None,
         "repeatability_review_sha256": None,
         "repeatability_owner_attestation_sha256": None,
     }
@@ -490,6 +491,7 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
         runtime_policy_binding_sha256=POLICY,
         input_gate_receipt_sha256=RECEIPT,
         qualification_receipt_sha256=RECEIPT,
+        candidate_readiness_receipt_sha256="f" * 64,
     )
     expected = {
         "scope": "repeatability-only",
@@ -498,6 +500,7 @@ def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
         "qualification_receipt_sha256": RECEIPT,
+        "candidate_readiness_receipt_sha256": "f" * 64,
         "campaign_root": tmp_path,
     }
     verify_authorization(payload, **expected)
@@ -571,6 +574,9 @@ def test_policy_rejects_a_different_cuda_visible_gpu_without_importing_torch(
 ) -> None:
     from laserperception.detection import m8_s2_runtime_policy as policy_module
 
+    monkeypatch.setattr(
+        policy_module.metadata, "version", lambda name: policy_module.REQUIRED_PACKAGES[name]
+    )
     monkeypatch.setattr(policy_module, "single_visible_gpu_uuid", lambda: "GPU-synthetic-123")
     monkeypatch.setattr(
         policy_module,
@@ -1064,6 +1070,7 @@ def test_unauthorized_cli_never_imports_science_or_torch(
     monkeypatch.setitem(main.__globals__, "verify_static_bindings", lambda *_: None)
     monkeypatch.setitem(main.__globals__, "verify_input_gate_receipt", lambda *_, **__: RECEIPT)
     monkeypatch.setitem(main.__globals__, "verify_runtime_policy_document", lambda *_, **__: None)
+    monkeypatch.setitem(main.__globals__, "verify_readiness_receipt", lambda *_, **__: "f" * 64)
     monkeypatch.setitem(main.__globals__, "verify_qualification_receipt", lambda *_, **__: "d" * 64)
     monkeypatch.setitem(main.__globals__, "sha256_file", lambda *_: POLICY)
     monkeypatch.setitem(
@@ -1075,7 +1082,7 @@ def test_unauthorized_cli_never_imports_science_or_torch(
     policy.write_text(
         json.dumps(
             {
-                "schema_version": "laserperception.m8.s2.runtime-policy-binding.v1",
+                "schema_version": "laserperception.m8.s2.runtime-policy-binding.v2",
                 "repository_execution_commit": COMMIT,
             }
         )
@@ -1093,6 +1100,8 @@ def test_unauthorized_cli_never_imports_science_or_torch(
         str(tmp_path / "receipt"),
         "--runtime-policy-binding",
         str(policy),
+        "--candidate-readiness-receipt",
+        str(tmp_path / "readiness.json"),
         "--qualification-receipt",
         str(tmp_path / "qualification"),
         "--authorization",
@@ -1143,7 +1152,7 @@ def test_structural_coordinate_contract_with_cpu_mock(
     grant_path.write_text(
         json.dumps(
             {
-                "schema_version": "laserperception.m8.s2.authorization.v1",
+                "schema_version": "laserperception.m8.s2.authorization.v2",
                 "authorized": True,
                 "scope": "qualification-only",
                 "owner_approval": True,
@@ -1163,6 +1172,7 @@ def test_structural_coordinate_contract_with_cpu_mock(
                 "runtime_policy_binding_sha256": None,
                 "input_gate_receipt_sha256": None,
                 "qualification_receipt_sha256": None,
+                "candidate_readiness_receipt_sha256": None,
                 "repeatability_review_sha256": None,
                 "repeatability_owner_attestation_sha256": None,
             }

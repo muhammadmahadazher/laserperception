@@ -173,6 +173,23 @@ def test_complete_development_environment_passes(development: dict[str, object])
     )
 
 
+@pytest.mark.parametrize(
+    "version", [None, "0.16.0", "0.16.0+cpu", "0.16.0+cu121", "0.17.0+cu118", "0.16.0+cu118"]
+)
+def test_torchvision_exact_metadata(development: dict[str, object], version: str | None) -> None:
+    packages = dict(REQUIRED_PACKAGES)
+    if version is None:
+        packages.pop("torchvision")
+    else:
+        packages["torchvision"] = version
+    development["packages"] = packages
+    if version == "0.16.0+cu118":
+        assert verify_development_environment(**development)["complete"] is True  # type: ignore[arg-type]
+    else:
+        with pytest.raises(M8S2BootstrapError, match="torchvision"):
+            verify_development_environment(**development)  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize("relative", ["bin/nvcc", "include/cusparse.h", "lib64/libcusparse.so"])
 def test_missing_development_file_fails(development: dict[str, object], relative: str) -> None:
     root = development["cuda_home"]
