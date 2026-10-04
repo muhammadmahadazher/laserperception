@@ -64,12 +64,16 @@ hostname/GPU UUID, generated version SHA and canonical native inventory SHA. It 
 initialization complete, model device `cuda:0`, eval true, zero inference/engineering/scientific
 calls and GT/evaluator false. No initialization timing or detector output is included.
 
-Prospective S2 authorization and policy schemas are **v2**; historical v1 files remain unchanged.
+Prospective S2 authorization, policy, attempt/condition/claim, sizing-result,
+repeatability-review/owner-attestation and scientific aggregate schemas are **v2**;
+historical v1 files remain unchanged.
 Qualification grants carry a null `candidate_readiness_receipt_sha256` and cannot imply later scope.
 Each separate sizing/repeatability/full-pass grant requires that SHA; runner modes require
 `--candidate-readiness-receipt` and validate its complete identity before accelerator imports.
-Readiness evidence grants no inference permission. The copied sizing grant transitively seals
-the readiness identity through its authorization SHA; recovery/aggregation retain that binding.
+Readiness evidence grants no inference permission. Scientific and sizing claims, attempts,
+condition identities and final aggregates retain the readiness SHA and require it to agree across
+processes. Scientific repeatability review and the separate owner attestation retain the same
+binding. Recovery preserves it; missing, malformed or mixed readiness identities fail closed.
 
 ## Next paid-worker handoff
 

@@ -69,6 +69,7 @@ def _pass(mode: str, index: int) -> dict[str, object]:
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
         "qualification_receipt_sha256": QUALIFICATION,
+        "candidate_readiness_receipt_sha256": "f" * 64,
         "authorization_id": AUTHORIZATION_ID,
         "authorization_sha256": AUTHORIZATION,
         "campaign_origin_root": "/synthetic/campaign",
@@ -120,6 +121,7 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
         AUTHORIZATION,
         str(tmp_path.resolve()),
         "f" * 64,
+        "f" * 64,
     )
     attempt = AtomicAttempt(tmp_path / "attempt", identity)
     with pytest.raises(M8S2ProtocolViolation, match="order"):
@@ -146,6 +148,7 @@ def test_atomic_attempt_failure_is_never_canonical(tmp_path: Path) -> None:
                 "logical_pass_id": "s2-repeatability-01",
                 "execution_commit": COMMIT,
                 "attempts": [{"attempt_id": "attempt-1", "root": str(attempt.root.resolve())}],
+                "candidate_readiness_receipt_sha256": "f" * 64,
             }
         ),
         encoding="utf-8",
@@ -189,6 +192,7 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
                 "runtime_policy_sha256": POLICY,
                 "input_gate_receipt_sha256": RECEIPT,
                 "qualification_receipt_sha256": QUALIFICATION,
+                "candidate_readiness_receipt_sha256": "f" * 64,
                 "authorization_id": AUTHORIZATION_ID,
                 "authorization_sha256": AUTHORIZATION,
             }
@@ -203,13 +207,14 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
     claim_path.write_text(
         json.dumps(
             {
-                "schema_version": "laserperception.m8.s2.pass-claim.v1",
+                "schema_version": "laserperception.m8.s2.pass-claim.v2",
                 "mode": "repeatability",
                 "logical_pass_id": "s2-repeatability-01",
                 "execution_commit": COMMIT,
                 "runtime_policy_sha256": POLICY,
                 "input_gate_receipt_sha256": RECEIPT,
                 "qualification_receipt_sha256": QUALIFICATION,
+                "candidate_readiness_receipt_sha256": "f" * 64,
                 "authorization_id": AUTHORIZATION_ID,
                 "authorization_sha256": AUTHORIZATION,
                 "attempts": [
@@ -249,6 +254,7 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
         AUTHORIZATION,
         str(tmp_path.resolve()),
         hashlib.sha256(claim_path.read_bytes()).hexdigest(),
+        "f" * 64,
     )
     attempt = AtomicAttempt(root, identity)
     for condition_id in condition_ids("repeatability"):
@@ -261,6 +267,7 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
     assert loaded["authorization_id"] == AUTHORIZATION_ID
     assert loaded["authorization_sha256"] == AUTHORIZATION
     assert loaded["qualification_receipt_sha256"] == QUALIFICATION
+    assert loaded["candidate_readiness_receipt_sha256"] == "f" * 64
     assert loaded["campaign_claim_sha256"]
     stale_manifest = json.loads((root / "attempt_manifest.json").read_text(encoding="utf-8"))
     stale_manifest["status"] = "IN_PROGRESS"
@@ -304,6 +311,7 @@ def test_completed_attempt_loader_retains_authorization_chain(tmp_path: Path) ->
                 "runtime_policy_sha256": POLICY,
                 "input_gate_receipt_sha256": RECEIPT,
                 "qualification_receipt_sha256": QUALIFICATION,
+                "candidate_readiness_receipt_sha256": "f" * 64,
                 "authorization_id": AUTHORIZATION_ID,
                 "authorization_sha256": AUTHORIZATION,
             }
@@ -361,6 +369,10 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
     assert result["aggregation_commit"] == COMMIT
     assert result["source_attempts"][0]["authorization_sha256"] == AUTHORIZATION
     assert result["qualification_receipt_sha256"] == QUALIFICATION
+    assert result["candidate_readiness_receipt_sha256"] == "f" * 64
+    assert all(
+        row["candidate_readiness_receipt_sha256"] == "f" * 64 for row in result["source_attempts"]
+    )
     review_path = tmp_path / "machine_review.json"
     review_path.write_text(json.dumps(result), encoding="utf-8")
     review_sha = verify_repeatability_review(
@@ -369,6 +381,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
         runtime_policy_sha256=POLICY,
         input_gate_receipt_sha256=RECEIPT,
         qualification_receipt_sha256=QUALIFICATION,
+        candidate_readiness_receipt_sha256="f" * 64,
     )
     with pytest.raises(M8S2ProtocolViolation, match="receipt differs"):
         verify_repeatability_review(
@@ -377,10 +390,11 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
             qualification_receipt_sha256="0" * 64,
+            candidate_readiness_receipt_sha256="f" * 64,
         )
     attestation_path = tmp_path / "owner_attestation.json"
     attestation = {
-        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v1",
+        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v2",
         "owner_approved": True,
         "approval_id": "synthetic-owner-review",
         "approval_timestamp_utc": "2026-01-01T00:00:00Z",
@@ -390,6 +404,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
         "qualification_receipt_sha256": QUALIFICATION,
+        "candidate_readiness_receipt_sha256": "f" * 64,
     }
     attestation_path.write_text(json.dumps(attestation), encoding="utf-8")
     assert (
@@ -400,6 +415,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
             qualification_receipt_sha256=QUALIFICATION,
+            candidate_readiness_receipt_sha256="f" * 64,
         )
         == hashlib.sha256(attestation_path.read_bytes()).hexdigest()
     )
@@ -412,6 +428,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
             qualification_receipt_sha256=QUALIFICATION,
+            candidate_readiness_receipt_sha256="f" * 64,
         )
     result["owner_reviewed"] = False
     result["source_attempts"][0]["authorization_id"] = "tampered"
@@ -423,6 +440,7 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
             runtime_policy_sha256=POLICY,
             input_gate_receipt_sha256=RECEIPT,
             qualification_receipt_sha256=QUALIFICATION,
+            candidate_readiness_receipt_sha256="f" * 64,
         )
     with pytest.raises(M8S2ProtocolViolation, match="aggregation checkout differs"):
         review_repeatability(passes, aggregation_commit="d" * 40)
@@ -431,6 +449,25 @@ def test_repeatability_requires_ten_exact_processes(tmp_path: Path) -> None:
         review_repeatability(passes)
     with pytest.raises(M8S2ProtocolViolation, match="process count"):
         review_repeatability(passes[:9])
+
+
+@pytest.mark.parametrize("mode,count", [("repeatability", 10), ("full-pass", 3)])
+@pytest.mark.parametrize("change", ["missing", "malformed", "different"])
+def test_scientific_aggregation_requires_same_readiness(mode: str, count: int, change: str) -> None:
+    from laserperception.evaluation.m8_s2_aggregation import validate_attempts
+
+    passes = [_pass(mode, index) for index in range(1, count + 1)]
+    validate_attempts(passes, mode=mode)
+    if change == "missing":
+        for row in passes:
+            row.pop("candidate_readiness_receipt_sha256")
+    elif change == "malformed":
+        for row in passes:
+            row["candidate_readiness_receipt_sha256"] = "invalid"
+    else:
+        passes[1]["candidate_readiness_receipt_sha256"] = "0" * 64
+    with pytest.raises(M8S2ProtocolViolation):
+        validate_attempts(passes, mode=mode)
 
 
 def test_authorization_scopes_fail_closed(tmp_path: Path) -> None:
@@ -610,6 +647,7 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
         "qualification_receipt_sha256": QUALIFICATION,
+        "candidate_readiness_receipt_sha256": "f" * 64,
         "authorization_id": AUTHORIZATION_ID,
         "authorization_sha256": AUTHORIZATION,
     }
@@ -627,6 +665,7 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
                     "qualification_receipt_sha256": QUALIFICATION,
+                    "candidate_readiness_receipt_sha256": "f" * 64,
                     "authorization_id": AUTHORIZATION_ID,
                     "authorization_sha256": AUTHORIZATION,
                 }
@@ -653,6 +692,7 @@ def test_logical_pass_claim_allows_incomplete_retry_but_consumes_success(tmp_pat
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
                     "qualification_receipt_sha256": QUALIFICATION,
+                    "candidate_readiness_receipt_sha256": "f" * 64,
                     "authorization_id": "fresh-retry-grant",
                     "authorization_sha256": "e" * 64,
                 }
@@ -823,6 +863,7 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(
         "runtime_policy_sha256": POLICY,
         "input_gate_receipt_sha256": RECEIPT,
         "qualification_receipt_sha256": QUALIFICATION,
+        "candidate_readiness_receipt_sha256": "f" * 64,
         "authorization_id": AUTHORIZATION_ID,
         "authorization_sha256": AUTHORIZATION,
     }
@@ -840,6 +881,7 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
                     "qualification_receipt_sha256": QUALIFICATION,
+                    "candidate_readiness_receipt_sha256": "f" * 64,
                     "authorization_id": AUTHORIZATION_ID,
                     "authorization_sha256": AUTHORIZATION,
                 }
@@ -896,6 +938,7 @@ def test_interrupted_lock_can_be_sealed_without_scientific_execution(
                     "runtime_policy_sha256": POLICY,
                     "input_gate_receipt_sha256": RECEIPT,
                     "qualification_receipt_sha256": QUALIFICATION,
+                    "candidate_readiness_receipt_sha256": "f" * 64,
                     "authorization_id": AUTHORIZATION_ID,
                     "authorization_sha256": AUTHORIZATION,
                 }
@@ -1360,6 +1403,10 @@ def test_three_pass_aggregation_is_deterministic_and_uses_frozen_partitions() ->
         "attempt-3",
     ]
     assert first["execution_binding"]["qualification_receipt_sha256"] == QUALIFICATION
+    assert first["execution_binding"]["candidate_readiness_receipt_sha256"] == "f" * 64
+    assert all(
+        row["candidate_readiness_receipt_sha256"] == "f" * 64 for row in first["source_attempts"]
+    )
     assert first["source_attempts"][0]["authorization_sha256"] == AUTHORIZATION
     assert first["car_recovery_by_pass"][0]["B2"]["G_car"] == 1.0
     assert first["car_recovery_by_pass"][0]["B2"]["R_gain"] == 1.0

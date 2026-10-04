@@ -44,7 +44,7 @@ from laserperception.detection.m8_s2_runtime import (
     verify_authorization,
 )
 
-ATTEMPT_SCHEMA = "laserperception.m8.s2.sizing-attempt.v1"
+ATTEMPT_SCHEMA = "laserperception.m8.s2.sizing-attempt.v2"
 CALL_KEYS = frozenset(
     {
         "condition_id",
@@ -208,12 +208,15 @@ def measure_calls(
     return initialization
 
 
-def _bindings(commit: str, policy: str, input_sha: str, qualification: str) -> dict[str, object]:
+def _bindings(
+    commit: str, policy: str, input_sha: str, qualification: str, readiness: str
+) -> dict[str, object]:
     return {
         "execution_commit": commit,
         "runtime_policy_binding_sha256": policy,
         "input_gate_receipt_sha256": input_sha,
         "qualification_receipt_sha256": qualification,
+        "candidate_readiness_receipt_sha256": readiness,
         "protocol_sha256": PROTOCOL_SHA256,
         "partitions_sha256": PARTITIONS_SHA256,
         "input_freeze_sha256": INPUT_FREEZE_SHA256,
@@ -260,6 +263,7 @@ def run_sizing_attempt(
         runtime_policy_sha256,
         input_gate_receipt_sha256,
         qualification_receipt_sha256,
+        candidate_readiness_receipt_sha256,
     )
     grant = require_authorization(
         authorization_path,
@@ -477,7 +481,7 @@ def _verify_files(root: Path, manifest: Mapping[str, Any]) -> None:
         "semantic_predictions_retained",
         "files",
         "failure_type",
-        *_bindings("", "", "", ""),
+        *_bindings("", "", "", "", ""),
     }
     if set(manifest) != allowed or (root / "manifest.json").is_symlink():
         raise M8S2ProtocolViolation("sizing manifest schema differs")
@@ -524,6 +528,7 @@ def _recover_initial_claim(
         initial["runtime_policy_binding_sha256"],
         initial["input_gate_receipt_sha256"],
         initial["qualification_receipt_sha256"],
+        initial["candidate_readiness_receipt_sha256"],
     )
     if (
         any(initial.get(k) != v for k, v in bindings.items())
@@ -545,9 +550,7 @@ def _recover_initial_claim(
         runtime_policy_sha256=initial["runtime_policy_binding_sha256"],
         input_gate_receipt_sha256=initial["input_gate_receipt_sha256"],
         qualification_receipt_sha256=initial["qualification_receipt_sha256"],
-        candidate_readiness_receipt_sha256=json.loads(authorization).get(
-            "candidate_readiness_receipt_sha256"
-        ),
+        candidate_readiness_receipt_sha256=initial["candidate_readiness_receipt_sha256"],
         sizing_plan_sha256=SIZING_PLAN_SHA256,
     )
     ledger_path = campaign / "sizing-claims.json"
@@ -825,6 +828,7 @@ def aggregate_sizing(
             bindings["runtime_policy_binding_sha256"],
             bindings["input_gate_receipt_sha256"],
             bindings["qualification_receipt_sha256"],
+            bindings["candidate_readiness_receipt_sha256"],
         ):
             raise M8S2ProtocolViolation("sizing frozen aggregation bindings differ")
         if any(manifest.get(k) != v for k, v in bindings.items()):
@@ -838,9 +842,7 @@ def aggregate_sizing(
             runtime_policy_sha256=bindings["runtime_policy_binding_sha256"],
             input_gate_receipt_sha256=bindings["input_gate_receipt_sha256"],
             qualification_receipt_sha256=bindings["qualification_receipt_sha256"],
-            candidate_readiness_receipt_sha256=_json(root / "authorization.json").get(
-                "candidate_readiness_receipt_sha256"
-            ),
+            candidate_readiness_receipt_sha256=bindings["candidate_readiness_receipt_sha256"],
             sizing_plan_sha256=SIZING_PLAN_SHA256,
         )
         if manifest["authorization_id"] != grant["authorization_id"] or manifest[
@@ -905,7 +907,7 @@ def aggregate_sizing(
     )
     estimates = estimate["estimates"]
     return {
-        "schema_version": "laserperception.m8.s2.sizing-result.v1",
+        "schema_version": "laserperception.m8.s2.sizing-result.v2",
         "status": "ACCEPTED",
         **ledger["bindings"],
         "process_uuids": [r["process_uuid"] for r in ordered],

@@ -450,6 +450,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
         )
         if mode == "full-pass"
         else None
@@ -462,6 +463,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
         )
         if mode == "full-pass" and review_sha is not None
         else None
@@ -550,6 +552,7 @@ def main(argv: list[str] | None = None) -> int:
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
         qualification_receipt_sha256=qualification_sha,
+        candidate_readiness_receipt_sha256=readiness_sha,
         authorization_id=authorization_id,
         authorization_sha256=authorization_sha,
     ):
@@ -562,6 +565,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
             authorization_id=authorization_id,
             authorization_sha256=authorization_sha,
             attempt_root=attempt_root,

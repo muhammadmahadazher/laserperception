@@ -200,6 +200,7 @@ def test_exact_plan_two_processes_and_estimator(
     assert result == aggregate(list(reversed(paths)))
     assert result["measured_call_count"] == 32 and result["warmup_call_count"] == 4
     assert result["engineering_calls"] == 36 and result["scientific_calls"] == 0
+    assert result["candidate_readiness_receipt_sha256"] == "f" * 64
     assert result["initialization_seconds"] == [4.0, 4.0]
     assert 999.0 not in result["measured_call_seconds"]
     assert len(observed[0]["measured_call_seconds"]) == 32
