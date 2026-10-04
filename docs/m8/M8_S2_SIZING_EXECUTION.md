@@ -4,6 +4,11 @@ This CPU-only implementation creates no runtime, real authorization, measurement
 result. [Qualification attempt 2](M8_S2_QUALIFICATION_ATTEMPT_2.md) was accepted historically;
 its A40 worker was deleted. Its policy cannot authorize a future worker.
 
+The later [first sizing attempt](M8_S2_SIZING_ATTEMPT_1.md) failed during initialization with
+zero detector calls. Future execution additionally requires the
+[candidate-readiness receipt](M8_S2_CANDIDATE_READINESS.md) and a v2 sizing-only grant binding
+`candidate_readiness_receipt_sha256`; supply `--candidate-readiness-receipt <receipt>` to sizing.
+
 The unchanged [sizing plan](../../benchmarks/m8/preregistration/m8_s2_qualification_plan.json)
 has SHA256 `f3bb7ca94785ccaed71c821ecfa1e9494c9015b7fa87ded51c33c96c51adda5e`.
 Selection is read from these frozen bytes, never regenerated from detector output.

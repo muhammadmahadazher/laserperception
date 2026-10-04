@@ -81,6 +81,13 @@ accepted 28/28 frozen inputs and both 7/7 same-runtime CUDA coordinate identitie
 its evidence is preserved and the temporary Pod was deleted. This historical policy is not
 portable and no active runtime exists. The [GT-blind sizing execution freeze](m8/M8_S2_SIZING_EXECUTION.md)
 adds a separate future sizing-only scope and two-process/36-call path, with no current execution.
+
+The [first S2 sizing attempt](m8/M8_S2_SIZING_ATTEMPT_1.md) passed fresh structural qualification
+but failed full model initialization because torchvision was absent, with zero engineering or
+scientific calls; its A40 Pod was deleted. The prospective
+[candidate-readiness gate](m8/M8_S2_CANDIDATE_READINESS.md) requires exact package metadata and
+zero-forward full initialization before fresh sizing/repeatability/full-pass authorization.
+No active worker or accepted sizing result exists; S2 scientific execution remains pending.
 A future worker requires fresh binding, qualification and explicit scope-specific authorization.
 S2 detector execution and training have not started.
 

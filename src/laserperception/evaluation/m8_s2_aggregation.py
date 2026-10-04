@@ -18,6 +18,7 @@ from typing import cast
 from laserperception.detection.m8_s1_runtime import canonical_json_sha256, sha256_file
 from laserperception.detection.m8_s2_runtime import (
     ARMS,
+    ATTEMPT_SCHEMA,
     CONDITION_SCHEMA,
     FULL_LEDGER_SHA256,
     FULL_PASS_IDS,
@@ -102,6 +103,7 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
         "runtime_policy_sha256",
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
+        "candidate_readiness_receipt_sha256",
         "full_ledger_sha256",
         "protocol_sha256",
     ):
@@ -120,6 +122,7 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
     for row in passes:
         authorization_sha = row.get("authorization_sha256")
         qualification_sha = row.get("qualification_receipt_sha256")
+        readiness_sha = row.get("candidate_readiness_receipt_sha256")
         claim_sha = row.get("campaign_claim_sha256")
         if (
             not isinstance(row.get("authorization_id"), str)
@@ -128,6 +131,8 @@ def validate_attempts(passes: Sequence[Mapping[str, object]], *, mode: str) -> N
             or re.fullmatch(r"[0-9a-f]{64}", authorization_sha) is None
             or not isinstance(qualification_sha, str)
             or re.fullmatch(r"[0-9a-f]{64}", qualification_sha) is None
+            or not isinstance(readiness_sha, str)
+            or re.fullmatch(r"[0-9a-f]{64}", readiness_sha) is None
             or not isinstance(claim_sha, str)
             or re.fullmatch(r"[0-9a-f]{64}", claim_sha) is None
         ):
@@ -178,12 +183,13 @@ def _verify_campaign_claim(
         "runtime_policy_sha256",
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
+        "candidate_readiness_receipt_sha256",
         "authorization_id",
         "authorization_sha256",
     ):
         if claim.get(key) != manifest.get(key):
             raise M8S2ProtocolViolation(f"S2 campaign claim binding differs: {key}")
-    if claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v1":
+    if claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v2":
         raise M8S2ProtocolViolation("S2 campaign claim schema differs")
     history = _list(claim.get("attempts"), "campaign claim history")
     if not history:
@@ -220,6 +226,7 @@ def _verify_campaign_claim(
                         "runtime_policy_sha256",
                         "input_gate_receipt_sha256",
                         "qualification_receipt_sha256",
+                        "candidate_readiness_receipt_sha256",
                     )
                 },
                 "authorization_id": previous["authorization_id"],
@@ -278,7 +285,13 @@ def load_completed_attempt(
         manifest = json.loads((root / "final_pass_manifest.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise M8S2ProtocolViolation("S2 complete attempt manifest is absent") from error
-    if not isinstance(manifest, dict) or manifest.get("status") != "COMPLETE":
+    if (
+        not isinstance(manifest, dict)
+        or manifest.get("status") != "COMPLETE"
+        or manifest.get("schema_version") != ATTEMPT_SCHEMA
+        or not isinstance(manifest.get("candidate_readiness_receipt_sha256"), str)
+        or re.fullmatch(r"[0-9a-f]{64}", manifest["candidate_readiness_receipt_sha256"]) is None
+    ):
         raise M8S2ProtocolViolation("S2 attempt is incomplete")
     unsigned = dict(manifest)
     digest = unsigned.pop("result_sha256", None)
@@ -331,6 +344,7 @@ def load_completed_attempt(
             "runtime_policy_sha256",
             "input_gate_receipt_sha256",
             "qualification_receipt_sha256",
+            "candidate_readiness_receipt_sha256",
             "authorization_id",
             "authorization_sha256",
             "campaign_origin_root",
@@ -412,7 +426,7 @@ def review_repeatability(
                     )
                 comparisons += 1
     result: dict[str, object] = {
-        "schema_version": "laserperception.m8.s2.repeatability-review.v1",
+        "schema_version": "laserperception.m8.s2.repeatability-review.v2",
         "status": "ACCEPTED",
         "processes": 10,
         "calls_per_process": 28,
@@ -426,6 +440,7 @@ def review_repeatability(
                 "process_uuid": row["process_uuid"],
                 "result_sha256": row["result_sha256"],
                 "qualification_receipt_sha256": row["qualification_receipt_sha256"],
+                "candidate_readiness_receipt_sha256": row["candidate_readiness_receipt_sha256"],
                 "authorization_id": row["authorization_id"],
                 "authorization_sha256": row["authorization_sha256"],
                 "campaign_claim_sha256": row["campaign_claim_sha256"],
@@ -437,6 +452,7 @@ def review_repeatability(
         "runtime_policy_sha256": passes[0]["runtime_policy_sha256"],
         "input_gate_receipt_sha256": passes[0]["input_gate_receipt_sha256"],
         "qualification_receipt_sha256": passes[0]["qualification_receipt_sha256"],
+        "candidate_readiness_receipt_sha256": passes[0]["candidate_readiness_receipt_sha256"],
         "campaign_origin_root": passes[0]["campaign_origin_root"],
         "owner_reviewed": False,
         "full_corpus_authorized": False,
@@ -899,7 +915,7 @@ def aggregate_three_full_passes(
         for arm in ARMS
     }
     output: dict[str, object] = {
-        "schema_version": "laserperception.m8.s2.aggregate.v1",
+        "schema_version": "laserperception.m8.s2.aggregate.v2",
         "status": "COMPLETE_INPUT_EVIDENCE_AGGREGATION",
         "aggregation_commit": aggregation_commit,
         "execution_binding": {
@@ -909,6 +925,7 @@ def aggregate_three_full_passes(
                 "runtime_policy_sha256",
                 "input_gate_receipt_sha256",
                 "qualification_receipt_sha256",
+                "candidate_readiness_receipt_sha256",
                 "full_ledger_sha256",
                 "protocol_sha256",
             )
@@ -920,6 +937,7 @@ def aggregate_three_full_passes(
                 "process_uuid": row["process_uuid"],
                 "result_sha256": row["result_sha256"],
                 "qualification_receipt_sha256": row["qualification_receipt_sha256"],
+                "candidate_readiness_receipt_sha256": row["candidate_readiness_receipt_sha256"],
                 "authorization_id": row["authorization_id"],
                 "authorization_sha256": row["authorization_sha256"],
                 "campaign_claim_sha256": row["campaign_claim_sha256"],

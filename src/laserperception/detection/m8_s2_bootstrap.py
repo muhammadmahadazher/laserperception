@@ -22,9 +22,21 @@ REQUIRED_HEADERS = (
 REQUIRED_LIBRARIES = ("cudart", "cusparse", "cublas", "cusolver", "curand")
 REQUIRED_PACKAGES = {
     "torch": "2.1.0+cu118",
+    "torchvision": "0.16.0+cu118",
     "numpy": "1.23.5",
     "spconv-cu118": "2.3.8",
     "torch-scatter": "2.1.2+pt21cu118",
+    # Eager imports reached by the exact pinned pcdet.models registry.
+    "easydict": "1.13",
+    "PyYAML": "6.0.3",
+    "SharedArray": "3.2.4",
+    "scipy": "1.10.1",
+    "numba": "0.57.1",
+    "scikit-image": "0.21.0",
+    "tqdm": "4.66.5",
+    "packaging": "26.3",
+    "onnx": "1.14.1",
+    "tensorrt": "8.6.1",
 }
 
 

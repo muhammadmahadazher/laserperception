@@ -54,6 +54,7 @@ def grant(root: Path) -> dict:
         "runtime_policy_binding_sha256": POLICY,
         "input_gate_receipt_sha256": INPUT,
         "qualification_receipt_sha256": QUAL,
+        "candidate_readiness_receipt_sha256": "f" * 64,
         "repeatability_review_sha256": None,
         "repeatability_owner_attestation_sha256": None,
         "sizing_plan_sha256": SIZING_PLAN_SHA256,
@@ -68,6 +69,7 @@ def expected(root: Path) -> dict:
         runtime_policy_sha256=POLICY,
         input_gate_receipt_sha256=INPUT,
         qualification_receipt_sha256=QUAL,
+        candidate_readiness_receipt_sha256="f" * 64,
         campaign_root=root,
         sizing_plan_sha256=SIZING_PLAN_SHA256,
     )
@@ -91,6 +93,7 @@ def test_scopes_never_imply_sizing(tmp_path: Path, scope: str) -> None:
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
         "sizing_plan_sha256",
+        "candidate_readiness_receipt_sha256",
     ],
 )
 @pytest.mark.parametrize("value", [None, "0" * 64])
@@ -160,6 +163,7 @@ def attempt(
         runtime_policy_sha256=POLICY,
         input_gate_receipt_sha256=INPUT,
         qualification_receipt_sha256=QUAL,
+        candidate_readiness_receipt_sha256="f" * 64,
         authorization_path=auth,
         worker=work,
     )
@@ -196,6 +200,7 @@ def test_exact_plan_two_processes_and_estimator(
     assert result == aggregate(list(reversed(paths)))
     assert result["measured_call_count"] == 32 and result["warmup_call_count"] == 4
     assert result["engineering_calls"] == 36 and result["scientific_calls"] == 0
+    assert result["candidate_readiness_receipt_sha256"] == "f" * 64
     assert result["initialization_seconds"] == [4.0, 4.0]
     assert 999.0 not in result["measured_call_seconds"]
     assert len(observed[0]["measured_call_seconds"]) == 32
@@ -334,6 +339,8 @@ def test_cli_rejects_before_accelerator_or_scoring_import(
         monkeypatch.setitem(glob, name, lambda *a, **k: None)
     monkeypatch.setitem(glob, "verify_input_gate_receipt", lambda *a, **k: INPUT)
     monkeypatch.setitem(glob, "verify_qualification_receipt", lambda *a, **k: QUAL)
+    monkeypatch.setitem(glob, "verify_readiness_receipt", lambda *a, **k: "f" * 64)
+    monkeypatch.setitem(glob, "verify_preimport_runtime", lambda *a, **k: None)
     monkeypatch.setitem(glob, "sha256_file", lambda *a: POLICY)
 
     def authorization(*args: object, **kw: object) -> dict:
@@ -384,6 +391,7 @@ def test_cli_rejects_before_accelerator_or_scoring_import(
         "input-gate-receipt": tmp_path / "input",
         "runtime-policy-binding": policy,
         "qualification-receipt": tmp_path / "qual",
+        "candidate-readiness-receipt": tmp_path / "readiness",
         "qualification-authorization": tmp_path / "qual-grant",
         "authorization": tmp_path / "grant",
         "upstream-root": tmp_path / "dsvt",

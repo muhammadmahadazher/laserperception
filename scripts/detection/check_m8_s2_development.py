@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""External-only pre-build gate; no Torch import, GPU discovery, or compilation."""
+"""External-only metadata/development gate, including the exact cu118 torchvision.
+
+No Torch import, GPU discovery, or compilation occurs here.
+"""
 
 from __future__ import annotations
 

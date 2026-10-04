@@ -64,6 +64,12 @@ from laserperception.detection.m8_s2_input_gate import (
     write_input_gate_receipt,
 )
 from laserperception.detection.m8_s2_planning import qualification_plan
+from laserperception.detection.m8_s2_readiness import (
+    initialize_candidate,
+    readiness_document,
+    verify_preimport_runtime,
+    verify_readiness_receipt,
+)
 from laserperception.detection.m8_s2_runtime import (
     SIZING_PLAN_SHA256,
     M8S2ProtocolViolation,
@@ -93,6 +99,7 @@ def _parser() -> argparse.ArgumentParser:
             "runtime-binding",
             "qualification-plan",
             "qualification",
+            "candidate-readiness",
             "sizing",
             "sizing-aggregate",
             "sizing-seal-interrupted",
@@ -109,6 +116,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--input-gate-receipt", type=Path)
     parser.add_argument("--runtime-policy-binding", type=Path)
     parser.add_argument("--qualification-receipt", type=Path)
+    parser.add_argument("--candidate-readiness-receipt", type=Path)
     parser.add_argument("--repeatability-review", type=Path)
     parser.add_argument("--repeatability-owner-attestation", type=Path)
     parser.add_argument("--authorization", type=Path)
@@ -182,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         "input-gate",
         "runtime-binding",
         "qualification",
+        "candidate-readiness",
         "sizing",
         "sizing-seal-interrupted",
         "repeatability",
@@ -345,6 +354,57 @@ def main(argv: list[str] | None = None) -> int:
         atomic_write_json(_path(args.output, "--output"), receipt)
         return 0
 
+    if args.mode == "candidate-readiness":
+        # Every CPU/static authorization check precedes policy capture or backend import.
+        grant_path = _path(args.qualification_authorization, "--qualification-authorization")
+        grant = require_authorization(
+            grant_path, scope="qualification-only", execution_commit=commit, logical_pass_id=None
+        )
+        input_sha = verify_input_gate_receipt(
+            _path(args.input_gate_receipt, "--input-gate-receipt"),
+            root=root,
+            ledger=_path(args.full_ledger, "--full-ledger"),
+            execution_commit=commit,
+        )
+        policy_path = _path(args.runtime_policy_binding, "--runtime-policy-binding")
+        policy_sha = sha256_file(policy_path)
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        candidate = json.loads((root / CANDIDATE_MANIFEST_PATH).read_text(encoding="utf-8"))
+        if not isinstance(policy, dict):
+            raise M8S2ProtocolViolation("readiness runtime policy is malformed")
+        qualification_sha = verify_qualification_receipt(
+            _path(args.qualification_receipt, "--qualification-receipt"),
+            execution_commit=commit,
+            runtime_policy_sha256=policy_sha,
+            input_gate_receipt_sha256=input_sha,
+            qualification_authorization_path=grant_path,
+        )
+        expected = readiness_document(
+            execution_commit=commit,
+            input_gate_receipt_sha256=input_sha,
+            runtime_policy_sha256=policy_sha,
+            qualification_receipt_sha256=qualification_sha,
+            policy=policy,
+            candidate=candidate,
+        )
+        if (
+            policy["worker_hostname"] != grant["authorized_worker_hostname"]
+            or policy["gpu_uuid"] != grant["authorized_gpu_uuid"]
+        ):
+            raise M8S2ProtocolViolation("readiness qualification worker differs")
+        upstream = _path(args.upstream_root, "--upstream-root")
+        _external_candidate(root, upstream, _path(args.checkpoint, "--checkpoint"))
+        verify_preimport_runtime(policy, upstream)
+        output = _path(args.output, "--output")
+        if output.exists():
+            raise M8S2ProtocolViolation("readiness output must be fresh")
+        verify_qualification_worker(grant)
+        live_policy = _capture_bound_policy(commit, candidate, upstream)
+        verify_runtime_policy(policy_path, policy_sha, live_policy)
+        receipt = initialize_candidate(root, expected)
+        atomic_write_json(output, receipt)
+        return 0
+
     # From here, every failure must occur before importing the science module.
     mode = args.mode
     logical_pass_id = _text(args.logical_pass_id, "--logical-pass-id")
@@ -374,6 +434,15 @@ def main(argv: list[str] | None = None) -> int:
             args.qualification_authorization, "--qualification-authorization"
         ),
     )
+    readiness_sha = verify_readiness_receipt(
+        _path(args.candidate_readiness_receipt, "--candidate-readiness-receipt"),
+        execution_commit=commit,
+        input_gate_receipt_sha256=input_receipt_sha,
+        runtime_policy_sha256=policy_sha,
+        qualification_receipt_sha256=qualification_sha,
+        policy=bound_policy,
+        candidate=candidate,
+    )
     review_sha = (
         verify_repeatability_review(
             _path(args.repeatability_review, "--repeatability-review"),
@@ -381,6 +450,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
         )
         if mode == "full-pass"
         else None
@@ -393,6 +463,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
         )
         if mode == "full-pass" and review_sha is not None
         else None
@@ -412,6 +483,7 @@ def main(argv: list[str] | None = None) -> int:
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
         qualification_receipt_sha256=qualification_sha,
+        candidate_readiness_receipt_sha256=readiness_sha,
         repeatability_review_sha256=review_sha,
         repeatability_owner_attestation_sha256=attestation_sha,
         campaign_root=campaign_root,
@@ -419,7 +491,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     authorization_sha = sha256_file(authorization_path)
     authorization_id = str(authorization["authorization_id"])
-    if mode == "sizing":
+    if mode in {"sizing", "repeatability", "full-pass"}:
         qualification_grant = require_authorization(
             _path(args.qualification_authorization, "--qualification-authorization"),
             scope="qualification-only",
@@ -437,6 +509,7 @@ def main(argv: list[str] | None = None) -> int:
         _path(args.upstream_root, "--upstream-root"),
         _path(args.checkpoint, "--checkpoint"),
     )
+    verify_preimport_runtime(bound_policy, _path(args.upstream_root, "--upstream-root"))
     if mode != "sizing":
         verify_frozen_gt_assets(root, _path(args.date_root, "--date-root"))
     else:
@@ -463,6 +536,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
             authorization_path=authorization_path,
             attempt_id=attempt_id,
         )
@@ -478,6 +552,7 @@ def main(argv: list[str] | None = None) -> int:
         runtime_policy_sha256=policy_sha,
         input_gate_receipt_sha256=input_receipt_sha,
         qualification_receipt_sha256=qualification_sha,
+        candidate_readiness_receipt_sha256=readiness_sha,
         authorization_id=authorization_id,
         authorization_sha256=authorization_sha,
     ):
@@ -490,6 +565,7 @@ def main(argv: list[str] | None = None) -> int:
             runtime_policy_sha256=policy_sha,
             input_gate_receipt_sha256=input_receipt_sha,
             qualification_receipt_sha256=qualification_sha,
+            candidate_readiness_receipt_sha256=readiness_sha,
             authorization_id=authorization_id,
             authorization_sha256=authorization_sha,
             attempt_root=attempt_root,

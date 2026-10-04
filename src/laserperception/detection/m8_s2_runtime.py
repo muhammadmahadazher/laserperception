@@ -54,11 +54,11 @@ SENTINELS = (
     "2011_09_26_drive_0091/0000000011",
     "2011_09_26_drive_0091/0000000012",
 )
-AUTHORIZATION_SCHEMA = "laserperception.m8.s2.authorization.v1"
+AUTHORIZATION_SCHEMA = "laserperception.m8.s2.authorization.v2"
 QUALIFICATION_RECEIPT_SCHEMA = "laserperception.m8.s2.qualification-receipt.v1"
-RUNTIME_POLICY_SCHEMA = "laserperception.m8.s2.runtime-policy-binding.v1"
-ATTEMPT_SCHEMA = "laserperception.m8.s2.attempt.v1"
-CONDITION_SCHEMA = "laserperception.m8.s2.condition.v1"
+RUNTIME_POLICY_SCHEMA = "laserperception.m8.s2.runtime-policy-binding.v2"
+ATTEMPT_SCHEMA = "laserperception.m8.s2.attempt.v2"
+CONDITION_SCHEMA = "laserperception.m8.s2.condition.v2"
 REPEATABILITY_IDS = tuple(f"s2-repeatability-{index:02d}" for index in range(1, 11))
 FULL_PASS_IDS = ("s2-pass-1", "s2-pass-2", "s2-pass-3")
 SCOPES = frozenset({"qualification-only", "sizing-only", "repeatability-only", "full-pass-only"})
@@ -317,6 +317,7 @@ def verify_authorization(
     runtime_policy_sha256: str | None = None,
     input_gate_receipt_sha256: str | None = None,
     qualification_receipt_sha256: str | None = None,
+    candidate_readiness_receipt_sha256: str | None = None,
     repeatability_review_sha256: str | None = None,
     repeatability_owner_attestation_sha256: str | None = None,
     campaign_root: Path | None = None,
@@ -347,6 +348,7 @@ def verify_authorization(
         "runtime_policy_binding_sha256",
         "input_gate_receipt_sha256",
         "qualification_receipt_sha256",
+        "candidate_readiness_receipt_sha256",
         "repeatability_review_sha256",
         "repeatability_owner_attestation_sha256",
     }
@@ -375,6 +377,7 @@ def verify_authorization(
         "runtime_policy_binding_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "qualification_receipt_sha256": qualification_receipt_sha256,
+        "candidate_readiness_receipt_sha256": candidate_readiness_receipt_sha256,
         "repeatability_review_sha256": repeatability_review_sha256,
         "repeatability_owner_attestation_sha256": repeatability_owner_attestation_sha256,
     }
@@ -397,6 +400,7 @@ def verify_authorization(
                 runtime_policy_sha256,
                 input_gate_receipt_sha256,
                 qualification_receipt_sha256,
+                candidate_readiness_receipt_sha256,
                 repeatability_review_sha256,
                 repeatability_owner_attestation_sha256,
             )
@@ -436,8 +440,10 @@ def verify_authorization(
             runtime_policy_sha256 is None
             or input_gate_receipt_sha256 is None
             or qualification_receipt_sha256 is None
+            or candidate_readiness_receipt_sha256 is None
         ):
             raise M8S2ProtocolViolation("S2 runtime qualification binding is absent")
+        _sha(candidate_readiness_receipt_sha256, "candidate readiness receipt")
         if scope == "full-pass-only" and (
             repeatability_review_sha256 is None or repeatability_owner_attestation_sha256 is None
         ):
@@ -517,6 +523,7 @@ def claim_logical_pass(
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
     qualification_receipt_sha256: str,
+    candidate_readiness_receipt_sha256: str,
     authorization_id: str,
     authorization_sha256: str,
 ) -> Iterator[None]:
@@ -530,6 +537,7 @@ def claim_logical_pass(
     campaign_root = campaign_root.resolve()
     attempt_root = attempt_root.resolve()
     _sha(qualification_receipt_sha256, "qualification receipt", length=64)
+    _sha(candidate_readiness_receipt_sha256, "candidate readiness receipt", length=64)
     _sha(authorization_sha256, "owner authorization", length=64)
     if (
         logical_pass_id not in logical_pass_ids(mode)
@@ -563,13 +571,15 @@ def claim_logical_pass(
             claim = _mapping(claim_path)
             history = claim.get("attempts")
             if (
-                claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v1"
+                claim.get("schema_version") != "laserperception.m8.s2.pass-claim.v2"
                 or claim.get("mode") != mode
                 or claim.get("logical_pass_id") != logical_pass_id
                 or claim.get("execution_commit") != execution_commit
                 or claim.get("runtime_policy_sha256") != runtime_policy_sha256
                 or claim.get("input_gate_receipt_sha256") != input_gate_receipt_sha256
                 or claim.get("qualification_receipt_sha256") != qualification_receipt_sha256
+                or claim.get("candidate_readiness_receipt_sha256")
+                != candidate_readiness_receipt_sha256
                 or not isinstance(history, list)
                 or not history
             ):
@@ -598,6 +608,9 @@ def claim_logical_pass(
                             "runtime_policy_sha256": runtime_policy_sha256,
                             "input_gate_receipt_sha256": input_gate_receipt_sha256,
                             "qualification_receipt_sha256": qualification_receipt_sha256,
+                            "candidate_readiness_receipt_sha256": (
+                                candidate_readiness_receipt_sha256
+                            ),
                         }.items()
                     )
                     or manifest.get("status") != "INCOMPLETE"
@@ -654,13 +667,14 @@ def claim_logical_pass(
         atomic_write_json(
             claim_path,
             {
-                "schema_version": "laserperception.m8.s2.pass-claim.v1",
+                "schema_version": "laserperception.m8.s2.pass-claim.v2",
                 "mode": mode,
                 "logical_pass_id": logical_pass_id,
                 "execution_commit": execution_commit,
                 "runtime_policy_sha256": runtime_policy_sha256,
                 "input_gate_receipt_sha256": input_gate_receipt_sha256,
                 "qualification_receipt_sha256": qualification_receipt_sha256,
+                "candidate_readiness_receipt_sha256": candidate_readiness_receipt_sha256,
                 "authorization_id": authorization_id,
                 "authorization_sha256": authorization_sha256,
                 "attempts": history,
@@ -761,6 +775,7 @@ def seal_interrupted_attempt(
             lock_path.unlink()
             return {"status": "RECOVERED_PRECLAIM", "attempt_id": attempt_id}
     claim = _mapping(claim_path)
+    _sha(claim.get("candidate_readiness_receipt_sha256"), "candidate readiness receipt")
     history = claim.get("attempts")
     if (
         not isinstance(history, list)
@@ -878,6 +893,8 @@ def seal_interrupted_attempt(
             or manifest.get("logical_pass_id") != logical_pass_id
             or manifest.get("attempt_id") != attempt_id
             or manifest.get("execution_commit") != execution_commit
+            or manifest.get("candidate_readiness_receipt_sha256")
+            != claim.get("candidate_readiness_receipt_sha256")
         ):
             raise M8S2ProtocolViolation("S2 interrupted attempt manifest differs")
         if manifest.get("status") == "IN_PROGRESS":
@@ -911,6 +928,7 @@ def seal_interrupted_attempt(
             "runtime_policy_sha256": claim.get("runtime_policy_sha256"),
             "input_gate_receipt_sha256": claim.get("input_gate_receipt_sha256"),
             "qualification_receipt_sha256": claim.get("qualification_receipt_sha256"),
+            "candidate_readiness_receipt_sha256": claim.get("candidate_readiness_receipt_sha256"),
             "authorization_id": claim.get("authorization_id"),
             "authorization_sha256": claim.get("authorization_sha256"),
             "attempted_calls": 0,
@@ -1010,6 +1028,8 @@ def verify_runtime_policy_document(
 ) -> None:
     """Check all frozen and required policy fields before science import."""
 
+    from laserperception.detection.m8_s2_bootstrap import REQUIRED_PACKAGES
+
     upstream = candidate.get("upstream")
     checkpoint = candidate.get("checkpoint")
     if not isinstance(upstream, Mapping) or not isinstance(checkpoint, Mapping):
@@ -1030,6 +1050,13 @@ def verify_runtime_policy_document(
         "s2_input_freeze_sha256": INPUT_FREEZE_SHA256,
         "s2_full_ledger_sha256": FULL_LEDGER_SHA256,
         "s2_compact_manifest_sha256": COMPACT_MANIFEST_SHA256,
+        "torchvision": "0.16.0+cu118",
+        "pytorch_exact_version": "2.1.0+cu118",
+        "cuda_runtime": "11.8",
+        "numpy": "1.23.5",
+        "spconv": "2.3.8",
+        "torch_scatter": "2.1.2+pt21cu118",
+        "candidate_import_packages": REQUIRED_PACKAGES,
     }
     if any(policy.get(key) != value for key, value in exact.items()):
         raise M8S2ProtocolViolation("S2 runtime policy frozen identity differs")
@@ -1158,12 +1185,13 @@ def verify_repeatability_review(
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
     qualification_receipt_sha256: str,
+    candidate_readiness_receipt_sha256: str,
 ) -> str:
     """Verify the unchanged machine-generated ten-process review."""
 
     record = _mapping(path)
     expected = {
-        "schema_version": "laserperception.m8.s2.repeatability-review.v1",
+        "schema_version": "laserperception.m8.s2.repeatability-review.v2",
         "status": "ACCEPTED",
         "processes": 10,
         "calls_per_process": 28,
@@ -1173,6 +1201,7 @@ def verify_repeatability_review(
         "runtime_policy_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "qualification_receipt_sha256": qualification_receipt_sha256,
+        "candidate_readiness_receipt_sha256": candidate_readiness_receipt_sha256,
         "owner_reviewed": False,
         "full_corpus_authorized": False,
     }
@@ -1200,18 +1229,20 @@ def verify_repeatability_owner_attestation(
     runtime_policy_sha256: str,
     input_gate_receipt_sha256: str,
     qualification_receipt_sha256: str,
+    candidate_readiness_receipt_sha256: str,
 ) -> str:
     """Require a separate owner decision bound to the immutable machine review."""
 
     record = _mapping(path)
     expected = {
-        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v1",
+        "schema_version": "laserperception.m8.s2.repeatability-owner-attestation.v2",
         "owner_approved": True,
         "repeatability_review_sha256": review_sha256,
         "execution_commit": execution_commit,
         "runtime_policy_sha256": runtime_policy_sha256,
         "input_gate_receipt_sha256": input_gate_receipt_sha256,
         "qualification_receipt_sha256": qualification_receipt_sha256,
+        "candidate_readiness_receipt_sha256": candidate_readiness_receipt_sha256,
     }
     if any(record.get(key) != value for key, value in expected.items()):
         raise M8S2ProtocolViolation("S2 repeatability owner attestation binding differs")
@@ -1238,6 +1269,7 @@ class AttemptIdentity:
     authorization_sha256: str
     campaign_origin_root: str
     campaign_claim_sha256: str
+    candidate_readiness_receipt_sha256: str
 
     def __post_init__(self) -> None:
         if self.logical_pass_id not in logical_pass_ids(self.mode):
@@ -1254,6 +1286,7 @@ class AttemptIdentity:
             ("runtime policy", self.runtime_policy_sha256),
             ("input receipt", self.input_gate_receipt_sha256),
             ("qualification receipt", self.qualification_receipt_sha256),
+            ("candidate readiness receipt", self.candidate_readiness_receipt_sha256),
             ("owner authorization", self.authorization_sha256),
             ("campaign claim", self.campaign_claim_sha256),
         ):
@@ -1270,6 +1303,7 @@ class AttemptIdentity:
             "runtime_policy_sha256": self.runtime_policy_sha256,
             "input_gate_receipt_sha256": self.input_gate_receipt_sha256,
             "qualification_receipt_sha256": self.qualification_receipt_sha256,
+            "candidate_readiness_receipt_sha256": self.candidate_readiness_receipt_sha256,
             "authorization_id": self.authorization_id,
             "authorization_sha256": self.authorization_sha256,
             "campaign_origin_root": self.campaign_origin_root,

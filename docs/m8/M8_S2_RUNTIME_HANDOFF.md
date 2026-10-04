@@ -13,6 +13,13 @@ temporary A40 that was deleted afterward. Its runtime identity is historical and
 The [separate sizing execution freeze](M8_S2_SIZING_EXECUTION.md) adds the prospective scoped
 36-call engineering path; no active worker, sizing execution or scientific authorization exists.
 
+The later [first sizing attempt](M8_S2_SIZING_ATTEMPT_1.md) qualified structurally but failed
+model initialization before any calls; its worker was deleted. The prospective
+[candidate-readiness contract and next-worker sequence](M8_S2_CANDIDATE_READINESS.md) now govern
+future setup and supersede the earlier dependency list/qualification-only stopping point below
+when the owner separately authorizes qualification plus readiness plus sizing. Prospective S2
+policy/authorization schemas are v2; historical artifacts remain unchanged.
+
 ## Software and input identities
 
 The execution software and synthetic tests were committed before this handoff, beginning at

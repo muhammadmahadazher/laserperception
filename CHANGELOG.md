@@ -7,6 +7,10 @@ All notable changes to LaserPerception are documented here. The project follows
 
 ### Research / M8 measurement
 
+- Require prospective S2 full candidate initialization with a zero-forward readiness receipt
+  before sizing/repeatability/full authorization. Pin torchvision and the audited eager import
+  dependencies; preserve the historical zero-call sizing failure. No GPU or science executed.
+
 - Record the accepted historical S2 qualification on a now-deleted A40 and freeze a separate
   GT-blind sizing-only execution/authorization path for two fresh processes and 36 engineering
   calls, with prediction discard, atomic accounting and existing cost projections. This CPU-only
